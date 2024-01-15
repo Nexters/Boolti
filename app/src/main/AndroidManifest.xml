@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".ui.BooltiApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,7 +16,12 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
+            android:theme="@style/Theme.Boolti" />
+        <activity
+            android:name=".presentation.SplashActivity"
+            android:exported="true"
             android:theme="@style/Theme.Boolti">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

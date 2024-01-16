@@ -1,8 +1,8 @@
 package com.nexters.boolti.presentation
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -36,6 +36,15 @@ class SplashActivity : ComponentActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 },
+                onClickUpdate = {
+                    val playStoreUrl = "http://play.google.com/store/apps/details?id=${BuildConfig.PACKAGE_NAME}"
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse(playStoreUrl)
+                            setPackage("com.android.vending")
+                        }
+                    )
+                },
                 onDismiss = { finish() }
             )
         }
@@ -47,12 +56,13 @@ fun SplashScreen(
     shouldUpdate: Boolean?,
     modifier: Modifier = Modifier,
     onSuccessVersionCheck: () -> Unit,
+    onClickUpdate: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (shouldUpdate) {
             true -> UpdateDialog(
-                onClickUpdate = { Log.d("mangbaam", "SplashScreen: 업데이트 클릭") },
+                onClickUpdate = onClickUpdate,
                 onClickDismiss = onDismiss,
             )
 

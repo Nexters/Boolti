@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nexters.boolti"
+    namespace = libs.versions.packageName.get()
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

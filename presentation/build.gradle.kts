@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.androidx.compose.material3.material3)
     implementation(libs.coil.compose)
 
+    implementation(libs.zxing.android.embedded)
+
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.ui.test.junit4)
     androidTestImplementation(libs.kotest.runner.junit5.jvm)

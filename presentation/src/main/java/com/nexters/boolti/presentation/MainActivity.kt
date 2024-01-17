@@ -43,26 +43,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Composable
-fun KakaoLoginButton() {
-    val localContext = LocalContext.current
-    TextButton(onClick = {
-        UserApiClient.instance.loginWithKakaoTalk(localContext) { token, error ->
-            var keyHash = Utility.getKeyHash(localContext)
-            println("키 해시 : $keyHash")
-            println("로그인")
-            if (error != null) {
-                Log.e("KakaoLoginButton", "로그인 실패", error)
-            }
-            else if (token != null) {
-                Log.i("KakaoLoginButton", "로그인 성공 ${token.accessToken}")
-            }
-        }
-    }) {
-        Text("카카오톡으로 로그인")
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

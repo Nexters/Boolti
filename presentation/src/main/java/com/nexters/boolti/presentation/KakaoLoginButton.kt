@@ -12,12 +12,11 @@ fun KakaoLoginButton() {
     val localContext = LocalContext.current
     TextButton(onClick = {
         UserApiClient.instance.loginWithKakaoTalk(localContext) { token, error ->
-            println("로그인")
             if (error != null) {
+                // TODO 로그인 실패 처리
                 Log.e("KakaoLoginButton", "로그인 실패", error)
-            }
-            else if (token != null) {
-                Log.i("KakaoLoginButton", "로그인 성공 ${token.accessToken}")
+            } else if (token != null) {
+                // TODO token.accessToken를 사용하여 로그인 성공 처리
             }
         }
     }) {

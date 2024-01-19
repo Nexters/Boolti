@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation
+package com.nexters.boolti.presentation.screen.splash
 
 import android.content.Intent
 import android.net.Uri
@@ -17,6 +17,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import com.nexters.boolti.domain.repository.ConfigRepository
+import com.nexters.boolti.presentation.BuildConfig
+import com.nexters.boolti.presentation.screen.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

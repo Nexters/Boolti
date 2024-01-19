@@ -16,11 +16,11 @@
         android:theme="@style/Theme.Boolti"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.screen.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Boolti" />
         <activity
-            android:name=".presentation.SplashActivity"
+            android:name=".presentation.screen.splash.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Boolti">
 

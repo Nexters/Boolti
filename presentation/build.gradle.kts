@@ -15,6 +15,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "PACKAGE_NAME", "\"${libs.versions.packageName.get()}\"")
     }
 
     buildTypes {
@@ -69,6 +70,7 @@ dependencies {
     implementation(platform(libs.andoridx.compose.compose.bom))
     implementation(libs.androidx.compose.material3.material3)
     implementation(libs.coil.compose)
+    api(libs.kakao.login)
 
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.ui.test.junit4)

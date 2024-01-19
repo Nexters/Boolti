@@ -8,7 +8,7 @@ compileSdk = "34"
 targetJvm = "17"
 kotlin = "1.9.21"
 android = "8.2.1"
-ksp = "1.9.10-1.0.13"
+ksp = "1.9.21-1.0.15"
 composeBom = "2023.10.01"
 
 activity-ktx = "1.8.2"
@@ -27,6 +27,7 @@ javax-inject = "1"
 junit = "4.13.2"
 coil = "2.5.0"
 kotlinx-serialization-json = "1.5.1"
+serializationConverter = "1.0.0"
 logging-interceptor = "4.11.0"
 lottie = "6.1.0"
 material = "1.11.0"
@@ -88,6 +89,7 @@ firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx"
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.require = "false" }
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref="kakao"}
+retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android" }

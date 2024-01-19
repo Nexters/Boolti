@@ -57,9 +57,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-    implementation(project(":data"))
-    implementation(project(":presentation"))
+    implementation(projects.domain)
+    implementation(projects.data)
+    implementation(projects.presentation)
 
     implementation(libs.bundles.coroutines)
 

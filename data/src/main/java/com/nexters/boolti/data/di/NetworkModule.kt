@@ -25,11 +25,19 @@ import javax.inject.Singleton
 object NetworkModule {
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(BuildConfig.BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .build()
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val json = Json {
+            isLenient = true
+            prettyPrint = true
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
 
     @Singleton
     @Provides

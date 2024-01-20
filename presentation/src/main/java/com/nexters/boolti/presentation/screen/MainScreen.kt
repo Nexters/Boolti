@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -21,11 +22,22 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+
     Scaffold(
-        bottomBar = { BottomNav(navController = navController) }
+        bottomBar = {
+            if (bottomNavVisibleScreens.contains(currentDestination(navController)?.route)) {
+                BottomNav(navController = navController)
+            }
+        }
     ) { innerPadding ->
         BottomNavGraph(navController = navController, modifier = Modifier.padding(innerPadding))
     }
+}
+
+@Composable
+fun currentDestination(navController: NavController): NavDestination? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.destination
 }
 
 @Composable
@@ -35,14 +47,11 @@ fun BottomNav(navController: NavHostController) {
         BottomNavScreen.Tickets,
         BottomNavScreen.My,
     )
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
     BottomNavigation {
         screens.forEach { screen ->
             AddItem(
                 screen = screen,
-                currentDestination = currentDestination,
+                currentDestination = currentDestination(navController),
                 navController = navController
             )
         }

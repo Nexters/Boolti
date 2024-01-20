@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.theme
+package com.nexters.boolti.presentation.theme
 
 import android.app.Activity
 import android.os.Build

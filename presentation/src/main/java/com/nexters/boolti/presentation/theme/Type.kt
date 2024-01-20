@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.theme
+package com.nexters.boolti.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

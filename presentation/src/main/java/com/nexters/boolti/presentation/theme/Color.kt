@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.theme
+package com.nexters.boolti.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

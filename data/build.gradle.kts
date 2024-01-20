@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.bundles.coroutines)
 
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
 
     implementation(libs.bundles.network)

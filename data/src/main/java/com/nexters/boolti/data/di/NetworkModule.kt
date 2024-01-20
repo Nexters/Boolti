@@ -5,7 +5,7 @@ import com.nexters.boolti.data.BuildConfig
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.network.ApiService
 import com.nexters.boolti.data.network.AuthAuthenticator
-import com.nexters.boolti.data.network.AuthDataSource
+import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.network.AuthInterceptor
 import dagger.Module
 import dagger.Provides

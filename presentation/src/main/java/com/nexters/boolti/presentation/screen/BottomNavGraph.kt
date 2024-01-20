@@ -38,7 +38,11 @@ val bottomNavVisibleScreens = hashSetOf(
 )
 
 @Composable
-fun BottomNavGraph(navController: NavHostController, modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
+fun BottomNavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel()
+) {
     val loggedIn by viewModel.loggedIn.collectAsState()
     NavHost(
         navController = navController,
@@ -69,7 +73,11 @@ fun BottomNavGraph(navController: NavHostController, modifier: Modifier = Modifi
             }
         }
         composable(route = "login") {
-            LoginScreen()
+            if (loggedIn == true && navController.currentDestination?.route == "login") {
+                navController.popBackStack()
+            } else {
+                LoginScreen()
+            }
         }
     }
 }

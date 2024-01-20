@@ -1,3 +1,9 @@
 package com.nexters.boolti.domain.request
 
-data class LoginRequest(val idToken: String)
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LoginRequest(
+    @SerialName("idToken") val token: String
+)

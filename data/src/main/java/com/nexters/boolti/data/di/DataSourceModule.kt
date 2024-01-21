@@ -1,10 +1,15 @@
 package com.nexters.boolti.data.di
 
+import android.content.Context
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
+import com.nexters.boolti.data.datasource.TokenDataSource
+import com.nexters.boolti.data.network.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -13,7 +18,17 @@ import javax.inject.Singleton
 object DataSourceModule {
     @Singleton
     @Provides
-    fun provideRemoteConfigDataSource(remoteConfig: FirebaseRemoteConfig): RemoteConfigDataSource {
-        return RemoteConfigDataSource(remoteConfig)
-    }
+    fun provideRemoteConfigDataSource(remoteConfig: FirebaseRemoteConfig): RemoteConfigDataSource =
+        RemoteConfigDataSource(remoteConfig)
+
+    @Singleton
+    @Provides
+    fun provideAuthDataSource(
+        @ApplicationContext context: Context,
+        apiService: ApiService,
+    ): AuthDataSource = AuthDataSource(context, apiService)
+
+    @Singleton
+    @Provides
+    fun provideTokenDataSource(@ApplicationContext context: Context): TokenDataSource = TokenDataSource(context)
 }

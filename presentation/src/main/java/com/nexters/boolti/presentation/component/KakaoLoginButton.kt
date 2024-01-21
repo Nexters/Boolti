@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation
+package com.nexters.boolti.presentation.component
 
 import android.util.Log
 import androidx.compose.material3.Text

@@ -20,7 +20,7 @@ class TokenDataSource @Inject constructor(
         get() = dataStore.data
 
     fun getAccessToken(): String = runBlocking {
-        data.single().accessToken
+        data.first().accessToken
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network
 
+import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import okhttp3.Authenticator
 import okhttp3.Request

@@ -1,0 +1,5 @@
+<resources>
+    <string name="menu_show">홈</string>
+    <string name="menu_tickets">티켓내역</string>
+    <string name="menu_my">마이페이지</string>
+</resources>

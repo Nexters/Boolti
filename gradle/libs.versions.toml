@@ -20,9 +20,10 @@ navigationCompose = "2.7.6"
 core-ktx = "1.12.0"
 datastore = "1.0.0"
 espresso = "3.5.1"
-firebase-bom = "32.7.0"
+firebase-bom = "32.7.1"
 coroutines = "1.7.3"
 hilt = "2.50"
+hiltNavigationCompose = "1.1.0"
 javax-inject = "1"
 junit = "4.13.2"
 coil = "2.5.0"
@@ -31,6 +32,7 @@ serializationConverter = "1.0.0"
 logging-interceptor = "4.11.0"
 lottie = "6.1.0"
 material = "1.11.0"
+androidx-material = "1.5.4"
 retrofit = "2.9.0"
 room = "2.6.1"
 google-services = "4.4.0"
@@ -38,6 +40,7 @@ firebase-crashlytics = "2.9.9"
 firebase-config = "21.6.0"
 kotest = "5.8.0"
 kakao = "2.19.0"
+timber = "5.0.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-ktx" }
@@ -45,6 +48,7 @@ androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-material" }
 androidx-compose-material3-material3 = { module = "androidx.compose.material3:material3" }
 andoridx-compose-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-ui-ui = { module = "androidx.compose.ui:ui", version.require = "false" }
@@ -56,6 +60,7 @@ androidx-compose-ui-ui-test-manifest = { module = "androidx.compose.ui:ui-test-m
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
@@ -88,8 +93,9 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.require = "false" }
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.require = "false" }
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config" }
-kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref="kakao"}
+kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android" }
@@ -110,3 +116,4 @@ network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
 firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
+compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview"]

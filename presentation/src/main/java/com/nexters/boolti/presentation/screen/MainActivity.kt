@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             BooltiTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    MainScreen()
+                    Main()
                 }
             }
         }

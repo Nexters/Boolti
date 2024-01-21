@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.AuthRepository
@@ -9,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +23,7 @@ class LoginViewModel @Inject constructor(
             authRepository.kakaoLogin(LoginRequest("")).onSuccess {
                 if (it) event(LoginEvent.Success) else event(LoginEvent.RequireSignUp)
             }.onFailure {
-                Log.d("mangbaam_LoginViewModel", "login failed: $it")
+                Timber.tag("mangbaam_LoginViewModel").d("login failed: $it")
                 event(LoginEvent.Invalid)
             }
         }

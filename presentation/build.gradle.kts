@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.coil.compose)
     api(libs.kakao.login)
 
+    implementation(libs.timber)
+
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.ui.test.junit4)

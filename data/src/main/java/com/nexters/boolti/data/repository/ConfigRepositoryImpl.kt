@@ -1,11 +1,11 @@
 package com.nexters.boolti.data.repository
 
-import android.util.Log
 import com.nexters.boolti.data.BuildConfig
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
 import com.nexters.boolti.domain.repository.ConfigRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class ConfigRepositoryImpl @Inject constructor(
@@ -18,11 +18,11 @@ class ConfigRepositoryImpl @Inject constructor(
                 val currentVersion = BuildConfig.APP_VERSION
                 emit(checkMinVersion(currentVersion, minVersion))
             } ?: run {
-                Log.d("mangbaam_ConfigRepositoryImpl", "shouldUpdate: min version 가져오기 실패")
+                Timber.tag("mangbaam_ConfigRepositoryImpl").d("shouldUpdate: min version 가져오기 실패")
                 emit(false)
             }
         } else {
-            Log.d("mangbaam_ConfigRepositoryImpl", "shouldUpdate: 업데이트 필요 X")
+            Timber.tag("mangbaam_ConfigRepositoryImpl").d("shouldUpdate: 업데이트 필요 X")
             emit(false)
         }
     }
@@ -35,7 +35,7 @@ class ConfigRepositoryImpl @Inject constructor(
          * @return true 이면 업데이트 필요
          */
         fun checkMinVersion(currentVersion: String, minVersion: String): Boolean {
-            Log.d("mangbaam_ConfigRepositoryImpl", "checkMinVersion: current: $currentVersion, min: $minVersion")
+            Timber.tag("mangbaam_ConfigRepositoryImpl").d("checkMinVersion: current: $currentVersion, min: $minVersion")
             if (!Regex("""^\d+\.\d+(\.\d+)?$""").matches(currentVersion)) return false
             if (!Regex("""^\d+\.\d+(\.\d+)?$""").matches(minVersion)) return false
 

@@ -14,7 +14,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
@@ -55,7 +54,9 @@ fun BottomNavGraph(
         composable(route = BottomNavScreen.Tickets.route) {
             if (loggedIn == false) {
                 navController.navigate("login") {
-                    popUpTo(BottomNavScreen.Home.route)
+                    popUpTo(BottomNavScreen.Tickets.route) {
+                        inclusive = true
+                    }
                     launchSingleTop = true
                 }
             } else {
@@ -65,7 +66,9 @@ fun BottomNavGraph(
         composable(route = BottomNavScreen.My.route) {
             if (loggedIn == false) {
                 navController.navigate("login") {
-                    popUpTo(BottomNavScreen.Home.route)
+                    popUpTo(BottomNavScreen.My.route) {
+                        inclusive = true
+                    }
                     launchSingleTop = true
                 }
             } else {

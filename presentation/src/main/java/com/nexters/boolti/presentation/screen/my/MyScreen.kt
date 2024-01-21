@@ -1,8 +1,6 @@
 package com.nexters.boolti.presentation.screen.my
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,11 +11,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun MyScreen(
-    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel()) {
     Box(
-        modifier = modifier.padding(contentPadding),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         Button(onClick = { viewModel.logout() }) {

@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.home
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -67,7 +68,6 @@ fun HomeScreen(
                 route = Destination.Show.route,
             ) {
                 ShowScreen(
-                    contentPadding = innerPadding,
                     modifier = modifier,
                 )
             }
@@ -75,16 +75,14 @@ fun HomeScreen(
                 route = Destination.Ticket.route,
             ) {
                 TicketScreen(
-                    contentPadding = innerPadding,
-                    modifier = modifier,
+                    modifier = modifier.padding(innerPadding),
                 )
             }
             composable(
                 route = Destination.My.route,
             ) {
                 MyScreen(
-                    contentPadding = innerPadding,
-                    modifier = modifier,
+                    modifier = modifier.padding(innerPadding),
                 )
             }
         }

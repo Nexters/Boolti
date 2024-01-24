@@ -26,7 +26,7 @@ import com.nexters.boolti.presentation.icons.iconpack.Kakaotalk
 import com.nexters.boolti.presentation.theme.Grey95
 
 @Composable
-fun KakaoLoginButton() {
+fun KakaoLoginButton(modifier: Modifier = Modifier) {
     val localContext = LocalContext.current
     TextButton(
         onClick = {
@@ -39,8 +39,8 @@ fun KakaoLoginButton() {
                 }
             }
         },
-        modifier = Modifier
-            .padding(20.dp)
+        modifier = modifier
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(48.dp),
         shape = RoundedCornerShape(4.dp),

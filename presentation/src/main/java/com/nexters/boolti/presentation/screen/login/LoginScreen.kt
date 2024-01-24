@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.login
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,8 +53,17 @@ fun LoginScreen(
             modifier = modifier.padding(innerPadding),
             contentAlignment = Alignment.Center,
         ) {
-            Column {
-                KakaoLoginButton()
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text("불티나게 팔리는 티켓, 불티", style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    "지금 불티에서 티켓을 불티나게 팔아보세요!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+                KakaoLoginButton(modifier = Modifier.padding(top = 48.dp))
             }
         }
     }

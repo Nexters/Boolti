@@ -20,13 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.KakaoLoginButton
-import com.nexters.boolti.presentation.icons.IconPack
-import com.nexters.boolti.presentation.icons.iconpack.ArrowBack
 
 @Composable
 fun LoginScreen(
@@ -97,7 +96,7 @@ private fun LoginAppBar(
         ) {
             IconButton(onClick = onBackPressed) {
                 Icon(
-                    imageVector = IconPack.ArrowBack,
+                    painter = painterResource(R.drawable.ic_arrow_back),
                     contentDescription = "뒤로가기",
                     modifier
                         .padding(start = marginHorizontal, top = 10.dp, end = 4.dp, bottom = 10.dp)

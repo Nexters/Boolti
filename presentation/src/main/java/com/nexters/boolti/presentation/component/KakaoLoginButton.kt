@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -18,13 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kakao.sdk.user.UserApiClient
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.icons.IconPack
-import com.nexters.boolti.presentation.icons.iconpack.Kakaotalk
 import com.nexters.boolti.presentation.theme.Grey95
 
 @Composable
@@ -53,7 +51,7 @@ fun KakaoLoginButton(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.CenterStart,
         ) {
             Icon(
-                imageVector = IconPack.Kakaotalk, contentDescription = "카카오톡 아이콘",
+                painter = painterResource(R.drawable.ic_kakaotalk), contentDescription = "카카오톡 아이콘",
                 modifier = Modifier.size(width = 20.dp, height = 20.dp),
                 tint = Color.Black,
             )

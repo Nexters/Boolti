@@ -14,6 +14,6 @@ fun ShowScreen(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        KakaoLoginButton()
+
     }
 }

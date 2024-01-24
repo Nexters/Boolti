@@ -50,7 +50,7 @@ fun LoginScreen(
     BackHandler(onBack = onBackPressed)
 
     Scaffold(
-        topBar = { LoginAppBar(previousScreen = "이전 화면") },
+        topBar = { LoginAppBar(previousScreen = "이전 화면", onBackPressed = onBackPressed) },
     ) { innerPadding ->
         Box(
             modifier = modifier.padding(innerPadding),
@@ -85,6 +85,7 @@ fun LoginScreen(
 private fun LoginAppBar(
     modifier: Modifier = Modifier,
     previousScreen: String,
+    onBackPressed: () -> Unit,
 ) {
     Box(
         modifier = modifier.height(44.dp),
@@ -94,7 +95,7 @@ private fun LoginAppBar(
             modifier = Modifier.padding(end = marginHorizontal),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onBackPressed) {
                 Icon(
                     imageVector = IconPack.ArrowBack,
                     contentDescription = "뒤로가기",

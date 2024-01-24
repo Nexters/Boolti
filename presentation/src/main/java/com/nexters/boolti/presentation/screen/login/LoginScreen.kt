@@ -19,8 +19,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.icons.IconPack
 import com.nexters.boolti.presentation.icons.iconpack.ArrowBack
@@ -57,13 +60,22 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("불티나게 팔리는 티켓, 불티", style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    "지금 불티에서 티켓을 불티나게 팔아보세요!",
+                    stringResource(id = R.string.catch_phrase),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    stringResource(id = R.string.catch_phrase_sub),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 6.dp)
                 )
-                KakaoLoginButton(modifier = Modifier.padding(top = 48.dp))
+
+                val marginHorizontal = dimensionResource(id = R.dimen.margin_horizontal)
+                KakaoLoginButton(
+                    modifier = Modifier
+                        .padding(top = 48.dp)
+                        .padding(horizontal = marginHorizontal)
+                )
             }
         }
     }
@@ -77,8 +89,9 @@ private fun LoginAppBar(
     Box(
         modifier = modifier.height(44.dp),
     ) {
+        val marginHorizontal = dimensionResource(id = R.dimen.margin_horizontal)
         Row(
-            modifier = Modifier.padding(end = 20.dp),
+            modifier = Modifier.padding(end = marginHorizontal),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = { /*TODO*/ }) {
@@ -86,7 +99,7 @@ private fun LoginAppBar(
                     imageVector = IconPack.ArrowBack,
                     contentDescription = "뒤로가기",
                     modifier
-                        .padding(start = 20.dp, top = 10.dp, end = 4.dp, bottom = 10.dp)
+                        .padding(start = marginHorizontal, top = 10.dp, end = 4.dp, bottom = 10.dp)
                         .size(width = 24.dp, height = 24.dp)
                 )
             }

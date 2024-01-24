@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kakao.sdk.user.UserApiClient
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.icons.IconPack
 import com.nexters.boolti.presentation.icons.iconpack.Kakaotalk
 import com.nexters.boolti.presentation.theme.Grey95
@@ -40,7 +42,6 @@ fun KakaoLoginButton(modifier: Modifier = Modifier) {
             }
         },
         modifier = modifier
-            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(48.dp),
         shape = RoundedCornerShape(4.dp),
@@ -57,7 +58,7 @@ fun KakaoLoginButton(modifier: Modifier = Modifier) {
                 tint = Color.Black,
             )
             Text(
-                "카카오톡으로 시작하기",
+                stringResource(id = R.string.login_with_kakaotalk),
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium,
                 color = Grey95,

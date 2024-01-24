@@ -30,6 +30,7 @@ import com.nexters.boolti.presentation.component.KakaoLoginButton
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    previousScreen: String,
     viewModel: LoginViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
 ) {
@@ -49,7 +50,7 @@ fun LoginScreen(
     BackHandler(onBack = onBackPressed)
 
     Scaffold(
-        topBar = { LoginAppBar(previousScreen = "이전 화면", onBackPressed = onBackPressed) },
+        topBar = { LoginAppBar(previousScreen = previousScreen, onBackPressed = onBackPressed) },
     ) { innerPadding ->
         Box(
             modifier = modifier.padding(innerPadding),

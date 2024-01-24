@@ -8,9 +8,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -41,19 +43,25 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             HomeScreen(
                 navController = homeNavController,
                 modifier = modifier,
-            ) {
-                navController.navigate("login") {
+            ) { screenName ->
+                navController.navigate("login/$screenName") {
                     popUpTo("home")
                     launchSingleTop = true
                     restoreState = true
                 }
             }
         }
+
+        val previousScreen = "previousScreen"
         composable(
-            route = "login"
-        ) {
+            route = "login/{$previousScreen}",
+            arguments = listOf(navArgument(previousScreen) { type = NavType.StringType })
+        ) { backstackEntry ->
             if (loggedIn == true) navController.popBackStack("home", false)
-            if (loggedIn == false) LoginScreen(modifier = modifier) {
+            if (loggedIn == false) LoginScreen(
+                modifier = modifier,
+                previousScreen = backstackEntry.arguments?.getString(previousScreen) ?: "이전 화면",
+            ) {
                 navController.popBackStack()
                 homeNavController.navigateToHome()
             }

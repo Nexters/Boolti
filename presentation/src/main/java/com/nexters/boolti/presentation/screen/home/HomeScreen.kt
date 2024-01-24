@@ -34,7 +34,7 @@ fun HomeScreen(
     navController: NavHostController,
     modifier: Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    requireLogin: () -> Unit,
+    requireLogin: (screenName: String) -> Unit,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
@@ -42,7 +42,10 @@ fun HomeScreen(
     val shouldLogin = currentDestination in listOf(Destination.Ticket.route, Destination.My.route)
 
     if (loggedIn == false && shouldLogin) {
-        requireLogin()
+        val screenNameId = Destination.entries.first {
+            it.route == currentDestination
+        }.label
+        requireLogin(stringResource(id = screenNameId))
     }
 
     Scaffold(

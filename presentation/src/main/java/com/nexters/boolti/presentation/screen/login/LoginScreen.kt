@@ -35,7 +35,7 @@ fun LoginScreen(
     onBackPressed: () -> Unit,
 ) {
     val context = LocalContext.current
-    LaunchedEffect(key1 = viewModel.event) {
+    LaunchedEffect(Unit) {
         viewModel.event.collect {
             when (it) {
                 LoginEvent.Success -> Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()

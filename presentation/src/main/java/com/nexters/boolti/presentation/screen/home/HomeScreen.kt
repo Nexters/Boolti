@@ -33,7 +33,6 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 fun HomeScreen(
     navController: NavHostController,
     modifier: Modifier,
-    viewModel: MainViewModel = hiltViewModel(),
     requireLogin: (screenName: String) -> Unit,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()

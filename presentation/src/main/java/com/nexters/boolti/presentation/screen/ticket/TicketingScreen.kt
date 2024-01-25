@@ -9,11 +9,14 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey70
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.UUID
 
@@ -21,10 +24,12 @@ import java.util.UUID
 @Composable
 fun TicketingScreen(
     modifier: Modifier = Modifier,
+    viewModel: TicketingViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(scaffoldState.bottomSheetState) {
         scaffoldState.bottomSheetState.expand()
@@ -49,9 +54,12 @@ fun TicketingScreen(
         sheetContent = {
             ChooseTicketBottomSheetContent(ticketingTickets = ticketItems) {
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $it")
+                scope.launch {
+                    viewModel.selectTicket(it)
+                    scaffoldState.bottomSheetState.hide()
+                }
             }
         },
-        sheetPeekHeight = 30.dp,
         sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,
         sheetDragHandle = {
             BottomSheetDefaults.DragHandle(

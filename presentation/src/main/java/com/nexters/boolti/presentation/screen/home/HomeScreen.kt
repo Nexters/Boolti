@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.screen.MainViewModel
 import com.nexters.boolti.presentation.screen.my.MyScreen
@@ -31,10 +32,10 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
     modifier: Modifier,
     requireLogin: (screenName: String) -> Unit,
 ) {
+    val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 

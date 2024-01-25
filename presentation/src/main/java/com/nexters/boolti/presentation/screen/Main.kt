@@ -27,7 +27,6 @@ fun Main() {
 @Composable
 fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
-    val homeNavController = rememberNavController()
 
     NavHost(
         navController = navController,
@@ -37,7 +36,6 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             route = "home",
         ) {
             HomeScreen(
-                navController = homeNavController,
                 modifier = modifier,
             ) { screenName ->
                 navController.navigate("login/$screenName")

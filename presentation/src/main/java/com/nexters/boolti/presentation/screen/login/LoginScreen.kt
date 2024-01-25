@@ -30,7 +30,6 @@ import com.nexters.boolti.presentation.component.KakaoLoginButton
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    previousScreen: String,
     viewModel: LoginViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
 ) {
@@ -50,7 +49,7 @@ fun LoginScreen(
     BackHandler(onBack = onBackPressed)
 
     Scaffold(
-        topBar = { LoginAppBar(previousScreen = previousScreen, onBackPressed = onBackPressed) },
+        topBar = { LoginAppBar(onBackPressed = onBackPressed) },
     ) { innerPadding ->
         Box(
             modifier = modifier.padding(innerPadding),
@@ -84,27 +83,20 @@ fun LoginScreen(
 @Composable
 private fun LoginAppBar(
     modifier: Modifier = Modifier,
-    previousScreen: String,
     onBackPressed: () -> Unit,
 ) {
     Box(
         modifier = modifier.height(44.dp),
     ) {
         val marginHorizontal = dimensionResource(id = R.dimen.margin_horizontal)
-        Row(
-            modifier = Modifier.padding(end = marginHorizontal),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBackPressed) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = "뒤로가기",
-                    modifier
-                        .padding(start = marginHorizontal, top = 10.dp, end = 4.dp, bottom = 10.dp)
-                        .size(width = 24.dp, height = 24.dp)
-                )
-            }
-            Text(previousScreen, style = MaterialTheme.typography.titleMedium)
+        IconButton(onClick = onBackPressed) {
+            Icon(
+                painter = painterResource(R.drawable.ic_close),
+                contentDescription = "뒤로가기",
+                modifier
+                    .padding(start = marginHorizontal, top = 10.dp, end = 4.dp, bottom = 10.dp)
+                    .size(width = 24.dp, height = 24.dp)
+            )
         }
     }
 }

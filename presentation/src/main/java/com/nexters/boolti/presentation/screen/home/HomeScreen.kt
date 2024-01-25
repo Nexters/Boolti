@@ -33,7 +33,7 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 @Composable
 fun HomeScreen(
     modifier: Modifier,
-    requireLogin: (screenName: String) -> Unit,
+    requireLogin: () -> Unit,
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()

@@ -17,7 +17,7 @@ import com.nexters.boolti.presentation.R
 fun TicketScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketViewModel = hiltViewModel(),
-    requireLogin: (screenName: String) -> Unit,
+    requireLogin: () -> Unit,
 ) {
     val loggedIn by viewModel.loggedIn.collectAsState()
 
@@ -29,10 +29,7 @@ fun TicketScreen(
             Text(text = "티켓 목록 화면", style = MaterialTheme.typography.headlineMedium)
         }
     } else if(loggedIn == false) {
-        val currentScreenName = stringResource(id = R.string.menu_tickets)
-        TextButton(onClick = {
-            requireLogin(currentScreenName)
-        }) {
+        TextButton(onClick = requireLogin) {
             Text("로그인 하러 가기")
         }
     }

@@ -38,15 +38,6 @@ fun HomeScreen(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
-    val loggedIn by viewModel.loggedIn.collectAsState()
-    val shouldLogin = currentDestination in listOf(Destination.Ticket.route, Destination.My.route)
-
-    if (loggedIn == false && shouldLogin) {
-        val screenNameId = Destination.entries.first {
-            it.route == currentDestination
-        }.label
-        requireLogin(stringResource(id = screenNameId))
-    }
 
     Scaffold(
         bottomBar = {
@@ -79,6 +70,7 @@ fun HomeScreen(
             ) {
                 TicketScreen(
                     modifier = modifier.padding(innerPadding),
+                    requireLogin = requireLogin,
                 )
             }
             composable(

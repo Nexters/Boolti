@@ -3,11 +3,8 @@ package com.nexters.boolti.presentation.screen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +28,6 @@ fun Main() {
 fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val homeNavController = rememberNavController()
-    val loggedIn by viewModel.loggedIn.collectAsState()
 
     NavHost(
         navController = navController,
@@ -44,11 +40,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                 navController = homeNavController,
                 modifier = modifier,
             ) { screenName ->
-                navController.navigate("login/$screenName") {
-                    popUpTo("home")
-                    launchSingleTop = true
-                    restoreState = true
-                }
+                navController.navigate("login/$screenName")
             }
         }
 
@@ -57,22 +49,12 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             route = "login/{$previousScreen}",
             arguments = listOf(navArgument(previousScreen) { type = NavType.StringType })
         ) { backstackEntry ->
-            if (loggedIn == true) navController.popBackStack("home", false)
-            if (loggedIn == false) LoginScreen(
+            LoginScreen(
                 modifier = modifier,
                 previousScreen = backstackEntry.arguments?.getString(previousScreen) ?: "이전 화면",
             ) {
                 navController.popBackStack()
-                homeNavController.navigateToHome()
             }
         }
-    }
-}
-
-fun NavHostController.navigateToHome() {
-    val homeRoute = "show" // HomeScreen 의 StartDestination.route 와 일치해야 함
-    navigate(homeRoute) {
-        popUpTo(homeRoute)
-        launchSingleTop = true
     }
 }

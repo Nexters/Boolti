@@ -34,6 +34,7 @@ fun HomeScreen(
     navController: NavHostController,
     modifier: Modifier,
     viewModel: MainViewModel = hiltViewModel(),
+    onClickTicketing: () -> Unit,
     requireLogin: () -> Unit,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -69,6 +70,7 @@ fun HomeScreen(
             ) {
                 ShowScreen(
                     modifier = modifier,
+                    onClickTicketing,
                 )
             }
             composable(

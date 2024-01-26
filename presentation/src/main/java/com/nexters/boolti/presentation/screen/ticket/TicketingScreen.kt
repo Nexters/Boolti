@@ -1,23 +1,18 @@
 package com.nexters.boolti.presentation.screen.ticket
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey70
@@ -27,11 +22,18 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketScreen(
+fun TicketingScreen(
     modifier: Modifier = Modifier,
+    viewModel: TicketingViewModel = hiltViewModel(),
+    onDismiss: () -> Unit,
 ) {
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(scaffoldState.bottomSheetState) {
+        scaffoldState.bottomSheetState.expand()
+    }
 
     val ticketItems = buildList {
         repeat(30) {
@@ -46,39 +48,29 @@ fun TicketScreen(
             )
         }
     }
-
     BottomSheetScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
         sheetContent = {
             ChooseTicketBottomSheetContent(ticketingTickets = ticketItems) {
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $it")
+                scope.launch {
+                    viewModel.selectTicket(it)
+                    scaffoldState.bottomSheetState.hide()
+                }
             }
         },
-        sheetPeekHeight = 0.dp,
         sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,
         sheetDragHandle = {
-            Box(
-                Modifier
-                    .padding(top = 12.dp)
-                    .size(width = 45.dp, height = 4.dp)
-                    .clip(RoundedCornerShape(100.dp))
-                    .background(Grey70)
+            BottomSheetDefaults.DragHandle(
+                shape = RoundedCornerShape(100.dp),
+                width = 45.dp,
+                height = 4.dp,
+                color = Grey70
             )
         },
         sheetSwipeEnabled = false,
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Button(onClick = {
-                scope.launch {
-                    scaffoldState.bottomSheetState.expand()
-                }
-            }) {
-                Text(text = "예매하기", style = MaterialTheme.typography.bodyLarge)
-            }
-        }
     }
 }

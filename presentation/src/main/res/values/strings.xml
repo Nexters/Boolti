@@ -7,4 +7,15 @@
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>
     <string name="login_with_kakaotalk">카카오톡으로 시작하기</string>
+
+    <string name="format_price">%,d원</string>
+    <string name="format_total_price">총 %,d원</string>
+
+    <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
+    <string name="badge_left_ticket_amount">%d매 남음</string>
+    <string name="sold_out_label">품절</string>
+    <string name="ticketing_button_label">예매하기</string>
+    <string name="ticketing_limit_per_person">1인 %d매</string>
+
+    <string name="description_close_button">닫기</string>
 </resources>

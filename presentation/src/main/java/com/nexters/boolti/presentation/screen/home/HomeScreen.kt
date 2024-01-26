@@ -33,6 +33,8 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 @Composable
 fun HomeScreen(
     modifier: Modifier,
+    viewModel: MainViewModel = hiltViewModel(),
+    onClickTicketing: () -> Unit,
     requireLogin: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -63,6 +65,7 @@ fun HomeScreen(
             ) {
                 ShowScreen(
                     modifier = modifier,
+                    onClickTicketing,
                 )
             }
             composable(

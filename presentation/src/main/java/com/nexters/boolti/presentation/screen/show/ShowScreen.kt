@@ -17,6 +17,7 @@ fun ShowScreen(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
+
         Button(onClick = onClickTicketing) {
             Text(text = "예매하기", style = MaterialTheme.typography.bodyLarge)
         }

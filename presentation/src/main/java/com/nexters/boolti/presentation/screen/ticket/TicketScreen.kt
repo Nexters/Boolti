@@ -12,8 +12,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,14 +27,27 @@ import com.nexters.boolti.presentation.theme.Grey70
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.UUID
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nexters.boolti.presentation.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketScreen(
     modifier: Modifier = Modifier,
+    viewModel: TicketViewModel = hiltViewModel(),
+    requireLogin: () -> Unit,
 ) {
+    val loggedIn by viewModel.loggedIn.collectAsState()
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
+
+    if (loggedIn == false) {
+        TextButton(onClick = requireLogin) {
+            Text("로그인 하러 가기")
+        }
+        return
+    }
 
     val ticketItems = buildList {
         repeat(30) {

@@ -19,6 +19,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +42,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 
@@ -131,9 +133,10 @@ private fun ChooseTicketBottomSheetContent2(
             }
             Spacer(modifier = Modifier.weight(1F))
             IconButton(onClick = onCloseClicked) {
-                Image(
-                    painter = painterResource(R.drawable.ic_close_24),
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
                     contentDescription = stringResource(id = R.string.description_close_button),
+                    tint = Grey50,
                 )
             }
         }

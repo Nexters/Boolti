@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.screen.MainViewModel
 import com.nexters.boolti.presentation.screen.my.MyScreen
@@ -31,20 +32,14 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
     modifier: Modifier,
     viewModel: MainViewModel = hiltViewModel(),
     onClickTicketing: () -> Unit,
     requireLogin: () -> Unit,
 ) {
+    val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
-    val loggedIn by viewModel.loggedIn.collectAsState()
-    val shouldLogin = currentDestination in listOf(Destination.Ticket.route, Destination.My.route)
-
-    if (loggedIn == false && shouldLogin) {
-        requireLogin()
-    }
 
     Scaffold(
         bottomBar = {
@@ -78,6 +73,7 @@ fun HomeScreen(
             ) {
                 TicketScreen(
                     modifier = modifier.padding(innerPadding),
+                    requireLogin = requireLogin,
                 )
             }
             composable(

@@ -3,6 +3,11 @@
     <string name="menu_tickets">티켓내역</string>
     <string name="menu_my">마이페이지</string>
 
+    <!-- 로그인 -->
+    <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
+    <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>
+    <string name="login_with_kakaotalk">카카오톡으로 시작하기</string>
+
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>
 

@@ -66,6 +66,7 @@ fun TicketScreen(
                     .background(Grey70)
             )
         },
+        sheetSwipeEnabled = false,
     ) {
         Box(
             modifier = modifier.fillMaxSize(),

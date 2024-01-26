@@ -78,7 +78,7 @@ fun ChooseTicketBottomSheetContent(
 }
 
 @Composable
-fun ChooseTicketBottomSheetContent1(
+private fun ChooseTicketBottomSheetContent1(
     modifier: Modifier,
     listState: LazyListState,
     items: List<TicketingTicket>,
@@ -95,7 +95,7 @@ fun ChooseTicketBottomSheetContent1(
 }
 
 @Composable
-fun ChooseTicketBottomSheetContent2(
+private fun ChooseTicketBottomSheetContent2(
     modifier: Modifier,
     item: TicketingTicket,
     onCloseClicked: () -> Unit,
@@ -176,7 +176,7 @@ fun ChooseTicketBottomSheetContent2(
 }
 
 @Composable
-fun TicketingTicketItem(ticketingTicket: TicketingTicket, onClick: (TicketingTicket) -> Unit) {
+private fun TicketingTicketItem(ticketingTicket: TicketingTicket, onClick: (TicketingTicket) -> Unit) {
     val enabled = ticketingTicket.isInviteTicket || ticketingTicket.leftAmount > 0
 
     Row(
@@ -211,7 +211,7 @@ fun TicketingTicketItem(ticketingTicket: TicketingTicket, onClick: (TicketingTic
 }
 
 @Composable
-fun Badge(label: String, modifier: Modifier = Modifier) {
+private fun Badge(label: String, modifier: Modifier = Modifier) {
     Text(
         text = label,
         modifier = modifier

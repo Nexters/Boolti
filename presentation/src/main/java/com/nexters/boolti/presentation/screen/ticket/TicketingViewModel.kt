@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.nexters.boolti.domain.model.TicketingTicket
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -13,6 +15,9 @@ class TicketingViewModel @Inject constructor(
 ) : ViewModel() {
     private val showId: String? = savedStateHandle["showId"]
     private var selectedTicket: TicketingTicket? = null
+
+    private val _state = MutableStateFlow<TicketingState?>(null)
+    val state = _state.asStateFlow()
 
     init {
         Timber.tag("MANGBAAM-TicketingViewModel()").d("showId: $showId")

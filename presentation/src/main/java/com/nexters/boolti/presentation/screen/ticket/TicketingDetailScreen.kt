@@ -1,0 +1,347 @@
+package com.nexters.boolti.presentation.screen.ticket
+
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.TicketingTicket
+import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
+
+@Composable
+fun TicketingDetailScreen(
+    modifier: Modifier = Modifier,
+    state: TicketingState,
+) {
+    val scrollState = rememberScrollState()
+    Box {
+        Column(
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(scrollState)
+        ) {
+            Row(modifier = Modifier.padding(20.dp)) {
+                AsyncImage(
+                    model = state.poster,
+                    contentDescription = "포스터",
+                    modifier = Modifier.size(width = 70.dp, height = 98.dp),
+                    contentScale = ContentScale.Crop,
+                )
+
+                Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
+                    Text(
+                        text = state.ticket.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Text(
+                        text = "2024.03.09 (토) 17:30",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Grey30,
+                    )
+                }
+            }
+
+            // 예매자 정보
+            Section(title = "예매자 정보") {
+                InputRow("이름", "") {}
+                Spacer(modifier = Modifier.size(16.dp))
+                InputRow("연락처", "") {}
+            }
+
+            // 입금자 정보
+            var checked by remember { mutableStateOf(false) }
+            Section(
+                title = "입금자 정보",
+                titleRowOption = {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .clickable { checked = !checked }
+                    ) {
+                        if (checked) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_checkbox_selected),
+                                contentDescription = null,
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_checkbox_18),
+                                tint = Grey50,
+                                contentDescription = null,
+                            )
+                        }
+                        Text(
+                            text = "예매자와 입금자가 같아요",
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                },
+                modifier = Modifier.animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium,
+                    )
+                ),
+                contentVisible = !checked,
+            ) {
+                if (!checked) {
+                    InputRow("이름", "") {}
+                    Spacer(modifier = Modifier.size(16.dp))
+                    InputRow("연락처", "") {}
+                }
+            }
+
+            // 티켓 정보
+            Section(title = "티켓 정보") {
+                SectionTicketInfo("선택한 티켓 종류", "일반 티켓 B", marginTop = 0.dp)
+                SectionTicketInfo(label = "선택한 티켓 개수", value = "1개")
+                SectionTicketInfo(label = "총 결제 금액", value = "5,000원")
+                Spacer(modifier = Modifier.padding(bottom = 8.dp))
+            }
+
+            // 결제 수단
+            Section(title = "결제 수단") {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(4.dp),
+                        )
+                        .background(MaterialTheme.colorScheme.surfaceTint)
+                        .padding(12.dp),
+                ) {
+                    Text(
+                        text = "계좌이체",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+                Row(Modifier.padding(top = 12.dp)) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_info_20),
+                        tint = Grey50,
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = "다음 페이지에서 계좌 번호를 안내해 드릴게요",
+                        modifier = Modifier.padding(start = 4.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                }
+            }
+
+            // 취소/환불 규정
+            var expanded by remember { mutableStateOf(false) }
+            val refundPolicy = stringArrayResource(R.array.refund_policy)
+            val rotation by animateFloatAsState(
+                targetValue = if (expanded) 180F else 0F,
+                animationSpec = tween(),
+                label = "expandIconRotation"
+            )
+            Section(
+                title = "취소/환불 규정",
+                titleRowOption = {
+                    Icon(
+                        modifier = Modifier
+                            .rotate(rotation)
+                            .clickable { expanded = !expanded },
+                        painter = painterResource(R.drawable.ic_expand_24),
+                        tint = Grey50,
+                        contentDescription = null,
+                    )
+                },
+                contentVisible = expanded,
+            ) {
+                Column(
+                    Modifier
+                        .animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            )
+                        )
+                ) {
+                    if (expanded) {
+                        refundPolicy.forEach {
+                            Row {
+                                Text(
+                                    text = "•",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Grey50,
+                                )
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Grey50,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(120.dp))
+        }
+
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(16.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.background.copy(alpha = 0F),
+                                MaterialTheme.colorScheme.background,
+                            )
+                        ),
+                        shape = RectangleShape,
+                    )
+            ) {}
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
+                shape = RoundedCornerShape(4.dp),
+                contentPadding = PaddingValues(12.dp),
+                onClick = { /*TODO*/ },
+            ) {
+                Text(text = "5,000원 결제하기")
+            }
+        }
+    }
+}
+
+@Composable
+private fun Section(
+    modifier: Modifier = Modifier,
+    title: String,
+    titleRowOption: (@Composable () -> Unit)? = null,
+    contentVisible: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        modifier
+            .padding(bottom = 12.dp)
+            .fillMaxWidth()
+            .background((MaterialTheme.colorScheme.surface))
+            .padding(start = 20.dp, end = 20.dp, bottom = if (contentVisible) 20.dp else 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            SectionTitle(title)
+            titleRowOption?.let { it() }
+        }
+        content()
+    }
+}
+
+@Composable
+fun InputRow(label: String, text: String, placeholder: String = "", onValueChanged: (String) -> Unit) {
+    Row {
+        Text(
+            text = label,
+            Modifier
+                .width(44.dp)
+                .align(Alignment.CenterVertically),
+            style = MaterialTheme.typography.bodySmall,
+        )
+        BTTextField(
+            text = text,
+            placeholder = placeholder,
+            modifier = Modifier.weight(1F),
+            onValueChanged = onValueChanged,
+        )
+    }
+}
+
+@Composable
+private fun SectionTitle(title: String) {
+    Text(title, style = MaterialTheme.typography.titleLarge)
+}
+
+@Composable
+private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.dp) {
+    Row(
+        modifier = Modifier
+            .padding(top = marginTop)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = Grey30)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TicketingDetailScreenPreview() {
+    BooltiTheme {
+        Surface {
+            val state = TicketingState(
+                poster = "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png",
+                ticket = TicketingTicket("", false, "임영웅 콘서트", 119000, 5)
+            )
+            TicketingDetailScreen(state = state)
+        }
+    }
+}

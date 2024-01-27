@@ -1,19 +1,31 @@
 package com.nexters.boolti.presentation.screen.ticket
 
+import android.graphics.drawable.Icon
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
+import androidx.compose.material.TopAppBar
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.TicketingTicket
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey70
 import kotlinx.coroutines.launch
@@ -25,11 +37,13 @@ import java.util.UUID
 fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
-    onDismiss: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
+
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(scaffoldState.bottomSheetState) {
         scaffoldState.bottomSheetState.expand()

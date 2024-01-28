@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
+import com.nexters.boolti.presentation.screen.ticket.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
 @Composable
@@ -29,6 +30,7 @@ fun Main() {
 fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
+    // TODO: 하드코딩 된 route 를 각 화면에 정의
     NavHost(
         navController = navController,
         startDestination = "home",
@@ -39,7 +41,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             HomeScreen(
                 modifier = modifier,
                 onClickShowItem = {
-                    navController.navigate("showDetail/$it") // TODO 공연 목록에서 선택했을 때 공연 아이디와 함께 넘겨줘야 함
+                    navController.navigate("showDetail/$it")
                 }
             ) {
                 navController.navigate("login")
@@ -60,8 +62,14 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             arguments = listOf(navArgument("showId") { type = NavType.StringType })
         ) {
             ShowDetailScreen(modifier = modifier) {
-                navController.popBackStack()
+                navController.navigate("ticketing/$it")
             }
+        }
+        composable(
+            route = "ticketing/{showId}",
+            arguments = listOf(navArgument("showId") { type = NavType.StringType })
+        ) {
+            TicketingScreen(modifier = modifier)
         }
     }
 }

@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.R
@@ -53,11 +55,13 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 
 @Composable
-fun TicketingDetailScreen(
+fun TicketingScreen(
     modifier: Modifier = Modifier,
-    state: TicketingState,
+    viewModel: TicketingViewModel = hiltViewModel(),
 ) {
     val scrollState = rememberScrollState()
+    val state by viewModel.state.collectAsState()
+
     Box {
         Column(
             modifier = modifier
@@ -74,7 +78,7 @@ fun TicketingDetailScreen(
 
                 Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
                     Text(
-                        text = state.ticket.title,
+                        text = state.ticket?.title ?: "",
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
@@ -94,16 +98,15 @@ fun TicketingDetailScreen(
             }
 
             // 입금자 정보
-            var checked by remember { mutableStateOf(false) }
             Section(
                 title = "입금자 정보",
                 titleRowOption = {
                     Row(
                         modifier = Modifier
                             .padding(start = 20.dp)
-                            .clickable { checked = !checked }
+                            .clickable { viewModel.toggleIsSameContactInfo() }
                     ) {
-                        if (checked) {
+                        if (state.isSameContactInfo) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_checkbox_selected),
                                 contentDescription = null,
@@ -128,9 +131,9 @@ fun TicketingDetailScreen(
                         stiffness = Spring.StiffnessMedium,
                     )
                 ),
-                contentVisible = !checked,
+                contentVisible = !state.isSameContactInfo,
             ) {
-                if (!checked) {
+                if (!state.isSameContactInfo) {
                     InputRow("이름", "") {}
                     Spacer(modifier = Modifier.size(16.dp))
                     InputRow("연락처", "") {}
@@ -337,11 +340,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            val state = TicketingState(
-                poster = "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png",
-                ticket = TicketingTicket("", false, "임영웅 콘서트", 119000)
-            )
-            TicketingDetailScreen(state = state)
+            TicketingScreen()
         }
     }
 }

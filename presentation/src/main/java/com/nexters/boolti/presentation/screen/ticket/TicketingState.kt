@@ -3,10 +3,11 @@ package com.nexters.boolti.presentation.screen.ticket
 import com.nexters.boolti.domain.model.TicketingTicket
 
 data class TicketingState(
-    val poster: String,
+    val loading: Boolean = false,
+    val poster: String = "",
     val isSameContactInfo: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val ticket: TicketingTicket,
+    val ticket: TicketingTicket? = null,
     private val leftAmount: Map<String, Int> = emptyMap(),
 )
 

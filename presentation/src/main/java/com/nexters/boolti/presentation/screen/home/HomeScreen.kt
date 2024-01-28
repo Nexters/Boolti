@@ -64,7 +64,7 @@ fun HomeScreen(
                 route = Destination.Show.route,
             ) {
                 ShowScreen(
-                    modifier = modifier,
+                    modifier = modifier.padding(innerPadding),
                     onClickTicketing,
                 )
             }

@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.ticket
+package com.nexters.boolti.presentation.screen.ticketing
 
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize

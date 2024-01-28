@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.ticket
+package com.nexters.boolti.presentation.screen.ticketing
 
 import com.nexters.boolti.domain.model.TicketingTicket
 

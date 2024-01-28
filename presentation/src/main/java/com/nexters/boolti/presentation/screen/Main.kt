@@ -13,7 +13,7 @@ import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
-import com.nexters.boolti.presentation.screen.ticket.TicketingScreen
+import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
 @Composable

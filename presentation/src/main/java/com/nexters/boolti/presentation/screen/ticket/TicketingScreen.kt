@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticket
 
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -46,8 +47,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -69,6 +72,7 @@ fun TicketingScreen(
 ) {
     val scrollState = rememberScrollState()
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -79,7 +83,7 @@ fun TicketingScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back),
                         contentDescription = "뒤로 가기",
-                        modifier = Modifier.clickable { onBackClicked() },
+                        modifier = Modifier.clickable(role = Role.Button) { onBackClicked() },
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -140,7 +144,7 @@ fun TicketingScreen(
                         Row(
                             modifier = Modifier
                                 .padding(start = 20.dp)
-                                .clickable { viewModel.toggleIsSameContactInfo() }
+                                .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
                         ) {
                             if (state.isSameContactInfo) {
                                 Icon(
@@ -200,6 +204,11 @@ fun TicketingScreen(
                                 shape = RoundedCornerShape(4.dp),
                             )
                             .background(MaterialTheme.colorScheme.surfaceTint)
+                            .clickable(role = Role.DropdownList) {
+                                Toast
+                                    .makeText(context, "지금은 계좌 이체로만 결제할 수 있어요", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                             .padding(12.dp),
                     ) {
                         Text(
@@ -238,7 +247,7 @@ fun TicketingScreen(
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .rotate(rotation)
-                                .clickable { expanded = !expanded },
+                                .clickable(role = Role.Image) { expanded = !expanded },
                             painter = painterResource(R.drawable.ic_expand_24),
                             tint = Grey50,
                             contentDescription = null,

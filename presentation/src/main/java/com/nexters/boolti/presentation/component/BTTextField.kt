@@ -1,20 +1,17 @@
 package com.nexters.boolti.presentation.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -27,6 +24,7 @@ fun BTTextField(
     modifier: Modifier = Modifier,
     placeholder: String = "",
     enabled: Boolean = true,
+    isError: Boolean = false,
     readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -35,34 +33,42 @@ fun BTTextField(
     minLines: Int = 1,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.surfaceTint)
-            .padding(12.dp),
-    ) {
-        BasicTextField(
-            value = text.ifEmpty { placeholder },
-            modifier = modifier,
-            onValueChange = onValueChanged,
-            enabled = enabled,
-            readOnly = readOnly,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = if (text.isEmpty()) {
-                    Grey70
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            ),
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            interactionSource = interactionSource,
-            singleLine = singleLine,
-            maxLines = maxLines,
-            minLines = minLines,
-        )
-    }
+    OutlinedTextField(
+        value = text,
+        onValueChange = onValueChanged,
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+        placeholder = {
+            Text(placeholder, style = MaterialTheme.typography.bodyLarge.copy(color = Grey70))
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        interactionSource = interactionSource,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        minLines = minLines,
+        isError = isError,
+        shape = RoundedCornerShape(4.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            errorTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceTint,
+            focusedPlaceholderColor = Grey70,
+            unfocusedPlaceholderColor = Grey70,
+            disabledPlaceholderColor = Grey70,
+            errorPlaceholderColor = Grey70,
+            focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+            disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
+            errorBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        ),
+    )
 }
 
 @Preview

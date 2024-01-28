@@ -3,6 +3,15 @@
     <string name="menu_tickets">티켓내역</string>
     <string name="menu_my">마이페이지</string>
 
+    <string name="description_navigate_back">뒤로 가기</string>
+    <string name="description_poster">포스터 사진</string>
+    <string name="description_close_button">닫기</string>
+
+    <!-- 공통 -->
+    <string name="badge_left_ticket_amount">%d매 남음</string>
+    <string name="sold_out_label">품절</string>
+    <string name="bullet">•</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>
@@ -11,14 +20,29 @@
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>
 
+    <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
-    <string name="badge_left_ticket_amount">%d매 남음</string>
-    <string name="sold_out_label">품절</string>
     <string name="ticketing_button_label">예매하기</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
+    <string name="ticketing_toolbar_title">결제하기</string>
+    <string name="ticketing_ticket_holder_label">예매자 정보</string>
+    <string name="ticketing_depositor_label">입금자 정보</string>
+    <string name="ticketing_ticket_info_label">티켓 정보</string>
+    <string name="ticketing_payment_label">결제 수단</string>
+    <string name="ticketing_refund_policy_label">취소/환불 규정</string>
+    <string name="ticketing_payment_account_transfer">계좌 이체</string>
+    <string name="ticketing_name_label">이름</string>
+    <string name="ticketing_contact_label">연락처</string>
+    <string name="ticketing_name_placeholder">예) 김불티</string>
+    <string name="ticketing_contact_placeholder">연락처</string>
+    <string name="ticketing_same_contact_info">예매자와 입금자가 같아요</string>
+    <string name="ticketing_selected_ticket">선택한 티켓 종류</string>
+    <string name="ticketing_selected_ticket_count">선택한 티켓 개수</string>
+    <string name="ticketing_total_payment_amount">총 결제 금액</string>
+    <string name="ticketing_payment_information">다음 페이지에서 계좌 번호를 안내해 드릴게요</string>
+    <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
+    <string name="ticketing_payment_button_label">%,d원 결제하기</string>
 
-    <string name="description_close_button">닫기</string>
-    
     <string-array name="refund_policy">
         <item>하단에 나열된 내용은 전부 임시 텍스트입니다.</item>
         <item>입장 확인이 된 티켓이 있을 경우 환불이 불가합니다.</item>

@@ -51,6 +51,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -83,11 +84,16 @@ fun TicketingScreen(
         topBar = {
             TopAppBar(
                 modifier = Modifier.padding(start = 20.dp),
-                title = { Text(text = "결제하기", style = MaterialTheme.typography.titleLarge) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.ticketing_toolbar_title),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
                 navigationIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back),
-                        contentDescription = "뒤로 가기",
+                        contentDescription = stringResource(R.string.description_navigate_back),
                         modifier = Modifier.clickable(role = Role.Button) { onBackClicked() },
                     )
                 },
@@ -109,7 +115,7 @@ fun TicketingScreen(
                 ) {
                     AsyncImage(
                         model = state.poster,
-                        contentDescription = "포스터",
+                        contentDescription = stringResource(R.string.description_poster),
                         modifier = Modifier
                             .size(width = 70.dp, height = 98.dp)
                             .clip(RoundedCornerShape(4.dp))
@@ -128,7 +134,7 @@ fun TicketingScreen(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         Text(
-                            text = "2024.03.09 (토) 17:30",
+                            text = "2024.03.09 (토) 17:30", // TODO API 나오면 대체하기
                             style = MaterialTheme.typography.bodySmall,
                             color = Grey30,
                         )
@@ -136,17 +142,21 @@ fun TicketingScreen(
                 }
 
                 // 예매자 정보
-                Section(title = "예매자 정보") {
+                Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
                     var name by remember { mutableStateOf("") } // TODO remove
                     var phoneNumber by remember { mutableStateOf("") } // TODO remove
-                    InputRow("이름", name, placeholder = "예) 김불티") {
+                    InputRow(
+                        stringResource(R.string.ticketing_name_label),
+                        name,
+                        placeholder = stringResource(R.string.ticketing_name_placeholder),
+                    ) {
                         name = it
                     }
                     Spacer(modifier = Modifier.size(16.dp))
                     InputRow(
-                        "연락처",
+                        stringResource(R.string.ticketing_contact_label),
                         phoneNumber,
-                        placeholder = "예) 010-1234-5678",
+                        placeholder = stringResource(R.string.ticketing_contact_placeholder),
                         isPhoneNumber = true,
                         imeAction = if (state.isSameContactInfo) {
                             ImeAction.Default
@@ -160,7 +170,7 @@ fun TicketingScreen(
 
                 // 입금자 정보
                 Section(
-                    title = "입금자 정보",
+                    title = stringResource(R.string.ticketing_depositor_label),
                     titleRowOption = {
                         Row(
                             modifier = Modifier
@@ -185,7 +195,7 @@ fun TicketingScreen(
                                 )
                             }
                             Text(
-                                text = "예매자와 입금자가 같아요",
+                                text = stringResource(R.string.ticketing_same_contact_info),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
@@ -200,12 +210,16 @@ fun TicketingScreen(
                     contentVisible = !state.isSameContactInfo,
                 ) {
                     if (!state.isSameContactInfo) {
-                        InputRow("이름", "", placeholder = "예) 김불티") {}
+                        InputRow(
+                            stringResource(R.string.ticketing_name_label),
+                            "",
+                            placeholder = stringResource(R.string.ticketing_name_placeholder),
+                        ) {}
                         Spacer(modifier = Modifier.size(16.dp))
                         InputRow(
-                            "연락처",
+                            stringResource(R.string.ticketing_contact_label),
                             "",
-                            placeholder = "예) 010-1234-5678",
+                            placeholder = stringResource(R.string.ticketing_contact_placeholder),
                             isPhoneNumber = true,
                             imeAction = ImeAction.Default,
                         ) {}
@@ -213,15 +227,25 @@ fun TicketingScreen(
                 }
 
                 // 티켓 정보
-                Section(title = "티켓 정보") {
-                    SectionTicketInfo("선택한 티켓 종류", "일반 티켓 B", marginTop = 0.dp)
-                    SectionTicketInfo(label = "선택한 티켓 개수", value = "1개")
-                    SectionTicketInfo(label = "총 결제 금액", value = "5,000원")
+                Section(title = stringResource(R.string.ticketing_ticket_info_label)) {
+                    SectionTicketInfo(
+                        stringResource(R.string.ticketing_selected_ticket),
+                        "일반 티켓 B",
+                        marginTop = 0.dp
+                    ) // TODO API 나오면 대체하기
+                    SectionTicketInfo(
+                        label = stringResource(R.string.ticketing_selected_ticket_count),
+                        value = "1개"
+                    ) // TODO 데이터 붙일 때 연결
+                    SectionTicketInfo(
+                        label = stringResource(R.string.ticketing_total_payment_amount),
+                        value = "5,000원"
+                    ) // TODO 데이터 붙일 때 연결
                     Spacer(modifier = Modifier.padding(bottom = 8.dp))
                 }
 
                 // 결제 수단
-                Section(title = "결제 수단") {
+                Section(title = stringResource(R.string.ticketing_payment_label)) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -233,13 +257,17 @@ fun TicketingScreen(
                             .background(MaterialTheme.colorScheme.surfaceTint)
                             .clickable(role = Role.DropdownList) {
                                 Toast
-                                    .makeText(context, "지금은 계좌 이체로만 결제할 수 있어요", Toast.LENGTH_SHORT)
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.ticketing_payment_message),
+                                        Toast.LENGTH_SHORT
+                                    )
                                     .show()
                             }
                             .padding(12.dp),
                     ) {
                         Text(
-                            text = "계좌이체",
+                            text = stringResource(R.string.ticketing_payment_account_transfer),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodyLarge,
                         )
@@ -251,7 +279,7 @@ fun TicketingScreen(
                             contentDescription = null,
                         )
                         Text(
-                            text = "다음 페이지에서 계좌 번호를 안내해 드릴게요",
+                            text = stringResource(R.string.ticketing_payment_information),
                             modifier = Modifier.padding(start = 4.dp),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -268,7 +296,7 @@ fun TicketingScreen(
                     label = "expandIconRotation"
                 )
                 Section(
-                    title = "취소/환불 규정",
+                    title = stringResource(R.string.ticketing_refund_policy_label),
                     titleRowOption = {
                         Icon(
                             modifier = Modifier
@@ -295,7 +323,7 @@ fun TicketingScreen(
                             refundPolicy.forEach {
                                 Row {
                                     Text(
-                                        text = "•",
+                                        text = stringResource(R.string.bullet),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = Grey50,
                                     )
@@ -338,7 +366,7 @@ fun TicketingScreen(
                     contentPadding = PaddingValues(12.dp),
                     onClick = { /*TODO*/ },
                 ) {
-                    Text(text = "5,000원 결제하기")
+                    Text(text = stringResource(R.string.ticketing_payment_button_label, 5000)) // TODO 데이터 붙일 때 연결
                 }
             }
         }

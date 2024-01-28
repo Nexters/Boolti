@@ -56,6 +56,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 
@@ -91,9 +92,12 @@ fun TicketingScreen(
             Column(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.background)
-                    .verticalScroll(scrollState)
+                    .verticalScroll(scrollState),
             ) {
-                Row(modifier = Modifier.padding(20.dp)) {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     AsyncImage(
                         model = state.poster,
                         contentDescription = "포스터",
@@ -124,9 +128,9 @@ fun TicketingScreen(
 
                 // 예매자 정보
                 Section(title = "예매자 정보") {
-                    InputRow("이름", "") {}
+                    InputRow("이름", "", placeholder = "예) 김불티") {}
                     Spacer(modifier = Modifier.size(16.dp))
-                    InputRow("연락처", "") {}
+                    InputRow("연락처", "", placeholder = "예) 010-1234-5678") {}
                 }
 
                 // 입금자 정보
@@ -141,7 +145,12 @@ fun TicketingScreen(
                             if (state.isSameContactInfo) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_checkbox_selected),
+                                    tint = Grey05,
                                     contentDescription = null,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(3.dp)
+                                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
                                 )
                             } else {
                                 Icon(
@@ -166,9 +175,9 @@ fun TicketingScreen(
                     contentVisible = !state.isSameContactInfo,
                 ) {
                     if (!state.isSameContactInfo) {
-                        InputRow("이름", "") {}
+                        InputRow("이름", "", placeholder = "예) 김불티") {}
                         Spacer(modifier = Modifier.size(16.dp))
-                        InputRow("연락처", "") {}
+                        InputRow("연락처", "", placeholder = "예) 010-1234-5678") {}
                     }
                 }
 

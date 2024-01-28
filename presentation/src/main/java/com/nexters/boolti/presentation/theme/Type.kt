@@ -17,6 +17,10 @@ val pretendardFamily = FontFamily(
     Font(R.font.pretendard_semi_bold, FontWeight.SemiBold)
 )
 
+val aggroFamily = FontFamily(
+    Font(R.font.sb_aggro_b, FontWeight.Normal),
+)
+
 private val headline3 = TextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,

@@ -74,13 +74,13 @@ fun Show(
                         alpha = 0.5f,
                     )
             )
-            if (disabled) Badge(label = "공연 종료", modifier = Modifier.padding(all = 10.dp))
-            else if (isPreview) Badge(
+            if (isPreview) Badge(
                 label = "예매 시작 D-$dDay",
                 modifier = Modifier.padding(all = 10.dp),
                 color = Grey05,
                 containerColor = MaterialTheme.colorScheme.primary,
             )
+            else if (disabled) Badge(label = "공연 종료", modifier = Modifier.padding(all = 10.dp))
         }
         Text(
             text = "2024.03.09 (토) 17:00",

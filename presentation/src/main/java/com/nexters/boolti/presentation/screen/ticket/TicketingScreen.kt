@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +52,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -62,6 +66,7 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,9 +137,25 @@ fun TicketingScreen(
 
                 // 예매자 정보
                 Section(title = "예매자 정보") {
-                    InputRow("이름", "", placeholder = "예) 김불티") {}
+                    var name by remember { mutableStateOf("") } // TODO remove
+                    var phoneNumber by remember { mutableStateOf("") } // TODO remove
+                    InputRow("이름", name, placeholder = "예) 김불티") {
+                        name = it
+                    }
                     Spacer(modifier = Modifier.size(16.dp))
-                    InputRow("연락처", "", placeholder = "예) 010-1234-5678") {}
+                    InputRow(
+                        "연락처",
+                        phoneNumber,
+                        placeholder = "예) 010-1234-5678",
+                        isPhoneNumber = true,
+                        imeAction = if (state.isSameContactInfo) {
+                            ImeAction.Default
+                        } else {
+                            ImeAction.Next
+                        },
+                    ) {
+                        phoneNumber = it
+                    }
                 }
 
                 // 입금자 정보
@@ -181,7 +202,13 @@ fun TicketingScreen(
                     if (!state.isSameContactInfo) {
                         InputRow("이름", "", placeholder = "예) 김불티") {}
                         Spacer(modifier = Modifier.size(16.dp))
-                        InputRow("연락처", "", placeholder = "예) 010-1234-5678") {}
+                        InputRow(
+                            "연락처",
+                            "",
+                            placeholder = "예) 010-1234-5678",
+                            isPhoneNumber = true,
+                            imeAction = ImeAction.Default,
+                        ) {}
                     }
                 }
 
@@ -347,7 +374,14 @@ private fun Section(
 }
 
 @Composable
-fun InputRow(label: String, text: String, placeholder: String = "", onValueChanged: (String) -> Unit) {
+fun InputRow(
+    label: String,
+    text: String,
+    placeholder: String = "",
+    isPhoneNumber: Boolean = false,
+    imeAction: ImeAction = ImeAction.Next,
+    onValueChanged: (String) -> Unit,
+) {
     Row {
         Text(
             text = label,
@@ -357,11 +391,24 @@ fun InputRow(label: String, text: String, placeholder: String = "", onValueChang
             style = MaterialTheme.typography.bodySmall,
         )
         BTTextField(
-            text = text,
+            text = text.filter { it.isDigit() }.run {
+                substring(0..minOf(10, lastIndex))
+            },
             placeholder = placeholder,
             modifier = Modifier
                 .padding(start = 12.dp)
                 .weight(1F),
+            singleLine = true,
+            keyboardOptions = if (isPhoneNumber) {
+                KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = imeAction)
+            } else {
+                KeyboardOptions.Default.copy(imeAction = imeAction)
+            },
+            visualTransformation = if (isPhoneNumber) {
+                PhoneNumberVisualTransformation('-')
+            } else {
+                VisualTransformation.None
+            },
             onValueChanged = onValueChanged,
         )
     }

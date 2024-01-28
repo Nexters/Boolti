@@ -12,6 +12,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -28,6 +29,7 @@ fun BTTextField(
     readOnly: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     singleLine: Boolean = false,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
@@ -50,6 +52,7 @@ fun BTTextField(
         maxLines = maxLines,
         minLines = minLines,
         isError = isError,
+        visualTransformation = visualTransformation,
         shape = RoundedCornerShape(4.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,

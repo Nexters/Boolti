@@ -59,11 +59,8 @@ fun ShowDetailScreen(
         sheetContent = {
             ChooseTicketBottomSheetContent(ticketingTickets = ticketItems, leftAmount = leftAmount) { ticket ->
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
-                scope.launch {
-                    scaffoldState.bottomSheetState.hide()
-                }.invokeOnCompletion {
-                    onTicketSelected(ticket.id)
-                }
+                onTicketSelected(ticket.id)
+                scope.launch { scaffoldState.bottomSheetState.hide() }
             }
         },
         sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,

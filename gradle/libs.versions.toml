@@ -1,4 +1,5 @@
 [versions]
+constraintlayoutCompose = "1.0.1"
 minSdk = "26"
 targetSdk = "34"
 versionCode = "1"
@@ -47,6 +48,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-material" }
 androidx-compose-material3-material3 = { module = "androidx.compose.material3:material3" }

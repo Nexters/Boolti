@@ -21,7 +21,6 @@ fun Badge(
     Text(
         text = label,
         modifier = modifier
-            .padding(8.dp)
             .clip(RoundedCornerShape(100.dp))
             .background(containerColor)
             .padding(vertical = 4.dp, horizontal = 12.dp),

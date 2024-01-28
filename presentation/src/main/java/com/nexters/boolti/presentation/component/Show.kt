@@ -39,7 +39,7 @@ fun Show(
     val now = LocalDate.now()
     val dDay = openDate.toEpochDay() - now.toEpochDay()
     val isPreview = now < openDate
-    val outdated = now > showDate
+    val disabled = now > showDate || isPreview
 
     val borderRadius = 8.dp
 
@@ -65,7 +65,7 @@ fun Show(
                     ),
                 contentScale = ContentScale.Crop,
             )
-            if (outdated) Box(
+            if (disabled) Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(210f / 297f)
@@ -74,7 +74,7 @@ fun Show(
                         alpha = 0.5f,
                     )
             )
-            if (outdated) Badge(label = "공연 종료", modifier = Modifier.padding(all = 10.dp))
+            if (disabled) Badge(label = "공연 종료", modifier = Modifier.padding(all = 10.dp))
             else if (isPreview) Badge(
                 label = "예매 시작 D-$dDay",
                 modifier = Modifier.padding(all = 10.dp),

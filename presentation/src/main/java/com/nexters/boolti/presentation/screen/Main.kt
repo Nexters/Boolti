@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
-import com.nexters.boolti.presentation.screen.ticket.TicketingScreen
+import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
 @Composable
@@ -38,8 +38,8 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
         ) {
             HomeScreen(
                 modifier = modifier,
-                onClickTicketing = {
-                    navController.navigate("ticketing/1") // TODO 공연 목록에서 선택했을 때 공연 아이디와 함께 넘겨줘야 함
+                onClickShowItem = {
+                    navController.navigate("showDetail/$it") // TODO 공연 목록에서 선택했을 때 공연 아이디와 함께 넘겨줘야 함
                 }
             ) {
                 navController.navigate("login")
@@ -56,10 +56,10 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             }
         }
         composable(
-            route = "ticketing/{showId}",
+            route = "showDetail/{showId}",
             arguments = listOf(navArgument("showId") { type = NavType.StringType })
         ) {
-            TicketingScreen(modifier = modifier) {
+            ShowDetailScreen(modifier = modifier) {
                 navController.popBackStack()
             }
         }

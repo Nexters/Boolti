@@ -21,13 +21,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
@@ -47,220 +53,248 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
+    onBackClicked: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val state by viewModel.state.collectAsState()
 
-    Box {
-        Column(
-            modifier = modifier
-                .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(scrollState)
-        ) {
-            Row(modifier = Modifier.padding(20.dp)) {
-                AsyncImage(
-                    model = state.poster,
-                    contentDescription = "포스터",
-                    modifier = Modifier.size(width = 70.dp, height = 98.dp),
-                    contentScale = ContentScale.Crop,
-                )
-
-                Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
-                    Text(
-                        text = state.ticket?.title ?: "",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 4.dp)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.padding(start = 20.dp),
+                title = { Text(text = "결제하기", style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_back),
+                        contentDescription = "뒤로 가기",
+                        modifier = Modifier.clickable { onBackClicked() },
                     )
-                    Text(
-                        text = "2024.03.09 (토) 17:30",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Grey30,
-                    )
-                }
-            }
-
-            // 예매자 정보
-            Section(title = "예매자 정보") {
-                InputRow("이름", "") {}
-                Spacer(modifier = Modifier.size(16.dp))
-                InputRow("연락처", "") {}
-            }
-
-            // 입금자 정보
-            Section(
-                title = "입금자 정보",
-                titleRowOption = {
-                    Row(
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
+            )
+        }
+    ) { innerPadding ->
+        Box(modifier = modifier.padding(innerPadding)) {
+            Column(
+                modifier = modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .verticalScroll(scrollState)
+            ) {
+                Row(modifier = Modifier.padding(20.dp)) {
+                    AsyncImage(
+                        model = state.poster,
+                        contentDescription = "포스터",
                         modifier = Modifier
-                            .padding(start = 20.dp)
-                            .clickable { viewModel.toggleIsSameContactInfo() }
-                    ) {
-                        if (state.isSameContactInfo) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_checkbox_selected),
-                                contentDescription = null,
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_checkbox_18),
-                                tint = Grey50,
-                                contentDescription = null,
-                            )
-                        }
+                            .size(width = 70.dp, height = 98.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                shape = RoundedCornerShape(4.dp),
+                            ),
+                        contentScale = ContentScale.Crop,
+                    )
+
+                    Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
                         Text(
-                            text = "예매자와 입금자가 같아요",
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(start = 4.dp)
+                            text = state.ticket?.title ?: "",
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Text(
+                            text = "2024.03.09 (토) 17:30",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Grey30,
                         )
                     }
-                },
-                modifier = Modifier.animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioNoBouncy,
-                        stiffness = Spring.StiffnessMedium,
-                    )
-                ),
-                contentVisible = !state.isSameContactInfo,
-            ) {
-                if (!state.isSameContactInfo) {
+                }
+
+                // 예매자 정보
+                Section(title = "예매자 정보") {
                     InputRow("이름", "") {}
                     Spacer(modifier = Modifier.size(16.dp))
                     InputRow("연락처", "") {}
                 }
-            }
 
-            // 티켓 정보
-            Section(title = "티켓 정보") {
-                SectionTicketInfo("선택한 티켓 종류", "일반 티켓 B", marginTop = 0.dp)
-                SectionTicketInfo(label = "선택한 티켓 개수", value = "1개")
-                SectionTicketInfo(label = "총 결제 금액", value = "5,000원")
-                Spacer(modifier = Modifier.padding(bottom = 8.dp))
-            }
-
-            // 결제 수단
-            Section(title = "결제 수단") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.secondaryContainer,
-                            shape = RoundedCornerShape(4.dp),
-                        )
-                        .background(MaterialTheme.colorScheme.surfaceTint)
-                        .padding(12.dp),
-                ) {
-                    Text(
-                        text = "계좌이체",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-                Row(Modifier.padding(top = 12.dp)) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_info_20),
-                        tint = Grey50,
-                        contentDescription = null,
-                    )
-                    Text(
-                        text = "다음 페이지에서 계좌 번호를 안내해 드릴게요",
-                        modifier = Modifier.padding(start = 4.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                }
-            }
-
-            // 취소/환불 규정
-            var expanded by remember { mutableStateOf(false) }
-            val refundPolicy = stringArrayResource(R.array.refund_policy)
-            val rotation by animateFloatAsState(
-                targetValue = if (expanded) 180F else 0F,
-                animationSpec = tween(),
-                label = "expandIconRotation"
-            )
-            Section(
-                title = "취소/환불 규정",
-                titleRowOption = {
-                    Icon(
-                        modifier = Modifier
-                            .rotate(rotation)
-                            .clickable { expanded = !expanded },
-                        painter = painterResource(R.drawable.ic_expand_24),
-                        tint = Grey50,
-                        contentDescription = null,
-                    )
-                },
-                contentVisible = expanded,
-            ) {
-                Column(
-                    Modifier
-                        .animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessMedium,
+                // 입금자 정보
+                Section(
+                    title = "입금자 정보",
+                    titleRowOption = {
+                        Row(
+                            modifier = Modifier
+                                .padding(start = 20.dp)
+                                .clickable { viewModel.toggleIsSameContactInfo() }
+                        ) {
+                            if (state.isSameContactInfo) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_checkbox_selected),
+                                    contentDescription = null,
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_checkbox_18),
+                                    tint = Grey50,
+                                    contentDescription = null,
+                                )
+                            }
+                            Text(
+                                text = "예매자와 입금자가 같아요",
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(start = 4.dp)
                             )
+                        }
+                    },
+                    modifier = Modifier.animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium,
                         )
+                    ),
+                    contentVisible = !state.isSameContactInfo,
                 ) {
-                    if (expanded) {
-                        refundPolicy.forEach {
-                            Row {
-                                Text(
-                                    text = "•",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Grey50,
+                    if (!state.isSameContactInfo) {
+                        InputRow("이름", "") {}
+                        Spacer(modifier = Modifier.size(16.dp))
+                        InputRow("연락처", "") {}
+                    }
+                }
+
+                // 티켓 정보
+                Section(title = "티켓 정보") {
+                    SectionTicketInfo("선택한 티켓 종류", "일반 티켓 B", marginTop = 0.dp)
+                    SectionTicketInfo(label = "선택한 티켓 개수", value = "1개")
+                    SectionTicketInfo(label = "총 결제 금액", value = "5,000원")
+                    Spacer(modifier = Modifier.padding(bottom = 8.dp))
+                }
+
+                // 결제 수단
+                Section(title = "결제 수단") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                shape = RoundedCornerShape(4.dp),
+                            )
+                            .background(MaterialTheme.colorScheme.surfaceTint)
+                            .padding(12.dp),
+                    ) {
+                        Text(
+                            text = "계좌이체",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                    Row(Modifier.padding(top = 12.dp)) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_info_20),
+                            tint = Grey50,
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = "다음 페이지에서 계좌 번호를 안내해 드릴게요",
+                            modifier = Modifier.padding(start = 4.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    }
+                }
+
+                // 취소/환불 규정
+                var expanded by remember { mutableStateOf(false) }
+                val refundPolicy = stringArrayResource(R.array.refund_policy)
+                val rotation by animateFloatAsState(
+                    targetValue = if (expanded) 180F else 0F,
+                    animationSpec = tween(),
+                    label = "expandIconRotation"
+                )
+                Section(
+                    title = "취소/환불 규정",
+                    titleRowOption = {
+                        Icon(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .rotate(rotation)
+                                .clickable { expanded = !expanded },
+                            painter = painterResource(R.drawable.ic_expand_24),
+                            tint = Grey50,
+                            contentDescription = null,
+                        )
+                    },
+                    contentVisible = expanded,
+                ) {
+                    Column(
+                        Modifier
+                            .animateContentSize(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioNoBouncy,
+                                    stiffness = Spring.StiffnessMedium,
                                 )
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Grey50,
-                                )
+                            )
+                    ) {
+                        if (expanded) {
+                            refundPolicy.forEach {
+                                Row {
+                                    Text(
+                                        text = "•",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Grey50,
+                                    )
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Grey50,
+                                    )
+                                }
                             }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(120.dp))
             }
-            Spacer(modifier = Modifier.height(120.dp))
-        }
 
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(16.dp)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.background.copy(alpha = 0F),
-                                MaterialTheme.colorScheme.background,
-                            )
-                        ),
-                        shape = RectangleShape,
-                    )
-            ) {}
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-                shape = RoundedCornerShape(4.dp),
-                contentPadding = PaddingValues(12.dp),
-                onClick = { /*TODO*/ },
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                Text(text = "5,000원 결제하기")
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.background.copy(alpha = 0F),
+                                    MaterialTheme.colorScheme.background,
+                                )
+                            ),
+                            shape = RectangleShape,
+                        )
+                ) {}
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    contentPadding = PaddingValues(12.dp),
+                    onClick = { /*TODO*/ },
+                ) {
+                    Text(text = "5,000원 결제하기")
+                }
             }
         }
     }
@@ -307,7 +341,9 @@ fun InputRow(label: String, text: String, placeholder: String = "", onValueChang
         BTTextField(
             text = text,
             placeholder = placeholder,
-            modifier = Modifier.weight(1F),
+            modifier = Modifier
+                .padding(start = 12.dp)
+                .weight(1F),
             onValueChanged = onValueChanged,
         )
     }
@@ -340,7 +376,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen()
+            TicketingScreen {}
         }
     }
 }

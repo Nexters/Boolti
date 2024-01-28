@@ -69,7 +69,9 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             route = "ticketing/{showId}",
             arguments = listOf(navArgument("showId") { type = NavType.StringType })
         ) {
-            TicketingScreen(modifier = modifier)
+            TicketingScreen(modifier = modifier) {
+                navController.popBackStack()
+            }
         }
     }
 }

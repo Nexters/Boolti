@@ -63,6 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -419,9 +420,7 @@ fun InputRow(
             style = MaterialTheme.typography.bodySmall,
         )
         BTTextField(
-            text = text.filter { it.isDigit() }.run {
-                substring(0..minOf(10, lastIndex))
-            },
+            text = if (isPhoneNumber) text.filterToPhoneNumber() else text,
             placeholder = placeholder,
             modifier = Modifier
                 .padding(start = 12.dp)

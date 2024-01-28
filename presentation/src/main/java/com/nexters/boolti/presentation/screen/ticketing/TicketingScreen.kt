@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -21,16 +20,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.swipeable
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +76,7 @@ import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,8 +86,10 @@ fun TicketingScreen(
     onBackClicked: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -102,6 +112,24 @@ fun TicketingScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
             )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 100.dp),
+            ) { data ->
+                Card(
+                    shape = RoundedCornerShape(4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                ) {
+                    Text(
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                        text = data.visuals.message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
         }
     ) { innerPadding ->
         Box(modifier = modifier.padding(innerPadding)) {
@@ -257,13 +285,12 @@ fun TicketingScreen(
                             )
                             .background(MaterialTheme.colorScheme.surfaceTint)
                             .clickable(role = Role.DropdownList) {
-                                Toast
-                                    .makeText(
-                                        context,
-                                        context.getString(R.string.ticketing_payment_message),
-                                        Toast.LENGTH_SHORT
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = context.getString(R.string.ticketing_payment_message),
+                                        duration = SnackbarDuration.Short,
                                     )
-                                    .show()
+                                }
                             }
                             .padding(12.dp),
                     ) {
@@ -357,7 +384,7 @@ fun TicketingScreen(
                             ),
                             shape = RectangleShape,
                         )
-                ) {}
+                )
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()

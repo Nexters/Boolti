@@ -48,6 +48,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 fun ChooseTicketBottomSheetContent(
     modifier: Modifier = Modifier,
     ticketingTickets: List<TicketingTicket> = emptyList(),
+    leftAmount: Map<String, Int>,
     onTicketingClicked: (TicketingTicket) -> Unit,
 ) {
     var selectedItem by remember { mutableStateOf<TicketingTicket?>(null) }
@@ -66,11 +67,17 @@ fun ChooseTicketBottomSheetContent(
             ChooseTicketBottomSheetContent2(
                 modifier,
                 it,
+                leftAmount = leftAmount,
                 onCloseClicked = { selectedItem = null },
                 onTicketingClicked = onTicketingClicked,
             )
         } ?: run {
-            ChooseTicketBottomSheetContent1(modifier, listState , ticketingTickets) { item ->
+            ChooseTicketBottomSheetContent1(
+                modifier = modifier,
+                listState = listState,
+                items = ticketingTickets,
+                leftAmount = leftAmount,
+            ) { item ->
                 selectedItem = item
             }
         }
@@ -82,6 +89,7 @@ private fun ChooseTicketBottomSheetContent1(
     modifier: Modifier,
     listState: LazyListState,
     items: List<TicketingTicket>,
+    leftAmount: Map<String, Int>,
     onSelectItem: (TicketingTicket) -> Unit,
 ) {
     LazyColumn(
@@ -89,7 +97,11 @@ private fun ChooseTicketBottomSheetContent1(
         state = listState
     ) {
         items(items, key = { it.id }) {
-            TicketingTicketItem(ticketingTicket = it, onClick = onSelectItem)
+            TicketingTicketItem(
+                ticketingTicket = it,
+                leftAmount = leftAmount.getOrDefault(it.id, 0),
+                onClick = onSelectItem,
+            )
         }
     }
 }
@@ -98,6 +110,7 @@ private fun ChooseTicketBottomSheetContent1(
 private fun ChooseTicketBottomSheetContent2(
     modifier: Modifier,
     item: TicketingTicket,
+    leftAmount: Map<String, Int>,
     onCloseClicked: () -> Unit,
     onTicketingClicked: (TicketingTicket) -> Unit,
 ) {
@@ -116,7 +129,7 @@ private fun ChooseTicketBottomSheetContent2(
                     )
                     if (!item.isInviteTicket) {
                         Badge(
-                            stringResource(R.string.badge_left_ticket_amount, item.leftAmount),
+                            stringResource(R.string.badge_left_ticket_amount, leftAmount.getOrDefault(item.id, 0)),
                             modifier = Modifier.padding(start = 8.dp),
                         )
                     }
@@ -176,8 +189,12 @@ private fun ChooseTicketBottomSheetContent2(
 }
 
 @Composable
-private fun TicketingTicketItem(ticketingTicket: TicketingTicket, onClick: (TicketingTicket) -> Unit) {
-    val enabled = ticketingTicket.isInviteTicket || ticketingTicket.leftAmount > 0
+private fun TicketingTicketItem(
+    ticketingTicket: TicketingTicket,
+    leftAmount: Int,
+    onClick: (TicketingTicket) -> Unit
+) {
+    val enabled = ticketingTicket.isInviteTicket || leftAmount > 0
 
     Row(
         modifier = Modifier
@@ -191,9 +208,9 @@ private fun TicketingTicketItem(ticketingTicket: TicketingTicket, onClick: (Tick
             text = ticketingTicket.title,
             style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey30 else Grey70),
         )
-        if (!ticketingTicket.isInviteTicket && ticketingTicket.leftAmount > 0) {
+        if (!ticketingTicket.isInviteTicket && leftAmount > 0) {
             Badge(
-                stringResource(R.string.badge_left_ticket_amount, ticketingTicket.leftAmount),
+                stringResource(R.string.badge_left_ticket_amount, leftAmount),
                 Modifier.padding(start = 8.dp),
             )
         }
@@ -226,9 +243,9 @@ private fun Badge(label: String, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun TicketingTicketItemPreview() {
-    val item = TicketingTicket("item1", true, "일반 티켓 A", 5000, 0)
+    val item = TicketingTicket("item1", true, "일반 티켓 A", 5000)
     BooltiTheme {
-        TicketingTicketItem(ticketingTicket = item) {}
+        TicketingTicketItem(ticketingTicket = item, leftAmount = 5) {}
     }
 }
 

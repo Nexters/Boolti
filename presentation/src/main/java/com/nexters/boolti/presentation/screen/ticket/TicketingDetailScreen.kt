@@ -339,7 +339,7 @@ private fun TicketingDetailScreenPreview() {
         Surface {
             val state = TicketingState(
                 poster = "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png",
-                ticket = TicketingTicket("", false, "임영웅 콘서트", 119000, 5)
+                ticket = TicketingTicket("", false, "임영웅 콘서트", 119000)
             )
             TicketingDetailScreen(state = state)
         }

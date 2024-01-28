@@ -4,9 +4,10 @@ import com.nexters.boolti.domain.model.TicketingTicket
 
 data class TicketingState(
     val poster: String,
-    val ticket: TicketingTicket,
     val isSameContactInfo: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
+    val ticket: TicketingTicket,
+    private val leftAmount: Map<String, Int> = emptyMap(),
 )
 
 sealed interface InviteCodeStatus {

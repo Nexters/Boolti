@@ -12,14 +12,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -34,7 +32,7 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 fun HomeScreen(
     modifier: Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    onClickTicketing: () -> Unit,
+    onClickShowItem: (showId: String) -> Unit,
     requireLogin: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -65,7 +63,7 @@ fun HomeScreen(
             ) {
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
-                    onClickTicketing,
+                    onClickShowItem,
                 )
             }
             composable(

@@ -119,35 +119,33 @@ fun ShowAppBar(
 fun SearchBar(
     modifier: Modifier = Modifier,
 ) {
-    Row {
-        TextField(
-            modifier = modifier
-                .fillMaxWidth(),
-            value = "",
-            onValueChange = {},
-            placeholder = {
-                Text(
-                    stringResource(id = R.string.search_bar_hint),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
-                )
-            },
-            shape = RoundedCornerShape(4.dp),
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_search),
-                    contentDescription = "검색",
-                    tint = Grey60,
-                )
-            },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-            colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.White,
-                unfocusedContainerColor = Grey85,
-                focusedContainerColor = Grey85,
-            ),
-        )
-    }
+    TextField(
+        modifier = modifier
+            .fillMaxWidth(),
+        value = "",
+        onValueChange = {},
+        placeholder = {
+            Text(
+                stringResource(id = R.string.search_bar_hint),
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
+            )
+        },
+        shape = RoundedCornerShape(4.dp),
+        trailingIcon = {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.ic_search),
+                contentDescription = "검색",
+                tint = Grey60,
+            )
+        },
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+        colors = TextFieldDefaults.colors(
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            cursorColor = Color.White,
+            unfocusedContainerColor = Grey85,
+            focusedContainerColor = Grey85,
+        ),
+    )
 }

@@ -18,12 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.theme.Grey50
@@ -46,7 +48,7 @@ fun TicketDetailScreen(
             modifier = Modifier
                 .align(Alignment.Center)
                 .clickable { showEnterCodeDialog = true },
-            text = "입장 코드 입력하기",
+            text = stringResource(R.string.input_enter_code_button),
             style = MaterialTheme.typography.bodySmall,
             color = Grey50,
             textDecoration = TextDecoration.Underline,
@@ -63,14 +65,14 @@ fun TicketDetailScreen(
             onClickPositiveButton = { /* TODO 입장 코드 검증 */ }
         ) {
             Text(
-                text = "입장 코드로 입장 확인",
+                text = stringResource(R.string.enter_code_dialog_title),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.",
+                text = stringResource(R.string.enter_code_dialog_desc),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -80,7 +82,7 @@ fun TicketDetailScreen(
             )
             BTTextField(
                 text = enterCode,
-                placeholder = "입장 코드를 입력해 주세요",
+                placeholder = stringResource(R.string.enter_code_dialog_placeholder),
                 onValueChanged = {
                     enterCodeError = false
                     enterCode = it
@@ -111,7 +113,7 @@ fun TicketDetailScreen(
             )
             if (enterCodeError) {
                 Text(
-                    text = "올바른 입장 코드를 입력해 주세요",
+                    text = stringResource(R.string.enter_code_dialog_error_msg),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp),

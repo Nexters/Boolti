@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -170,23 +171,14 @@ private fun ChooseTicketBottomSheetContent2(
             )
         }
 
-        Button(
+        MainButton(
+            label = stringResource(R.string.ticketing_button_label),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
                 .height(48.dp),
-            shape = RoundedCornerShape(4.dp),
-            colors = ButtonDefaults.textButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
             onClick = { onTicketingClicked(item) },
-        ) {
-            Text(
-                text = stringResource(R.string.ticketing_button_label),
-                style = MaterialTheme.typography.titleMedium,
-            )
-        }
+        )
     }
 }
 

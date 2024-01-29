@@ -5,7 +5,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import com.nexters.boolti.presentation.R
 
-@Composable
-fun getMarginHorizontal(): Dp {
-    return dimensionResource(id = R.dimen.margin_horizontal)
-}
+val marginHorizontal: Dp
+    @Composable
+    get() = dimensionResource(id = R.dimen.margin_horizontal)

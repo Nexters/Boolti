@@ -37,7 +37,7 @@ import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
-import com.nexters.boolti.presentation.theme.getMarginHorizontal
+import com.nexters.boolti.presentation.theme.marginHorizontal
 import java.time.LocalDate
 
 @Composable
@@ -56,7 +56,7 @@ fun ShowScreen(
             contentAlignment = Alignment.Center,
         ) {
             LazyVerticalGrid(
-                modifier = Modifier.padding(horizontal = getMarginHorizontal()),
+                modifier = Modifier.padding(horizontal = marginHorizontal),
                 columns = GridCells.Adaptive(minSize = 150.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalArrangement = Arrangement.spacedBy(28.dp),
@@ -79,7 +79,7 @@ fun ShowAppBar(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = getMarginHorizontal()),
+            .padding(horizontal = marginHorizontal),
     ) {
         Box(
             modifier = Modifier.height(44.dp),

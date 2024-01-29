@@ -17,6 +17,10 @@ val pretendardFamily = FontFamily(
     Font(R.font.pretendard_semi_bold, FontWeight.SemiBold)
 )
 
+val aggroFamily = FontFamily(
+    Font(R.font.sb_aggro_b, FontWeight.Normal),
+)
+
 private val headline3 = TextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
@@ -46,7 +50,7 @@ private val subhead1 = TextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 16.sp,
-    lineHeight = 22.sp,
+    lineHeight = 24.sp,
 )
 
 private val body4 = TextStyle(
@@ -59,19 +63,19 @@ private val body3 = TextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 16.sp,
-    lineHeight = 22.sp,
+    lineHeight = 24.sp,
 )
 private val body2 = TextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 15.sp,
-    lineHeight = 21.sp,
+    lineHeight = 23.sp,
 )
 private val body1 = TextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 14.sp,
-    lineHeight = 20.sp,
+    lineHeight = 22.sp,
 )
 
 private val caption = TextStyle(

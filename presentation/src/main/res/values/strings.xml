@@ -3,6 +3,10 @@
     <string name="menu_tickets">티켓내역</string>
     <string name="menu_my">마이페이지</string>
 
+    <!-- 홈(Show) -->
+    <string name="finished_show">공연 종료</string>
+    <string name="search_bar_hint">공연명으로 검색해 주세요</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>

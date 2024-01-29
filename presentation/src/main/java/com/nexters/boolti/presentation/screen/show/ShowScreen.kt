@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -126,7 +127,7 @@ fun SearchBar(
             onValueChange = {},
             placeholder = {
                 Text(
-                    "공연명으로 검색해 주세요",
+                    stringResource(id = R.string.search_bar_hint),
                     style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
                 )
             },

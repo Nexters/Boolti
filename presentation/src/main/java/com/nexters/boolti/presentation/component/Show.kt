@@ -18,12 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
@@ -80,7 +82,7 @@ fun Show(
                 color = Grey05,
                 containerColor = MaterialTheme.colorScheme.primary,
             )
-            else if (disabled) Badge(label = "공연 종료", modifier = Modifier.padding(all = 10.dp))
+            else if (disabled) Badge(label = stringResource(id = R.string.finished_show), modifier = Modifier.padding(all = 10.dp))
         }
         Text(
             text = "2024.03.09 (토) 17:00",

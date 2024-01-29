@@ -18,12 +18,12 @@ class LoginViewModel @Inject constructor(
     private val _event = Channel<LoginEvent>()
     val event = _event.receiveAsFlow()
 
-    fun login() {
+    fun login(accessToken: String) {
         viewModelScope.launch {
-            authRepository.kakaoLogin(LoginRequest("")).onSuccess {
+            authRepository.kakaoLogin(LoginRequest(accessToken)).onSuccess {
                 if (it) event(LoginEvent.Success) else event(LoginEvent.RequireSignUp)
             }.onFailure {
-                Timber.tag("mangbaam_LoginViewModel").d("login failed: $it")
+                Timber.d("login failed: $it")
                 event(LoginEvent.Invalid)
             }
         }

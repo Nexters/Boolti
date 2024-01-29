@@ -24,18 +24,22 @@ import androidx.compose.ui.unit.dp
 import com.kakao.sdk.user.UserApiClient
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey95
+import timber.log.Timber
 
 @Composable
-fun KakaoLoginButton(modifier: Modifier = Modifier) {
+fun KakaoLoginButton(
+    onClick: (accessToken: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val localContext = LocalContext.current
     TextButton(
         onClick = {
             UserApiClient.instance.loginWithKakaoTalk(localContext) { token, error ->
                 if (error != null) {
                     // TODO 로그인 실패 처리
-                    Log.e("KakaoLoginButton", "로그인 실패", error)
+                    Timber.e("KakaoLoginButton", "로그인 실패", error)
                 } else if (token != null) {
-                    // TODO token.accessToken를 사용하여 로그인 성공 처리
+                    onClick(token.accessToken)
                 }
             }
         },

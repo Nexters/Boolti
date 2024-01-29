@@ -12,13 +12,12 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenDataSource: TokenDataSource,
 ) : AuthRepository {
     override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
-        tokenDataSource.saveTokens("123123", "123123") // TODO Remove me
         return authDataSource.login(request)
             .onSuccess { response ->
                 tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             }
             .mapCatching {
-                !it.signupRequired
+                !it.signUpRequired
             }
     }
 

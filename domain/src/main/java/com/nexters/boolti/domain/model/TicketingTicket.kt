@@ -5,5 +5,4 @@ data class TicketingTicket(
     val isInviteTicket: Boolean,
     val title: String,
     val price: Int,
-    val leftAmount: Int,
 )

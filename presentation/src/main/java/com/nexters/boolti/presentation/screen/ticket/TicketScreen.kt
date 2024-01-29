@@ -57,9 +57,13 @@ fun TicketScreen(
                     isInviteTicket = listOf(true, false).random(),
                     title = "티켓 ${it + 1}",
                     price = (100..100000).random(),
-                    leftAmount = listOf(0, 100).random(),
                 )
             )
+        }
+    }
+    val leftAmount = buildMap {
+        ticketItems.forEach {
+            put(it.id, listOf(0, 50, 100).random())
         }
     }
 
@@ -67,7 +71,7 @@ fun TicketScreen(
         modifier = modifier,
         scaffoldState = scaffoldState,
         sheetContent = {
-            ChooseTicketBottomSheetContent(ticketingTickets = ticketItems) {
+            ChooseTicketBottomSheetContent(ticketingTickets = ticketItems, leftAmount = leftAmount) {
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $it")
             }
         },

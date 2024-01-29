@@ -12,6 +12,8 @@
     <string name="sold_out_label">품절</string>
     <string name="bullet">•</string>
 
+    <string name="btn_ok">확인</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>

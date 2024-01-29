@@ -42,7 +42,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             HomeScreen(
                 modifier = modifier,
                 onClickShowItem = {
-                    navController.navigate("showDetail/$it")
+                    navController.navigate("show/$it")
                 },
                 onClickTicket = {
                     navController.navigate("ticket/$it")

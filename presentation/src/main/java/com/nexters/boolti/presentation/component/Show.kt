@@ -52,9 +52,7 @@ fun Show(
             contentAlignment = Alignment.BottomEnd,
         ) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://picsum.photos/200/200")
-                    .build(),
+                model = "https://picsum.photos/200/200",
                 contentDescription = "poster",
                 modifier = Modifier
                     .fillMaxWidth()

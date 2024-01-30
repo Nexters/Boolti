@@ -30,8 +30,8 @@ class LoginViewModel @Inject constructor(
     private val _event = Channel<LoginEvent>()
     val event = _event.receiveAsFlow()
 
-    fun login(accessToken: String, idToken: String) {
-        updateUserInfo(idToken = idToken)
+    fun loginWithKaKao(accessToken: String, idToken: String) {
+        updateUserInfoFromKaKao(idToken = idToken)
 
         viewModelScope.launch {
             authRepository.kakaoLogin(LoginRequest(accessToken)).onSuccess {
@@ -43,7 +43,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun updateUserInfo(idToken: String) {
+    private fun updateUserInfoFromKaKao(idToken: String) {
         val payloadMap = JwtUtil().decodePayload(idToken)
 
         val profileImageUrl = payloadMap["picture"]?.replace("http:", "https:")

@@ -90,7 +90,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .padding(top = 48.dp)
                         .padding(horizontal = marginHorizontal),
-                    onClick = viewModel::login,
+                    onClick = viewModel::loginWithKaKao,
                 )
             }
         }

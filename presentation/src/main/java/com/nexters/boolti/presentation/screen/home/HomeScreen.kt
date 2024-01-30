@@ -33,6 +33,7 @@ fun HomeScreen(
     modifier: Modifier,
     viewModel: MainViewModel = hiltViewModel(),
     onClickShowItem: (showId: String) -> Unit,
+    onClickTicket: (ticketId: String) -> Unit,
     requireLogin: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -70,8 +71,8 @@ fun HomeScreen(
                 route = Destination.Ticket.route,
             ) {
                 TicketScreen(
+                    onClickTicket = onClickTicket,
                     modifier = modifier.padding(innerPadding),
-                    requireLogin = requireLogin,
                 )
             }
             composable(

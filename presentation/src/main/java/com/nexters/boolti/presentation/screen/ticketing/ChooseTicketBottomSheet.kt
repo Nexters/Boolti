@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,10 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
@@ -38,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.Badge
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
@@ -171,23 +167,14 @@ private fun ChooseTicketBottomSheetContent2(
             )
         }
 
-        Button(
+        MainButton(
+            label = stringResource(R.string.ticketing_button_label),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
                 .height(48.dp),
-            shape = RoundedCornerShape(4.dp),
-            colors = ButtonDefaults.textButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
             onClick = { onTicketingClicked(item) },
-        ) {
-            Text(
-                text = stringResource(R.string.ticketing_button_label),
-                style = MaterialTheme.typography.titleMedium,
-            )
-        }
+        )
     }
 }
 
@@ -195,7 +182,7 @@ private fun ChooseTicketBottomSheetContent2(
 private fun TicketingTicketItem(
     ticketingTicket: TicketingTicket,
     leftAmount: Int,
-    onClick: (TicketingTicket) -> Unit
+    onClick: (TicketingTicket) -> Unit,
 ) {
     val enabled = ticketingTicket.isInviteTicket || leftAmount > 0
 

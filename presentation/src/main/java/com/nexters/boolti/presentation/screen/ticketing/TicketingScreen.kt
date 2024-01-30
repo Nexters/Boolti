@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +24,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,6 +66,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
@@ -383,17 +382,14 @@ fun TicketingScreen(
                             shape = RectangleShape,
                         )
                 )
-                Button(
+                MainButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-                    shape = RoundedCornerShape(4.dp),
-                    contentPadding = PaddingValues(12.dp),
-                    onClick = { /*TODO*/ },
-                ) {
-                    Text(text = stringResource(R.string.ticketing_payment_button_label, 5000)) // TODO 데이터 붙일 때 연결
-                }
+                    label = stringResource(R.string.ticketing_payment_button_label, 5000),
+                    onClick = { /* TODO */ },
+                ) // TODO 데이터 붙일 때 연결
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
+import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
@@ -41,8 +42,11 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             HomeScreen(
                 modifier = modifier,
                 onClickShowItem = {
-                    navController.navigate("showDetail/$it")
-                }
+                    navController.navigate("show/$it")
+                },
+                onClickTicket = {
+                    navController.navigate("ticket/$it")
+                },
             ) {
                 navController.navigate("login")
             }
@@ -58,16 +62,22 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             }
         }
         composable(
-            route = "showDetail/{showId}",
-            arguments = listOf(navArgument("showId") { type = NavType.StringType })
+            route = "show/{showId}",
+            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
             ShowDetailScreen(modifier = modifier) {
                 navController.navigate("ticketing/$it")
             }
         }
         composable(
+            route = "ticket/{ticketId}",
+            arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
+        ) {
+            TicketDetailScreen(modifier = modifier)
+        }
+        composable(
             route = "ticketing/{showId}",
-            arguments = listOf(navArgument("showId") { type = NavType.StringType })
+            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
             TicketingScreen(modifier = modifier) {
                 navController.popBackStack()

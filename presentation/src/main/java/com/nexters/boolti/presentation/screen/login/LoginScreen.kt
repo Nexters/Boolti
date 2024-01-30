@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,8 +49,6 @@ fun LoginScreen(
             when (it) {
                 LoginEvent.Success -> Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
                 LoginEvent.RequireSignUp -> {
-                    Toast.makeText(context, "회원가입 필요", Toast.LENGTH_SHORT)
-                        .show()
                     scaffoldState.bottomSheetState.expand()
                 }
 
@@ -105,6 +104,7 @@ private fun LoginAppBar(
 ) {
     Box(
         modifier = modifier
+            .fillMaxWidth()
             .height(44.dp)
             .background(color = Grey95),
     ) {

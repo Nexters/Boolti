@@ -71,10 +71,9 @@ fun HomeScreen(
                 route = Destination.Ticket.route,
             ) {
                 TicketScreen(
+                    onClickTicket = onClickTicket,
                     modifier = modifier.padding(innerPadding),
-                ) {
-                    onClickTicket(it)
-                }
+                )
             }
             composable(
                 route = Destination.My.route,

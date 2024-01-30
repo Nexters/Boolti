@@ -29,7 +29,7 @@ fun MainButton(
 ) {
     Button(
         modifier = modifier,
-        onClick = { onClick() },
+        onClick = onClick,
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,

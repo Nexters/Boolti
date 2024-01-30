@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TicketScreen(
-    modifier: Modifier = Modifier,
     onClickTicket: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
         modifier = modifier,

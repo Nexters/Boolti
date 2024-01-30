@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,8 +73,12 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey90
+import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.launch
 
@@ -87,6 +94,8 @@ fun TicketingScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val isInviteTicket by remember { mutableStateOf(true) } // TODO 실제 데이터로 교체 필요
 
     Scaffold(
         topBar = {
@@ -194,61 +203,63 @@ fun TicketingScreen(
                     }
                 }
 
-                // 입금자 정보
-                Section(
-                    title = stringResource(R.string.ticketing_depositor_label),
-                    titleRowOption = {
-                        Row(
-                            modifier = Modifier
-                                .padding(start = 20.dp)
-                                .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
-                        ) {
-                            if (state.isSameContactInfo) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_checkbox_selected),
-                                    tint = Grey05,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .padding(3.dp)
-                                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_checkbox_18),
-                                    tint = Grey50,
-                                    contentDescription = null,
+                if (!isInviteTicket) {
+                    // 입금자 정보
+                    Section(
+                        title = stringResource(R.string.ticketing_depositor_label),
+                        titleRowOption = {
+                            Row(
+                                modifier = Modifier
+                                    .padding(start = 20.dp)
+                                    .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
+                            ) {
+                                if (state.isSameContactInfo) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_checkbox_selected),
+                                        tint = Grey05,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .padding(3.dp)
+                                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_checkbox_18),
+                                        tint = Grey50,
+                                        contentDescription = null,
+                                    )
+                                }
+                                Text(
+                                    text = stringResource(R.string.ticketing_same_contact_info),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 4.dp)
                                 )
                             }
-                            Text(
-                                text = stringResource(R.string.ticketing_same_contact_info),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(start = 4.dp)
+                        },
+                        modifier = Modifier.animateContentSize(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMedium,
                             )
+                        ),
+                        contentVisible = !state.isSameContactInfo,
+                    ) {
+                        if (!state.isSameContactInfo) {
+                            InputRow(
+                                stringResource(R.string.ticketing_name_label),
+                                "",
+                                placeholder = stringResource(R.string.ticketing_name_placeholder),
+                            ) {}
+                            Spacer(modifier = Modifier.size(16.dp))
+                            InputRow(
+                                stringResource(R.string.ticketing_contact_label),
+                                "",
+                                placeholder = stringResource(R.string.ticketing_contact_placeholder),
+                                isPhoneNumber = true,
+                                imeAction = ImeAction.Default,
+                            ) {}
                         }
-                    },
-                    modifier = Modifier.animateContentSize(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMedium,
-                        )
-                    ),
-                    contentVisible = !state.isSameContactInfo,
-                ) {
-                    if (!state.isSameContactInfo) {
-                        InputRow(
-                            stringResource(R.string.ticketing_name_label),
-                            "",
-                            placeholder = stringResource(R.string.ticketing_name_placeholder),
-                        ) {}
-                        Spacer(modifier = Modifier.size(16.dp))
-                        InputRow(
-                            stringResource(R.string.ticketing_contact_label),
-                            "",
-                            placeholder = stringResource(R.string.ticketing_contact_placeholder),
-                            isPhoneNumber = true,
-                            imeAction = ImeAction.Default,
-                        ) {}
                     }
                 }
 
@@ -270,45 +281,95 @@ fun TicketingScreen(
                     Spacer(modifier = Modifier.padding(bottom = 8.dp))
                 }
 
-                // 결제 수단
-                Section(title = stringResource(R.string.ticketing_payment_label)) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                shape = RoundedCornerShape(4.dp),
+                if (isInviteTicket) {
+                    // 초청 코드
+                    Section(title = stringResource(R.string.ticketing_invite_code_label)) {
+                        var inviteCode by remember { mutableStateOf("") }
+                        var inviteCodeUsed by remember { mutableStateOf(false) }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            BTTextField(
+                                modifier = Modifier
+                                    .weight(1F)
+                                    .padding(end = 6.dp),
+                                text = inviteCode,
+                                singleLine = true,
+                                placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    keyboardType = KeyboardType.Password,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                onValueChanged = { inviteCode = it },
                             )
-                            .background(MaterialTheme.colorScheme.surfaceTint)
-                            .clickable(role = Role.DropdownList) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.ticketing_payment_message),
-                                        duration = SnackbarDuration.Short,
-                                    )
-                                }
+                            Button(
+                                onClick = { inviteCodeUsed = true },
+                                enabled = !inviteCodeUsed,
+                                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
+                                shape = RoundedCornerShape(4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Grey20,
+                                    disabledContainerColor = Grey80,
+                                    contentColor = Grey90,
+                                    disabledContentColor = Grey50,
+                                ),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.ticketing_invite_code_use_button),
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
                             }
-                            .padding(12.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.ticketing_payment_account_transfer),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        }
+                        if (inviteCodeUsed) {
+                            Text(
+                                modifier = Modifier.padding(top = 12.dp),
+                                text = stringResource(R.string.ticketing_invite_code_success),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Success,
+                            )
+                        }
                     }
-                    Row(Modifier.padding(top = 12.dp)) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_info_20),
-                            tint = Grey50,
-                            contentDescription = null,
-                        )
-                        Text(
-                            text = stringResource(R.string.ticketing_payment_information),
-                            modifier = Modifier.padding(start = 4.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        )
+                }
+
+                if (!isInviteTicket) {
+                    // 결제 수단
+                    Section(title = stringResource(R.string.ticketing_payment_label)) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = RoundedCornerShape(4.dp),
+                                )
+                                .background(MaterialTheme.colorScheme.surfaceTint)
+                                .clickable(role = Role.DropdownList) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = context.getString(R.string.ticketing_payment_message),
+                                            duration = SnackbarDuration.Short,
+                                        )
+                                    }
+                                }
+                                .padding(12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.ticketing_payment_account_transfer),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                        Row(Modifier.padding(top = 12.dp)) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_info_20),
+                                tint = Grey50,
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = stringResource(R.string.ticketing_payment_information),
+                                modifier = Modifier.padding(start = 4.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
+                        }
                     }
                 }
 
@@ -316,7 +377,7 @@ fun TicketingScreen(
                 var expanded by remember { mutableStateOf(false) }
                 val refundPolicy = stringArrayResource(R.array.refund_policy)
                 val rotation by animateFloatAsState(
-                    targetValue = if (expanded) 180F else 0F,
+                    targetValue = if (expanded) 0F else 180F,
                     animationSpec = tween(),
                     label = "expandIconRotation"
                 )

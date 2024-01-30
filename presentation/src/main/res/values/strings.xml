@@ -34,6 +34,7 @@
     <string name="ticketing_ticket_holder_label">예매자 정보</string>
     <string name="ticketing_depositor_label">입금자 정보</string>
     <string name="ticketing_ticket_info_label">티켓 정보</string>
+    <string name="ticketing_invite_code_label">초청 코드</string>
     <string name="ticketing_payment_label">결제 수단</string>
     <string name="ticketing_refund_policy_label">취소/환불 규정</string>
     <string name="ticketing_payment_account_transfer">계좌 이체</string>
@@ -41,6 +42,9 @@
     <string name="ticketing_contact_label">연락처</string>
     <string name="ticketing_name_placeholder">예) 김불티</string>
     <string name="ticketing_contact_placeholder">연락처</string>
+    <string name="ticketing_invite_code_placeholder">예) B123456</string>
+    <string name="ticketing_invite_code_use_button">사용하기</string>
+    <string name="ticketing_invite_code_success">사용되었습니다.</string>
     <string name="ticketing_same_contact_info">예매자와 입금자가 같아요</string>
     <string name="ticketing_selected_ticket">선택한 티켓 종류</string>
     <string name="ticketing_selected_ticket_count">선택한 티켓 개수</string>

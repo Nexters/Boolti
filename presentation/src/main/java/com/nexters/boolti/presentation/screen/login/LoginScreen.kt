@@ -61,7 +61,7 @@ fun LoginScreen(
 
     BottomSheetScaffold(
         topBar = { LoginAppBar(onBackPressed = onBackPressed) },
-        sheetContent = { SignUpBottomSheet() },
+        sheetContent = { SignUpBottomSheet(signUp = viewModel::signUp) },
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContainerColor = Grey85,
@@ -122,7 +122,10 @@ private fun LoginAppBar(
 }
 
 @Composable
-private fun SignUpBottomSheet(modifier: Modifier = Modifier) {
+private fun SignUpBottomSheet(
+    signUp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.padding(horizontal = 24.dp),
     ) {
@@ -141,7 +144,7 @@ private fun SignUpBottomSheet(modifier: Modifier = Modifier) {
                 .padding(vertical = 8.dp)
                 .padding(bottom = 34.dp),
             text = stringResource(id = R.string.signup_with_agreement),
-            onClick = {},
+            onClick = signUp,
         )
     }
 }

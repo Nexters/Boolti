@@ -8,7 +8,7 @@ import javax.inject.Inject
 class SignUpDataSource @Inject constructor(
     private val signUpService: SignUpService,
 ) {
-    suspend fun signUp(signUpRequest: SignUpRequest): Result<SignUpResponse> {
-        return signUpService.signup(signUpRequest)
+    suspend fun signUp(signUpRequest: SignUpRequest): Result<SignUpResponse> = runCatching {
+        signUpService.signup(signUpRequest)
     }
 }

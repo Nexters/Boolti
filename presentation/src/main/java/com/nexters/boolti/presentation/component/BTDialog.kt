@@ -1,0 +1,98 @@
+package com.nexters.boolti.presentation.component
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.theme.BooltiTheme
+
+@Composable
+fun BTDialog(
+    enableDismiss: Boolean = true,
+    showCloseButton: Boolean = true,
+    onDismiss: () -> Unit = {},
+    positiveButtonLabel: String = stringResource(R.string.btn_ok),
+    positiveButtonEnabled: Boolean = true,
+    onClickPositiveButton: () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Dialog(
+        properties = DialogProperties(
+            dismissOnBackPress = enableDismiss,
+            dismissOnClickOutside = enableDismiss,
+            usePlatformDefaultWidth = false,
+        ),
+        onDismissRequest = { onDismiss() }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .fillMaxWidth()
+                ) {
+                    if (showCloseButton) {
+                        Icon(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .clickable { onDismiss() },
+                            painter = painterResource(id = R.drawable.ic_close),
+                            contentDescription = stringResource(R.string.description_close_button),
+                        )
+                    }
+                }
+                content()
+                Spacer(modifier = Modifier.size(28.dp))
+                MainButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = positiveButtonLabel,
+                    enabled = positiveButtonEnabled,
+                    onClick = onClickPositiveButton,
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BTDialogPreview() {
+    BooltiTheme {
+        Surface {
+            BTDialog {
+                Text(text = "관리자 코드로 입장 확인")
+            }
+        }
+    }
+}

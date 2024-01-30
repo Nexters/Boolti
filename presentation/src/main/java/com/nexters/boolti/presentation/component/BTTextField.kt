@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -33,6 +34,23 @@ fun BTTextField(
     singleLine: Boolean = false,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        errorTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        focusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedPlaceholderColor = Grey70,
+        unfocusedPlaceholderColor = Grey70,
+        disabledPlaceholderColor = Grey70,
+        errorPlaceholderColor = Grey70,
+        focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        errorBorderColor = MaterialTheme.colorScheme.surfaceTint,
+    ),
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     OutlinedTextField(
@@ -54,23 +72,7 @@ fun BTTextField(
         isError = isError,
         visualTransformation = visualTransformation,
         shape = RoundedCornerShape(4.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            errorTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceTint,
-            focusedPlaceholderColor = Grey70,
-            unfocusedPlaceholderColor = Grey70,
-            disabledPlaceholderColor = Grey70,
-            errorPlaceholderColor = Grey70,
-            focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
-            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
-            disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
-            errorBorderColor = MaterialTheme.colorScheme.surfaceTint,
-        ),
+        colors = colors,
     )
 }
 

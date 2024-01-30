@@ -16,6 +16,8 @@
     <string name="sold_out_label">품절</string>
     <string name="bullet">•</string>
 
+    <string name="btn_ok">확인</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>
@@ -54,4 +56,11 @@
         <item>환불 금액 : 당사에서는 주문에 대해 즉시 취소를 하고, 취소 금액에 대한 입금은 카드사 영업일 기준 4~5일이 소요될 수 있습니다.</item>
         <item>문의사항 발생시 카카오톡 채널로 문의부탁드립니다.</item>
     </string-array>
+    
+    <!-- 입장 코드 -->
+    <string name="input_enter_code_button">입장 코드 입력하기</string>
+    <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
+    <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
+    <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
+    <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
 </resources>

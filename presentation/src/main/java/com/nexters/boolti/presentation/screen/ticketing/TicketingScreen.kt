@@ -272,7 +272,7 @@ fun TicketingScreen(
                     ) // TODO API 나오면 대체하기
                     SectionTicketInfo(
                         label = stringResource(R.string.ticketing_selected_ticket_count),
-                        value = "1개"
+                        value = "1매"
                     ) // TODO 데이터 붙일 때 연결
                     SectionTicketInfo(
                         label = stringResource(R.string.ticketing_total_payment_amount),

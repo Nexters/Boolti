@@ -30,8 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.CtaButton
 import com.nexters.boolti.presentation.component.KakaoLoginButton
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey95
@@ -148,11 +148,11 @@ private fun SignUpBottomSheet(
             text = stringResource(id = R.string.term_notice),
             style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
         )
-        CtaButton(
+        MainButton(
             modifier = Modifier
                 .padding(vertical = 8.dp)
                 .padding(bottom = 34.dp),
-            text = stringResource(id = R.string.signup_with_agreement),
+            label = stringResource(id = R.string.signup_with_agreement),
             onClick = signUp,
         )
     }

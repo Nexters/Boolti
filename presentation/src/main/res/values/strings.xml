@@ -7,6 +7,10 @@
     <string name="description_poster">포스터 사진</string>
     <string name="description_close_button">닫기</string>
 
+    <!-- 홈(Show) -->
+    <string name="finished_show">공연 종료</string>
+    <string name="search_bar_hint">공연명으로 검색해 주세요</string>
+
     <!-- 공통 -->
     <string name="badge_left_ticket_amount">%d매 남음</string>
     <string name="sold_out_label">품절</string>

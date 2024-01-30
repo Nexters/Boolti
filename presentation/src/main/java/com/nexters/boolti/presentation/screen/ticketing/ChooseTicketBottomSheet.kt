@@ -13,10 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.IconButton
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
@@ -39,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.TicketingTicket
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.Badge
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -186,7 +183,7 @@ private fun ChooseTicketBottomSheetContent2(
 private fun TicketingTicketItem(
     ticketingTicket: TicketingTicket,
     leftAmount: Int,
-    onClick: (TicketingTicket) -> Unit
+    onClick: (TicketingTicket) -> Unit,
 ) {
     val enabled = ticketingTicket.isInviteTicket || leftAmount > 0
 
@@ -219,19 +216,6 @@ private fun TicketingTicketItem(
             textAlign = TextAlign.End,
         )
     }
-}
-
-@Composable
-private fun Badge(label: String, modifier: Modifier = Modifier) {
-    Text(
-        text = label,
-        modifier = modifier
-            .padding(8.dp)
-            .clip(RoundedCornerShape(100.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .padding(vertical = 4.dp, horizontal = 12.dp),
-        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
-    )
 }
 
 @Preview

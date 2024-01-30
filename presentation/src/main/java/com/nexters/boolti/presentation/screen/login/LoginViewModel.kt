@@ -71,7 +71,9 @@ class LoginViewModel @Inject constructor(
                     oauthType = OauthType.KAKAO,
                     oauthIdentity = loginState.userId,
                 )
-            )
+            ).onSuccess {
+                event(LoginEvent.Success)
+            }
         }
     }
 

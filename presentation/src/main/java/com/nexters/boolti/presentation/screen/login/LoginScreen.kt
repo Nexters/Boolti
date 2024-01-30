@@ -19,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,13 +43,14 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val scaffoldState = rememberBottomSheetScaffoldState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.event.collect {
             when (it) {
-                LoginEvent.Success -> Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
+                LoginEvent.Success -> onBackPressed()
                 LoginEvent.RequireSignUp -> {
                     scaffoldState.bottomSheetState.expand()
                 }
@@ -61,7 +64,12 @@ fun LoginScreen(
 
     BottomSheetScaffold(
         topBar = { LoginAppBar(onBackPressed = onBackPressed) },
-        sheetContent = { SignUpBottomSheet(signUp = viewModel::signUp) },
+        sheetContent = {
+            SignUpBottomSheet(
+                nickname = uiState.nickname ?: "알수없음",
+                signUp = viewModel::signUp
+            )
+        },
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
         sheetContainerColor = Grey85,
@@ -123,6 +131,7 @@ private fun LoginAppBar(
 
 @Composable
 private fun SignUpBottomSheet(
+    nickname: String,
     signUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -131,7 +140,7 @@ private fun SignUpBottomSheet(
     ) {
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 12.dp),
-            text = "어서오세요 %닉네임 최대 10자%님!",
+            text = "어서오세요 ${nickname}님!",
             style = MaterialTheme.typography.headlineSmall
         )
         Text(

@@ -65,9 +65,10 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             route = "show/{showId}",
             arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
-            ShowDetailScreen(modifier = modifier) {
-                navController.navigate("ticketing/$it")
-            }
+            ShowDetailScreen(
+                modifier = modifier,
+                onTicketSelected = { navController.navigate("ticketing/$it") },
+            )
         }
         composable(
             route = "ticket/{ticketId}",

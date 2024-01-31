@@ -15,49 +15,39 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.nexters.boolti.domain.model.TicketingTicket
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey70
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
-    modifier: Modifier = Modifier,
     onTicketSelected: (ticketId: String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
 
-    val ticketItems = buildList {
-        repeat(30) {
-            add(
-                TicketingTicket(
-                    id = UUID.randomUUID().toString(),
-                    isInviteTicket = listOf(true, false).random(),
-                    title = "티켓 ${it + 1}",
-                    price = (100..100000).random(),
-                )
-            )
-        }
-    }
-    val leftAmount = buildMap {
-        ticketItems.forEach {
-            put(it.id, listOf(0, 50, 100).random())
-        }
-    }
     BottomSheetScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
         sheetContent = {
-            ChooseTicketBottomSheetContent(ticketingTickets = ticketItems, leftAmount = leftAmount) { ticket ->
+            ChooseTicketBottomSheetContent(
+                ticketingTickets = uiState.tickets,
+                leftAmount = uiState.leftAmount
+            ) { ticket ->
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
                 onTicketSelected(ticket.id)
                 scope.launch { scaffoldState.bottomSheetState.hide() }

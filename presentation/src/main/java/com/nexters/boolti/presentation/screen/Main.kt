@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
+import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
@@ -79,9 +80,31 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             route = "ticketing/{showId}",
             arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
-            TicketingScreen(modifier = modifier) {
-                navController.popBackStack()
-            }
+            TicketingScreen(
+                modifier = modifier,
+                onBackClicked = { navController.popBackStack() },
+                onPayClicked = { isInviteTicket ->
+                    if (isInviteTicket) {
+                    } else {
+                        navController.navigate("payment/accountTransfer") {
+                            popUpTo("ticketing/{showId}") { inclusive = true }
+                        }
+                    }
+                }
+            )
+        }
+        composable(
+            route = "payment/accountTransfer",
+        ) {
+            AccountTransferScreen(
+                onClickHome = {
+                    navController.popBackStack(navController.graph.startDestinationId, true)
+                    navController.navigate("home")
+                },
+                onClickClose = {
+                    navController.popBackStack("ticketing/{showId}", true)
+                }
+            )
         }
     }
 }

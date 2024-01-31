@@ -6,6 +6,7 @@
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
     <string name="description_close_button">닫기</string>
+    <string name="description_toolbar_home">홈으로 이동</string>
 
     <!-- 홈(Show) -->
     <string name="finished_show">공연 종료</string>
@@ -67,4 +68,6 @@
     <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
+
+    <string name="payment_title">%s까지 아래 계좌로\n%,d원을 입금해주세요</string>
 </resources>

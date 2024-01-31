@@ -114,7 +114,7 @@ private fun LoginAppBar(
         modifier = modifier
             .fillMaxWidth()
             .height(44.dp)
-            .background(color = Grey95),
+            .background(color = MaterialTheme.colorScheme.background),
     ) {
         val marginHorizontal = dimensionResource(id = R.dimen.margin_horizontal)
         IconButton(onClick = onBackPressed) {
@@ -140,7 +140,7 @@ private fun SignUpBottomSheet(
     ) {
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 12.dp),
-            text = "어서오세요 ${nickname}님!",
+            text = stringResource(id = R.string.signup_greeting, nickname),
             style = MaterialTheme.typography.headlineSmall
         )
         Text(

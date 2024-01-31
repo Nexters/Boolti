@@ -73,6 +73,8 @@ class LoginViewModel @Inject constructor(
                 )
             ).onSuccess {
                 event(LoginEvent.Success)
+            }.onFailure {
+                // TODO 예외 처리
             }
         }
     }

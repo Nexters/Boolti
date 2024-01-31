@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.AuthRepository
-import com.nexters.boolti.domain.repository.SignUpRepository
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.OauthType
 import com.nexters.boolti.domain.request.SignUpRequest
@@ -22,7 +21,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val signUpRepository: SignUpRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -62,7 +60,7 @@ class LoginViewModel @Inject constructor(
     fun signUp() {
         viewModelScope.launch {
             val loginState = uiState.value
-            signUpRepository.signUp(
+            authRepository.signUp(
                 SignUpRequest(
                     email = loginState.email,
                     nickname = loginState.nickname,

@@ -25,6 +25,7 @@
     <string name="term_notice">원활한 이용을 위해 서비스 이용약관 확인 후 동의해 주세요.</string>
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
     <string name="signup_greeting">어서오세요 %s님!</string>
+    <string name="nickname_default">(알수없음)</string>
 
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>

@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -66,7 +67,7 @@ fun LoginScreen(
         topBar = { LoginAppBar(onBackPressed = onBackPressed) },
         sheetContent = {
             SignUpBottomSheet(
-                nickname = uiState.nickname ?: "알수없음",
+                nickname = uiState.nickname ?: stringResource(R.string.nickname_default),
                 signUp = viewModel::signUp
             )
         },

@@ -80,6 +80,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,285 +145,13 @@ fun TicketingScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(scrollState),
             ) {
-                Row(
-                    modifier = Modifier.padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    AsyncImage(
-                        model = state.poster,
-                        contentDescription = stringResource(R.string.description_poster),
-                        modifier = Modifier
-                            .size(width = 70.dp, height = 98.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                shape = RoundedCornerShape(4.dp),
-                            ),
-                        contentScale = ContentScale.Crop,
-                    )
-
-                    Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
-                        Text(
-                            text = state.ticket?.title ?: "",
-                            style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                        Text(
-                            text = "2024.03.09 (토) 17:30", // TODO API 나오면 대체하기
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Grey30,
-                        )
-                    }
-                }
-
-                // 예매자 정보
-                Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
-                    var name by remember { mutableStateOf("") } // TODO remove
-                    var phoneNumber by remember { mutableStateOf("") } // TODO remove
-                    InputRow(
-                        stringResource(R.string.ticketing_name_label),
-                        name,
-                        placeholder = stringResource(R.string.ticketing_name_placeholder),
-                    ) {
-                        name = it
-                    }
-                    Spacer(modifier = Modifier.size(16.dp))
-                    InputRow(
-                        stringResource(R.string.ticketing_contact_label),
-                        phoneNumber,
-                        placeholder = stringResource(R.string.ticketing_contact_placeholder),
-                        isPhoneNumber = true,
-                        imeAction = if (state.isSameContactInfo) {
-                            ImeAction.Default
-                        } else {
-                            ImeAction.Next
-                        },
-                    ) {
-                        phoneNumber = it
-                    }
-                }
-
-                if (!isInviteTicket) {
-                    // 입금자 정보
-                    Section(
-                        title = stringResource(R.string.ticketing_depositor_label),
-                        titleRowOption = {
-                            Row(
-                                modifier = Modifier
-                                    .padding(start = 20.dp)
-                                    .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
-                            ) {
-                                if (state.isSameContactInfo) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_checkbox_selected),
-                                        tint = Grey05,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .padding(3.dp)
-                                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
-                                    )
-                                } else {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_checkbox_18),
-                                        tint = Grey50,
-                                        contentDescription = null,
-                                    )
-                                }
-                                Text(
-                                    text = stringResource(R.string.ticketing_same_contact_info),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(start = 4.dp)
-                                )
-                            }
-                        },
-                        modifier = Modifier.animateContentSize(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessMedium,
-                            )
-                        ),
-                        contentVisible = !state.isSameContactInfo,
-                    ) {
-                        if (!state.isSameContactInfo) {
-                            InputRow(
-                                stringResource(R.string.ticketing_name_label),
-                                "",
-                                placeholder = stringResource(R.string.ticketing_name_placeholder),
-                            ) {}
-                            Spacer(modifier = Modifier.size(16.dp))
-                            InputRow(
-                                stringResource(R.string.ticketing_contact_label),
-                                "",
-                                placeholder = stringResource(R.string.ticketing_contact_placeholder),
-                                isPhoneNumber = true,
-                                imeAction = ImeAction.Default,
-                            ) {}
-                        }
-                    }
-                }
-
-                // 티켓 정보
-                Section(title = stringResource(R.string.ticketing_ticket_info_label)) {
-                    SectionTicketInfo(
-                        stringResource(R.string.ticketing_selected_ticket),
-                        "일반 티켓 B",
-                        marginTop = 0.dp
-                    ) // TODO API 나오면 대체하기
-                    SectionTicketInfo(
-                        label = stringResource(R.string.ticketing_selected_ticket_count),
-                        value = "1매"
-                    ) // TODO 데이터 붙일 때 연결
-                    SectionTicketInfo(
-                        label = stringResource(R.string.ticketing_total_payment_amount),
-                        value = "5,000원"
-                    ) // TODO 데이터 붙일 때 연결
-                    Spacer(modifier = Modifier.padding(bottom = 8.dp))
-                }
-
-                if (isInviteTicket) {
-                    // 초청 코드
-                    Section(title = stringResource(R.string.ticketing_invite_code_label)) {
-                        var inviteCode by remember { mutableStateOf("") }
-                        var inviteCodeUsed by remember { mutableStateOf(false) }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            BTTextField(
-                                modifier = Modifier
-                                    .weight(1F)
-                                    .padding(end = 6.dp),
-                                text = inviteCode,
-                                singleLine = true,
-                                placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
-                                keyboardOptions = KeyboardOptions.Default.copy(
-                                    keyboardType = KeyboardType.Password,
-                                    imeAction = ImeAction.Done,
-                                ),
-                                onValueChanged = { inviteCode = it },
-                            )
-                            Button(
-                                onClick = { inviteCodeUsed = true },
-                                enabled = !inviteCodeUsed,
-                                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
-                                shape = RoundedCornerShape(4.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Grey20,
-                                    disabledContainerColor = Grey80,
-                                    contentColor = Grey90,
-                                    disabledContentColor = Grey50,
-                                ),
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.ticketing_invite_code_use_button),
-                                    style = MaterialTheme.typography.titleMedium,
-                                )
-                            }
-                        }
-                        if (inviteCodeUsed) {
-                            Text(
-                                modifier = Modifier.padding(top = 12.dp),
-                                text = stringResource(R.string.ticketing_invite_code_success),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Success,
-                            )
-                        }
-                    }
-                }
-
-                if (!isInviteTicket) {
-                    // 결제 수단
-                    Section(title = stringResource(R.string.ticketing_payment_label)) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.secondaryContainer,
-                                    shape = RoundedCornerShape(4.dp),
-                                )
-                                .background(MaterialTheme.colorScheme.surfaceTint)
-                                .clickable(role = Role.DropdownList) {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = context.getString(R.string.ticketing_payment_message),
-                                            duration = SnackbarDuration.Short,
-                                        )
-                                    }
-                                }
-                                .padding(12.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.ticketing_payment_account_transfer),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
-                        Row(Modifier.padding(top = 12.dp)) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_info_20),
-                                tint = Grey50,
-                                contentDescription = null,
-                            )
-                            Text(
-                                text = stringResource(R.string.ticketing_payment_information),
-                                modifier = Modifier.padding(start = 4.dp),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            )
-                        }
-                    }
-                }
-
-                // 취소/환불 규정
-                var expanded by remember { mutableStateOf(false) }
-                val refundPolicy = stringArrayResource(R.array.refund_policy)
-                val rotation by animateFloatAsState(
-                    targetValue = if (expanded) 0F else 180F,
-                    animationSpec = tween(),
-                    label = "expandIconRotation"
-                )
-                Section(
-                    title = stringResource(R.string.ticketing_refund_policy_label),
-                    titleRowOption = {
-                        Icon(
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .rotate(rotation)
-                                .clickable(role = Role.Image) { expanded = !expanded },
-                            painter = painterResource(R.drawable.ic_expand_24),
-                            tint = Grey50,
-                            contentDescription = null,
-                        )
-                    },
-                    contentVisible = expanded,
-                ) {
-                    Column(
-                        Modifier
-                            .animateContentSize(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium,
-                                )
-                            )
-                    ) {
-                        if (expanded) {
-                            refundPolicy.forEach {
-                                Row {
-                                    Text(
-                                        text = stringResource(R.string.bullet),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Grey50,
-                                    )
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Grey50,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                Header(state)
+                TicketHolderSection(state) // 예매자 정보
+                if (!isInviteTicket) DeposorSection(viewModel, state) // 입금자 정보
+                TicketInfoSection() // 티켓 정보
+                if (isInviteTicket) InviteCodeSection() // 초청 코드
+                if (!isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
+                RefundPolicySection() // 취소/환불 규정
                 Spacer(modifier = Modifier.height(120.dp))
             }
 
@@ -452,6 +181,302 @@ fun TicketingScreen(
                     onClick = { /* TODO */ },
                 ) // TODO 데이터 붙일 때 연결
             }
+        }
+    }
+}
+
+@Composable
+private fun Header(state: TicketingState) {
+    Row(
+        modifier = Modifier.padding(20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AsyncImage(
+            model = state.poster,
+            contentDescription = stringResource(R.string.description_poster),
+            modifier = Modifier
+                .size(width = 70.dp, height = 98.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(4.dp),
+                ),
+            contentScale = ContentScale.Crop,
+        )
+
+        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
+            Text(
+                text = state.ticket?.title ?: "",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "2024.03.09 (토) 17:30", // TODO API 나오면 대체하기
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey30,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RefundPolicySection() {
+    var expanded by remember { mutableStateOf(false) }
+    val refundPolicy = stringArrayResource(R.array.refund_policy)
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 0F else 180F,
+        animationSpec = tween(),
+        label = "expandIconRotation"
+    )
+    Section(
+        title = stringResource(R.string.ticketing_refund_policy_label),
+        titleRowOption = {
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .rotate(rotation)
+                    .clickable(role = Role.Image) { expanded = !expanded },
+                painter = painterResource(R.drawable.ic_expand_24),
+                tint = Grey50,
+                contentDescription = null,
+            )
+        },
+        contentVisible = expanded,
+    ) {
+        Column(
+            Modifier
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium,
+                    )
+                )
+        ) {
+            if (expanded) {
+                refundPolicy.forEach {
+                    Row {
+                        Text(
+                            text = stringResource(R.string.bullet),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Grey50,
+                        )
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Grey50,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaymentSection(
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+) {
+    val context = LocalContext.current
+    Section(title = stringResource(R.string.ticketing_payment_label)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(4.dp),
+                )
+                .background(MaterialTheme.colorScheme.surfaceTint)
+                .clickable(role = Role.DropdownList) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.ticketing_payment_message),
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
+                }
+                .padding(12.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.ticketing_payment_account_transfer),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+        Row(Modifier.padding(top = 12.dp)) {
+            Icon(
+                painter = painterResource(R.drawable.ic_info_20),
+                tint = Grey50,
+                contentDescription = null,
+            )
+            Text(
+                text = stringResource(R.string.ticketing_payment_information),
+                modifier = Modifier.padding(start = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+        }
+    }
+}
+
+@Composable
+private fun InviteCodeSection() {
+    Section(title = stringResource(R.string.ticketing_invite_code_label)) {
+        var inviteCode by remember { mutableStateOf("") }
+        var inviteCodeUsed by remember { mutableStateOf(false) }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            BTTextField(
+                modifier = Modifier
+                    .weight(1F)
+                    .padding(end = 6.dp),
+                text = inviteCode,
+                singleLine = true,
+                placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
+                onValueChanged = { inviteCode = it },
+            )
+            Button(
+                onClick = { inviteCodeUsed = true },
+                enabled = !inviteCodeUsed,
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
+                shape = RoundedCornerShape(4.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Grey20,
+                    disabledContainerColor = Grey80,
+                    contentColor = Grey90,
+                    disabledContentColor = Grey50,
+                ),
+            ) {
+                Text(
+                    text = stringResource(R.string.ticketing_invite_code_use_button),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
+        if (inviteCodeUsed) {
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(R.string.ticketing_invite_code_success),
+                style = MaterialTheme.typography.bodySmall,
+                color = Success,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TicketInfoSection() {
+    Section(title = stringResource(R.string.ticketing_ticket_info_label)) {
+        SectionTicketInfo(
+            stringResource(R.string.ticketing_selected_ticket),
+            "일반 티켓 B",
+            marginTop = 0.dp
+        ) // TODO API 나오면 대체하기
+        SectionTicketInfo(
+            label = stringResource(R.string.ticketing_selected_ticket_count),
+            value = "1매"
+        ) // TODO 데이터 붙일 때 연결
+        SectionTicketInfo(
+            label = stringResource(R.string.ticketing_total_payment_amount),
+            value = "5,000원"
+        ) // TODO 데이터 붙일 때 연결
+        Spacer(modifier = Modifier.padding(bottom = 8.dp))
+    }
+}
+
+@Composable
+private fun DeposorSection(
+    viewModel: TicketingViewModel,
+    state: TicketingState,
+) {
+    Section(
+        title = stringResource(R.string.ticketing_depositor_label),
+        titleRowOption = {
+            Row(
+                modifier = Modifier
+                    .padding(start = 20.dp)
+                    .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
+            ) {
+                if (state.isSameContactInfo) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_checkbox_selected),
+                        tint = Grey05,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(3.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_checkbox_18),
+                        tint = Grey50,
+                        contentDescription = null,
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.ticketing_same_contact_info),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        },
+        modifier = Modifier.animateContentSize(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMedium,
+            )
+        ),
+        contentVisible = !state.isSameContactInfo,
+    ) {
+        if (!state.isSameContactInfo) {
+            InputRow(
+                stringResource(R.string.ticketing_name_label),
+                "",
+                placeholder = stringResource(R.string.ticketing_name_placeholder),
+            ) {}
+            Spacer(modifier = Modifier.size(16.dp))
+            InputRow(
+                stringResource(R.string.ticketing_contact_label),
+                "",
+                placeholder = stringResource(R.string.ticketing_contact_placeholder),
+                isPhoneNumber = true,
+                imeAction = ImeAction.Default,
+            ) {}
+        }
+    }
+}
+
+@Composable
+private fun TicketHolderSection(state: TicketingState) {
+    Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
+        var name by remember { mutableStateOf("") } // TODO remove
+        var phoneNumber by remember { mutableStateOf("") } // TODO remove
+        InputRow(
+            stringResource(R.string.ticketing_name_label),
+            name,
+            placeholder = stringResource(R.string.ticketing_name_placeholder),
+        ) {
+            name = it
+        }
+        Spacer(modifier = Modifier.size(16.dp))
+        InputRow(
+            stringResource(R.string.ticketing_contact_label),
+            phoneNumber,
+            placeholder = stringResource(R.string.ticketing_contact_placeholder),
+            isPhoneNumber = true,
+            imeAction = if (state.isSameContactInfo) {
+                ImeAction.Default
+            } else {
+                ImeAction.Next
+            },
+        ) {
+            phoneNumber = it
         }
     }
 }

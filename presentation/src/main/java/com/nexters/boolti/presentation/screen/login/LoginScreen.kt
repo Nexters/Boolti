@@ -36,6 +36,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey95
+import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +95,6 @@ fun LoginScreen(
                     modifier = Modifier.padding(top = 6.dp)
                 )
 
-                val marginHorizontal = dimensionResource(id = R.dimen.margin_horizontal)
                 KakaoLoginButton(
                     modifier = Modifier
                         .padding(top = 48.dp)
@@ -117,7 +117,6 @@ private fun LoginAppBar(
             .height(44.dp)
             .background(color = MaterialTheme.colorScheme.background),
     ) {
-        val marginHorizontal = dimensionResource(id = R.dimen.margin_horizontal)
         IconButton(onClick = onBackPressed) {
             Icon(
                 painter = painterResource(R.drawable.ic_close),

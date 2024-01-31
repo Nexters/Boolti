@@ -5,7 +5,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
-import com.nexters.boolti.data.network.ApiService
+import com.nexters.boolti.data.network.LoginService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,8 +25,8 @@ object DataSourceModule {
     @Provides
     fun provideAuthDataSource(
         @ApplicationContext context: Context,
-        apiService: ApiService,
-    ): AuthDataSource = AuthDataSource(context, apiService)
+        loginService: LoginService,
+    ): AuthDataSource = AuthDataSource(context, loginService)
 
     @Singleton
     @Provides

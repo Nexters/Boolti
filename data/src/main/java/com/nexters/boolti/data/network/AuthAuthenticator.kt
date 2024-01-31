@@ -11,7 +11,7 @@ import javax.inject.Inject
 class AuthAuthenticator @Inject constructor(
     private val tokenDataSource: TokenDataSource,
     private val authDataSource: AuthDataSource,
-    private val apiService: ApiService,
+    private val loginService: LoginService,
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         return null

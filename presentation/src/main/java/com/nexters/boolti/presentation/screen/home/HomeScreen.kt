@@ -80,6 +80,7 @@ fun HomeScreen(
             ) {
                 MyScreen(
                     modifier = modifier.padding(innerPadding),
+                    requireLogin = requireLogin,
                 )
             }
         }

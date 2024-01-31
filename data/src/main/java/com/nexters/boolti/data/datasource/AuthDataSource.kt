@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
-import com.nexters.boolti.data.network.ApiService
+import com.nexters.boolti.data.network.LoginService
 import com.nexters.boolti.domain.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 class AuthDataSource @Inject constructor(
     private val context: Context,
-    private val apiService: ApiService,
+    private val loginService: LoginService,
 ) {
     private val dataStore: DataStore<AppSettings>
         get() = context.dataStore
@@ -24,7 +24,7 @@ class AuthDataSource @Inject constructor(
         get() = data.map { it.accessToken.isNotEmpty() }
 
     suspend fun login(request: LoginRequest) = runCatching {
-        apiService.kakaoLogin(request)
+        loginService.kakaoLogin(request)
     }
 
     suspend fun logout() {

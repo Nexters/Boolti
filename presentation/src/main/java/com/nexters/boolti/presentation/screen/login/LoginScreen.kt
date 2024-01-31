@@ -21,11 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,8 +32,6 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,8 +70,8 @@ fun LoginScreen(
         },
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
-        sheetContainerColor = Grey85,
-        containerColor = Grey95,
+        sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
             modifier = modifier.padding(innerPadding),

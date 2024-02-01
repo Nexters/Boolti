@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.payment
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
@@ -18,6 +19,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,11 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -38,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -47,6 +52,7 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import kotlinx.coroutines.launch
 
 @Composable
 fun AccountTransferScreen(
@@ -55,6 +61,10 @@ fun AccountTransferScreen(
     onClickClose: () -> Unit = {},
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     val dueDate by remember { mutableStateOf("1월 19일") }
     val price by remember { mutableIntStateOf(5000) }
     val accountNumber by remember { mutableStateOf("110-584-112392") }
@@ -63,6 +73,9 @@ fun AccountTransferScreen(
         modifier = modifier.scrollable(rememberScrollState(), Orientation.Vertical),
         topBar = {
             PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose)
+        },
+        snackbarHost = {
+            ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 40.dp))
         }
     ) { innerPadding ->
         Column(
@@ -217,6 +230,13 @@ fun AccountTransferScreen(
                     .fillMaxWidth(),
                 onClick = {
                     clipboardManager.setText(AnnotatedString(accountNumber))
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.account_number_copied_message),
+                            )
+                        }
+                    }
                 },
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(

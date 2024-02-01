@@ -71,4 +71,5 @@
     <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
 
     <string name="payment_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
+    <string name="account_number_copied_message">계좌번호가 복사되었어요</string>
 </resources>

@@ -87,14 +87,14 @@ fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
-    onPayClicked: (isInviteTicket: Boolean) -> Unit = {},
+    onPayClicked: (isInviteTicket: Boolean, ticketId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val isInviteTicket by remember { mutableStateOf(false) } // TODO 실제 데이터로 교체 필요
+    val isInviteTicket by remember { mutableStateOf(true) } // TODO 실제 데이터로 교체 필요
 
     Scaffold(
         topBar = {
@@ -161,7 +161,7 @@ fun TicketingScreen(
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
                     label = stringResource(R.string.ticketing_payment_button_label, 5000),
-                    onClick = { onPayClicked(isInviteTicket) },
+                    onClick = { onPayClicked(isInviteTicket, viewModel.state.value.ticket?.id ?: "") },
                 ) // TODO 데이터 붙일 때 연결
             }
         }
@@ -558,7 +558,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen()
+            TicketingScreen() { _, _ -> }
         }
     }
 }

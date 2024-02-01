@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -45,6 +47,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
@@ -273,7 +276,17 @@ private fun ContentScaffold(
 
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
-            content = { Text(text = host) },
+            content = {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(color = MaterialTheme.colorScheme.surfaceTint)
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    text = host,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                )
+            },
         )
     }
 }

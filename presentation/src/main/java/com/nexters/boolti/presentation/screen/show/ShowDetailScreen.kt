@@ -49,6 +49,7 @@ import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetC
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
@@ -76,8 +77,7 @@ fun ShowDetailScreen(
         topBar = { ShowDetailAppBar() },
         sheetContent = {
             ChooseTicketBottomSheetContent(
-                ticketingTickets = uiState.tickets,
-                leftAmount = uiState.leftAmount
+                ticketingTickets = uiState.tickets, leftAmount = uiState.leftAmount
             ) { ticket ->
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
                 onTicketSelected(ticket.id)
@@ -88,10 +88,7 @@ fun ShowDetailScreen(
         sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,
         sheetDragHandle = {
             BottomSheetDefaults.DragHandle(
-                shape = RoundedCornerShape(100.dp),
-                width = 45.dp,
-                height = 4.dp,
-                color = Grey70
+                shape = RoundedCornerShape(100.dp), width = 45.dp, height = 4.dp, color = Grey70
             )
         },
         sheetPeekHeight = 0.dp,
@@ -119,22 +116,13 @@ fun ShowDetailScreen(
                     ticketingEndDate = LocalDate.now(),
                     placeName = "클럽 샤프",
                     address = "서울틀벽시 마포구 와우산로 19길 20 / 지하 1층",
-                    content = "[팀명 및 팀 소개]\n\n" +
-                            "OvO (오보)\n" +
-                            "웃는 표정, 틀려도 웃고 넘기자!\n\n" +
-                            "[곡 소개]\n\n" +
-                            "The Volunteers - Let me go!\n" +
-                            "실리카켈 - No Pain\n" +
-                            "데이먼스 이어 - Yours\n" +
-                            "윤하 - 오르트구름 (Rock 편곡)\n" +
-                            "체리필터 - 낭만고양이",
+                    content = "[팀명 및 팀 소개]\n\n" + "OvO (오보)\n" + "웃는 표정, 틀려도 웃고 넘기자!\n\n" + "[곡 소개]\n\n" + "The Volunteers - Let me go!\n" + "실리카켈 - No Pain\n" + "데이먼스 이어 - Yours\n" + "윤하 - 오르트구름 (Rock 편곡)\n" + "체리필터 - 낭만고양이",
                     host = "김불다람쥐 (010-1234-5678)",
                 )
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxHeight()
+                modifier = Modifier.fillMaxHeight()
             ) {
                 Spacer(modifier = Modifier.weight(1.0f))
                 Spacer(
@@ -189,8 +177,7 @@ private fun ShowDetailAppBar(
             Icon(
                 painter = painterResource(R.drawable.ic_home),
                 contentDescription = stringResource(id = R.string.description_navigate_home),
-                Modifier
-                    .size(width = 24.dp, height = 24.dp)
+                Modifier.size(width = 24.dp, height = 24.dp)
             )
         }
         Spacer(modifier = Modifier.weight(1.0f))
@@ -201,8 +188,7 @@ private fun ShowDetailAppBar(
             Icon(
                 painter = painterResource(R.drawable.ic_share),
                 contentDescription = stringResource(id = R.string.ticketing_share),
-                Modifier
-                    .size(width = 24.dp, height = 24.dp)
+                Modifier.size(width = 24.dp, height = 24.dp)
             )
         }
         IconButton(
@@ -212,8 +198,7 @@ private fun ShowDetailAppBar(
             Icon(
                 painter = painterResource(R.drawable.ic_verticle_more),
                 contentDescription = stringResource(id = R.string.description_more_menu),
-                Modifier
-                    .size(width = 24.dp, height = 24.dp)
+                Modifier.size(width = 24.dp, height = 24.dp)
             )
         }
     }
@@ -331,9 +316,7 @@ private fun TicketReservationPeriod(
     ) {
         Text("티켓 예매 기간", style = MaterialTheme.typography.titleMedium.copy(color = Grey15))
         Divider(
-            modifier = Modifier.padding(vertical = 10.dp),
-            thickness = 1.dp,
-            color = Color.Black
+            modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
         )
         Text(
             "2023.12.01 (토) - 2024.01.20 (월)",
@@ -344,9 +327,7 @@ private fun TicketReservationPeriod(
 
 @Composable
 private fun Section(
-    title: @Composable () -> Unit,
-    content: @Composable () -> Unit,
-    modifier: Modifier = Modifier
+    title: @Composable () -> Unit, content: @Composable () -> Unit, modifier: Modifier = Modifier
 ) {
     Column(modifier.padding(top = 40.dp, bottom = 32.dp)) {
         title()
@@ -391,11 +372,16 @@ fun ShowDetailCtaButton(
 ) {
     val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
-        is ShowState.WaitingTicketing -> stringResource(id = R.string.ticketing_button_upcoming_ticket, showState.dDay)
+        is ShowState.WaitingTicketing -> stringResource(
+            id = R.string.ticketing_button_upcoming_ticket, showState.dDay
+        )
+
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }
+
+    val disabledContentColor = if (showState is ShowState.WaitingTicketing) MaterialTheme.colorScheme.primary else Grey50
 
     MainButton(
         modifier = modifier
@@ -406,6 +392,6 @@ fun ShowDetailCtaButton(
         label = text,
         onClick = onClick,
         enabled = enabled,
-        disabledContentColor = MaterialTheme.colorScheme.primary,
+        disabledContentColor = disabledContentColor,
     )
 }

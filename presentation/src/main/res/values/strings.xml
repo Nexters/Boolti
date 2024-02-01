@@ -40,6 +40,9 @@
     <string name="ticketing_content">공연 내용</string>
     <string name="ticketing_host">주최자</string>
     <string name="ticketing_button_label">예매하기</string>
+    <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>
+    <string name="ticketing_button_closed_ticket">예매 마감</string>
+    <string name="ticketing_button_finished_show">공연 종료</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>
     <string name="ticketing_ticket_holder_label">예매자 정보</string>

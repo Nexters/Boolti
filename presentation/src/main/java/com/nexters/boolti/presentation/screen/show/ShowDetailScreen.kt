@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
@@ -149,18 +150,10 @@ fun ShowDetailScreen(
                             )
                         )
                 )
-                MainButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = MaterialTheme.colorScheme.background)
-                        .padding(horizontal = marginHorizontal, vertical = 8.dp)
-                        .padding(bottom = 34.dp),
-                    label = stringResource(id = R.string.ticketing_button_label)
-                ) {
-                    scope.launch {
-                        scaffoldState.bottomSheetState.expand()
-                    }
-                }
+                ShowDetailCtaButton(
+                    showState = ShowState.WaitingTicketing(7),
+                    onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } },
+                )
             }
         }
     }
@@ -387,5 +380,32 @@ private fun SectionContent(
         style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
         maxLines = maxLines,
         overflow = overflow,
+    )
+}
+
+@Composable
+fun ShowDetailCtaButton(
+    onClick: () -> Unit,
+    showState: ShowState,
+    modifier: Modifier = Modifier,
+) {
+    val enabled = showState is ShowState.TicketingInProgress
+    val text = when (showState) {
+        is ShowState.WaitingTicketing -> stringResource(id = R.string.ticketing_button_upcoming_ticket, showState.dDay)
+        ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
+        ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
+        ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
+    }
+
+    MainButton(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.background)
+            .padding(horizontal = marginHorizontal, vertical = 8.dp)
+            .padding(bottom = 34.dp),
+        label = text,
+        onClick = onClick,
+        enabled = enabled,
+        disabledContentColor = MaterialTheme.colorScheme.primary,
     )
 }

@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,7 @@ fun MainButton(
     modifier: Modifier = Modifier,
     label: String = stringResource(id = R.string.btn_ok),
     enabled: Boolean = true,
+    disabledContentColor: Color = Grey50,
     onClick: () -> Unit,
 ) {
     Button(
@@ -33,9 +35,9 @@ fun MainButton(
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = White, // MaterialTheme.colorScheme.onPrimary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             disabledContainerColor = Grey80,
-            disabledContentColor = Grey50,
+            disabledContentColor = disabledContentColor,
         ),
         shape = RoundedCornerShape(4.dp),
         contentPadding = PaddingValues(12.dp),

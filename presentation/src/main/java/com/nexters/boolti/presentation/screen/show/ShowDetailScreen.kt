@@ -285,7 +285,7 @@ private fun Poster(
         AsyncImage(
             modifier = Modifier.fillMaxWidth(),
             model = images.first(),
-            contentDescription = "포스터",
+            contentDescription = stringResource(id = R.string.description_poster),
             contentScale = ContentScale.FillWidth,
         )
         Text(
@@ -314,7 +314,7 @@ private fun TicketReservationPeriod(
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("티켓 예매 기간", style = MaterialTheme.typography.titleMedium.copy(color = Grey15))
+        Text(stringResource(id = R.string.ticketing_period), style = MaterialTheme.typography.titleMedium.copy(color = Grey15))
         Divider(
             modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
         )

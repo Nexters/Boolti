@@ -9,10 +9,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation(libs.javax.inject)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.core.jvm)
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.bundles.kotest)
+    testImplementation(libs.mockk)
 }

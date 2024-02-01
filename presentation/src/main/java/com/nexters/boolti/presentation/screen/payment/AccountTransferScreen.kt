@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -71,20 +70,23 @@ fun AccountTransferScreen(
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal),
         ) {
-            val colorSpans = listOf(
-                Pair(dueDate, MaterialTheme.colorScheme.primary),
-                Pair("까지 아래 계좌로\n", Grey05),
-                Pair("5,000원", MaterialTheme.colorScheme.primary),
-                Pair("을 입금해주세요", Grey05),
-            )
+            val priceString = stringResource(R.string.unit_won, price)
+            val fullText = StringBuilder(stringResource(R.string.payment_title, dueDate, priceString))
+            val spanIndices = buildList {
+                add(Pair(fullText.indexOf(dueDate), dueDate.length))
+                add(Pair(fullText.indexOf(priceString), priceString.length))
+            }
 
             Text(
                 modifier = Modifier.padding(top = 20.dp),
                 text = buildAnnotatedString {
-                    colorSpans.forEach { (text, color) ->
-                        withStyle(style = SpanStyle(color = color)) {
-                            append(text)
-                        }
+                    append(fullText)
+                    spanIndices.forEach { (start, length) ->
+                        addStyle(
+                            SpanStyle(color = MaterialTheme.colorScheme.primary),
+                            start,
+                            start + length,
+                        )
                     }
                 },
                 style = MaterialTheme.typography.headlineMedium,

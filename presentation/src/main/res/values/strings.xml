@@ -70,6 +70,13 @@
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
 
-    <string name="payment_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
+    <!-- 결제 -->
+    <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
+    <string name="account_transfer_description">입금 마감일까지 입금이 확인되지 않는 경우\n주문이 자동 취소됩니다.</string>
+    <string name="account_number_copy_button">계좌번호 복사하기</string>
     <string name="account_number_copied_message">계좌번호가 복사되었어요</string>
+    <string name="bank_name">은행명</string>
+    <string name="account_number">계좌번호</string>
+    <string name="account_holder">예금주</string>
+    <string name="account_transfer_due_date">입금 마감일</string>
 </resources>

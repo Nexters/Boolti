@@ -62,7 +62,7 @@ fun AccountTransferScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val dueDate by remember { mutableStateOf("1월 19일") }
+    val dueDate by remember { mutableStateOf("1월 19일") } // TODO 실데이터로 변경
     val price by remember { mutableIntStateOf(5000) }
     val accountNumber by remember { mutableStateOf("110-584-112392") }
 
@@ -105,7 +105,7 @@ fun AccountTransferScreen(
 @Composable
 private fun HeaderSection(price: Int, dueDate: String) {
     val priceString = stringResource(R.string.unit_won, price)
-    val fullText = StringBuilder(stringResource(R.string.payment_title, dueDate, priceString))
+    val fullText = StringBuilder(stringResource(R.string.account_transfer_title, dueDate, priceString))
     val spanIndices = buildList {
         add(Pair(fullText.indexOf(dueDate), dueDate.length))
         add(Pair(fullText.indexOf(priceString), priceString.length))
@@ -127,19 +127,19 @@ private fun HeaderSection(price: Int, dueDate: String) {
     )
     Text(
         modifier = Modifier.padding(top = 8.dp),
-        text = "입금 마감일까지 입금이 확인되지 않는 경우\n주문이 자동 취소됩니다.",
+        text = stringResource(R.string.account_transfer_description),
         style = MaterialTheme.typography.bodySmall,
         color = Grey30,
     )
 }
 
 @Composable
-private fun PaymentInfoSection(accountNumber: String) {
+private fun PaymentInfoSection(accountNumber: String) { // TODO 실제 데이터 받아서 처리
     Column {
-        PaymentInfoRow("은행명", "신한은행")
-        PaymentInfoRow("계좌번호", accountNumber)
-        PaymentInfoRow("예금주", "박불티")
-        PaymentInfoRow("입금 마감일", "2024.01.19 23:59")
+        PaymentInfoRow(stringResource(R.string.bank_name), "신한은행")
+        PaymentInfoRow(stringResource(R.string.account_number), accountNumber)
+        PaymentInfoRow(stringResource(R.string.account_holder), "박불티")
+        PaymentInfoRow(stringResource(R.string.account_transfer_due_date), "2024.01.19 23:59")
     }
 }
 
@@ -190,7 +190,10 @@ private fun AccountNumberCopyButton(
         ),
         contentPadding = PaddingValues(13.dp)
     ) {
-        Text(text = "계좌번호 복사하기", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = stringResource(R.string.account_number_copy_button),
+            style = MaterialTheme.typography.titleMedium,
+        )
     }
 }
 

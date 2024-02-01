@@ -32,6 +32,10 @@
 
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
+    <string name="ticketing_datetime">일시</string>
+    <string name="ticketing_place">장소</string>
+    <string name="ticketing_content">공연 내용</string>
+    <string name="ticketing_host">주최자</string>
     <string name="ticketing_button_label">예매하기</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>

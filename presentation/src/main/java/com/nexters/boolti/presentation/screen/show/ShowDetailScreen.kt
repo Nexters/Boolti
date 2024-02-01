@@ -46,8 +46,8 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
@@ -299,6 +299,7 @@ private fun Poster(
 ) {
     Column(
         modifier = modifier
+            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .background(color = MaterialTheme.colorScheme.surface)
             .padding(top = 16.dp)
             .padding(horizontal = 38.dp)
@@ -326,9 +327,25 @@ private fun TicketReservationPeriod(
     endDate: LocalDate,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
-        Text("티켓 예매 기간")
-        Text("2023.12.01 (토) - 2024.01.20 (월)")
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(8.dp))
+            .border(shape = RoundedCornerShape(8.dp), color = Color.White, width = 1.dp)
+            .background(color = Grey70)
+            .padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("티켓 예매 기간", style = MaterialTheme.typography.titleMedium.copy(color = Grey15))
+        Divider(
+            modifier = Modifier.padding(vertical = 10.dp),
+            thickness = 1.dp,
+            color = Color.Black
+        )
+        Text(
+            "2023.12.01 (토) - 2024.01.20 (월)",
+            style = MaterialTheme.typography.titleMedium.copy(color = Grey30),
+        )
     }
 }
 

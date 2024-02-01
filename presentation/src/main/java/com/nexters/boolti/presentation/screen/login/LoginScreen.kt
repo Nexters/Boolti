@@ -113,12 +113,15 @@ private fun LoginAppBar(
             .height(44.dp)
             .background(color = MaterialTheme.colorScheme.background),
     ) {
-        IconButton(onClick = onBackPressed) {
+        IconButton(
+            modifier = Modifier.size(width = 48.dp, height = 44.dp),
+            onClick = onBackPressed
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_close),
-                contentDescription = "뒤로가기",
+                contentDescription = stringResource(id = R.string.description_navigate_back),
                 modifier
-                    .padding(start = marginHorizontal, top = 10.dp, end = 4.dp, bottom = 10.dp)
+                    .padding(start = marginHorizontal)
                     .size(width = 24.dp, height = 24.dp)
             )
         }

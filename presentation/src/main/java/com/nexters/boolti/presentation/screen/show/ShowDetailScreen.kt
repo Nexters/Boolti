@@ -1,11 +1,11 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -127,16 +128,35 @@ fun ShowDetailScreen(
                 )
             }
 
-            MainButton(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = marginHorizontal, vertical = 8.dp)
-                    .padding(bottom = 34.dp)
-                    .align(Alignment.BottomCenter),
-                label = stringResource(id = R.string.ticketing_button_label)
+                    .fillMaxHeight()
             ) {
-                scope.launch {
-                    scaffoldState.bottomSheetState.expand()
+                Spacer(modifier = Modifier.weight(1.0f))
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.background,
+                                )
+                            )
+                        )
+                )
+                MainButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.background)
+                        .padding(horizontal = marginHorizontal, vertical = 8.dp)
+                        .padding(bottom = 34.dp),
+                    label = stringResource(id = R.string.ticketing_button_label)
+                ) {
+                    scope.launch {
+                        scaffoldState.bottomSheetState.expand()
+                    }
                 }
             }
         }

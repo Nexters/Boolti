@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,11 +43,12 @@ import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetC
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +88,7 @@ fun ShowDetailScreen(
             )
         },
         sheetPeekHeight = 0.dp,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -95,23 +96,23 @@ fun ShowDetailScreen(
                 .padding(innerPadding),
         ) {
             val scrollState = rememberScrollState()
-            Column(modifier = Modifier.verticalScroll(scrollState)) {
+            Column(
+                modifier = Modifier.verticalScroll(scrollState),
+            ) {
                 Poster(
                     modifier = modifier.fillMaxWidth(),
                     title = "2024 TOGETHER LUCKY CLUB",
                     images = listOf("https://picsum.photos/400/550")
                 )
-                TicketReservationPeriod(LocalDateTime.now(), LocalDateTime.now())
-                SectionTitle("일시")
-                Text("2024.01.20 (토) / 18:00 (150분)")
-                Divider()
-                SectionTitle("장소")
-                Text("클럽 샤프", style = MaterialTheme.typography.bodyLarge)
-                SectionContent(text = "서울틀벽시 마포구 와우산로 19길 20 / 지하 1층")
-                Divider()
-                SectionTitle("공연 내용")
-                SectionContent(
-                    "[팀명 및 팀 소개]\n\n" +
+                ContentScaffold(
+                    modifier = Modifier
+                        .padding(horizontal = marginHorizontal)
+                        .padding(bottom = 114.dp),
+                    ticketingStartDate = LocalDate.now(),
+                    ticketingEndDate = LocalDate.now(),
+                    placeName = "클럽 샤프",
+                    address = "서울틀벽시 마포구 와우산로 19길 20 / 지하 1층",
+                    content = "[팀명 및 팀 소개]\n\n" +
                             "OvO (오보)\n" +
                             "웃는 표정, 틀려도 웃고 넘기자!\n\n" +
                             "[곡 소개]\n\n" +
@@ -120,12 +121,8 @@ fun ShowDetailScreen(
                             "데이먼스 이어 - Yours\n" +
                             "윤하 - 오르트구름 (Rock 편곡)\n" +
                             "체리필터 - 낭만고양이",
-                    maxLines = 11,
-                    overflow = TextOverflow.Ellipsis,
+                    host = "김불다람쥐 (010-1234-5678)",
                 )
-                Divider()
-                SectionTitle("주최자")
-                Text(text = "김불다람쥐 (010-1234-5678)")
             }
 
             MainButton(
@@ -171,6 +168,61 @@ private fun ShowDetailAppBar(
 }
 
 @Composable
+private fun ContentScaffold(
+    ticketingStartDate: LocalDate,
+    ticketingEndDate: LocalDate,
+    placeName: String,
+    address: String,
+    content: String,
+    host: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
+        TicketReservationPeriod(
+            modifier = Modifier.padding(top = 40.dp),
+            stateDate = ticketingStartDate,
+            endDate = ticketingEndDate,
+        )
+
+        Section(
+            title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
+            content = { Text("2024.01.20 (토) / 18:00 (150분)") },
+        )
+        Divider(color = Grey85)
+
+        Section(
+            title = { SectionTitle(stringResource(id = R.string.ticketing_place)) },
+            content = {
+                Column {
+                    Text(placeName, style = MaterialTheme.typography.bodyLarge)
+                    SectionContent(text = address)
+                }
+            },
+        )
+        Divider(color = Grey85)
+
+        Section(
+            title = { SectionTitle(stringResource(id = R.string.ticketing_content)) },
+            content = {
+                SectionContent(
+                    content,
+                    maxLines = 11,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
+        )
+        Divider(color = Grey85)
+
+        Section(
+            title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
+            content = { Text(text = host) },
+        )
+    }
+}
+
+@Composable
 private fun Poster(
     images: List<String>,
     title: String,
@@ -201,13 +253,26 @@ private fun Poster(
 
 @Composable
 private fun TicketReservationPeriod(
-    stateTime: LocalDateTime,
-    endTime: LocalDateTime,
+    stateDate: LocalDate,
+    endDate: LocalDate,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         Text("티켓 예매 기간")
         Text("2023.12.01 (토) - 2024.01.20 (월)")
+    }
+}
+
+@Composable
+private fun Section(
+    title: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier.padding(top = 40.dp, bottom = 32.dp)) {
+        title()
+        Spacer(modifier = Modifier.height(16.dp))
+        content()
     }
 }
 

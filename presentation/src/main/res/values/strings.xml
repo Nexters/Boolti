@@ -4,8 +4,10 @@
     <string name="menu_my">마이페이지</string>
 
     <string name="description_navigate_back">뒤로 가기</string>
+    <string name="description_navigate_home">홈으로 가기</string>
     <string name="description_poster">포스터 사진</string>
     <string name="description_close_button">닫기</string>
+    <string name="description_more_menu">더보기 메뉴</string>
 
     <!-- 홈(Show) -->
     <string name="finished_show">공연 종료</string>
@@ -32,6 +34,7 @@
 
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
+    <string name="ticketing_share">공유하기</string>
     <string name="ticketing_datetime">일시</string>
     <string name="ticketing_place">장소</string>
     <string name="ticketing_content">공연 내용</string>

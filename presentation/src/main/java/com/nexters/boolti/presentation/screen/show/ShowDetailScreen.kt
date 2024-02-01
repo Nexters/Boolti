@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -161,6 +163,40 @@ private fun ShowDetailAppBar(
                 contentDescription = stringResource(id = R.string.description_navigate_back),
                 Modifier
                     .padding(start = marginHorizontal)
+                    .size(width = 24.dp, height = 24.dp)
+            )
+        }
+        IconButton(
+            modifier = Modifier.size(width = 64.dp, height = 44.dp),
+            onClick = {},
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_home),
+                contentDescription = stringResource(id = R.string.description_navigate_home),
+                Modifier
+                    .size(width = 24.dp, height = 24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1.0f))
+        IconButton(
+            modifier = Modifier.size(width = 64.dp, height = 44.dp),
+            onClick = {},
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_share),
+                contentDescription = stringResource(id = R.string.ticketing_share),
+                Modifier
+                    .size(width = 24.dp, height = 24.dp)
+            )
+        }
+        IconButton(
+            modifier = Modifier.size(width = 64.dp, height = 44.dp),
+            onClick = {},
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_verticle_more),
+                contentDescription = stringResource(id = R.string.description_more_menu),
+                Modifier
                     .size(width = 24.dp, height = 24.dp)
             )
         }

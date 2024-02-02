@@ -1,0 +1,59 @@
+package com.nexters.boolti.presentation.component
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.nexters.boolti.presentation.theme.Grey95
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ZoomableImage(
+    modifier: Modifier = Modifier,
+    models: List<String>,
+) {
+    val pageState = rememberPagerState(
+        initialPage = 0, initialPageOffsetFraction = 0f
+    ) { models.size }
+
+    Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
+        HorizontalPager(modifier = modifier, state = pageState, key = { models[it] }) {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(210f / 297f),
+                model = models[it],
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .clip(shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp))
+                .background(
+                    alpha = 0.5f,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent, Grey95
+                        )
+                    )
+                )
+        )
+    }
+}

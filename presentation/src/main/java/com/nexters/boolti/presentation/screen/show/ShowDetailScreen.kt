@@ -34,23 +34,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.ZoomableImage
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -282,11 +282,12 @@ private fun Poster(
             .padding(top = 16.dp)
             .padding(horizontal = 38.dp)
     ) {
-        AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
-            model = images.first(),
-            contentDescription = stringResource(id = R.string.description_poster),
-            contentScale = ContentScale.FillWidth,
+        ZoomableImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(8.dp))
+                .border(width = 1.dp, color = Grey80, shape = RoundedCornerShape(8.dp)),
+            models = listOf("https://picsum.photos/400/550", "https://picsum.photos/450/650"),
         )
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),
@@ -314,7 +315,10 @@ private fun TicketReservationPeriod(
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(id = R.string.ticketing_period), style = MaterialTheme.typography.titleMedium.copy(color = Grey15))
+        Text(
+            stringResource(id = R.string.ticketing_period),
+            style = MaterialTheme.typography.titleMedium.copy(color = Grey15)
+        )
         Divider(
             modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
         )
@@ -381,7 +385,8 @@ fun ShowDetailCtaButton(
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }
 
-    val disabledContentColor = if (showState is ShowState.WaitingTicketing) MaterialTheme.colorScheme.primary else Grey50
+    val disabledContentColor =
+        if (showState is ShowState.WaitingTicketing) MaterialTheme.colorScheme.primary else Grey50
 
     MainButton(
         modifier = modifier

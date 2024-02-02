@@ -12,6 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
+import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
+import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
@@ -79,9 +81,49 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             route = "ticketing/{showId}",
             arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
-            TicketingScreen(modifier = modifier) {
-                navController.popBackStack()
-            }
+            TicketingScreen(
+                modifier = modifier,
+                onBackClicked = { navController.popBackStack() },
+                onPayClicked = { isInviteTicket, ticketId ->
+                    if (isInviteTicket) {
+                        navController.navigate("payment/inviteTicket?ticketId=$ticketId") {
+                            popUpTo("ticketing/{showId}") { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate("payment/accountTransfer?ticketId=$ticketId") {
+                            popUpTo("ticketing/{showId}") { inclusive = true }
+                        }
+                    }
+                }
+            )
+        }
+        composable(
+            route = "payment/accountTransfer?ticketId={ticketId}",
+        ) {
+            val ticketId = it.arguments?.getString("ticketId") ?: return@composable
+            AccountTransferScreen(
+                onClickHome = {
+                    navController.popBackStack(navController.graph.startDestinationId, true)
+                    navController.navigate("home")
+                },
+                onClickClose = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = "payment/inviteTicket?ticketId={ticketId}",
+            arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
+        ) {
+            InviteTicketCompleteScreen(
+                onClickHome = {
+                    navController.popBackStack(navController.graph.startDestinationId, true)
+                    navController.navigate("home")
+                },
+                onClickClose = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

@@ -27,14 +27,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -70,6 +67,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
@@ -88,12 +86,12 @@ import kotlinx.coroutines.launch
 fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
-    onBackClicked: () -> Unit,
+    onBackClicked: () -> Unit = {},
+    onPayClicked: (isInviteTicket: Boolean, ticketId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val isInviteTicket by remember { mutableStateOf(true) } // TODO 실제 데이터로 교체 필요
@@ -121,22 +119,7 @@ fun TicketingScreen(
             )
         },
         snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = 100.dp),
-            ) { data ->
-                Card(
-                    shape = RoundedCornerShape(4.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                ) {
-                    Text(
-                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
-                        text = data.visuals.message,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
+            ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 100.dp))
         }
     ) { innerPadding ->
         Box(modifier = modifier.padding(innerPadding)) {
@@ -178,7 +161,7 @@ fun TicketingScreen(
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
                     label = stringResource(R.string.ticketing_payment_button_label, 5000),
-                    onClick = { /* TODO */ },
+                    onClick = { onPayClicked(isInviteTicket, viewModel.state.value.ticket?.id ?: "") },
                 ) // TODO 데이터 붙일 때 연결
             }
         }
@@ -575,7 +558,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen {}
+            TicketingScreen() { _, _ -> }
         }
     }
 }

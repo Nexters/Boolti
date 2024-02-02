@@ -6,6 +6,7 @@
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
     <string name="description_close_button">닫기</string>
+    <string name="description_toolbar_home">홈으로 이동</string>
 
     <!-- 홈(Show) -->
     <string name="finished_show">공연 종료</string>
@@ -15,6 +16,7 @@
     <string name="badge_left_ticket_amount">%d매 남음</string>
     <string name="sold_out_label">품절</string>
     <string name="bullet">•</string>
+    <string name="unit_won">%,d원</string>
 
     <string name="btn_ok">확인</string>
 
@@ -71,4 +73,16 @@
     <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
+
+    <!-- 결제 -->
+    <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
+    <string name="account_transfer_description">입금 마감일까지 입금이 확인되지 않는 경우\n주문이 자동 취소됩니다.</string>
+    <string name="account_number_copy_button">계좌번호 복사하기</string>
+    <string name="account_number_copied_message">계좌번호가 복사되었어요</string>
+    <string name="bank_name">은행명</string>
+    <string name="account_number">계좌번호</string>
+    <string name="account_holder">예금주</string>
+    <string name="account_transfer_due_date">입금 마감일</string>
+    <string name="invite_ticket_complete_title">결제가 완료되었어요</string>
+    <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 </resources>

@@ -25,7 +25,7 @@ fun PaymentToolbar(
         navigationIcon = {
             IconButton(onClick = onClickHome) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_home_24),
+                    painter = painterResource(R.drawable.ic_home),
                     contentDescription = stringResource(R.string.description_toolbar_home),
                 )
             }

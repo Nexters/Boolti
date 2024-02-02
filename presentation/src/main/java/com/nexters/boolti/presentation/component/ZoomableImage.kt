@@ -3,9 +3,12 @@ package com.nexters.boolti.presentation.component
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,5 +58,30 @@ fun ZoomableImage(
                     )
                 )
         )
+        Indicator(
+            modifier = Modifier.padding(bottom = 14.dp),
+            position = pageState.currentPage,
+            size = models.size
+        )
+    }
+}
+
+@Composable
+private fun Indicator(
+    modifier: Modifier = Modifier,
+    position: Int,
+    size: Int,
+) {
+    Row(modifier = modifier) {
+        (0 until size).forEach { index ->
+            val opacity = if (index == position) 1f else 0.5f
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .size(7.dp)
+                    .clip(shape = RoundedCornerShape(4.dp))
+                    .background(Color.White.copy(alpha = opacity))
+            )
+        }
     }
 }

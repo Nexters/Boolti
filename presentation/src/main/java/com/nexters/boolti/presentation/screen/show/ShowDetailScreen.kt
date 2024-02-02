@@ -176,7 +176,7 @@ private fun ShowDetailAppBar(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_home),
-                contentDescription = stringResource(id = R.string.description_navigate_home),
+                contentDescription = stringResource(id = R.string.description_toolbar_home),
                 Modifier.size(width = 24.dp, height = 24.dp)
             )
         }

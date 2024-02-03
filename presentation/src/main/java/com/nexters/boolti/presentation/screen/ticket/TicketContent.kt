@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -90,14 +91,14 @@ fun TicketContent(
             DottedDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(top = 20.dp, start = 20.dp, end = 20.dp),
                 thickness = 2.dp,
                 color = White.copy(alpha = .3f),
             )
             Row(
                 modifier = Modifier
-                    .padding(horizontal = marginHorizontal)
-                    .padding(bottom = 20.dp),
+                    .height(125.dp)
+                    .padding(horizontal = marginHorizontal),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(

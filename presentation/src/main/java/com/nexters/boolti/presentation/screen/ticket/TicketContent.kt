@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticket
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,24 +18,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
 @Composable
@@ -44,12 +42,13 @@ fun TicketContent(
     poster: String,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     Box(modifier = modifier) {
         AsyncImage(
+            model = asyncImageBlurModel(context, poster),
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(0.3f),
-            model = poster,
             contentDescription = null,
             contentScale = ContentScale.Crop,
         )
@@ -131,41 +130,30 @@ fun TicketContent(
                     }
                 }
                 Spacer(modifier = Modifier.padding(12.dp))
-                Image(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(White)
-                        .padding(2.dp),
-                    painter = rememberQrBitmapPainter(
-                        "im hero",
-                        size = 70.dp,
-                    ),
-                    contentScale = ContentScale.Inside,
-                    contentDescription = "입장 QR 코드",
-                )
+                Box(
+                    modifier = Modifier,
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(White)
+                            .padding(2.dp),
+                        painter = rememberQrBitmapPainter(
+                            "im hero",
+                            size = 70.dp,
+                        ),
+                        contentScale = ContentScale.Inside,
+                        contentDescription = "입장 QR 코드",
+                    )
+                    /*Text(
+                        modifier = Modifier,
+                        text = "입장 완료",
+                        style = MaterialTheme.typography.titleMedium,
+                    )*/
+                }
             }
         }
     }
-}
-
-@Composable
-fun DottedDivider(
-    modifier: Modifier = Modifier,
-    color: Color,
-    thickness: Dp,
-) {
-    val pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f), 10f)
-    Canvas(
-        modifier = modifier,
-        onDraw = {
-            drawLine(
-                color = color,
-                start = Offset.Zero,
-                end = Offset(size.width, 0f),
-                strokeWidth = thickness.toPx(),
-                pathEffect = pathEffect,
-            )
-        }
-    )
 }

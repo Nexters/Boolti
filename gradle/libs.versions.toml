@@ -71,6 +71,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -119,4 +120,5 @@ network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
 firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
+coil = ["coil", "coil-compose"]
 compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util"]

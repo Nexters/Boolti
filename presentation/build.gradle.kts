@@ -64,7 +64,7 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.lottie)
-    implementation(libs.coil.compose)
+    implementation(libs.bundles.coil)
     api(libs.kakao.login)
 
     implementation(libs.timber)

@@ -80,17 +80,12 @@ fun TicketScreen(
                         translationX = calculateTranslationX(
                             screenWidth = screenWidth,
                             scaleRatio = scaleSizeRatio,
-                            contentPadding =contentPadding,
+                            contentPadding = contentPadding,
                             pageOffset = pageOffset,
                         ).toPx()
                     },
             ) {
-                Text(
-                    text = "Page: $page",
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .clickable { onClickTicket(page.toString()) }
-                )
+                TicketContent("https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png")
             }
         }
 

@@ -1,10 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticket
 
-import android.graphics.Bitmap
-import android.os.Build
-import android.renderscript.Allocation
-import android.renderscript.RenderScript
-import android.renderscript.ScriptIntrinsicBlur
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,17 +18,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -44,6 +37,7 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
 @Composable
 fun TicketContent(
@@ -104,10 +98,12 @@ fun TicketContent(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "2024 TOGETHER LUCKY CLUB",
+                        text = "2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontFamily = aggroFamily,
                         ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
                     Row(
@@ -126,20 +122,25 @@ fun TicketContent(
                                 .background(Grey50),
                         )
                         Text(
-                            text = "클럽 샤프",
+                            text = "클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프",
                             style = MaterialTheme.typography.bodySmall,
                             color = Grey30,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
                 Spacer(modifier = Modifier.padding(12.dp))
                 Image(
                     modifier = Modifier
-                        .size(70.dp)
+                        .padding(vertical = 8.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(White)
-                        .padding(vertical = 8.dp),
-                    painter = painterResource(id = R.drawable.ic_info_20),
+                        .padding(2.dp),
+                    painter = rememberQrBitmapPainter(
+                        "im hero",
+                        size = 70.dp,
+                    ),
                     contentScale = ContentScale.Inside,
                     contentDescription = "입장 QR 코드",
                 )
@@ -166,51 +167,5 @@ fun DottedDivider(
                 pathEffect = pathEffect,
             )
         }
-    )
-}
-
-@Composable
-fun Blur(bitmap: Bitmap) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-        LegacyBlurImage(bitmap, 25f)
-    } else {
-        BlurImage(
-            bitmap,
-            Modifier
-                .fillMaxSize()
-                .blur(radiusX = 15.dp, radiusY = 15.dp)
-        )
-    }
-}
-
-@Composable
-private fun LegacyBlurImage(
-    bitmap: Bitmap,
-    blurRatio: Float,
-    modifier: Modifier = Modifier.fillMaxSize(),
-) {
-    val renderScript = RenderScript.create(LocalContext.current)
-    val bitmapAlloc = Allocation.createFromBitmap(renderScript, bitmap)
-    ScriptIntrinsicBlur.create(renderScript, bitmapAlloc.element).apply {
-        setRadius(blurRatio)
-        setInput(bitmapAlloc)
-        forEach(bitmapAlloc)
-    }
-    bitmapAlloc.copyTo(bitmap)
-    renderScript.destroy()
-
-    BlurImage(bitmap, modifier)
-}
-
-@Composable
-private fun BlurImage(
-    bitmap: Bitmap,
-    modifier: Modifier = Modifier.fillMaxSize(),
-) {
-    Image(
-        bitmap = bitmap.asImageBitmap(),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
     )
 }

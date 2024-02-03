@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.show
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,12 +25,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +54,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -79,6 +83,7 @@ fun ShowDetailScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
@@ -86,6 +91,12 @@ fun ShowDetailScreen(
     BottomSheetScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
+        snackbarHost = {
+            ToastSnackbarHost(
+                modifier = Modifier.padding(bottom = 80.dp),
+                hostState = snackbarHostState,
+            )
+        },
         topBar = { ShowDetailAppBar(onBack = onBack, onClickHome = onClickHome) },
         sheetContent = {
             ChooseTicketBottomSheetContent(
@@ -124,6 +135,7 @@ fun ShowDetailScreen(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
                         .padding(bottom = 114.dp),
+                    snackbarHost = snackbarHostState,
                     ticketingStartDate = LocalDate.now(),
                     ticketingEndDate = LocalDate.now(),
                     placeName = "클럽 샤프",
@@ -220,6 +232,7 @@ private fun ShowDetailAppBar(
 
 @Composable
 private fun ContentScaffold(
+    snackbarHost: SnackbarHostState,
     ticketingStartDate: LocalDate,
     ticketingEndDate: LocalDate,
     placeName: String,
@@ -228,6 +241,8 @@ private fun ContentScaffold(
     host: String,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = modifier,
     ) {
@@ -249,6 +264,7 @@ private fun ContentScaffold(
                     SectionTitle(stringResource(id = R.string.ticketing_place))
                     Spacer(modifier = modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current
+                    val copiedMessage = stringResource(id = R.string.ticketing_account_copied_message)
                     Row(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(4.dp))
@@ -256,6 +272,11 @@ private fun ContentScaffold(
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                             .clickable {
                                 clipboardManager.setText(AnnotatedString(placeName))
+                                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                    scope.launch {
+                                        snackbarHost.showSnackbar(copiedMessage)
+                                    }
+                                }
                             }
                     ) {
                         Icon(

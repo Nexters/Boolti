@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,9 +37,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -240,7 +243,36 @@ private fun ContentScaffold(
         Divider(color = Grey85)
 
         Section(
-            title = { SectionTitle(stringResource(id = R.string.ticketing_place)) },
+            title = {
+                Row {
+                    SectionTitle(stringResource(id = R.string.ticketing_place))
+                    Spacer(modifier = modifier.weight(1.0f))
+                    val clipboardManager = LocalClipboardManager.current
+                    Row(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(4.dp))
+                            .background(color = Grey85)
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .clickable {
+                                clipboardManager.setText(AnnotatedString(placeName))
+                            }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_copy),
+                            contentDescription = stringResource(
+                                id = R.string.ticketing_copy_address
+                            )
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 6.dp),
+                            text = stringResource(
+                                id = R.string.ticketing_copy_address
+                            ),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            },
             content = {
                 Column {
                     Text(placeName, style = MaterialTheme.typography.bodyLarge)
@@ -324,7 +356,10 @@ private fun TicketReservationPeriod(
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(id = R.string.ticketing_period), style = MaterialTheme.typography.titleMedium.copy(color = Grey15))
+        Text(
+            stringResource(id = R.string.ticketing_period),
+            style = MaterialTheme.typography.titleMedium.copy(color = Grey15)
+        )
         Divider(
             modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
         )
@@ -391,7 +426,8 @@ fun ShowDetailCtaButton(
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }
 
-    val disabledContentColor = if (showState is ShowState.WaitingTicketing) MaterialTheme.colorScheme.primary else Grey50
+    val disabledContentColor =
+        if (showState is ShowState.WaitingTicketing) MaterialTheme.colorScheme.primary else Grey50
 
     MainButton(
         modifier = modifier

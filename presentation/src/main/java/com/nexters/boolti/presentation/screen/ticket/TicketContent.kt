@@ -16,16 +16,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,8 +49,10 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
+import com.nexters.boolti.presentation.util.ticketPath
 
 @Composable
 fun TicketContent(
@@ -50,15 +61,54 @@ fun TicketContent(
 ) {
     val context = LocalContext.current
     val ticketState = TicketState.entries.random()
+    val bottomAreaHeight = 125.dp
 
-    Box(modifier = modifier) {
+    var ticketWidth by remember { mutableFloatStateOf(0f) }
+    var ticketHeight by remember { mutableFloatStateOf(0f) }
+
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
+            .onGloballyPositioned { coordinates ->
+                ticketWidth = coordinates.size.width.toFloat()
+                ticketHeight = coordinates.size.height.toFloat()
+            }
+            .graphicsLayer {
+                shape = TicketShape(
+                    width = ticketWidth,
+                    height = ticketHeight,
+                    circleRadius = 10.dp.toPx(),
+                    bottomAreaHeight = bottomAreaHeight.toPx(),
+                )
+                clip = true
+            }
+            .drawBehind {
+                drawPath(
+                    brush = Brush.linearGradient(
+                        listOf(
+                            Color(0x4DC5CACD),
+                            Color(0x4D090A0B),
+                        ),
+                        start = Offset.Zero,
+                        end = Offset(ticketWidth, ticketHeight),
+                    ),
+                    path = ticketPath(
+                        width = ticketWidth,
+                        height = ticketHeight,
+                        circleRadius = 10.dp.toPx(),
+                        bottomAreaHeight = bottomAreaHeight.toPx(),
+                    ),
+                    style = Stroke(
+                        width = 1.dp.toPx(),
+                    )
+                )
+            }
+    ) {
         AsyncImage(
             model = asyncImageBlurModel(context, poster),
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(0.3f),
-            contentDescription = null,
+            modifier = Modifier.fillMaxSize().alpha(0.5f),
             contentScale = ContentScale.Crop,
+            contentDescription = null,
         )
         Column {
             Row(
@@ -97,7 +147,7 @@ fun TicketContent(
             )
             Row(
                 modifier = Modifier
-                    .height(125.dp)
+                    .height(bottomAreaHeight)
                     .padding(horizontal = marginHorizontal),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -145,7 +195,7 @@ fun TicketContent(
 }
 
 @Composable
-fun TicketQr(
+private fun TicketQr(
     ticketState: TicketState,
 ) {
     Box(

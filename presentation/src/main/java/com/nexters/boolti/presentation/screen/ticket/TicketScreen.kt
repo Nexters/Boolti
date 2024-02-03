@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticket
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +29,7 @@ fun TicketScreen(
     onClickTicket: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,7 +85,9 @@ fun TicketScreen(
                         ).toPx()
                     },
             ) {
-                TicketContent("https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png")
+                TicketContent(
+                    "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png"
+                )
             }
         }
 

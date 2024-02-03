@@ -3,11 +3,12 @@ package com.nexters.boolti.data.di
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.nexters.boolti.data.BuildConfig
 import com.nexters.boolti.data.datasource.TokenDataSource
-import com.nexters.boolti.data.network.LoginService
+import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.network.AuthInterceptor
-import com.nexters.boolti.data.network.SignUpService
+import com.nexters.boolti.data.network.api.ShowService
+import com.nexters.boolti.data.network.api.SignUpService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -70,6 +71,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideSignUpService(retrofit: Retrofit): SignUpService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideShowService(retrofit: Retrofit): ShowService = retrofit.create()
 
     @Singleton
     @Provides

@@ -53,6 +53,7 @@ androidx-compose-material3-material3 = { module = "androidx.compose.material3:ma
 andoridx-compose-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-ui-ui = { module = "androidx.compose.ui:ui", version.require = "false" }
 androidx-compose-ui-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.require = "false" }
+androidx-compose-ui-ui-util = { module = "androidx.compose.ui:ui-util", version.require = "false" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.require = "false" }
 androidx-compose-ui-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
@@ -116,4 +117,4 @@ network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
 firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
-compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview"]
+compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util"]

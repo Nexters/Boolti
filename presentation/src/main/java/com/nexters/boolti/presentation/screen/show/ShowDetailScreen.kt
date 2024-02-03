@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -287,7 +288,6 @@ private fun ContentScaffold(
             content = {
                 SectionContent(
                     content,
-                    maxLines = 11,
                     overflow = TextOverflow.Ellipsis,
                 )
             },
@@ -401,7 +401,7 @@ private fun SectionContent(
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
     Text(
-        modifier = modifier,
+        modifier = modifier.heightIn(0.dp, 246.dp),
         text = text,
         style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
         maxLines = maxLines,

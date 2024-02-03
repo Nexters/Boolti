@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,8 +31,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.Show
+import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
@@ -38,14 +42,14 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import java.time.LocalDate
 
 @Composable
 fun ShowScreen(
     modifier: Modifier = Modifier,
     onClickShowItem: (showId: String) -> Unit,
+    viewModel: ShowViewModel = hiltViewModel()
 ) {
-    val shows = (5 downTo -5).toList()
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = modifier,
@@ -62,14 +66,12 @@ fun ShowScreen(
                 verticalArrangement = Arrangement.spacedBy(28.dp),
                 contentPadding = PaddingValues(top = 12.dp),
             ) {
-                val now = LocalDate.now()
-                items(count = shows.size, key = { index -> shows[index] }) { index ->
-                    val tempDay = now.plusDays(shows[index].toLong())
-                    Show(
+                items(count = uiState.shows.size, key = { index -> uiState.shows[index].id }) { index ->
+                    ShowFeed(
+                        show = uiState.shows[index],
+                        showState = ShowState.WaitingTicketing(7),
                         modifier = Modifier
                             .clickable { onClickShowItem(index.toString()) },
-                        openDate = tempDay,
-                        showDate = tempDay.plusDays(1),
                     )
                 }
             }
@@ -80,6 +82,7 @@ fun ShowScreen(
 @Composable
 fun ShowAppBar(
     modifier: Modifier = Modifier,
+    viewModel: ShowViewModel = hiltViewModel(),
 ) {
     Column(
         modifier = modifier

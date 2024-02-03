@@ -7,14 +7,19 @@ import kotlinx.serialization.Serializable
 data class ShowResponse(
     val id: Long,
     val name: String,
-    val date: Long,
-    val salesStartTime: Long,
-    val salesEndTime: Long,
+    val date: String,
+    val salesStartTime: String,
+    val salesEndTime: String,
     val showImg: String,
 ) {
     fun toDomain(): Show {
         return Show(
-            name = name
+            id = id,
+            name = name,
+//            date = LocalDate(date),
+//            salesStartTime = salesStartTime,
+//            salesEndTime = salesEndTime,
+            thumbnailImage = showImg,
         )
     }
 }

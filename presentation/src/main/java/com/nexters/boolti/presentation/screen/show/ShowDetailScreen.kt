@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.show
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -65,6 +64,8 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
+    onBack: () -> Unit,
+    onClickHome: () -> Unit,
     onTicketSelected: (ticketId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
@@ -81,7 +82,7 @@ fun ShowDetailScreen(
     BottomSheetScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
-        topBar = { ShowDetailAppBar() },
+        topBar = { ShowDetailAppBar(onBack = onBack, onClickHome = onClickHome) },
         sheetContent = {
             ChooseTicketBottomSheetContent(
                 ticketingTickets = uiState.tickets, leftAmount = uiState.leftAmount
@@ -146,7 +147,7 @@ fun ShowDetailScreen(
                         )
                 )
                 ShowDetailCtaButton(
-                    showState = ShowState.WaitingTicketing(7),
+                    showState = ShowState.TicketingInProgress,
                     onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } },
                 )
             }
@@ -156,6 +157,8 @@ fun ShowDetailScreen(
 
 @Composable
 private fun ShowDetailAppBar(
+    onBack: () -> Unit,
+    onClickHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -167,7 +170,7 @@ private fun ShowDetailAppBar(
     ) {
         IconButton(
             modifier = Modifier.size(width = 48.dp, height = 44.dp),
-            onClick = {},
+            onClick = onBack,
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_back),
@@ -179,7 +182,7 @@ private fun ShowDetailAppBar(
         }
         IconButton(
             modifier = Modifier.size(width = 64.dp, height = 44.dp),
-            onClick = {},
+            onClick = onClickHome,
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_home),

@@ -25,9 +25,9 @@
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 불티에서 티켓을 불티나게 팔아보세요!</string>
     <string name="login_with_kakaotalk">카카오톡으로 시작하기</string>
-    <string name="term_notice">원활한 이용을 위해 서비스 이용약관 확인 후 동의해 주세요.</string>
+    <string name="term_notice">원활한 이용을 위해 서비스 이용약관 확인 후\n동의해 주세요.</string>
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
-    <string name="signup_greeting">어서오세요 %s님!</string>
+    <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">(알수없음)</string>
 
     <string name="format_price">%,d원</string>

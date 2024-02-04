@@ -80,7 +80,7 @@ fun QrFullScreen(
                 size = 260.dp,
             ),
             contentScale = ContentScale.Inside,
-            contentDescription = "입장 QR 코드",
+            contentDescription = stringResource(R.string.description_qr),
         )
     }
 }

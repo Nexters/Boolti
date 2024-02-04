@@ -6,6 +6,7 @@
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
     <string name="description_close_button">닫기</string>
+    <string name="description_qr">입장 QR 코드</string>
 
     <!-- 홈(Show) -->
     <string name="finished_show">공연 종료</string>
@@ -29,6 +30,10 @@
 
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>
+
+    <!-- 티켓 -->
+    <string name="ticket_show_finished_state">공연 종료</string>
+    <string name="ticket_used_state">입장 완료</string>
 
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>

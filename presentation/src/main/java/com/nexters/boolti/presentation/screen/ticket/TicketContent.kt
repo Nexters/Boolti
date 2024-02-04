@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -142,7 +143,7 @@ fun TicketContent(
                     .clip(RoundedCornerShape(8.dp)),
                 model = poster,
                 contentScale = ContentScale.FillWidth,
-                contentDescription = "포스터",
+                contentDescription = stringResource(R.string.description_poster),
             )
             DottedDivider(
                 modifier = Modifier
@@ -224,7 +225,7 @@ private fun TicketQr(
                 size = 66.dp,
             ),
             contentScale = ContentScale.Inside,
-            contentDescription = "입장 QR 코드",
+            contentDescription = stringResource(R.string.description_qr),
         )
         if (ticketState != TicketState.Ready) {
             val color = when (ticketState) {
@@ -251,8 +252,8 @@ private fun TicketQr(
                     )
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 text = when (ticketState) {
-                    TicketState.Used -> "입장 완료"
-                    TicketState.Finished -> "공연 종료"
+                    TicketState.Used -> stringResource(R.string.ticket_used_state)
+                    TicketState.Finished -> stringResource(R.string.ticket_show_finished_state)
                     else -> ""
                 },
                 style = MaterialTheme.typography.titleMedium,

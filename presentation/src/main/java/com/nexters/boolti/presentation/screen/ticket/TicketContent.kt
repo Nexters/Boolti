@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.ticket
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,11 +58,14 @@ import com.nexters.boolti.presentation.util.ticketPath
 @Composable
 fun TicketContent(
     poster: String,
+    onClickQr: (data: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val ticketState = TicketState.entries.random()
     val bottomAreaHeight = 125.dp
+
+    val qrText = "boolti ticket 1"
 
     var ticketWidth by remember { mutableFloatStateOf(0f) }
     var ticketHeight by remember { mutableFloatStateOf(0f) }
@@ -106,7 +110,9 @@ fun TicketContent(
     ) {
         AsyncImage(
             model = asyncImageBlurModel(context, poster),
-            modifier = Modifier.fillMaxSize().alpha(0.5f),
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(0.5f),
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )
@@ -188,7 +194,7 @@ fun TicketContent(
                     }
                 }
                 Spacer(modifier = Modifier.padding(12.dp))
-                TicketQr(ticketState)
+                TicketQr(qrText, ticketState, onClickQr)
             }
         }
     }
@@ -196,7 +202,9 @@ fun TicketContent(
 
 @Composable
 private fun TicketQr(
+    data: String,
     ticketState: TicketState,
+    onClickQr: (data: String) -> Unit,
 ) {
     Box(
         modifier = Modifier,
@@ -207,9 +215,12 @@ private fun TicketQr(
                 .padding(vertical = 8.dp)
                 .clip(RoundedCornerShape(4.dp))
                 .background(White)
-                .padding(2.dp),
+                .padding(2.dp)
+                .clickable {
+                    if (ticketState == TicketState.Ready) onClickQr(data)
+                },
             painter = rememberQrBitmapPainter(
-                "im hero",
+                data,
                 size = 66.dp,
             ),
             contentScale = ContentScale.Inside,

@@ -27,6 +27,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun TicketScreen(
     onClickTicket: (String) -> Unit,
+    onClickQr: (data: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -86,7 +87,8 @@ fun TicketScreen(
                     },
             ) {
                 TicketContent(
-                    "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png"
+                    "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png",
+                    onClickQr = onClickQr,
                 )
             }
         }

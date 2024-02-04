@@ -250,7 +250,11 @@ private fun TicketQr(
                         shape = RoundedCornerShape(8.dp),
                     )
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                text = "입장 완료",
+                text = when (ticketState) {
+                    TicketState.Used -> "입장 완료"
+                    TicketState.Finished -> "공연 종료"
+                    else -> ""
+                },
                 style = MaterialTheme.typography.titleMedium,
                 color = color,
             )

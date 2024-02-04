@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
@@ -118,23 +119,7 @@ fun TicketContent(
             contentDescription = null,
         )
         Column {
-            Row(
-                modifier = Modifier
-                    .background(White.copy(alpha = 0.3f))
-                    .padding(horizontal = 20.dp, vertical = 10.dp),
-            ) {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "일반티켓 B • 1매",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Grey80,
-                )
-                Image(
-                    painter = painterResource(R.drawable.boolti_logo),
-                    colorFilter = ColorFilter.tint(Grey20),
-                    contentDescription = null,
-                )
-            }
+            Title()
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,52 +137,83 @@ fun TicketContent(
                 thickness = 2.dp,
                 color = White.copy(alpha = .3f),
             )
+            TicketInfo(bottomAreaHeight, qrText, ticketState, onClickQr)
+        }
+    }
+}
+
+@Composable
+private fun Title() {
+    Row(
+        modifier = Modifier
+            .background(White.copy(alpha = 0.3f))
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "일반티켓 B • 1매",
+            style = MaterialTheme.typography.bodySmall,
+            color = Grey80,
+        )
+        Image(
+            painter = painterResource(R.drawable.boolti_logo),
+            colorFilter = ColorFilter.tint(Grey20),
+            contentDescription = null,
+        )
+    }
+}
+
+@Composable
+private fun TicketInfo(
+    bottomAreaHeight: Dp,
+    qrText: String,
+    ticketState: TicketState,
+    onClickQr: (data: String) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .height(bottomAreaHeight)
+            .padding(horizontal = marginHorizontal),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = "2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontFamily = aggroFamily,
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
             Row(
-                modifier = Modifier
-                    .height(bottomAreaHeight)
-                    .padding(horizontal = marginHorizontal),
+                modifier = Modifier.padding(top = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB",
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontFamily = aggroFamily,
-                        ),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                    Row(
-                        modifier = Modifier.padding(top = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "2024.01.20 (토)",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Grey30,
-                        )
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 6.dp)
-                                .size(width = 1.dp, height = 13.dp)
-                                .background(Grey50),
-                        )
-                        Text(
-                            text = "클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Grey30,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.padding(12.dp))
-                TicketQr(qrText, ticketState, onClickQr)
+                Text(
+                    text = "2024.01.20 (토)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey30,
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 6.dp)
+                        .size(width = 1.dp, height = 13.dp)
+                        .background(Grey50),
+                )
+                Text(
+                    text = "클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey30,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
+        Spacer(modifier = Modifier.padding(12.dp))
+        TicketQr(qrText, ticketState, onClickQr)
     }
 }
 

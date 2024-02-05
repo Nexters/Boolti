@@ -50,7 +50,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
@@ -61,6 +60,7 @@ import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -353,11 +353,12 @@ private fun Poster(
             .padding(top = 16.dp)
             .padding(horizontal = 38.dp)
     ) {
-        AsyncImage(
-            modifier = Modifier.fillMaxWidth(),
-            model = images.first(),
-            contentDescription = stringResource(id = R.string.description_poster),
-            contentScale = ContentScale.FillWidth,
+        SwipeableImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(8.dp))
+                .border(width = 1.dp, color = Grey80, shape = RoundedCornerShape(8.dp)),
+            models = listOf("https://picsum.photos/400/550", "https://picsum.photos/450/650"),
         )
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),

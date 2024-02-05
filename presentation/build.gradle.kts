@@ -64,10 +64,11 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.lottie)
-    implementation(libs.coil.compose)
+    implementation(libs.bundles.coil)
     api(libs.kakao.login)
 
     implementation(libs.timber)
+    implementation(libs.zxing.android.embedded)
 
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))

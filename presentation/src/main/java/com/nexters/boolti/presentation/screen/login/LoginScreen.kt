@@ -10,17 +10,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,16 +44,19 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val scaffoldState = rememberBottomSheetScaffoldState()
     val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState()
+    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.event.collect {
             when (it) {
-                LoginEvent.Success -> onBackPressed()
+                LoginEvent.Success -> {
+                    onBackPressed()
+                }
+
                 LoginEvent.RequireSignUp -> {
-                    scaffoldState.bottomSheetState.expand()
+                    isSheetOpen = true
                 }
 
                 LoginEvent.Invalid -> Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show()
@@ -60,17 +66,18 @@ fun LoginScreen(
 
     BackHandler(onBack = onBackPressed)
 
-    BottomSheetScaffold(
-        topBar = { LoginAppBar(onBackPressed = onBackPressed) },
-        sheetContent = {
+    if (isSheetOpen) {
+        ModalBottomSheet(sheetState = sheetState, onDismissRequest = {
+            isSheetOpen = false
+        }) {
             SignUpBottomSheet(
-                nickname = uiState.nickname ?: stringResource(R.string.nickname_default),
-                signUp = viewModel::signUp
+                signUp = viewModel::signUp,
             )
-        },
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        }
+    }
+
+    Scaffold(
+        topBar = { LoginAppBar(onBackPressed = onBackPressed) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
@@ -114,8 +121,7 @@ private fun LoginAppBar(
             .background(color = MaterialTheme.colorScheme.background),
     ) {
         IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp),
-            onClick = onBackPressed
+            modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_close),
@@ -130,7 +136,6 @@ private fun LoginAppBar(
 
 @Composable
 private fun SignUpBottomSheet(
-    nickname: String,
     signUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -139,7 +144,7 @@ private fun SignUpBottomSheet(
     ) {
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 12.dp),
-            text = stringResource(id = R.string.signup_greeting, nickname),
+            text = stringResource(id = R.string.signup_greeting),
             style = MaterialTheme.typography.headlineSmall
         )
         Text(

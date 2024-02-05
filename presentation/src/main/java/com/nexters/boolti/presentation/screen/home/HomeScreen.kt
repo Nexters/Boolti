@@ -34,6 +34,7 @@ fun HomeScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onClickShowItem: (showId: Long) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
+    onClickQr: (data: String) -> Unit,
     requireLogin: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -72,6 +73,7 @@ fun HomeScreen(
             ) {
                 TicketScreen(
                     onClickTicket = onClickTicket,
+                    onClickQr = onClickQr,
                     modifier = modifier.padding(innerPadding),
                 )
             }

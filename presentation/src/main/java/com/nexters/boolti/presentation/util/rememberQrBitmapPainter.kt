@@ -39,7 +39,7 @@ fun rememberQrBitmapPainter(
     LaunchedEffect(bitmap) {
         if (bitmap != null) return@LaunchedEffect
 
-        launch(Dispatchers.IO) {
+        launch(Dispatchers.Default) {
             val qrCodeWriter = QRCodeWriter()
 
             val encodeHints = mutableMapOf<EncodeHintType, Any?>()

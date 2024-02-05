@@ -15,8 +15,8 @@ import kotlin.math.roundToInt
 fun asyncImageBlurModel(
     context: Context,
     imageUrl: String,
-    scale: Float = 0.5f,
     radius: Int = 25,
+    scale: Float = .5f,
 ): ImageRequest = ImageRequest.Builder(context)
     .data(imageUrl)
     .transformations(

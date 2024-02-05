@@ -23,12 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
@@ -84,24 +84,27 @@ fun TicketContent(
                     width = ticketWidth,
                     height = ticketHeight,
                     circleRadius = 10.dp.toPx(),
+                    cornerRadius = 8.dp.toPx(),
                     bottomAreaHeight = bottomAreaHeight.toPx(),
                 )
                 clip = true
             }
             .drawBehind {
+                // 보더 Line
                 drawPath(
                     brush = Brush.linearGradient(
                         listOf(
-                            Color(0x4DC5CACD),
-                            Color(0x4D090A0B),
+                            White.copy(alpha = .5f),
+                            White.copy(alpha = .2f),
                         ),
-                        start = Offset.Zero,
-                        end = Offset(ticketWidth, ticketHeight),
+                        start = Offset(ticketWidth / 2, 0f),
+                        end = Offset(0f, ticketHeight / 0f),
                     ),
                     path = ticketPath(
                         width = ticketWidth,
                         height = ticketHeight,
                         circleRadius = 10.dp.toPx(),
+                        cornerRadius = 8.dp.toPx(),
                         bottomAreaHeight = bottomAreaHeight.toPx(),
                     ),
                     style = Stroke(
@@ -111,12 +114,38 @@ fun TicketContent(
             }
     ) {
         AsyncImage(
-            model = asyncImageBlurModel(context, poster),
+            model = asyncImageBlurModel(context, poster, radius = 24),
             modifier = Modifier
-                .fillMaxSize()
-                .alpha(0.5f),
+                .fillMaxSize(),
             contentScale = ContentScale.Crop,
             contentDescription = null,
+        )
+        // 포스터 위에 올라가는 그라데이션
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xCCC5CACD),
+                            Color(0xCC090A0B),
+                        ),
+                        start = Offset.Zero,
+                        end = Offset(ticketWidth, ticketHeight),
+                    ),
+                    alpha = .8f,
+                )
+        )
+        // 텍스트 뒤에 깔린 DIM 그라데이션
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .height(bottomAreaHeight)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Black.copy(alpha = .2f), Black.copy(alpha = .8f))
+                    )
+                )
         )
         Column {
             Title()

@@ -66,6 +66,7 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -123,4 +124,4 @@ db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-roo
 firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
 coil = ["coil", "coil-compose"]
-compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util"]
+compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]

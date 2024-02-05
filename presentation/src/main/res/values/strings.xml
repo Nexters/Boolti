@@ -12,6 +12,15 @@
     <!-- 홈(Show) -->
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
+    <string-array name="days_of_week">
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+        <item>일</item>
+    </string-array>
 
     <!-- 공통 -->
     <string name="badge_left_ticket_amount">%d매 남음</string>

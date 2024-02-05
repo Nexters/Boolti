@@ -19,8 +19,8 @@ data class ShowResponse(
             id = id,
             name = name,
             date = date.toLocalDateTime(),
-            salesStartTime = salesStartTime.toLocalDate(),
-            salesEndTime = salesEndTime.toLocalDate(),
+            salesStartDate = salesStartTime.toLocalDate(),
+            salesEndDate = salesEndTime.toLocalDate(),
             thumbnailImage = showImg,
         )
     }

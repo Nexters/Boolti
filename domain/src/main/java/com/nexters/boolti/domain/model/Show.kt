@@ -7,7 +7,7 @@ data class Show(
     val id: Long,
     val name: String,
     val date: LocalDateTime,
-    val salesStartTime: LocalDate,
-    val salesEndTime: LocalDate,
+    val salesStartDate: LocalDate,
+    val salesEndDate: LocalDate,
     val thumbnailImage: String,
 )

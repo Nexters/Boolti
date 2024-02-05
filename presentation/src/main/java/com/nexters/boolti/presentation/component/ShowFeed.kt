@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,6 +31,7 @@ import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ShowFeed(
@@ -58,8 +60,8 @@ fun ShowFeed(
             }
 
             AsyncImage(
-                model = "https://picsum.photos/200/200",
-                contentDescription = "poster",
+                model = show.thumbnailImage,
+                contentDescription = stringResource(id = R.string.description_poster),
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(210f / 297f)
@@ -74,19 +76,26 @@ fun ShowFeed(
 
             if (showState is ShowState.WaitingTicketing) {
                 Badge(
-                    label = "예매 시작 D-${showState.dDay}",
+                    label = stringResource(
+                        id = R.string.ticketing_button_upcoming_ticket,
+                        showState.dDay
+                    ),
                     modifier = Modifier.padding(all = 10.dp),
                     color = Grey05,
                     containerColor = MaterialTheme.colorScheme.primary,
                 )
-            }
-            else if (showState is ShowState.FinishedShow) Badge(
+            } else if (showState is ShowState.FinishedShow) Badge(
                 label = stringResource(id = R.string.finished_show),
                 modifier = Modifier.padding(all = 10.dp)
             )
         }
+
+        val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
+        val indexOfDay = show.date.dayOfWeek.value
+        val formatter =
+            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm")
         Text(
-            text = "2024.03.09 (토) 17:00",
+            text = show.date.format(formatter),
             modifier = Modifier.padding(top = 12.dp),
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30)
         )

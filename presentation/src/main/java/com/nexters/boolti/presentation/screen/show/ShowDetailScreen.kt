@@ -164,6 +164,7 @@ fun ShowDetailScreen(
                 )
                 ShowDetailCtaButton(
                     showState = ShowState.TicketingInProgress,
+                    purchased = uiState.purchased,
                     onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } },
                 )
             }
@@ -264,7 +265,8 @@ private fun ContentScaffold(
                     SectionTitle(stringResource(id = R.string.ticketing_place))
                     Spacer(modifier = modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current
-                    val copiedMessage = stringResource(id = R.string.ticketing_account_copied_message)
+                    val copiedMessage =
+                        stringResource(id = R.string.ticketing_account_copied_message)
                     Row(
                         modifier = Modifier
                             .clip(shape = RoundedCornerShape(4.dp))
@@ -433,16 +435,24 @@ private fun SectionContent(
 @Composable
 fun ShowDetailCtaButton(
     onClick: () -> Unit,
+    purchased: Boolean,
     showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
-    val enabled = showState is ShowState.TicketingInProgress
+    val enabled = showState is ShowState.TicketingInProgress && !purchased
     val text = when (showState) {
         is ShowState.WaitingTicketing -> stringResource(
             id = R.string.ticketing_button_upcoming_ticket, showState.dDay
         )
 
-        ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
+        ShowState.TicketingInProgress -> {
+            if (purchased) {
+                stringResource(id = R.string.ticketing_button_purchased_ticket)
+            } else {
+                stringResource(id = R.string.ticketing_button_label)
+            }
+        }
+
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }

@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.component
+package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

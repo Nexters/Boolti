@@ -165,6 +165,11 @@ fun ShowDetailScreen(
                 ShowDetailCtaButton(
                     showState = ShowState.TicketingInProgress,
                     purchased = uiState.purchased,
+                    showMessage = { message ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message = message)
+                        }
+                    },
                     onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } },
                 )
             }
@@ -435,6 +440,7 @@ private fun SectionContent(
 @Composable
 fun ShowDetailCtaButton(
     onClick: () -> Unit,
+    showMessage: (message: String) -> Unit,
     purchased: Boolean,
     showState: ShowState,
     modifier: Modifier = Modifier,

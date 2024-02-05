@@ -74,20 +74,35 @@ fun ShowFeed(
                 contentScale = ContentScale.Crop,
             )
 
-            if (showState is ShowState.WaitingTicketing) {
-                Badge(
-                    label = stringResource(
-                        id = R.string.ticketing_button_upcoming_ticket,
-                        showState.dDay
-                    ),
-                    modifier = Modifier.padding(all = 10.dp),
-                    color = Grey05,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                )
-            } else if (showState is ShowState.FinishedShow) Badge(
-                label = stringResource(id = R.string.finished_show),
-                modifier = Modifier.padding(all = 10.dp)
-            )
+            when (showState) {
+                is ShowState.WaitingTicketing -> {
+                    Badge(
+                        label = stringResource(
+                            id = R.string.ticketing_button_upcoming_ticket,
+                            showState.dDay
+                        ),
+                        modifier = Modifier.padding(all = 10.dp),
+                        color = Grey05,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    )
+                }
+
+                is ShowState.FinishedShow -> {
+                    Badge(
+                        label = stringResource(id = R.string.finished_show),
+                        modifier = Modifier.padding(all = 10.dp)
+                    )
+                }
+
+                is ShowState.ClosedTicketing -> {
+                    Badge(
+                        label = stringResource(id = R.string.ticketing_button_closed_ticket),
+                        modifier = Modifier.padding(all = 10.dp)
+                    )
+                }
+
+                else -> {}
+            }
         }
 
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)

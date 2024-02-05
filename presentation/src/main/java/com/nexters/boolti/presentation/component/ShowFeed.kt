@@ -36,10 +36,10 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ShowFeed(
     show: Show,
-    showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
     val borderRadius = 8.dp
+    val showState = show.state
 
     Column(
         modifier = modifier,

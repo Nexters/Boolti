@@ -10,4 +10,18 @@ data class Show(
     val salesStartDate: LocalDate,
     val salesEndDate: LocalDate,
     val thumbnailImage: String,
-)
+) {
+    val state: ShowState
+        get() {
+            val now = LocalDate.now()
+            val dDay = salesStartDate.toEpochDay() - now.toEpochDay()
+
+            return when {
+                now < salesStartDate -> ShowState.WaitingTicketing(dDay.toInt())
+                now <= salesEndDate -> ShowState.TicketingInProgress
+                now > date.toLocalDate() -> ShowState.FinishedShow
+                now > salesEndDate -> ShowState.ClosedTicketing
+                else -> ShowState.FinishedShow
+            }
+        }
+}

@@ -25,7 +25,6 @@ class ShowViewModel @Inject constructor(
 
     fun fetchShows() {
         viewModelScope.launch {
-            println("얍!!")
             showRepository.search("").onSuccess { shows ->
                 _uiState.update {
                     it.copy(

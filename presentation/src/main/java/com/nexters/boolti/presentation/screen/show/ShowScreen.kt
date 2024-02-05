@@ -69,7 +69,6 @@ fun ShowScreen(
                 items(count = uiState.shows.size, key = { index -> uiState.shows[index].id }) { index ->
                     ShowFeed(
                         show = uiState.shows[index],
-                        showState = ShowState.WaitingTicketing(7),
                         modifier = Modifier
                             .clickable { onClickShowItem(index.toString()) },
                     )

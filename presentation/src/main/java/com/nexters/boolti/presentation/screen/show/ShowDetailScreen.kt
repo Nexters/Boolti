@@ -72,6 +72,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
+    showId: String?,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onTicketSelected: (ticketId: String) -> Unit,

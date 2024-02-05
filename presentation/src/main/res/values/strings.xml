@@ -9,10 +9,21 @@
     <string name="description_toolbar_home">홈으로 이동</string>
     <string name="description_more_menu">더보기 메뉴</string>
     <string name="description_qr">입장 QR 코드</string>
+    <string name="description_app_logo">앱 로고</string>
 
     <!-- 홈(Show) -->
+    <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
+    <string-array name="days_of_week">
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+        <item>일</item>
+    </string-array>
 
     <!-- 공통 -->
     <string name="badge_left_ticket_amount">%d매 남음</string>

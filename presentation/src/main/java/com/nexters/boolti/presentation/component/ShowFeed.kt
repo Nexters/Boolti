@@ -17,33 +17,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.nexters.boolti.domain.model.Show
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
-import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun Show(
+fun ShowFeed(
+    show: Show,
     modifier: Modifier = Modifier,
-    openDate: LocalDate = LocalDate.now(), // fixme : 추후 적절한 data model 로 변경하기
-    showDate: LocalDate = LocalDate.now(), // fixme : 추후 적절한 data model 로 변경하기
 ) {
-    val now = LocalDate.now()
-    val dDay = openDate.toEpochDay() - now.toEpochDay()
-    val isPreview = now < openDate
-    val disabled = now > showDate || isPreview
-
     val borderRadius = 8.dp
+    val showState = show.state
 
     Column(
         modifier = modifier,
@@ -51,9 +47,21 @@ fun Show(
         Box(
             contentAlignment = Alignment.BottomEnd,
         ) {
+            if (showState !is ShowState.TicketingInProgress) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(210f / 297f)
+                        .background(
+                            brush = SolidColor(Color.Black),
+                            alpha = 0.5f,
+                        )
+                )
+            }
+
             AsyncImage(
-                model = "https://picsum.photos/200/200",
-                contentDescription = "poster",
+                model = show.thumbnailImage,
+                contentDescription = stringResource(id = R.string.description_poster),
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(210f / 297f)
@@ -65,30 +73,49 @@ fun Show(
                     ),
                 contentScale = ContentScale.Crop,
             )
-            if (disabled) Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(210f / 297f)
-                    .background(
-                        brush = SolidColor(Color.Black),
-                        alpha = 0.5f,
+
+            when (showState) {
+                is ShowState.WaitingTicketing -> {
+                    Badge(
+                        label = stringResource(
+                            id = R.string.ticketing_button_upcoming_ticket,
+                            showState.dDay
+                        ),
+                        modifier = Modifier.padding(all = 10.dp),
+                        color = Grey05,
+                        containerColor = MaterialTheme.colorScheme.primary,
                     )
-            )
-            if (isPreview) Badge(
-                label = "예매 시작 D-$dDay",
-                modifier = Modifier.padding(all = 10.dp),
-                color = Grey05,
-                containerColor = MaterialTheme.colorScheme.primary,
-            )
-            else if (disabled) Badge(label = stringResource(id = R.string.finished_show), modifier = Modifier.padding(all = 10.dp))
+                }
+
+                is ShowState.FinishedShow -> {
+                    Badge(
+                        label = stringResource(id = R.string.finished_show),
+                        modifier = Modifier.padding(all = 10.dp)
+                    )
+                }
+
+                is ShowState.ClosedTicketing -> {
+                    Badge(
+                        label = stringResource(id = R.string.ticketing_button_closed_ticket),
+                        modifier = Modifier.padding(all = 10.dp)
+                    )
+                }
+
+                else -> {}
+            }
         }
+
+        val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
+        val indexOfDay = show.date.dayOfWeek.value
+        val formatter =
+            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm")
         Text(
-            text = "2024.03.09 (토) 17:00",
+            text = show.date.format(formatter),
             modifier = Modifier.padding(top = 12.dp),
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30)
         )
         Text(
-            text = "2024 TOGETHER LUCKY CLUB",
+            text = show.name,
             modifier = Modifier.padding(top = 2.dp),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,

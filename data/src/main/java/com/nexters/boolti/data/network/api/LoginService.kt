@@ -1,4 +1,4 @@
-package com.nexters.boolti.data.network
+package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.response.LoginResponse
 import com.nexters.boolti.domain.request.LoginRequest

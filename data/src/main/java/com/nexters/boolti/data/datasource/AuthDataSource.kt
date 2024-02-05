@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
-import com.nexters.boolti.data.network.LoginService
+import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.domain.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

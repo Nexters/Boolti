@@ -1,5 +1,7 @@
 package com.nexters.boolti.data.network.response
 
+import com.nexters.boolti.data.util.toLocalDate
+import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.Show
 import kotlinx.serialization.Serializable
 
@@ -16,9 +18,9 @@ data class ShowResponse(
         return Show(
             id = id,
             name = name,
-//            date = LocalDate(date),
-//            salesStartTime = salesStartTime,
-//            salesEndTime = salesEndTime,
+            date = date.toLocalDateTime(),
+            salesStartTime = salesStartTime.toLocalDate(),
+            salesEndTime = salesEndTime.toLocalDate(),
             thumbnailImage = showImg,
         )
     }

@@ -57,6 +57,7 @@ fun BooltiTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = Grey95.toArgb()
+            window.navigationBarColor = Grey95.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

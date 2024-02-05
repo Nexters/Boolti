@@ -72,6 +72,11 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
             ShowDetailScreen(
+                onBack = { navController.popBackStack() },
+                onClickHome = {
+                    navController.popBackStack(navController.graph.startDestinationId, true)
+                    navController.navigate("home")
+                },
                 modifier = modifier,
                 onTicketSelected = { navController.navigate("ticketing/$it") },
             )

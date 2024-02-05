@@ -44,9 +44,12 @@
     <string name="ticketing_period">티켓 예매 기간</string>
     <string name="ticketing_datetime">일시</string>
     <string name="ticketing_place">장소</string>
+    <string name="ticketing_copy_address">주소복사</string>
     <string name="ticketing_content">공연 내용</string>
     <string name="ticketing_host">주최자</string>
     <string name="ticketing_button_label">예매하기</string>
+    <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
+    <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>
     <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>
     <string name="ticketing_button_closed_ticket">예매 마감</string>
     <string name="ticketing_button_finished_show">공연 종료</string>
@@ -73,6 +76,7 @@
     <string name="ticketing_payment_information">다음 페이지에서 계좌 번호를 안내해 드릴게요</string>
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
+    <string name="ticketing_account_copied_message">주소가 복사되었어요</string>
 
     <string-array name="refund_policy">
         <item>하단에 나열된 내용은 전부 임시 텍스트입니다.</item>

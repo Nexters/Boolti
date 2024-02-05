@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,10 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.Show
+import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
@@ -38,18 +44,24 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import java.time.LocalDate
 
 @Composable
 fun ShowScreen(
     modifier: Modifier = Modifier,
     onClickShowItem: (showId: String) -> Unit,
+    viewModel: ShowViewModel = hiltViewModel()
 ) {
-    val shows = (5 downTo -5).toList()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
-        topBar = { ShowAppBar() },
+        topBar = {
+            ShowAppBar(
+                text = uiState.keyword,
+                onKeywordChanged = viewModel::updateKeyword,
+                search = viewModel::search,
+            )
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier.padding(innerPadding),
@@ -62,14 +74,13 @@ fun ShowScreen(
                 verticalArrangement = Arrangement.spacedBy(28.dp),
                 contentPadding = PaddingValues(top = 12.dp),
             ) {
-                val now = LocalDate.now()
-                items(count = shows.size, key = { index -> shows[index] }) { index ->
-                    val tempDay = now.plusDays(shows[index].toLong())
-                    Show(
+                items(
+                    count = uiState.shows.size,
+                    key = { index -> uiState.shows[index].id }) { index ->
+                    ShowFeed(
+                        show = uiState.shows[index],
                         modifier = Modifier
-                            .clickable { onClickShowItem(index.toString()) },
-                        openDate = tempDay,
-                        showDate = tempDay.plusDays(1),
+                            .clickable { onClickShowItem(uiState.shows[index].id) },
                     )
                 }
             }
@@ -79,6 +90,9 @@ fun ShowScreen(
 
 @Composable
 fun ShowAppBar(
+    text: String,
+    onKeywordChanged: (keyword: String) -> Unit,
+    search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -95,7 +109,7 @@ fun ShowAppBar(
                     .width(61.dp)
                     .height(16.dp),
                 painter = painterResource(id = R.drawable.boolti_logo),
-                contentDescription = "앱 로고",
+                contentDescription = stringResource(id = R.string.description_app_logo),
                 tint = Grey50,
             )
         }
@@ -103,7 +117,7 @@ fun ShowAppBar(
             modifier = Modifier
                 .padding(top = 20.dp)
                 .fillMaxWidth(),
-            text = "\${닉네임}님\n오늘은 어떤 공연을\n즐겨볼까요?",
+            text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
             style = TextStyle(
                 lineHeight = 34.sp,
                 fontWeight = FontWeight.Normal,
@@ -112,22 +126,29 @@ fun ShowAppBar(
             ),
         )
         SearchBar(
+            text = text,
+            onKeywordChanged = onKeywordChanged,
+            search = search,
             modifier = Modifier
                 .padding(vertical = 16.dp)
-                .padding(top = 20.dp)
+                .padding(top = 12.dp)
         )
     }
 }
 
 @Composable
 fun SearchBar(
+    text: String,
+    onKeywordChanged: (keyword: String) -> Unit,
+    search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TextField(
-        modifier = modifier
-            .fillMaxWidth(),
-        value = "",
-        onValueChange = {},
+        modifier = modifier.fillMaxWidth(),
+        value = text,
+        onValueChange = onKeywordChanged,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { search() }),
         placeholder = {
             Text(
                 stringResource(id = R.string.search_bar_hint),

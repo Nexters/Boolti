@@ -14,6 +14,7 @@ import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
+import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
@@ -49,6 +50,9 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                 onClickTicket = {
                     navController.navigate("ticket/$it")
                 },
+                onClickQr = {
+                    navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                }
             ) {
                 navController.navigate("login")
             }
@@ -68,7 +72,13 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
             ShowDetailScreen(
+                onBack = { navController.popBackStack() },
+                onClickHome = {
+                    navController.popBackStack(navController.graph.startDestinationId, true)
+                    navController.navigate("home")
+                },
                 modifier = modifier,
+                showId = it.arguments?.getString("showId"),
                 onTicketSelected = { navController.navigate("ticketing/$it") },
             )
         }
@@ -125,6 +135,14 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                     navController.popBackStack()
                 }
             )
+        }
+        composable(
+            route = "qr/{data}",
+            arguments = listOf(navArgument("data") { type = NavType.StringType }),
+        ) {
+            QrFullScreen(modifier = modifier) {
+                navController.popBackStack()
+            }
         }
     }
 }

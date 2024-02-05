@@ -1,7 +1,9 @@
 package com.nexters.boolti.presentation.screen.show
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -22,20 +25,27 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -53,6 +64,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.requireActivity
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
@@ -60,6 +72,9 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
+    showId: String?,
+    onBack: () -> Unit,
+    onClickHome: () -> Unit,
     onTicketSelected: (ticketId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
@@ -69,11 +84,21 @@ fun ShowDetailScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val window = LocalContext.current.requireActivity().window
+    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     BottomSheetScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
-        topBar = { ShowDetailAppBar() },
+        snackbarHost = {
+            ToastSnackbarHost(
+                modifier = Modifier.padding(bottom = 80.dp),
+                hostState = snackbarHostState,
+            )
+        },
+        topBar = { ShowDetailAppBar(onBack = onBack, onClickHome = onClickHome) },
         sheetContent = {
             ChooseTicketBottomSheetContent(
                 ticketingTickets = uiState.tickets, leftAmount = uiState.leftAmount
@@ -111,6 +136,7 @@ fun ShowDetailScreen(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
                         .padding(bottom = 114.dp),
+                    snackbarHost = snackbarHostState,
                     ticketingStartDate = LocalDate.now(),
                     ticketingEndDate = LocalDate.now(),
                     placeName = "클럽 샤프",
@@ -138,7 +164,13 @@ fun ShowDetailScreen(
                         )
                 )
                 ShowDetailCtaButton(
-                    showState = ShowState.WaitingTicketing(7),
+                    showState = ShowState.TicketingInProgress,
+                    purchased = uiState.purchased,
+                    showMessage = { message ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message = message)
+                        }
+                    },
                     onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } },
                 )
             }
@@ -148,6 +180,8 @@ fun ShowDetailScreen(
 
 @Composable
 private fun ShowDetailAppBar(
+    onBack: () -> Unit,
+    onClickHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -159,7 +193,7 @@ private fun ShowDetailAppBar(
     ) {
         IconButton(
             modifier = Modifier.size(width = 48.dp, height = 44.dp),
-            onClick = {},
+            onClick = onBack,
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_back),
@@ -171,7 +205,7 @@ private fun ShowDetailAppBar(
         }
         IconButton(
             modifier = Modifier.size(width = 64.dp, height = 44.dp),
-            onClick = {},
+            onClick = onClickHome,
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_home),
@@ -205,6 +239,7 @@ private fun ShowDetailAppBar(
 
 @Composable
 private fun ContentScaffold(
+    snackbarHost: SnackbarHostState,
     ticketingStartDate: LocalDate,
     ticketingEndDate: LocalDate,
     placeName: String,
@@ -213,6 +248,8 @@ private fun ContentScaffold(
     host: String,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = modifier,
     ) {
@@ -229,7 +266,43 @@ private fun ContentScaffold(
         Divider(color = Grey85)
 
         Section(
-            title = { SectionTitle(stringResource(id = R.string.ticketing_place)) },
+            title = {
+                Row {
+                    SectionTitle(stringResource(id = R.string.ticketing_place))
+                    Spacer(modifier = modifier.weight(1.0f))
+                    val clipboardManager = LocalClipboardManager.current
+                    val copiedMessage =
+                        stringResource(id = R.string.ticketing_account_copied_message)
+                    Row(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(4.dp))
+                            .background(color = Grey85)
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .clickable {
+                                clipboardManager.setText(AnnotatedString(placeName))
+                                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                    scope.launch {
+                                        snackbarHost.showSnackbar(copiedMessage)
+                                    }
+                                }
+                            }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_copy),
+                            contentDescription = stringResource(
+                                id = R.string.ticketing_copy_address
+                            )
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 6.dp),
+                            text = stringResource(
+                                id = R.string.ticketing_copy_address
+                            ),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            },
             content = {
                 Column {
                     Text(placeName, style = MaterialTheme.typography.bodyLarge)
@@ -244,7 +317,6 @@ private fun ContentScaffold(
             content = {
                 SectionContent(
                     content,
-                    maxLines = 11,
                     overflow = TextOverflow.Ellipsis,
                 )
             },
@@ -359,7 +431,7 @@ private fun SectionContent(
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
     Text(
-        modifier = modifier,
+        modifier = modifier.heightIn(0.dp, 246.dp),
         text = text,
         style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
         maxLines = maxLines,
@@ -370,16 +442,25 @@ private fun SectionContent(
 @Composable
 fun ShowDetailCtaButton(
     onClick: () -> Unit,
+    showMessage: (message: String) -> Unit,
+    purchased: Boolean,
     showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
-    val enabled = showState is ShowState.TicketingInProgress
+    val enabled = showState is ShowState.TicketingInProgress && !purchased
     val text = when (showState) {
         is ShowState.WaitingTicketing -> stringResource(
             id = R.string.ticketing_button_upcoming_ticket, showState.dDay
         )
 
-        ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
+        ShowState.TicketingInProgress -> {
+            if (purchased) {
+                stringResource(id = R.string.ticketing_button_purchased_ticket)
+            } else {
+                stringResource(id = R.string.ticketing_button_label)
+            }
+        }
+
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }

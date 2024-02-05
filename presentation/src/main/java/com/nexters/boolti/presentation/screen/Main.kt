@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
+import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
@@ -49,6 +50,9 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                 onClickTicket = {
                     navController.navigate("ticket/$it")
                 },
+                onClickQr = {
+                    navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                }
             ) {
                 navController.navigate("login")
             }
@@ -125,6 +129,14 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                     navController.popBackStack()
                 }
             )
+        }
+        composable(
+            route = "qr/{data}",
+            arguments = listOf(navArgument("data") { type = NavType.StringType }),
+        ) {
+            QrFullScreen(modifier = modifier) {
+                navController.popBackStack()
+            }
         }
     }
 }

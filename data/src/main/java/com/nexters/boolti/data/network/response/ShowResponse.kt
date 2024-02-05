@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ShowResponse(
-    val id: Long,
+    val id: String,
     val name: String,
     val date: String,
     val salesStartTime: String,

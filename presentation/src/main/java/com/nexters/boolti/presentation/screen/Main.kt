@@ -12,9 +12,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
-import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
+import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
@@ -69,7 +69,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
         }
         composable(
             route = "show/{showId}",
-            arguments = listOf(navArgument("showId") { type = NavType.LongType }),
+            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
         ) {
             ShowDetailScreen(
                 onBack = { navController.popBackStack() },
@@ -78,7 +78,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                     navController.navigate("home")
                 },
                 modifier = modifier,
-                showId = it.arguments?.getLong("showId"),
+                showId = it.arguments?.getString("showId"),
                 onTicketSelected = { navController.navigate("ticketing/$it") },
             )
         }

@@ -32,7 +32,7 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 fun HomeScreen(
     modifier: Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    onClickShowItem: (showId: Long) -> Unit,
+    onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
     onClickQr: (data: String) -> Unit,
     requireLogin: () -> Unit,

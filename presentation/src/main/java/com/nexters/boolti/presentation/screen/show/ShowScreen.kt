@@ -48,7 +48,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 @Composable
 fun ShowScreen(
     modifier: Modifier = Modifier,
-    onClickShowItem: (showId: Long) -> Unit,
+    onClickShowItem: (showId: String) -> Unit,
     viewModel: ShowViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class Show(
-    val id: Long,
+    val id: String,
     val name: String,
     val date: LocalDateTime,
     val salesStartDate: LocalDate,

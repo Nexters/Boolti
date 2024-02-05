@@ -20,12 +20,12 @@ class ShowViewModel @Inject constructor(
     val uiState: StateFlow<ShowUiState> = _uiState.asStateFlow()
 
     init {
-        fetchShows()
+        search()
     }
 
-    fun fetchShows() {
+    fun search() {
         viewModelScope.launch {
-            showRepository.search("").onSuccess { shows ->
+            showRepository.search(uiState.value.keyword).onSuccess { shows ->
                 _uiState.update {
                     it.copy(
                         shows = shows,
@@ -35,5 +35,9 @@ class ShowViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    fun updateKeyword(newKeyword: String) {
+        _uiState.update { it.copy(keyword = newKeyword) }
     }
 }

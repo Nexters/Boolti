@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,10 +31,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.theme.Grey15
@@ -53,7 +55,13 @@ fun ShowScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { ShowAppBar() },
+        topBar = {
+            ShowAppBar(
+                text = uiState.keyword,
+                onKeywordChanged = viewModel::updateKeyword,
+                search = viewModel::search,
+            )
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier.padding(innerPadding),
@@ -66,7 +74,9 @@ fun ShowScreen(
                 verticalArrangement = Arrangement.spacedBy(28.dp),
                 contentPadding = PaddingValues(top = 12.dp),
             ) {
-                items(count = uiState.shows.size, key = { index -> uiState.shows[index].id }) { index ->
+                items(
+                    count = uiState.shows.size,
+                    key = { index -> uiState.shows[index].id }) { index ->
                     ShowFeed(
                         show = uiState.shows[index],
                         modifier = Modifier
@@ -80,8 +90,10 @@ fun ShowScreen(
 
 @Composable
 fun ShowAppBar(
+    text: String,
+    onKeywordChanged: (keyword: String) -> Unit,
+    search: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ShowViewModel = hiltViewModel(),
 ) {
     Column(
         modifier = modifier
@@ -114,6 +126,9 @@ fun ShowAppBar(
             ),
         )
         SearchBar(
+            text = text,
+            onKeywordChanged = onKeywordChanged,
+            search = search,
             modifier = Modifier
                 .padding(vertical = 16.dp)
                 .padding(top = 12.dp)
@@ -123,13 +138,17 @@ fun ShowAppBar(
 
 @Composable
 fun SearchBar(
+    text: String,
+    onKeywordChanged: (keyword: String) -> Unit,
+    search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TextField(
-        modifier = modifier
-            .fillMaxWidth(),
-        value = "",
-        onValueChange = {},
+        modifier = modifier.fillMaxWidth(),
+        value = text,
+        onValueChange = onKeywordChanged,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = { search() }),
         placeholder = {
             Text(
                 stringResource(id = R.string.search_bar_hint),

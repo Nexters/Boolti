@@ -105,7 +105,7 @@ fun ShowAppBar(
             modifier = Modifier
                 .padding(top = 20.dp)
                 .fillMaxWidth(),
-            text = "\${닉네임}님\n오늘은 어떤 공연을\n즐겨볼까요?",
+            text = "\${닉네임}님, 오늘은\n어떤 공연을 즐겨볼까요?",
             style = TextStyle(
                 lineHeight = 34.sp,
                 fontWeight = FontWeight.Normal,
@@ -116,7 +116,7 @@ fun ShowAppBar(
         SearchBar(
             modifier = Modifier
                 .padding(vertical = 16.dp)
-                .padding(top = 20.dp)
+                .padding(top = 12.dp)
         )
     }
 }

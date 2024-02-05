@@ -25,7 +25,7 @@ import com.nexters.boolti.presentation.theme.Grey95
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ZoomableImage(
+fun SwipeableImage(
     modifier: Modifier = Modifier,
     models: List<String>,
 ) {

@@ -43,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.ZoomableImage
+import com.nexters.boolti.presentation.component.SwipeableImage
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -282,7 +282,7 @@ private fun Poster(
             .padding(top = 16.dp)
             .padding(horizontal = 38.dp)
     ) {
-        ZoomableImage(
+        SwipeableImage(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(8.dp))

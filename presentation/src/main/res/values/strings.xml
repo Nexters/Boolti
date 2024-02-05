@@ -32,6 +32,7 @@
     <string name="unit_won">%,d원</string>
 
     <string name="btn_ok">확인</string>
+    <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>

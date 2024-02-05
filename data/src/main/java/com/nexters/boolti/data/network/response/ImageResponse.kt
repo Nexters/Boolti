@@ -1,7 +1,9 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.Image
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ImageResponse(
     val id: String,
     val path: String,

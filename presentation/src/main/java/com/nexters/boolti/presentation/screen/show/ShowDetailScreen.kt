@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -40,7 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -88,6 +88,13 @@ fun ShowDetailScreen(
 
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
+
+    val unknownErrorMessage = stringResource(id = R.string.message_unknown_error)
+    LaunchedEffect(showId) {
+        showId?.let {
+            viewModel.fetchShowDetail(showId)
+        } ?: snackbarHostState.showSnackbar(unknownErrorMessage)
+    }
 
     BottomSheetScaffold(
         modifier = modifier,

@@ -3,7 +3,9 @@ package com.nexters.boolti.data.network.response
 import com.nexters.boolti.data.util.toLocalDate
 import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.ShowDetail
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ShowDetailResponse(
     val id: String,
     val name: String,

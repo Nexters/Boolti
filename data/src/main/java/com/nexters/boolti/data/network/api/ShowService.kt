@@ -10,6 +10,6 @@ interface ShowService {
     @GET("/app/papi/v1/shows/search")
     suspend fun search(@Query("nameLike") keyword: String): List<ShowResponse>
 
-    @GET("/app/papi/v1/shows/{id}")
+    @GET("/app/papi/v1/show/{id}")
     suspend fun findShowById(@Path("id") keyword: String): ShowDetailResponse
 }

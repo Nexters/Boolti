@@ -8,8 +8,10 @@
     <string name="description_close_button">닫기</string>
     <string name="description_toolbar_home">홈으로 이동</string>
     <string name="description_more_menu">더보기 메뉴</string>
+    <string name="description_app_logo">앱 로고</string>
 
     <!-- 홈(Show) -->
+    <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
     <string-array name="days_of_week">

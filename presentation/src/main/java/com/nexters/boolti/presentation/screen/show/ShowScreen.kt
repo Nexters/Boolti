@@ -97,7 +97,7 @@ fun ShowAppBar(
                     .width(61.dp)
                     .height(16.dp),
                 painter = painterResource(id = R.drawable.boolti_logo),
-                contentDescription = "앱 로고",
+                contentDescription = stringResource(id = R.string.description_app_logo),
                 tint = Grey50,
             )
         }
@@ -105,7 +105,7 @@ fun ShowAppBar(
             modifier = Modifier
                 .padding(top = 20.dp)
                 .fillMaxWidth(),
-            text = "\${닉네임}님, 오늘은\n어떤 공연을 즐겨볼까요?",
+            text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
             style = TextStyle(
                 lineHeight = 34.sp,
                 fontWeight = FontWeight.Normal,

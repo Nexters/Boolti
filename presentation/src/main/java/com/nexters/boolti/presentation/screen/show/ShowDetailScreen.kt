@@ -61,6 +61,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
+    showId: Long?,
     onTicketSelected: (ticketId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),

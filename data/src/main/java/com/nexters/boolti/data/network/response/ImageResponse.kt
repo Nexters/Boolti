@@ -15,9 +15,13 @@ data class ImageResponse(
             id = id,
             originImage = path,
             thumbnailImage = thumbnailPath,
-            sequence = sequence,
         )
     }
 }
 
-fun List<ImageResponse>.toDomains(): List<ImagePair> = this.map { it.toDomain() }
+fun List<ImageResponse>.toDomains(): List<ImagePair> {
+    return this.asSequence()
+        .sortedBy { it.sequence }
+        .map { it.toDomain() }
+        .toList()
+}

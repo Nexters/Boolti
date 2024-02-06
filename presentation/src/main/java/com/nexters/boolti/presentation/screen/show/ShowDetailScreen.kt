@@ -275,7 +275,9 @@ private fun ContentScaffold(
         // 장소
         Section(
             title = {
-                Row {
+                Row(
+                    modifier = Modifier.height(30.dp)
+                ) {
                     SectionTitle(stringResource(id = R.string.ticketing_place))
                     Spacer(modifier = modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current

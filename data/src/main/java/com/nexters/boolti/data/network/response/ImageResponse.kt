@@ -1,6 +1,6 @@
 package com.nexters.boolti.data.network.response
 
-import com.nexters.boolti.domain.model.Image
+import com.nexters.boolti.domain.model.ImagePair
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,14 +10,14 @@ data class ImageResponse(
     val thumbnailPath: String,
     val sequence: Int,
 ) {
-    fun toDomain(): Image {
-        return Image(
+    fun toDomain(): ImagePair {
+        return ImagePair(
             id = id,
-            path = path,
+            originImage = path,
             thumbnailImage = thumbnailPath,
             sequence = sequence,
         )
     }
 }
 
-fun List<ImageResponse>.toDomains(): List<Image> = this.map { it.toDomain() }
+fun List<ImageResponse>.toDomains(): List<ImagePair> = this.map { it.toDomain() }

@@ -1,8 +1,8 @@
 package com.nexters.boolti.domain.model
 
-data class Image(
+data class ImagePair(
     val id: String,
-    val path: String,
+    val originImage: String,
     val thumbnailImage: String,
     val sequence: Int = 0,
 )

@@ -14,5 +14,5 @@ data class ShowDetail(
     val notice: String = "",
     val salesStartDate: LocalDate = LocalDate.now(),
     val salesEndDate: LocalDate = LocalDate.now(),
-    val images: List<Image> = emptyList(),
+    val images: List<ImagePair> = emptyList(),
 )

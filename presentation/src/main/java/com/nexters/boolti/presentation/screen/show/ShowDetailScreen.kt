@@ -140,7 +140,7 @@ fun ShowDetailScreen(
                 Poster(
                     modifier = modifier.fillMaxWidth(),
                     title = uiState.showDetail.name,
-                    images = uiState.showDetail.images.map { it.path }
+                    images = uiState.showDetail.images.map { it.originImage }
                 )
                 ContentScaffold(
                     modifier = Modifier

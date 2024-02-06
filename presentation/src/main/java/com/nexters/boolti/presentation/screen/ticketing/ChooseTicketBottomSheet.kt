@@ -14,9 +14,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +30,7 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,39 +45,50 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
+import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseTicketBottomSheetContent(
     modifier: Modifier = Modifier,
     viewModel: SalesTicketViewModel = hiltViewModel(),
     onTicketingClicked: (Ticket) -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Column(
-        modifier = modifier.heightIn(max = 544.dp)
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
     ) {
-        Text(
-            text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
-            style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-            modifier = Modifier
-                .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
-        )
-        uiState.selected?.let {
-            ChooseTicketBottomSheetContent2(
-                modifier,
-                ticket = it,
-                onCloseClicked = viewModel::unSelectTicket,
-                onTicketingClicked = { onTicketingClicked(it.ticket) },
+        Column(
+            modifier = modifier
+                .padding(bottom = 20.dp)
+                .heightIn(max = 564.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
+                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                modifier = Modifier
+                    .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
             )
-        } ?: run {
-            ChooseTicketBottomSheetContent1(
-                modifier = modifier,
-                listState = listState,
-                tickets = uiState.tickets,
-                onSelectItem = viewModel::selectTicket,
-            )
+            uiState.selected?.let {
+                ChooseTicketBottomSheetContent2(
+                    modifier,
+                    ticket = it,
+                    onCloseClicked = viewModel::unSelectTicket,
+                    onTicketingClicked = { onTicketingClicked(it.ticket) },
+                )
+            } ?: run {
+                ChooseTicketBottomSheetContent1(
+                    modifier = modifier,
+                    listState = listState,
+                    tickets = uiState.tickets + uiState.tickets,
+                    onSelectItem = viewModel::selectTicket,
+                )
+            }
         }
     }
 }
@@ -89,7 +104,7 @@ private fun ChooseTicketBottomSheetContent1(
         modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         state = listState
     ) {
-        items(tickets, key = { it.ticket.id }) {
+        items(tickets, key = { it.ticket.id + UUID.randomUUID() }) {
             TicketingTicketItem(
                 ticket = it,
                 onClick = onSelectItem,
@@ -181,15 +196,15 @@ private fun TicketingTicketItem(
 
     Row(
         modifier = Modifier
-            .clickable(enabled) {
-                onClick(ticket)
-            }
+            .fillMaxWidth()
+            .clickable(enabled) { onClick(ticket) }
             .padding(vertical = 16.dp, horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = ticket.ticket.ticketName,
+            text = ticket.ticket.ticketName.slice(0 until minOf(12, ticket.ticket.ticketName.length)),
             style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey30 else Grey70),
+            overflow = TextOverflow.Ellipsis,
         )
         if (!isInviteTicket && ticket.quantity > 0) {
             Badge(
@@ -197,8 +212,10 @@ private fun TicketingTicketItem(
                 Modifier.padding(start = 8.dp),
             )
         }
-        Spacer(modifier = Modifier.weight(1F))
         Text(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .weight(1f),
             text = if (enabled) {
                 stringResource(R.string.format_price, ticket.ticket.price)
             } else {
@@ -206,6 +223,7 @@ private fun TicketingTicketItem(
             },
             style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey15 else Grey70),
             textAlign = TextAlign.End,
+            maxLines = 1,
         )
     }
 }
@@ -213,7 +231,7 @@ private fun TicketingTicketItem(
 @Preview
 @Composable
 fun TicketingTicketItemPreview() {
-    val ticket = Ticket.Sale("", "", "상운이쇼", 1000)
+    val ticket = Ticket.Sale("", "", "상운이쇼상운이쇼상운이쇼상운이쇼", 1000)
 
     BooltiTheme {
         TicketingTicketItem(

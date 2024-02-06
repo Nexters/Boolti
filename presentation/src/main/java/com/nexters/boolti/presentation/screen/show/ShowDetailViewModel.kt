@@ -36,6 +36,6 @@ class ShowDetailViewModel @Inject constructor(
             }
         }
 
-        _uiState.value = ShowDetailUiState(tickets = tickets, leftAmount = leftAmount)
+        _uiState.value = ShowDetailUiState(tickets = tickets)
     }
 }

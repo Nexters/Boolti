@@ -11,7 +11,8 @@ data class ShowDetail(
     val runningTime: Int = 0,
     val streetAddress: String = "",
     val detailAddress: String = "",
-    val salesStartTime: LocalDate = LocalDate.now(),
-    val salesEndTime: LocalDate = LocalDate.now(),
+    val notice: String = "",
+    val salesStartDate: LocalDate = LocalDate.now(),
+    val salesEndDate: LocalDate = LocalDate.now(),
     val images: List<Image> = emptyList(),
 )

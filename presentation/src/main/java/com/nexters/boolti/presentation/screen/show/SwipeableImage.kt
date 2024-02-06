@@ -34,7 +34,11 @@ fun SwipeableImage(
     ) { models.size }
 
     Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
-        HorizontalPager(modifier = modifier, state = pageState, key = { models[it] }) {
+        HorizontalPager(
+            modifier = modifier,
+            state = pageState,
+            key = { it },
+        ) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()

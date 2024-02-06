@@ -14,6 +14,7 @@ data class ShowDetailResponse(
     val runningTime: Int,
     val streetAddress: String,
     val detailAddress: String,
+    val notice: String,
     val salesStartTime: String,
     val salesEndTime: String,
     val showImg: List<ImageResponse>,
@@ -27,8 +28,9 @@ data class ShowDetailResponse(
             runningTime = runningTime,
             streetAddress = streetAddress,
             detailAddress = detailAddress,
-            salesStartTime = salesStartTime.toLocalDate(),
-            salesEndTime = salesEndTime.toLocalDate(),
+            notice = notice,
+            salesStartDate = salesStartTime.toLocalDate(),
+            salesEndDate = salesEndTime.toLocalDate(),
             images = showImg.toDomains(),
         )
     }

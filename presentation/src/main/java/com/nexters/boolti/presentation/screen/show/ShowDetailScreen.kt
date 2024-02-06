@@ -44,12 +44,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
@@ -68,6 +70,7 @@ import com.nexters.boolti.presentation.util.requireActivity
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,19 +139,15 @@ fun ShowDetailScreen(
             ) {
                 Poster(
                     modifier = modifier.fillMaxWidth(),
-                    title = "2024 TOGETHER LUCKY CLUB",
-                    images = listOf("https://picsum.photos/400/550")
+                    title = uiState.showDetail.name,
+                    images = uiState.showDetail.images.map { it.path }
                 )
                 ContentScaffold(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
                         .padding(bottom = 114.dp),
                     snackbarHost = snackbarHostState,
-                    ticketingStartDate = LocalDate.now(),
-                    ticketingEndDate = LocalDate.now(),
-                    placeName = "클럽 샤프",
-                    address = "서울틀벽시 마포구 와우산로 19길 20 / 지하 1층",
-                    content = "[팀명 및 팀 소개]\n\n" + "OvO (오보)\n" + "웃는 표정, 틀려도 웃고 넘기자!\n\n" + "[곡 소개]\n\n" + "The Volunteers - Let me go!\n" + "실리카켈 - No Pain\n" + "데이먼스 이어 - Yours\n" + "윤하 - 오르트구름 (Rock 편곡)\n" + "체리필터 - 낭만고양이",
+                    showDetail = uiState.showDetail,
                     host = "김불다람쥐 (010-1234-5678)",
                 )
             }
@@ -247,11 +246,7 @@ private fun ShowDetailAppBar(
 @Composable
 private fun ContentScaffold(
     snackbarHost: SnackbarHostState,
-    ticketingStartDate: LocalDate,
-    ticketingEndDate: LocalDate,
-    placeName: String,
-    address: String,
-    content: String,
+    showDetail: ShowDetail,
     host: String,
     modifier: Modifier = Modifier,
 ) {
@@ -262,16 +257,22 @@ private fun ContentScaffold(
     ) {
         TicketReservationPeriod(
             modifier = Modifier.padding(top = 40.dp),
-            stateDate = ticketingStartDate,
-            endDate = ticketingEndDate,
+            startDate = showDetail.salesStartDate,
+            endDate = showDetail.salesEndDate,
         )
 
+        // 일시
+        val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
+        val indexOfDay = showDetail.date.dayOfWeek.value
+        val formatter =
+            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm (${showDetail.runningTime}분)")
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = { Text("2024.01.20 (토) / 18:00 (150분)") },
+            content = { Text(showDetail.date.format(formatter)) },
         )
         Divider(color = Grey85)
 
+        // 장소
         Section(
             title = {
                 Row {
@@ -286,7 +287,7 @@ private fun ContentScaffold(
                             .background(color = Grey85)
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                             .clickable {
-                                clipboardManager.setText(AnnotatedString(placeName))
+                                clipboardManager.setText(AnnotatedString(showDetail.placeName))
                                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                                     scope.launch {
                                         snackbarHost.showSnackbar(copiedMessage)
@@ -312,24 +313,29 @@ private fun ContentScaffold(
             },
             content = {
                 Column {
-                    Text(placeName, style = MaterialTheme.typography.bodyLarge)
-                    SectionContent(text = address)
+                    Text(showDetail.placeName, style = MaterialTheme.typography.bodyLarge)
+                    SectionContent(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "${showDetail.streetAddress} / ${showDetail.detailAddress}"
+                    )
                 }
             },
         )
         Divider(color = Grey85)
 
+        // 공연 내용
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_content)) },
             content = {
                 SectionContent(
-                    content,
+                    showDetail.notice,
                     overflow = TextOverflow.Ellipsis,
                 )
             },
         )
         Divider(color = Grey85)
 
+        // 주최자
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
             content = {
@@ -365,7 +371,7 @@ private fun Poster(
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(8.dp))
                 .border(width = 1.dp, color = Grey80, shape = RoundedCornerShape(8.dp)),
-            models = listOf("https://picsum.photos/400/550", "https://picsum.photos/450/650"),
+            models = images,
         )
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),
@@ -380,10 +386,15 @@ private fun Poster(
 
 @Composable
 private fun TicketReservationPeriod(
-    stateDate: LocalDate,
+    startDate: LocalDate,
     endDate: LocalDate,
     modifier: Modifier = Modifier,
 ) {
+    val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
+    val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+    val startDayIndex = startDate.dayOfWeek.value
+    val endDayIndex = endDate.dayOfWeek.value
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -401,7 +412,11 @@ private fun TicketReservationPeriod(
             modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
         )
         Text(
-            "2023.12.01 (토) - 2024.01.20 (월)",
+            "${startDate.format(formatter)} (${daysOfWeek[startDayIndex]}) - ${
+                endDate.format(
+                    formatter
+                )
+            } (${daysOfWeek[endDayIndex]})",
             style = MaterialTheme.typography.titleMedium.copy(color = Grey30),
         )
     }

@@ -264,8 +264,10 @@ private fun ContentScaffold(
         // 일시
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
         val indexOfDay = showDetail.date.dayOfWeek.value
+        val minute = stringResource(id = R.string.ticketing_minutes)
+        // ex. 2024.01.20 (토) / 18:00 (150분)
         val formatter =
-            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm (${showDetail.runningTime}분)")
+            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm (${showDetail.runningTime}${minute})")
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = { Text(showDetail.date.format(formatter)) },
@@ -414,11 +416,9 @@ private fun TicketReservationPeriod(
             modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
         )
         Text(
-            "${startDate.format(formatter)} (${daysOfWeek[startDayIndex]}) - ${
-                endDate.format(
-                    formatter
-                )
-            } (${daysOfWeek[endDayIndex]})",
+            // ex. 2023.12.01 (토) - 2024.01.20 (월)
+            "${startDate.format(formatter)} (${daysOfWeek[startDayIndex]}) - " +
+                    "${endDate.format(formatter)} (${daysOfWeek[endDayIndex]})",
             style = MaterialTheme.typography.titleMedium.copy(color = Grey30),
         )
     }

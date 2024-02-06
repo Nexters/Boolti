@@ -55,6 +55,7 @@
     <string name="ticketing_share">공유하기</string>
     <string name="ticketing_period">티켓 예매 기간</string>
     <string name="ticketing_datetime">일시</string>
+    <string name="ticketing_minutes">분</string>
     <string name="ticketing_place">장소</string>
     <string name="ticketing_copy_address">주소복사</string>
     <string name="ticketing_content">공연 내용</string>

@@ -11,5 +11,5 @@ interface ShowService {
     suspend fun search(@Query("nameLike") keyword: String): List<ShowResponse>
 
     @GET("/app/papi/v1/show/{id}")
-    suspend fun findShowById(@Path("id") keyword: String): ShowDetailResponse
+    suspend fun findShowById(@Path("id") id: String): ShowDetailResponse
 }

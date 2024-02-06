@@ -9,6 +9,7 @@ import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.network.AuthInterceptor
 import com.nexters.boolti.data.network.api.ShowService
 import com.nexters.boolti.data.network.api.SignUpService
+import com.nexters.boolti.data.network.api.TicketingService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -75,6 +76,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideShowService(retrofit: Retrofit): ShowService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideTicketingService(@Named("auth") retrofit: Retrofit): TicketingService = retrofit.create()
 
     @Singleton
     @Provides

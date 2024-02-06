@@ -55,6 +55,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
+import com.nexters.boolti.presentation.screen.ticketing.SalesTicketViewModel
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -72,12 +73,12 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
-    showId: String?,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onTicketSelected: (ticketId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
+    testViewModel: SalesTicketViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -101,7 +102,7 @@ fun ShowDetailScreen(
         topBar = { ShowDetailAppBar(onBack = onBack, onClickHome = onClickHome) },
         sheetContent = {
             ChooseTicketBottomSheetContent(
-                ticketingTickets = uiState.tickets, leftAmount = uiState.leftAmount
+                viewModel = testViewModel,
             ) { ticket ->
                 Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
                 onTicketSelected(ticket.id)

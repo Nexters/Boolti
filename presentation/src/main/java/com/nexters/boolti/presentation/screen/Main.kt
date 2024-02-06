@@ -45,7 +45,8 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             HomeScreen(
                 modifier = modifier,
                 onClickShowItem = {
-                    navController.navigate("show/$it")
+//                    navController.navigate("show/$it")
+                    navController.navigate("show/3")
                 },
                 onClickTicket = {
                     navController.navigate("ticket/$it")
@@ -78,7 +79,6 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
                     navController.navigate("home")
                 },
                 modifier = modifier,
-                showId = it.arguments?.getString("showId"),
                 onTicketSelected = { navController.navigate("ticketing/$it") },
             )
         }

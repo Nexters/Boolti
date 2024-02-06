@@ -18,10 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -31,7 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nexters.boolti.domain.model.TicketingTicket
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.Badge
@@ -45,11 +45,10 @@ import com.nexters.boolti.presentation.theme.Grey80
 @Composable
 fun ChooseTicketBottomSheetContent(
     modifier: Modifier = Modifier,
-    ticketingTickets: List<TicketingTicket> = emptyList(),
-    leftAmount: Map<String, Int>,
-    onTicketingClicked: (TicketingTicket) -> Unit,
+    viewModel: SalesTicketViewModel = hiltViewModel(),
+    onTicketingClicked: (Ticket) -> Unit,
 ) {
-    var selectedItem by remember { mutableStateOf<TicketingTicket?>(null) }
+    val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
     Column(
@@ -61,23 +60,20 @@ fun ChooseTicketBottomSheetContent(
             modifier = Modifier
                 .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
         )
-        selectedItem?.let {
+        uiState.selected?.let {
             ChooseTicketBottomSheetContent2(
                 modifier,
-                it,
-                leftAmount = leftAmount,
-                onCloseClicked = { selectedItem = null },
-                onTicketingClicked = onTicketingClicked,
+                ticket = it,
+                onCloseClicked = viewModel::unSelectTicket,
+                onTicketingClicked = { onTicketingClicked(it.ticket) },
             )
         } ?: run {
             ChooseTicketBottomSheetContent1(
                 modifier = modifier,
                 listState = listState,
-                items = ticketingTickets,
-                leftAmount = leftAmount,
-            ) { item ->
-                selectedItem = item
-            }
+                tickets = uiState.tickets,
+                onSelectItem = viewModel::selectTicket,
+            )
         }
     }
 }
@@ -86,18 +82,16 @@ fun ChooseTicketBottomSheetContent(
 private fun ChooseTicketBottomSheetContent1(
     modifier: Modifier,
     listState: LazyListState,
-    items: List<TicketingTicket>,
-    leftAmount: Map<String, Int>,
-    onSelectItem: (TicketingTicket) -> Unit,
+    tickets: List<TicketWithQuantity>,
+    onSelectItem: (TicketWithQuantity) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         state = listState
     ) {
-        items(items, key = { it.id }) {
+        items(tickets, key = { it.ticket.id }) {
             TicketingTicketItem(
-                ticketingTicket = it,
-                leftAmount = leftAmount.getOrDefault(it.id, 0),
+                ticket = it,
                 onClick = onSelectItem,
             )
         }
@@ -107,10 +101,9 @@ private fun ChooseTicketBottomSheetContent1(
 @Composable
 private fun ChooseTicketBottomSheetContent2(
     modifier: Modifier,
-    item: TicketingTicket,
-    leftAmount: Map<String, Int>,
+    ticket: TicketWithQuantity,
     onCloseClicked: () -> Unit,
-    onTicketingClicked: (TicketingTicket) -> Unit,
+    onTicketingClicked: (TicketWithQuantity) -> Unit,
 ) {
     Column(modifier) {
         Row(
@@ -120,20 +113,20 @@ private fun ChooseTicketBottomSheetContent2(
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = item.title,
+                        text = ticket.ticket.ticketName,
                         style = MaterialTheme.typography.headlineSmall.copy(
                             color = MaterialTheme.colorScheme.onPrimary,
                         ),
                     )
-                    if (!item.isInviteTicket) {
+                    if (!ticket.ticket.isInviteTicket) {
                         Badge(
-                            stringResource(R.string.badge_left_ticket_amount, leftAmount.getOrDefault(item.id, 0)),
+                            stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
                             modifier = Modifier.padding(start = 8.dp),
                         )
                     }
                 }
                 Text(
-                    text = stringResource(R.string.format_price, item.price),
+                    text = stringResource(R.string.format_price, ticket.ticket.price),
                     style = MaterialTheme.typography.titleSmall.copy(
                         color = Grey15,
                     ),
@@ -162,7 +155,7 @@ private fun ChooseTicketBottomSheetContent2(
             )
             Spacer(modifier = Modifier.weight(1F))
             Text(
-                text = stringResource(R.string.format_total_price, item.price),
+                text = stringResource(R.string.format_total_price, ticket.ticket.price),
                 style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
             )
         }
@@ -173,41 +166,41 @@ private fun ChooseTicketBottomSheetContent2(
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
                 .height(48.dp),
-            onClick = { onTicketingClicked(item) },
+            onClick = { onTicketingClicked(ticket) },
         )
     }
 }
 
 @Composable
 private fun TicketingTicketItem(
-    ticketingTicket: TicketingTicket,
-    leftAmount: Int,
-    onClick: (TicketingTicket) -> Unit,
+    ticket: TicketWithQuantity,
+    onClick: (TicketWithQuantity) -> Unit,
 ) {
-    val enabled = ticketingTicket.isInviteTicket || leftAmount > 0
+    val isInviteTicket = ticket.ticket is Ticket.Invite
+    val enabled = isInviteTicket || ticket.quantity > 0
 
     Row(
         modifier = Modifier
             .clickable(enabled) {
-                onClick(ticketingTicket)
+                onClick(ticket)
             }
             .padding(vertical = 16.dp, horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = ticketingTicket.title,
+            text = ticket.ticket.ticketName,
             style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey30 else Grey70),
         )
-        if (!ticketingTicket.isInviteTicket && leftAmount > 0) {
+        if (!isInviteTicket && ticket.quantity > 0) {
             Badge(
-                stringResource(R.string.badge_left_ticket_amount, leftAmount),
+                stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
                 Modifier.padding(start = 8.dp),
             )
         }
         Spacer(modifier = Modifier.weight(1F))
         Text(
             text = if (enabled) {
-                stringResource(R.string.format_price, ticketingTicket.price)
+                stringResource(R.string.format_price, ticket.ticket.price)
             } else {
                 stringResource(R.string.sold_out_label)
             },
@@ -220,9 +213,15 @@ private fun TicketingTicketItem(
 @Preview
 @Composable
 fun TicketingTicketItemPreview() {
-    val item = TicketingTicket("item1", true, "일반 티켓 A", 5000)
+    val ticket = Ticket.Sale("", "", "상운이쇼", 1000)
+
     BooltiTheme {
-        TicketingTicketItem(ticketingTicket = item, leftAmount = 5) {}
+        TicketingTicketItem(
+            ticket = TicketWithQuantity(
+                ticket = ticket,
+                quantity = 100,
+            ),
+        ) {}
     }
 }
 

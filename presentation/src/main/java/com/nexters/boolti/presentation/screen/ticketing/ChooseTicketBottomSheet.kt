@@ -1,6 +1,8 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
@@ -39,6 +44,7 @@ import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.Badge
+import com.nexters.boolti.presentation.extension.sliceAtMost
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -49,7 +55,7 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChooseTicketBottomSheetContent(
+fun ChooseTicketBottomSheet(
     modifier: Modifier = Modifier,
     viewModel: SalesTicketViewModel = hiltViewModel(),
     onTicketingClicked: (Ticket) -> Unit,
@@ -62,6 +68,17 @@ fun ChooseTicketBottomSheetContent(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .size(45.dp, 4.dp)
+                    .background(Grey70)
+                    .clip(RoundedCornerShape(100.dp)),
+            )
+        },
+        contentColor = MaterialTheme.colorScheme.surfaceTint,
     ) {
         Column(
             modifier = modifier
@@ -128,7 +145,7 @@ private fun ChooseTicketBottomSheetContent2(
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = ticket.ticket.ticketName,
+                        text = ticket.ticket.ticketName.sliceAtMost(12),
                         style = MaterialTheme.typography.headlineSmall.copy(
                             color = MaterialTheme.colorScheme.onPrimary,
                         ),
@@ -202,7 +219,7 @@ private fun TicketingTicketItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = ticket.ticket.ticketName.slice(0 until minOf(12, ticket.ticket.ticketName.length)),
+            text = ticket.ticket.ticketName.sliceAtMost(12),
             style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey30 else Grey70),
             overflow = TextOverflow.Ellipsis,
         )

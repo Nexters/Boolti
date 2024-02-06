@@ -51,7 +51,7 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
+import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -156,7 +156,7 @@ fun ShowDetailScreen(
             }
         }
         if (showBottomSheet) {
-            ChooseTicketBottomSheetContent(
+            ChooseTicketBottomSheet(
                 onTicketingClicked = { ticket ->
                     Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
                     onTicketSelected(ticket.id)

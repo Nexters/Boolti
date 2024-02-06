@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.show
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.ShowDetail
@@ -16,13 +17,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ShowDetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val showRepository: ShowRepository,
 ) : ViewModel() {
+    private val showId: String = checkNotNull(savedStateHandle["showId"])
+
     private val _uiState = MutableStateFlow(ShowDetailUiState())
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()
 
     init {
         fetchDummyTickets()
+        fetchShowDetail()
     }
 
     private fun fetchDummyTickets() {
@@ -48,9 +53,9 @@ class ShowDetailViewModel @Inject constructor(
         _uiState.value = uiState.value.copy(tickets = tickets, leftAmount = leftAmount)
     }
 
-    fun fetchShowDetail(id: String) {
+    private fun fetchShowDetail() {
         viewModelScope.launch {
-            showRepository.searchById(id = id)
+            showRepository.searchById(id = showId)
                 .onSuccess { newShowDetail ->
                     _uiState.update { it.copy(showDetail = newShowDetail) }
                 }

@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -75,7 +74,6 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
-    showId: String?,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onTicketSelected: (ticketId: String) -> Unit,
@@ -91,13 +89,6 @@ fun ShowDetailScreen(
 
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
-
-    val unknownErrorMessage = stringResource(id = R.string.message_unknown_error)
-    LaunchedEffect(showId) {
-        showId?.let {
-            viewModel.fetchShowDetail(showId)
-        } ?: snackbarHostState.showSnackbar(unknownErrorMessage)
-    }
 
     BottomSheetScaffold(
         modifier = modifier,
@@ -267,7 +258,7 @@ private fun ContentScaffold(
         val minute = stringResource(id = R.string.ticketing_minutes)
         // ex. 2024.01.20 (토) / 18:00 (150분)
         val formatter =
-            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm (${showDetail.runningTime}${minute})")
+            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = { Text(showDetail.date.format(formatter)) },

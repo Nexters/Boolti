@@ -282,7 +282,7 @@ private fun ContentScaffold(
                             .background(color = Grey85)
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                             .clickable {
-                                clipboardManager.setText(AnnotatedString(showDetail.placeName))
+                                clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
                                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                                     scope.launch {
                                         snackbarHost.showSnackbar(copiedMessage)

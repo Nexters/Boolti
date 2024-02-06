@@ -99,7 +99,10 @@ fun ChooseTicketBottomSheet(
                     modifier,
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
-                    onTicketingClicked = { onTicketingClicked(it.ticket) },
+                    onTicketingClicked = {
+                        onTicketingClicked(it.ticket)
+                        viewModel.unSelectTicket()
+                    },
                 )
             } ?: run {
                 ChooseTicketBottomSheetContent1(

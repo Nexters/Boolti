@@ -33,10 +33,4 @@ object DataSourceModule {
     @Singleton
     @Provides
     fun provideTokenDataSource(@ApplicationContext context: Context): TokenDataSource = TokenDataSource(context)
-
-    @Singleton
-    @Provides
-    fun provideTicketingDataSource(
-        service: TicketingService,
-    ): TicketingDataSource = TicketingDataSource(service)
 }

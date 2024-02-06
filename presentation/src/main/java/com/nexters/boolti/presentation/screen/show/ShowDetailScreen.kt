@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -212,23 +213,27 @@ private fun ShowDetailAppBar(
         }
         Spacer(modifier = Modifier.weight(1.0f))
         IconButton(
-            modifier = Modifier.size(width = 64.dp, height = 44.dp),
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .size(44.dp),
             onClick = {},
         ) {
             Icon(
+                modifier = Modifier.size(24.dp),
                 painter = painterResource(R.drawable.ic_share),
                 contentDescription = stringResource(id = R.string.ticketing_share),
-                Modifier.size(width = 24.dp, height = 24.dp)
             )
         }
         IconButton(
-            modifier = Modifier.size(width = 64.dp, height = 44.dp),
+            modifier = Modifier
+                .padding(end = marginHorizontal)
+                .size(24.dp),
             onClick = {},
         ) {
             Icon(
+                modifier = Modifier.size(24.dp),
                 painter = painterResource(R.drawable.ic_verticle_more),
                 contentDescription = stringResource(id = R.string.description_more_menu),
-                Modifier.size(width = 24.dp, height = 24.dp)
             )
         }
     }

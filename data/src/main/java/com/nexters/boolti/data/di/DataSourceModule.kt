@@ -4,10 +4,8 @@ import android.content.Context
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
-import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.network.api.LoginService
-import com.nexters.boolti.data.network.api.TicketingService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

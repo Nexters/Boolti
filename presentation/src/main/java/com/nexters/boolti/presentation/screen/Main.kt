@@ -3,8 +3,12 @@ package com.nexters.boolti.presentation.screen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,7 +19,9 @@ import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
+import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
+import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
 import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -70,15 +76,34 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
         composable(
             route = "show/{showId}",
             arguments = listOf(navArgument("showId") { type = NavType.StringType }),
-        ) {
+        ) { entry ->
+            val showId = requireNotNull(entry.arguments?.getString("showId"))
+            val showViewModel: ShowDetailViewModel = entry.sharedViewModel(navController = navController)
+
             ShowDetailScreen(
                 onBack = { navController.popBackStack() },
                 onClickHome = {
                     navController.popBackStack(navController.graph.startDestinationId, true)
                     navController.navigate("home")
                 },
+                onClickContent = {
+                    navController.navigate("show/detail/${showId}")
+                },
                 modifier = modifier,
                 onTicketSelected = { navController.navigate("ticketing/$it") },
+                viewModel = showViewModel,
+            )
+        }
+        composable(
+            route = "show/detail/{showId}",
+            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
+        ) { entry ->
+            val showViewModel: ShowDetailViewModel = entry.sharedViewModel(navController = navController)
+            
+            ShowDetailContentScreen(
+                modifier = modifier,
+                viewModel = showViewModel,
+                onBackPressed = { navController.popBackStack() }
             )
         }
         composable(
@@ -144,4 +169,15 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             }
         }
     }
+}
+
+@Composable
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
+    navController: NavController,
+): T {
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+    val parentEntry = remember(this) {
+        navController.getBackStackEntry(navGraphRoute)
+    }
+    return hiltViewModel(parentEntry)
 }

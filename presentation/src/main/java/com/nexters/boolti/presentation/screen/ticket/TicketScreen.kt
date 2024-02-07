@@ -14,6 +14,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -22,23 +24,33 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TicketScreen(
     onClickTicket: (String) -> Unit,
-    onClickQr: (data: String) -> Unit,
+    onClickQr: (entryCode: String) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: TicketViewModel = hiltViewModel(),
 ) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.load()
+    }
 
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val pagerState = rememberPagerState(
-            pageCount = { 10 }
+            pageCount = { uiState.tickets.size }
         )
+
         val configuration = LocalConfiguration.current
         val screenWidth = configuration.screenWidthDp
 
@@ -88,8 +100,9 @@ fun TicketScreen(
                     },
                 shape = RectangleShape,
             ) {
+                val ticket = uiState.tickets[page]
                 TicketContent(
-                    "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png",
+                    ticket = ticket,
                     onClickQr = onClickQr,
                 )
             }

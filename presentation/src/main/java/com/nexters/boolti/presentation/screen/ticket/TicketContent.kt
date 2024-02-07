@@ -147,7 +147,7 @@ fun TicketContent(
                 )
         )
         Column {
-            Title()
+            Title(ticket.ticketName, 1) // TODO 개수 정보 생기면 업데이트
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -171,7 +171,10 @@ fun TicketContent(
 }
 
 @Composable
-private fun Title() {
+private fun Title(
+    ticketName: String = "",
+    count: Int = 0,
+) {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
@@ -179,7 +182,7 @@ private fun Title() {
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = "일반티켓 B • 1매",
+            text = stringResource(R.string.ticket_title, ticketName, count),
             style = MaterialTheme.typography.bodySmall,
             color = Grey80,
         )

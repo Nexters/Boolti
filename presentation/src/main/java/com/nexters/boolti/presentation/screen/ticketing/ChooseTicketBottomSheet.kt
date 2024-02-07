@@ -107,7 +107,7 @@ fun ChooseTicketBottomSheet(
                 ChooseTicketBottomSheetContent1(
                     modifier = modifier,
                     listState = listState,
-                    tickets = uiState.tickets + uiState.tickets,
+                    tickets = uiState.tickets,
                     onSelectItem = viewModel::selectTicket,
                 )
             }

@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -77,6 +77,7 @@ import java.time.format.DateTimeFormatter
 fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
+    onClickContent: () -> Unit,
     onTicketSelected: (ticketId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
@@ -141,6 +142,7 @@ fun ShowDetailScreen(
                     snackbarHost = snackbarHostState,
                     showDetail = uiState.showDetail,
                     host = "김불다람쥐 (010-1234-5678)",
+                    onClickContent = onClickContent,
                 )
             }
 
@@ -244,6 +246,7 @@ private fun ContentScaffold(
     snackbarHost: SnackbarHostState,
     showDetail: ShowDetail,
     host: String,
+    onClickContent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -325,7 +328,18 @@ private fun ContentScaffold(
 
         // 공연 내용
         Section(
-            title = { SectionTitle(stringResource(id = R.string.ticketing_content)) },
+            title = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    SectionTitle(stringResource(id = R.string.ticketing_content))
+                    Text(
+                        modifier = Modifier.clickable(onClick = onClickContent),
+                        text = "전체보기"
+                    )
+                }
+            },
             content = {
                 SectionContent(
                     showDetail.notice,

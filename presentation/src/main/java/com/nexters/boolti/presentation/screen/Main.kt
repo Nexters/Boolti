@@ -103,6 +103,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             ShowDetailContentScreen(
                 modifier = modifier,
                 viewModel = showViewModel,
+                onBackPressed = { navController.popBackStack() }
             )
         }
         composable(

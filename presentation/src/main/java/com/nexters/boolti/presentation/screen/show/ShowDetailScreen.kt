@@ -336,7 +336,8 @@ private fun ContentScaffold(
                     SectionTitle(stringResource(id = R.string.ticketing_content))
                     Text(
                         modifier = Modifier.clickable(onClick = onClickContent),
-                        text = "전체보기"
+                        text = stringResource(id = R.string.ticketing_all_content),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
                     )
                 }
             },

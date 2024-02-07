@@ -28,7 +28,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TicketScreen(
     onClickTicket: (String) -> Unit,
@@ -43,6 +42,20 @@ fun TicketScreen(
         viewModel.load()
     }
 
+    if (uiState.tickets.isNotEmpty()) {
+        TicketNotEmptyScreen(modifier, uiState, onClickQr)
+    } else {
+        TicketEmptyScreen(modifier)
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun TicketNotEmptyScreen(
+    modifier: Modifier,
+    uiState: TicketUiState,
+    onClickQr: (entryCode: String) -> Unit,
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,

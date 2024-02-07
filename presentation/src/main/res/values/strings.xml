@@ -32,6 +32,7 @@
     <string name="unit_won">%,d원</string>
 
     <string name="btn_ok">확인</string>
+    <string name="btn_goto_login">로그인 하러 가기</string>
     <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
 
     <!-- 로그인 -->
@@ -50,6 +51,7 @@
     <string name="ticket_show_finished_state">공연 종료</string>
     <string name="ticket_used_state">입장 완료</string>
     <string name="ticket_title">%s • %d매</string>
+    <string name="ticket_require_login">지금 로그인하고\n원하는 공연의 티켓을\n예매해보세요!</string>
 
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>

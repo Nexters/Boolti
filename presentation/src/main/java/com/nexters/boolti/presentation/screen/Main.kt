@@ -37,7 +37,7 @@ fun Main() {
 }
 
 @Composable
-fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel()) {
+fun MainNavigation(modifier: Modifier) {
     val navController = rememberNavController()
 
     // TODO: 하드코딩 된 route 를 각 화면에 정의

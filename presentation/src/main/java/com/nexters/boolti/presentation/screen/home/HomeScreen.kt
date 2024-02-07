@@ -17,21 +17,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.screen.MainViewModel
+import com.nexters.boolti.presentation.screen.HomeViewModel
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
+import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 
 @Composable
 fun HomeScreen(
     modifier: Modifier,
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
     onClickQr: (data: String) -> Unit,
@@ -40,6 +42,8 @@ fun HomeScreen(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
+
+    val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = {
@@ -71,11 +75,16 @@ fun HomeScreen(
             composable(
                 route = Destination.Ticket.route,
             ) {
-                TicketScreen(
-                    onClickTicket = onClickTicket,
-                    onClickQr = onClickQr,
-                    modifier = modifier.padding(innerPadding),
-                )
+                when (loggedIn) {
+                    true -> TicketScreen(
+                        onClickTicket = onClickTicket,
+                        onClickQr = onClickQr,
+                        modifier = modifier.padding(innerPadding),
+                    )
+
+                    false -> TicketLoginScreen(modifier.padding(innerPadding), onLoginClick = requireLogin)
+                    else -> Unit // 로그인 여부를 불러오는 중
+                }
             }
             composable(
                 route = Destination.My.route,

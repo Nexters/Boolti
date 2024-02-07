@@ -1,6 +1,9 @@
 package com.nexters.boolti.domain.model
 
-data class Ticket(
+/**
+ * 예매 티켓
+ */
+data class SalesTicket(
     val id: String,
     val showId: String,
     val ticketName: String,
@@ -9,6 +12,6 @@ data class Ticket(
 )
 
 data class TicketWithQuantity(
-    val ticket: Ticket,
+    val ticket: SalesTicket,
     val quantity: Int,
 )

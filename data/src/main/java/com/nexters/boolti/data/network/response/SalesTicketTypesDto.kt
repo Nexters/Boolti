@@ -1,6 +1,6 @@
 package com.nexters.boolti.data.network.response
 
-import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.SalesTicket
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,8 +16,8 @@ data class SalesTicketTypeDto(
 ) {
     fun toDomain(): TicketWithQuantity = TicketWithQuantity(
         ticket = when (ticketType.trim().uppercase()) {
-            "INVITE" -> Ticket(id = id, showId = showId, ticketName = ticketName, price = price, isInviteTicket = true)
-            else -> Ticket(id = id, showId = showId, ticketName = ticketName, price = price, isInviteTicket = false)
+            "INVITE" -> SalesTicket(id = id, showId = showId, ticketName = ticketName, price = price, isInviteTicket = true)
+            else -> SalesTicket(id = id, showId = showId, ticketName = ticketName, price = price, isInviteTicket = false)
         },
         quantity = quantity,
     )

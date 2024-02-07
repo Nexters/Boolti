@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.SalesTicket
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
@@ -51,14 +51,13 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
-import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseTicketBottomSheet(
     modifier: Modifier = Modifier,
     viewModel: SalesTicketViewModel = hiltViewModel(),
-    onTicketingClicked: (Ticket) -> Unit,
+    onTicketingClicked: (SalesTicket) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -253,7 +252,7 @@ private fun TicketingTicketItem(
 @Preview
 @Composable
 fun TicketingTicketItemPreview() {
-    val ticket = Ticket("", "", "상운이쇼상운이쇼상운이쇼상운이쇼", 1000, false)
+    val ticket = SalesTicket("", "", "상운이쇼상운이쇼상운이쇼상운이쇼", 1000, false)
 
     BooltiTheme {
         TicketingTicketItem(

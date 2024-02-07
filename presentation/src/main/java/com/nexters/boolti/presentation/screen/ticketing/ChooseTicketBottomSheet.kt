@@ -127,7 +127,7 @@ private fun ChooseTicketBottomSheetContent1(
         modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         state = listState
     ) {
-        items(tickets, key = { it.ticket.id + UUID.randomUUID() }) {
+        items(tickets, key = { it.ticket.id }) {
             TicketingTicketItem(
                 ticket = it,
                 onClick = onSelectItem,
@@ -214,8 +214,7 @@ private fun TicketingTicketItem(
     ticket: TicketWithQuantity,
     onClick: (TicketWithQuantity) -> Unit,
 ) {
-    val isInviteTicket = ticket.ticket is Ticket.Invite
-    val enabled = isInviteTicket || ticket.quantity > 0
+    val enabled = ticket.ticket.isInviteTicket || ticket.quantity > 0
 
     Row(
         modifier = Modifier
@@ -229,7 +228,7 @@ private fun TicketingTicketItem(
             style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey30 else Grey70),
             overflow = TextOverflow.Ellipsis,
         )
-        if (!isInviteTicket && ticket.quantity > 0) {
+        if (!ticket.ticket.isInviteTicket && ticket.quantity > 0) {
             Badge(
                 stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
                 Modifier.padding(start = 8.dp),
@@ -254,7 +253,7 @@ private fun TicketingTicketItem(
 @Preview
 @Composable
 fun TicketingTicketItemPreview() {
-    val ticket = Ticket.Sale("", "", "상운이쇼상운이쇼상운이쇼상운이쇼", 1000)
+    val ticket = Ticket("", "", "상운이쇼상운이쇼상운이쇼상운이쇼", 1000, false)
 
     BooltiTheme {
         TicketingTicketItem(

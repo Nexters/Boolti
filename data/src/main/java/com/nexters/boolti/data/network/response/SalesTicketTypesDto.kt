@@ -16,8 +16,8 @@ data class SalesTicketTypeDto(
 ) {
     fun toDomain(): TicketWithQuantity = TicketWithQuantity(
         ticket = when (ticketType.trim().uppercase()) {
-            "INVITE" -> Ticket.Invite(id = id, showId = showId, ticketName = ticketName, price = price)
-            else -> Ticket.Sale(id = id, showId = showId, ticketName = ticketName, price = price)
+            "INVITE" -> Ticket(id = id, showId = showId, ticketName = ticketName, price = price, isInviteTicket = true)
+            else -> Ticket(id = id, showId = showId, ticketName = ticketName, price = price, isInviteTicket = false)
         },
         quantity = quantity,
     )

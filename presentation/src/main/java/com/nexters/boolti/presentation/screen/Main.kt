@@ -19,6 +19,7 @@ import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
+import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
@@ -60,6 +61,9 @@ fun MainNavigation(modifier: Modifier) {
                 },
                 onClickQr = {
                     navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                },
+                onClickQrScan = {
+                    navController.navigate("hostedShows")
                 },
                 navigateToReservations = {
                     navController.navigate("reservations")
@@ -154,6 +158,13 @@ fun MainNavigation(modifier: Modifier) {
             arguments = listOf(navArgument("data") { type = NavType.StringType }),
         ) {
             QrFullScreen(modifier = modifier) {
+                navController.popBackStack()
+            }
+        }
+        composable(
+            route = "hostedShows"
+        ) {
+            HostedShowScreen(modifier = modifier) {
                 navController.popBackStack()
             }
         }

@@ -43,6 +43,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 fun MyScreen(
     requireLogin: () -> Unit,
     navigateToReservations: () -> Unit,
+    onClickQrScan: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
 ) {
@@ -71,7 +72,7 @@ fun MyScreen(
         MyButton(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.my_scan_qr),
-            onClick = {},
+            onClick = onClickQrScan,
         )
 
         Spacer(modifier = Modifier.weight(1.0f))

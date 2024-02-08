@@ -26,7 +26,6 @@ class ShowDetailViewModel @Inject constructor(
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()
 
     init {
-        println("생성")
         fetchDummyTickets()
         fetchShowDetail()
     }

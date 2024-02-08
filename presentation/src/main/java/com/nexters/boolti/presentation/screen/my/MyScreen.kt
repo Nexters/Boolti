@@ -35,9 +35,10 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun MyScreen(
+    requireLogin: () -> Unit,
+    navigateToReservations: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
-    requireLogin: () -> Unit,
 ) {
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
@@ -77,7 +78,8 @@ fun MyScreen(
         MyButton(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.my_ticketing_history),
-            onClick = {})
+            onClick = navigateToReservations,
+        )
         Spacer(modifier = Modifier.height(12.dp))
         MyButton(
             modifier = Modifier.fillMaxWidth(),
@@ -96,7 +98,6 @@ fun MyScreen(
     }
 }
 
-// todo : 적절한 이름이 없을까...?
 @Composable
 private fun MyButton(
     text: String,

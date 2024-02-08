@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,15 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TicketViewModel @Inject constructor(
-    authRepository: AuthRepository,
     private val ticketRepository: TicketRepository,
 ) : ViewModel() {
-    val loggedIn = authRepository.loggedIn.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        null,
-    )
-
     private val _uiState = MutableStateFlow(TicketUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -32,7 +27,7 @@ class TicketViewModel @Inject constructor(
         viewModelScope.launch {
             ticketRepository.getTicket().catch { e ->
                 e.printStackTrace()
-            }.collect { tickets ->
+            }.singleOrNull()?.let { tickets ->
                 _uiState.update {
                     it.copy(tickets = tickets)
                 }

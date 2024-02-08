@@ -164,9 +164,15 @@ fun MainNavigation(modifier: Modifier) {
         composable(
             route = "hostedShows"
         ) {
-            HostedShowScreen(modifier = modifier) {
-                navController.popBackStack()
-            }
+            HostedShowScreen(
+                modifier = modifier,
+                onClickShow = {
+                    // TODO QR 스캐너 띄우기
+                },
+                onClickBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(

@@ -1,14 +1,21 @@
 package com.nexters.boolti.presentation.screen.qr
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -18,20 +25,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.aggroFamily
 
 @Composable
 fun HostedShowScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
+    onClickShow: (showId: String) -> Unit,
 ) {
     Scaffold(
         topBar = { HostedShowToolbar(onClickBack) }
     ) { innerPadding ->
-        EmptyHostedShow(modifier = modifier.padding(innerPadding))
+        HostedShows(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxWidth(),
+            onClick = {
+                onClickShow("3") // TODO ViewModel 생성 후 showId 는 ViewModel 에서 관리
+            }
+        )
+//        EmptyHostedShow(modifier = modifier.padding(innerPadding))
     }
 }
 
@@ -57,6 +76,52 @@ private fun HostedShowToolbar(
             navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
         )
     )
+}
+
+@Composable
+fun HostedShows(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(3) {
+            HostedShowItem(onClick = onClick)
+        }
+    }
+}
+
+@Composable
+private fun HostedShowItem(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+            style = MaterialTheme.typography.bodyLarge,
+            fontFamily = aggroFamily,
+        )
+        IconButton(onClick = onClick) {
+            Icon(painter = painterResource(id = R.drawable.ic_scan), contentDescription = "QR 스캔 아이콘")
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HostedShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            HostedShowItem {}
+        }
+    }
 }
 
 @Composable

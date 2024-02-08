@@ -1,8 +1,9 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.User
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class UserResponse(
     val id: String,
     val nickname: String? = null,

@@ -42,6 +42,10 @@ fun MyScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchMyInfo()
+    }
+
     LaunchedEffect(uiState) {
         if (uiState is MyUiState.Failure) requireLogin()
     }

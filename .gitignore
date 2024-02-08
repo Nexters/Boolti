@@ -13,6 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+keystore.properties
+/keystore.properties
 ### Android template
 # Gradle files
 .gradle/

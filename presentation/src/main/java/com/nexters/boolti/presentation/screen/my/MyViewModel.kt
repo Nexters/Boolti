@@ -25,6 +25,7 @@ class MyViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+            _uiState.update { MyUiState.Failure }
         }
     }
 

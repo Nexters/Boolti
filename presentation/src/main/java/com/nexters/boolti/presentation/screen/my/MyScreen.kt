@@ -17,17 +17,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -98,14 +103,7 @@ fun MyScreen(
             onClick = {})
 
         Spacer(modifier = Modifier.weight(1.0f))
-        Text(
-            modifier = Modifier
-                .padding(bottom = 40.dp)
-                .clickable(onClick = viewModel::logout),
-            text = stringResource(id = R.string.my_logout),
-            style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
-            textDecoration = TextDecoration.Underline,
-        )
+        LogoutButton(logout = viewModel::logout)
     }
 }
 
@@ -131,5 +129,39 @@ private fun MyButton(
             contentDescription = null,
             tint = Grey50,
         )
+    }
+}
+
+@Composable
+fun LogoutButton(
+    modifier: Modifier = Modifier,
+    logout: () -> Unit,
+) {
+    var openDialog by remember { mutableStateOf(false) }
+
+    Text(
+        modifier = modifier
+            .padding(bottom = 40.dp)
+            .clickable { openDialog = true },
+        text = stringResource(id = R.string.my_logout),
+        style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
+        textDecoration = TextDecoration.Underline,
+    )
+
+    if (openDialog) {
+        BTDialog(
+            positiveButtonLabel = stringResource(id = R.string.my_logout),
+            onClickPositiveButton = {
+                openDialog = false
+                logout()
+            },
+            onDismiss = { openDialog = false }
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.my_logout_popup),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }

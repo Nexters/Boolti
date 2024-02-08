@@ -124,6 +124,7 @@
     <string name="my_logout">로그아웃</string>
     <string name="my_ticketing_history">예매 내역</string>
     <string name="my_scan_qr">QR 스캔</string>
+    <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

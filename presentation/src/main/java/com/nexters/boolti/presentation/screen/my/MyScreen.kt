@@ -40,10 +40,10 @@ fun MyScreen(
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
 ) {
-    val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(loggedIn) {
-        if (loggedIn == false) requireLogin()
+    LaunchedEffect(uiState) {
+        if (uiState is MyUiState.Failure) requireLogin()
     }
 
     Column(

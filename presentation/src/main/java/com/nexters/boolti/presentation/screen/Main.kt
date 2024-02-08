@@ -72,7 +72,8 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             LoginScreen(
                 modifier = modifier,
             ) {
-                navController.popBackStack()
+                navController.popBackStack(navController.graph.startDestinationId, true)
+                navController.navigate("home")
             }
         }
 

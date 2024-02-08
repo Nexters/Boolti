@@ -112,6 +112,7 @@ fun MainNavigation(modifier: Modifier) {
                 )
             }
         }
+
         composable(
             route = "ticket/{ticketId}",
             arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
@@ -138,6 +139,16 @@ fun MainNavigation(modifier: Modifier) {
                 }
             )
         }
+
+        composable(
+            route = "qr/{data}",
+            arguments = listOf(navArgument("data") { type = NavType.StringType }),
+        ) {
+            QrFullScreen(modifier = modifier) {
+                navController.popBackStack()
+            }
+        }
+
         composable(
             route = "payment/accountTransfer?ticketId={ticketId}",
         ) {
@@ -165,14 +176,6 @@ fun MainNavigation(modifier: Modifier) {
                     navController.popBackStack()
                 }
             )
-        }
-        composable(
-            route = "qr/{data}",
-            arguments = listOf(navArgument("data") { type = NavType.StringType }),
-        ) {
-            QrFullScreen(modifier = modifier) {
-                navController.popBackStack()
-            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticket
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.TicketRepository
@@ -13,20 +14,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TicketViewModel @Inject constructor(
-    private val ticketRepository: TicketRepository,
+class TicketDetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val repository: TicketRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(TicketUiState())
+    private val ticketId: String = requireNotNull(savedStateHandle["ticketId"]) {
+        "TicketDetailViewModel 에 ticketId 가 전달되지 않았습니다."
+    }
+
+    private val _uiState = MutableStateFlow(TicketDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun load() {
+    init {
+        load()
+    }
+
+    private fun load() {
         viewModelScope.launch {
-            ticketRepository.getTicket().catch { e ->
+            repository.getTicket(ticketId).catch { e ->
                 e.printStackTrace()
-            }.singleOrNull()?.let { tickets ->
-                _uiState.update {
-                    it.copy(tickets = tickets)
-                }
+            }.singleOrNull()?.let { ticket ->
+                _uiState.update { it.copy(ticket = ticket) }
             }
         }
     }

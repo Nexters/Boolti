@@ -27,6 +27,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey50
 
 @Composable
 fun BTDialog(
@@ -68,6 +69,7 @@ fun BTDialog(
                                 .align(Alignment.CenterEnd)
                                 .clickable { onDismiss() },
                             painter = painterResource(id = R.drawable.ic_close),
+                            tint = Grey50,
                             contentDescription = stringResource(R.string.description_close_button),
                         )
                     }

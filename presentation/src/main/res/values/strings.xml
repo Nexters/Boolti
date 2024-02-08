@@ -125,6 +125,14 @@
     <string name="invite_ticket_complete_title">결제가 완료되었어요</string>
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 
+    <!-- 마이 -->
+    <string name="my_login">불티 로그인 하러가기</string>
+    <string name="my_login_sub">원하는 공연 티켓을 예매해보세요!</string>
+    <string name="my_logout">로그아웃</string>
+    <string name="my_ticketing_history">예매 내역</string>
+    <string name="my_scan_qr">QR 스캔</string>
+    <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
+
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>

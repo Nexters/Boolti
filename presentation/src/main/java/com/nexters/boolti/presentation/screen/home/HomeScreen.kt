@@ -37,6 +37,7 @@ fun HomeScreen(
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
     onClickQr: (data: String) -> Unit,
+    navigateToReservations: () -> Unit,
     requireLogin: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -92,6 +93,7 @@ fun HomeScreen(
                 MyScreen(
                     modifier = modifier.padding(innerPadding),
                     requireLogin = requireLogin,
+                    navigateToReservations = navigateToReservations,
                 )
             }
         }

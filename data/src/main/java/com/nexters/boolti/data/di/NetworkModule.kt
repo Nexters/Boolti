@@ -11,6 +11,7 @@ import com.nexters.boolti.data.network.api.ShowService
 import com.nexters.boolti.data.network.api.SignUpService
 import com.nexters.boolti.data.network.api.TicketService
 import com.nexters.boolti.data.network.api.TicketingService
+import com.nexters.boolti.data.network.api.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -69,6 +70,10 @@ object NetworkModule {
     @Provides
     @Named("auth")
     fun provideAuthApiService(@Named("auth") retrofit: Retrofit): LoginService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideUserService(@Named("auth") retrofit: Retrofit): UserService = retrofit.create()
 
     @Singleton
     @Provides

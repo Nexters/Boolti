@@ -21,6 +21,7 @@ import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
+import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
@@ -60,6 +61,9 @@ fun MainNavigation(modifier: Modifier) {
                 },
                 onClickQr = {
                     navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                },
+                navigateToReservations = {
+                    navController.navigate("reservations")
                 }
             ) {
                 navController.navigate("login")
@@ -74,6 +78,12 @@ fun MainNavigation(modifier: Modifier) {
             ) {
                 navController.popBackStack()
             }
+        }
+
+        composable(
+            route = "reservations",
+        ) {
+            ReservationsScreen()
         }
 
         navigation(

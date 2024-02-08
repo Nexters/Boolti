@@ -3,16 +3,20 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
+import com.nexters.boolti.data.datasource.UserDataSource
+import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val tokenDataSource: TokenDataSource,
     private val signUpDataSource: SignUpDataSource,
+    private val userDateSource: UserDataSource,
 ) : AuthRepository {
     override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
         return authDataSource.login(request)
@@ -24,9 +28,7 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun logout() {
-        authDataSource.logout()
-    }
+    override suspend fun logout(): Result<Unit> = authDataSource.logout()
 
     override suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit> {
         return signUpDataSource.signUp(signUpRequest)
@@ -38,4 +40,8 @@ class AuthRepositoryImpl @Inject constructor(
 
     override val loggedIn: Flow<Boolean>
         get() = authDataSource.loggedIn
+
+    override fun getUser(): Flow<User> = flow {
+        emit(userDateSource.getUser().toDomain())
+    }
 }

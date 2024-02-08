@@ -8,4 +8,7 @@ import retrofit2.http.POST
 interface LoginService {
     @POST("/app/papi/v1/login/kakao")
     suspend fun kakaoLogin(@Body request: LoginRequest): LoginResponse
+
+    @POST("/app/v1/logout")
+    suspend fun logout()
 }

@@ -83,7 +83,9 @@ fun MainNavigation(modifier: Modifier) {
         composable(
             route = "reservations",
         ) {
-            ReservationsScreen()
+            ReservationsScreen(onBackPressed = {
+                navController.popBackStack()
+            })
         }
 
         navigation(

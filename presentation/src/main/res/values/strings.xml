@@ -133,6 +133,10 @@
     <string name="my_scan_qr">QR 스캔</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
 
+    <!-- 예매 내역 -->
+    <string name="reservations_empty">예매 내역이 없어요</string>
+    <string name="reservations_empty_sub">티켓을 예매하고 공연을 즐겨보세요!</string>
+
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>

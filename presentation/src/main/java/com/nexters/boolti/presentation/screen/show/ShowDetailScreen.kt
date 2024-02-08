@@ -19,22 +19,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,7 +54,7 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheetContent
+import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -72,7 +70,6 @@ import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowDetailScreen(
     onBack: () -> Unit,
@@ -84,17 +81,15 @@ fun ShowDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
 
-    BottomSheetScaffold(
+    Scaffold(
         modifier = modifier,
-        scaffoldState = scaffoldState,
         snackbarHost = {
             ToastSnackbarHost(
                 modifier = Modifier.padding(bottom = 80.dp),
@@ -102,24 +97,7 @@ fun ShowDetailScreen(
             )
         },
         topBar = { ShowDetailAppBar(onBack = onBack, onClickHome = onClickHome) },
-        sheetContent = {
-            ChooseTicketBottomSheetContent(
-                ticketingTickets = uiState.tickets, leftAmount = uiState.leftAmount
-            ) { ticket ->
-                Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
-                onTicketSelected(ticket.id)
-                scope.launch { scaffoldState.bottomSheetState.hide() }
-            }
-        },
         containerColor = MaterialTheme.colorScheme.background,
-        sheetContainerColor = MaterialTheme.colorScheme.surfaceTint,
-        sheetDragHandle = {
-            BottomSheetDefaults.DragHandle(
-                shape = RoundedCornerShape(100.dp), width = 45.dp, height = 4.dp, color = Grey70
-            )
-        },
-        sheetPeekHeight = 0.dp,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -171,9 +149,25 @@ fun ShowDetailScreen(
                             snackbarHostState.showSnackbar(message = message)
                         }
                     },
-                    onClick = { scope.launch { scaffoldState.bottomSheetState.expand() } },
+                    onClick = {
+                        scope.launch {
+                            showBottomSheet = true
+                        }
+                    },
                 )
             }
+        }
+        if (showBottomSheet) {
+            ChooseTicketBottomSheet(
+                onTicketingClicked = { ticket ->
+                    Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
+                    onTicketSelected(ticket.id)
+                    showBottomSheet = false
+                },
+                onDismissRequest = {
+                    showBottomSheet = false
+                }
+            )
         }
     }
 }
@@ -437,7 +431,7 @@ private fun TicketReservationPeriod(
 
 @Composable
 private fun Section(
-    title: @Composable () -> Unit, content: @Composable () -> Unit, modifier: Modifier = Modifier
+    title: @Composable () -> Unit, content: @Composable () -> Unit, modifier: Modifier = Modifier,
 ) {
     Column(modifier.padding(top = 40.dp, bottom = 32.dp)) {
         title()

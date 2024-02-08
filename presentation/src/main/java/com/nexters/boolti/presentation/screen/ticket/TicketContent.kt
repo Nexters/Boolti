@@ -43,6 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.theme.Grey20
@@ -59,15 +61,12 @@ import com.nexters.boolti.presentation.util.ticketPath
 
 @Composable
 fun TicketContent(
-    poster: String,
+    ticket: Ticket,
     onClickQr: (data: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val ticketState = TicketState.entries.random()
     val bottomAreaHeight = 125.dp
-
-    val qrText = "boolti ticket 1"
 
     var ticketWidth by remember { mutableFloatStateOf(0f) }
     var ticketHeight by remember { mutableFloatStateOf(0f) }
@@ -114,7 +113,7 @@ fun TicketContent(
             }
     ) {
         AsyncImage(
-            model = asyncImageBlurModel(context, poster, radius = 24),
+            model = asyncImageBlurModel(context, ticket.poster, radius = 24),
             modifier = Modifier
                 .fillMaxSize(),
             contentScale = ContentScale.Crop,
@@ -148,14 +147,14 @@ fun TicketContent(
                 )
         )
         Column {
-            Title()
+            Title(ticket.ticketName, 1) // TODO 개수 정보 생기면 업데이트
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(top = 20.dp, start = 20.dp, end = 20.dp)
                     .clip(RoundedCornerShape(8.dp)),
-                model = poster,
+                model = ticket.poster,
                 contentScale = ContentScale.FillWidth,
                 contentDescription = stringResource(R.string.description_poster),
             )
@@ -166,13 +165,16 @@ fun TicketContent(
                 thickness = 2.dp,
                 color = White.copy(alpha = .3f),
             )
-            TicketInfo(bottomAreaHeight, qrText, ticketState, onClickQr)
+            TicketInfo(bottomAreaHeight, ticket.entryCode, ticket.ticketState, onClickQr)
         }
     }
 }
 
 @Composable
-private fun Title() {
+private fun Title(
+    ticketName: String = "",
+    count: Int = 0,
+) {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
@@ -180,7 +182,7 @@ private fun Title() {
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = "일반티켓 B • 1매",
+            text = stringResource(R.string.ticket_title, ticketName, count),
             style = MaterialTheme.typography.bodySmall,
             color = Grey80,
         )
@@ -195,9 +197,9 @@ private fun Title() {
 @Composable
 private fun TicketInfo(
     bottomAreaHeight: Dp,
-    qrText: String,
+    entryCode: String,
     ticketState: TicketState,
-    onClickQr: (data: String) -> Unit,
+    onClickQr: (entryCode: String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -242,15 +244,15 @@ private fun TicketInfo(
             }
         }
         Spacer(modifier = Modifier.padding(12.dp))
-        TicketQr(qrText, ticketState, onClickQr)
+        TicketQr(entryCode, ticketState, onClickQr)
     }
 }
 
 @Composable
 private fun TicketQr(
-    data: String,
+    entryCode: String,
     ticketState: TicketState,
-    onClickQr: (data: String) -> Unit,
+    onClickQr: (entryCode: String) -> Unit,
 ) {
     Box(
         modifier = Modifier,
@@ -263,10 +265,10 @@ private fun TicketQr(
                 .background(White)
                 .padding(2.dp)
                 .clickable {
-                    if (ticketState == TicketState.Ready) onClickQr(data)
+                    if (ticketState == TicketState.Ready) onClickQr(entryCode)
                 },
             painter = rememberQrBitmapPainter(
-                data,
+                entryCode,
                 size = 66.dp,
             ),
             contentScale = ContentScale.Inside,

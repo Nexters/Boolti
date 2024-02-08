@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
@@ -39,7 +40,7 @@ fun Main() {
 }
 
 @Composable
-fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel()) {
+fun MainNavigation(modifier: Modifier) {
     val navController = rememberNavController()
 
     // TODO: 하드코딩 된 route 를 각 화면에 정의
@@ -93,8 +94,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             composable(
                 route = "detail",
             ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
+                val showViewModel: ShowDetailViewModel = entry.sharedViewModel(navController = navController)
 
                 ShowDetailScreen(
                     onBack = { navController.popBackStack() },
@@ -113,8 +113,7 @@ fun MainNavigation(modifier: Modifier, viewModel: MainViewModel = hiltViewModel(
             composable(
                 route = "content",
             ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
+                val showViewModel: ShowDetailViewModel = entry.sharedViewModel(navController = navController)
 
                 ShowDetailContentScreen(
                     modifier = modifier,

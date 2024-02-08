@@ -25,6 +25,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
@@ -34,10 +36,13 @@ import com.nexters.boolti.presentation.theme.Grey60
 @Composable
 fun TicketDetailScreen(
     modifier: Modifier,
+    viewModel: TicketDetailViewModel = hiltViewModel(),
 ) {
     var showEnterCodeDialog by remember { mutableStateOf(false) }
     var enterCodeError by remember { mutableStateOf(false) }
     var enterCode by remember { mutableStateOf("") }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Box(
         modifier = modifier

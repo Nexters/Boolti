@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.ticket
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +44,7 @@ fun TicketScreen(
     }
 
     if (uiState.tickets.isNotEmpty()) {
-        TicketNotEmptyScreen(modifier, uiState, onClickQr)
+        TicketNotEmptyScreen(modifier, uiState, onClickQr, onClickTicket = onClickTicket)
     } else {
         TicketEmptyScreen(modifier)
     }
@@ -55,6 +56,7 @@ private fun TicketNotEmptyScreen(
     modifier: Modifier,
     uiState: TicketUiState,
     onClickQr: (entryCode: String) -> Unit,
+    onClickTicket: (ticketId: String) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -110,7 +112,8 @@ private fun TicketNotEmptyScreen(
                             contentPadding = contentPadding,
                             pageOffset = pageOffset,
                         ).toPx()
-                    },
+                    }
+                    .clickable { onClickTicket(uiState.tickets[page].ticketId) },
                 shape = RectangleShape,
             ) {
                 val ticket = uiState.tickets[page]

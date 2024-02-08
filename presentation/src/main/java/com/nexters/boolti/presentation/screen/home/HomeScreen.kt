@@ -106,7 +106,7 @@ private enum class Destination(
     val icon: ImageVector,
 ) {
     Show(route = "show", label = R.string.menu_show, icon = Icons.Default.Home),
-    Ticket(route = "ticket", label = R.string.menu_tickets, icon = Icons.Default.List),
+    Ticket(route = "tickets", label = R.string.menu_tickets, icon = Icons.Default.List),
     My(route = "my", label = R.string.menu_my, icon = Icons.Default.Person)
 }
 

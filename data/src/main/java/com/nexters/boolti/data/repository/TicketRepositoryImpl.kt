@@ -13,4 +13,8 @@ class TicketRepositoryImpl @Inject constructor(
     override suspend fun getTicket(): Flow<List<Ticket>> = flow {
         emit(dataSource.getTickets())
     }
+
+    override suspend fun getTicket(ticketId: String): Flow<Ticket> = flow {
+        emit(dataSource.getTicket(ticketId))
+    }
 }

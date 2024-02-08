@@ -136,6 +136,11 @@
     <!-- 예매 내역 -->
     <string name="reservations_empty">예매 내역이 없어요</string>
     <string name="reservations_empty_sub">티켓을 예매하고 공연을 즐겨보세요!</string>
+    <string name="reservations_depositing">입금 확인 중</string>
+    <string name="reservations_refunding">환불 진행 중</string>
+    <string name="reservations_canceled">예매 취소</string>
+    <string name="reservations_reserved">티켓 발권 완료</string>
+    <string name="reservations_refunded">환불 완료</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

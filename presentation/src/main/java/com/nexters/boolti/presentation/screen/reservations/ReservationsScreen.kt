@@ -29,13 +29,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 
@@ -161,10 +164,7 @@ fun ReservationItem(
                 modifier = Modifier.padding(start = 16.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(
-                    text = "입금 확인 중",
-                    style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
-                )
+                ReservationStateLabel(reservationState = ReservationState.REFUNDED)
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = "2024 TOGETHER LUCKY CLUB",
@@ -179,4 +179,24 @@ fun ReservationItem(
             }
         }
     }
+}
+
+@Composable
+fun ReservationStateLabel(
+    modifier: Modifier = Modifier,
+    reservationState: ReservationState,
+) {
+    val (stringId, color) = when (reservationState) {
+        ReservationState.DEPOSITING -> Pair(R.string.reservations_depositing, Grey30)
+        ReservationState.REFUNDING -> Pair(R.string.reservations_refunding, Success)
+        ReservationState.CANCELED -> Pair(R.string.reservations_canceled, Error)
+        ReservationState.RESERVED -> Pair(R.string.reservations_reserved, Grey30)
+        ReservationState.REFUNDED -> Pair(R.string.reservations_refunded, Error)
+    }
+
+    Text(
+        modifier = modifier,
+        text = stringResource(id = stringId),
+        style = MaterialTheme.typography.bodySmall.copy(color = color),
+    )
 }

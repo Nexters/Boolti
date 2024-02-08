@@ -15,7 +15,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
@@ -56,7 +55,7 @@ fun MainNavigation(modifier: Modifier) {
                     navController.navigate("show/$it")
                 },
                 onClickTicket = {
-                    navController.navigate("ticket/$it")
+                    navController.navigate("tickets/$it")
                 },
                 onClickQr = {
                     navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
@@ -114,7 +113,7 @@ fun MainNavigation(modifier: Modifier) {
         }
 
         composable(
-            route = "ticket/{ticketId}",
+            route = "tickets/{ticketId}",
             arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
         ) {
             TicketDetailScreen(modifier = modifier)

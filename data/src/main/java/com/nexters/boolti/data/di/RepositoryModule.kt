@@ -4,9 +4,11 @@ import com.nexters.boolti.data.datasource.TicketingRepositoryImpl
 import com.nexters.boolti.data.repository.AuthRepositoryImpl
 import com.nexters.boolti.data.repository.ConfigRepositoryImpl
 import com.nexters.boolti.data.repository.ShowRepositoryImpl
+import com.nexters.boolti.data.repository.TicketRepositoryImpl
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ConfigRepository
 import com.nexters.boolti.domain.repository.ShowRepository
+import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import dagger.Binds
 import dagger.Module
@@ -27,4 +29,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTicketingRepository(repository: TicketingRepositoryImpl): TicketingRepository
+
+    @Binds
+    abstract fun bindTicketRepository(repository: TicketRepositoryImpl): TicketRepository
 }

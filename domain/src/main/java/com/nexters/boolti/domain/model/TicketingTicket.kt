@@ -1,6 +1,6 @@
 package com.nexters.boolti.domain.model
 
-data class TicketingTicket(
+data class TicketingTicket( // TODO Remove
     val id: String,
     val isInviteTicket: Boolean,
     val title: String,

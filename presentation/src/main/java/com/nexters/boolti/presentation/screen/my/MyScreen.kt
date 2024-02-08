@@ -50,6 +50,11 @@ fun MyScreen(
         if (uiState is MyUiState.Failure) requireLogin()
     }
 
+    val user = when (val state = uiState) {
+        is MyUiState.Success -> state.user
+        else -> null
+    } ?: return
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,15 +70,17 @@ fun MyScreen(
                 modifier = Modifier
                     .size(70.dp)
                     .clip(shape = RoundedCornerShape(100.dp)),
-                model = "https://picsum.photos/200", contentDescription = null
+                model = user.photo,
+                contentDescription = null,
+                fallback = painterResource(id = R.drawable.ic_fallback_profile)
             )
             Column(
                 modifier = Modifier.padding(start = 12.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(text = "김불티 Kim Boolti", style = MaterialTheme.typography.titleLarge)
+                Text(text = user.nickname, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    text = "boolti1234@gmail.com",
+                    text = user.email,
                     style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
                 )
             }

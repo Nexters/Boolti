@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.theme.Grey10
@@ -51,59 +52,74 @@ fun MyScreen(
         viewModel.fetchMyInfo()
     }
 
-    LaunchedEffect(uiState) {
-        if (uiState is MyUiState.Failure) requireLogin()
-    }
-
     val user = when (val state = uiState) {
         is MyUiState.Success -> state.user
         else -> null
-    } ?: return
+    }
 
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = marginHorizontal)
-                .padding(top = 40.dp, bottom = 32.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AsyncImage(
-                modifier = Modifier
-                    .size(70.dp)
-                    .clip(shape = RoundedCornerShape(100.dp)),
-                model = user.photo,
-                contentDescription = null,
-                fallback = painterResource(id = R.drawable.ic_fallback_profile)
-            )
-            Column(
-                modifier = Modifier.padding(start = 12.dp),
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(text = user.nickname, style = MaterialTheme.typography.titleLarge)
-                Text(
-                    text = user.email,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                )
-            }
-        }
-
+        MyHeader(user = user, requireLogin = requireLogin)
         MyButton(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.my_ticketing_history),
-            onClick = navigateToReservations,
+            onClick = if (user == null) requireLogin else navigateToReservations,
         )
         Spacer(modifier = Modifier.height(12.dp))
         MyButton(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.my_scan_qr),
-            onClick = {})
+            onClick = {},
+        )
 
         Spacer(modifier = Modifier.weight(1.0f))
-        LogoutButton(logout = viewModel::logout)
+        if(user != null) LogoutButton(logout = viewModel::logout)
+    }
+}
+
+@Composable
+fun MyHeader(modifier: Modifier = Modifier, user: User?, requireLogin: () -> Unit) {
+    val headerModifier = if (user == null) modifier.clickable(onClick = requireLogin) else modifier
+
+    Row(
+        modifier = headerModifier
+            .fillMaxWidth()
+            .padding(horizontal = marginHorizontal)
+            .padding(top = 40.dp, bottom = 32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .size(70.dp)
+                .clip(shape = RoundedCornerShape(100.dp)),
+            model = user?.photo,
+            contentDescription = null,
+            fallback = painterResource(id = R.drawable.ic_fallback_profile)
+        )
+        Column(
+            modifier = Modifier.padding(start = 12.dp),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = user?.nickname ?: stringResource(id = R.string.my_login),
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = user?.email ?: stringResource(id = R.string.my_login_sub),
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+            )
+        }
+        Spacer(modifier = modifier.weight(1.0f))
+        if (user == null) {
+            Icon(
+                modifier = Modifier.padding(start = 12.dp),
+                painter = painterResource(id = R.drawable.ic_arrow_right),
+                contentDescription = null,
+                tint = Grey50,
+            )
+        }
     }
 }
 

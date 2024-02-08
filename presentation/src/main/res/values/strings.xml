@@ -121,6 +121,8 @@
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 
     <!-- 마이 -->
+    <string name="my_login">불티 로그인 하러가기</string>
+    <string name="my_login_sub">원하는 공연 티켓을 예매해보세요!</string>
     <string name="my_logout">로그아웃</string>
     <string name="my_ticketing_history">예매 내역</string>
     <string name="my_scan_qr">QR 스캔</string>

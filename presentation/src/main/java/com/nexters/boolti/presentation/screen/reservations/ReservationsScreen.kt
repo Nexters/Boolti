@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,9 +75,8 @@ fun ReservationsScreen(
 
         val items = (1..10).toList()
         LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(top = 20.dp),
+            modifier = Modifier.padding(innerPadding),
+            contentPadding = PaddingValues(top = 20.dp)
         ) {
             items(count = items.size) { index ->
                 ReservationItem()
@@ -149,7 +149,8 @@ fun ReservationItem(
         }
         Divider(thickness = 1.dp, color = Grey85)
         Row(
-            modifier = Modifier.padding(top = 12.dp, bottom = 20.dp)
+            modifier = Modifier.padding(top = 12.dp, bottom = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             AsyncImage(
                 modifier = Modifier

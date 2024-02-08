@@ -27,7 +27,8 @@ class AuthDataSource @Inject constructor(
         loginService.kakaoLogin(request)
     }
 
-    suspend fun logout() {
+    suspend fun logout(): Result<Unit> = runCatching {
+        loginService.logout()
         dataStore.updateData {
             it.copy(
                 userId = null,

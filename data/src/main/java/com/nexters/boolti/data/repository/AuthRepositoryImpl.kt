@@ -24,9 +24,7 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun logout() {
-        authDataSource.logout()
-    }
+    override suspend fun logout(): Result<Unit> = authDataSource.logout()
 
     override suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit> {
         return signUpDataSource.signUp(signUpRequest)

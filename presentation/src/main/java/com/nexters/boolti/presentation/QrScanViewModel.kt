@@ -21,7 +21,9 @@ class QrScanViewModel @Inject constructor(
     private val _eventChannel = Channel<QrScanEvent>()
     val event = _eventChannel.receiveAsFlow()
 
-    fun qrScan(showId: String, entryCode: String) {
+    private var lastCode: String? = null // 테스트 코드: wkjai-qoxzaz
+
+    private fun requestEntrance(showId: String, entryCode: String) {
         viewModelScope.launch {
             hostRepository.requestEntrance(
                 QrScanRequest(showId = showId, entryCode = entryCode)
@@ -36,6 +38,13 @@ class QrScanViewModel @Inject constructor(
             }.singleOrNull()?.let { success ->
                 event(QrScanEvent.ScanSuccess)
             }
+        }
+    }
+
+    fun scan(entryCode: String) {
+        if (entryCode != lastCode) {
+            lastCode = entryCode
+            requestEntrance("3", entryCode)
         }
     }
 

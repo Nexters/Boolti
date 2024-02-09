@@ -57,7 +57,6 @@ import com.nexters.boolti.presentation.extension.requestPermission
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -65,15 +64,13 @@ import timber.log.Timber
 class QrScanActivity : ComponentActivity() {
 
     private var barcodeView: DecoratedBarcodeView? = null
-    private var lastText: String? = null
     private val viewModel: QrScanViewModel by viewModels()
 
     private val callback = BarcodeCallback { result: BarcodeResult ->
-        if (result.text == null || result.text == lastText) return@BarcodeCallback
+        result.text ?: return@BarcodeCallback
 
         Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: ${result.text}")
-        lastText = result.text
-//        barcodeView?.setStatusText(result.text)
+        viewModel.scan(result.text)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,16 +83,6 @@ class QrScanActivity : ComponentActivity() {
                 var showEntryCodeDialog by remember { mutableStateOf(false) }
                 val snackbarHostState = remember { SnackbarHostState() }
 
-                val tempShowId = "3"
-                val tempEntryCode = "wkjai-qoxzaz"
-                val scope = rememberCoroutineScope()
-
-                LaunchedEffect(tempEntryCode) {
-                    scope.launch {
-                        delay(3000) // TODO 테스트용. 3초 뒤 QR 스캔 요청
-                        viewModel.qrScan(tempShowId, tempEntryCode)
-                    }
-                }
                 LaunchedEffect(viewModel.event) {
                     lifecycleScope.launch {
                         repeatOnLifecycle(Lifecycle.State.STARTED) {

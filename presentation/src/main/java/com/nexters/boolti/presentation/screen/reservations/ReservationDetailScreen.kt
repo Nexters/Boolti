@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -66,72 +68,7 @@ fun ReservationDetailScreen(
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
             )
             Header()
-            Section(
-                title = stringResource(id = R.string.reservation_account_info),
-            ) {
-                Column {
-                    Row(
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(end = 20.dp)
-                                .width(80.dp),
-                            text = "은행명",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                        Text(
-                            text = "신한은행",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(end = 20.dp)
-                                .width(80.dp),
-                            text = "계좌번호",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                        Text(
-                            text = "1234-56-7890123",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(end = 20.dp)
-                                .width(80.dp),
-                            text = "예금주",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                        Text(
-                            text = "박불티",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(end = 20.dp)
-                                .width(80.dp),
-                            text = "입금 마감일",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                        Text(
-                            text = "2024.01.19 23:59",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                        )
-                    }
-                }
-            }
+            DepositInfo()
             Section(
                 modifier = Modifier.padding(top = 12.dp),
                 title = stringResource(id = R.string.reservation_pament_info),
@@ -232,6 +169,76 @@ private fun Header(
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
             )
         }
+    }
+}
+
+@Composable
+private fun DepositInfo(
+    modifier: Modifier = Modifier,
+) {
+    Section(
+        modifier = modifier,
+        title = stringResource(id = R.string.reservation_account_info),
+    ) {
+        Column {
+            DepositInfoRow(
+                modifier = Modifier
+                    .height(32.dp)
+                    .padding(bottom = 8.dp),
+                key = stringResource(id = R.string.bank_name),
+                value = "신한은행",
+            )
+            DepositInfoRow(
+                modifier = Modifier
+                    .height(40.dp)
+                    .padding(bottom = 2.dp),
+                key = stringResource(id = R.string.account_number),
+                value = "1234-56-7890123",
+            ) {
+                CopyButton(label = "복사", onClick = { /*TODO*/ })
+            }
+            DepositInfoRow(
+                modifier = Modifier
+                    .height(40.dp)
+                    .padding(bottom = 2.dp),
+                key = stringResource(id = R.string.account_holder),
+                value = "박불티",
+            )
+            DepositInfoRow(
+                modifier = Modifier
+                    .height(40.dp)
+                    .padding(bottom = 2.dp),
+                key = stringResource(id = R.string.account_transfer_due_date),
+                value = "2024.01.19 23:59",
+            )
+        }
+    }
+}
+
+@Composable
+private fun DepositInfoRow(
+    key: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    content: (@Composable () -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(end = 20.dp)
+                .width(80.dp),
+            text = key,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+        )
+        Spacer(modifier = Modifier.weight(1.0f))
+        content?.invoke()
     }
 }
 

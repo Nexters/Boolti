@@ -268,7 +268,7 @@ private fun ContentScaffold(
             DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = { Text(showDetail.date.format(formatter)) },
+            content = { SectionContent(text = showDetail.date.format(formatter)) },
         )
         Divider(color = Grey85)
 

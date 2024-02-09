@@ -1,7 +1,10 @@
 package com.nexters.boolti.presentation.screen.reservations
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +22,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +66,14 @@ fun ReservationDetailScreen(
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
             )
             Header()
+            Section(
+                title = "입금 계좌 정보",
+            ) {
+                Text(
+                    text = "헤헤",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
         }
     }
 }
@@ -124,6 +140,59 @@ private fun Header(
                 text = "일반 티켓 B / 1매",
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
             )
+        }
+    }
+}
+
+@Composable
+private fun Section(
+    title: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    var expanded by remember {
+        mutableStateOf(true)
+    }
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 0f else 180f,
+        label = "rotationX"
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.surface),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(horizontal = marginHorizontal)
+                .padding(vertical = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge.copy(color = Grey10),
+            )
+            Icon(
+                modifier = modifier.graphicsLayer {
+                    rotationX = rotation
+                },
+                painter = painterResource(id = R.drawable.ic_expand_24),
+                contentDescription = stringResource(R.string.description_expand),
+                tint = Grey50,
+            )
+        }
+        AnimatedVisibility(
+            modifier = Modifier
+                .padding(horizontal = marginHorizontal)
+                .padding(bottom = 20.dp),
+            visible = expanded,
+        ) {
+            content()
         }
     }
 }

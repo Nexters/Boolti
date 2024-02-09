@@ -10,6 +10,7 @@
     <string name="description_more_menu">더보기 메뉴</string>
     <string name="description_qr">입장 QR 코드</string>
     <string name="description_app_logo">앱 로고</string>
+    <string name="description_expand">확장하기</string>
 
     <!-- 홈(Show) -->
     <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>

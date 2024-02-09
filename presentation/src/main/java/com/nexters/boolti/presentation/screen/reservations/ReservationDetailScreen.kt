@@ -67,12 +67,103 @@ fun ReservationDetailScreen(
             )
             Header()
             Section(
-                title = "입금 계좌 정보",
+                title = stringResource(id = R.string.reservation_account_info),
             ) {
-                Text(
-                    text = "헤헤",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+                Column {
+                    Row(
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 20.dp)
+                                .width(80.dp),
+                            text = "은행명",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                        Text(
+                            text = "신한은행",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 20.dp)
+                                .width(80.dp),
+                            text = "계좌번호",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                        Text(
+                            text = "1234-56-7890123",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 20.dp)
+                                .width(80.dp),
+                            text = "예금주",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                        Text(
+                            text = "박불티",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 20.dp)
+                                .width(80.dp),
+                            text = "입금 마감일",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                        Text(
+                            text = "2024.01.19 23:59",
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                        )
+                    }
+                }
+            }
+            Section(
+                modifier = Modifier.padding(top = 12.dp),
+                title = stringResource(id = R.string.reservation_pament_info),
+            ) {
+
+            }
+            Section(
+                modifier = Modifier.padding(top = 12.dp),
+                title = stringResource(id = R.string.reservation_ticket_info),
+            ) {
+
+            }
+            Section(
+                modifier = Modifier.padding(top = 12.dp),
+                title = stringResource(id = R.string.ticketing_ticket_holder_label),
+                defaultExpanded = false,
+            ) {
+
+            }
+            Section(
+                modifier = Modifier.padding(top = 12.dp),
+                title = stringResource(id = R.string.ticketing_depositor_label),
+                defaultExpanded = false,
+            ) {
+
+            }
+            Section(
+                modifier = Modifier.padding(top = 12.dp, bottom = 40.dp),
+                title = stringResource(id = R.string.ticketing_refund_policy_label),
+                defaultExpanded = false,
+            ) {
+
             }
         }
     }
@@ -148,10 +239,11 @@ private fun Header(
 private fun Section(
     title: String,
     modifier: Modifier = Modifier,
+    defaultExpanded: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     var expanded by remember {
-        mutableStateOf(true)
+        mutableStateOf(defaultExpanded)
     }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0f else 180f,
@@ -178,7 +270,7 @@ private fun Section(
                 style = MaterialTheme.typography.titleLarge.copy(color = Grey10),
             )
             Icon(
-                modifier = modifier.graphicsLayer {
+                modifier = Modifier.graphicsLayer {
                     rotationX = rotation
                 },
                 painter = painterResource(id = R.drawable.ic_expand_24),

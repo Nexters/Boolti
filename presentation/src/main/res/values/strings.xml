@@ -146,6 +146,9 @@
 
     <!-- 예매 내역 상세 -->
     <string name="reservation_detail">예매 내역 상세</string>
+    <string name="reservation_account_info">입금 계좌 정보</string>
+    <string name="reservation_pament_info">결제 정보</string>
+    <string name="reservation_ticket_info">티켓 정보</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.reservations
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,8 +46,9 @@ import com.nexters.boolti.presentation.theme.point1
 
 @Composable
 fun ReservationsScreen(
-    modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
+    navigateToDetail: (reservationsId: String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = { ReservationsAppBar(onBackPressed = onBackPressed) }
@@ -79,7 +81,8 @@ fun ReservationsScreen(
             contentPadding = PaddingValues(top = 20.dp)
         ) {
             items(count = items.size) { index ->
-                ReservationItem()
+                // todo : api 연결시 실제 id를 넘겨주어야 함
+                ReservationItem(navigateToDetail = { navigateToDetail("1") })
             }
         }
     }
@@ -117,12 +120,14 @@ private fun ReservationsAppBar(
 
 @Composable
 fun ReservationItem(
+    navigateToDetail: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .padding(bottom = 12.dp)
             .background(color = MaterialTheme.colorScheme.surface)
+            .clickable(onClick = navigateToDetail)
             .padding(horizontal = marginHorizontal)
     ) {
         Row(
@@ -136,7 +141,7 @@ fun ReservationItem(
             )
             Spacer(modifier = Modifier.weight(1.0f))
             Text(
-                text = "상세 보기",
+                text = stringResource(id = R.string.reservations_detail_view),
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
             )

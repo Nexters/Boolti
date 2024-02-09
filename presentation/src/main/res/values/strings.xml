@@ -141,6 +141,10 @@
     <string name="reservations_canceled">예매 취소</string>
     <string name="reservations_reserved">티켓 발권 완료</string>
     <string name="reservations_refunded">환불 완료</string>
+    <string name="reservations_detail_view">상세 보기</string>
+
+    <!-- 예매 내역 상세 -->
+    <string name="reservation_detail">예매 내역 상세</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

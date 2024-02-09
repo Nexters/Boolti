@@ -112,6 +112,7 @@
     <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
+    <string name="show_entry_code">입장코드 보기</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

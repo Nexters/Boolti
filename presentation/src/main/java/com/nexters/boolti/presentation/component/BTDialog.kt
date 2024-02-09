@@ -31,11 +31,13 @@ import com.nexters.boolti.presentation.theme.Grey50
 
 @Composable
 fun BTDialog(
+    modifier: Modifier = Modifier,
     enableDismiss: Boolean = true,
     showCloseButton: Boolean = true,
     onDismiss: () -> Unit = {},
     positiveButtonLabel: String = stringResource(R.string.btn_ok),
     positiveButtonEnabled: Boolean = true,
+    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     onClickPositiveButton: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -55,8 +57,9 @@ fun BTDialog(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceTint),
         ) {
             Column(
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                modifier = modifier
+                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                horizontalAlignment = horizontalAlignment,
             ) {
                 Box(
                     modifier = Modifier

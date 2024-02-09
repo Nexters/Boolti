@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
@@ -69,39 +71,11 @@ fun ReservationDetailScreen(
             )
             Header()
             DepositInfo()
-            Section(
-                modifier = Modifier.padding(top = 12.dp),
-                title = stringResource(id = R.string.reservation_pament_info),
-            ) {
-
-            }
-            Section(
-                modifier = Modifier.padding(top = 12.dp),
-                title = stringResource(id = R.string.reservation_ticket_info),
-            ) {
-
-            }
-            Section(
-                modifier = Modifier.padding(top = 12.dp),
-                title = stringResource(id = R.string.ticketing_ticket_holder_label),
-                defaultExpanded = false,
-            ) {
-
-            }
-            Section(
-                modifier = Modifier.padding(top = 12.dp),
-                title = stringResource(id = R.string.ticketing_depositor_label),
-                defaultExpanded = false,
-            ) {
-
-            }
-            Section(
-                modifier = Modifier.padding(top = 12.dp, bottom = 40.dp),
-                title = stringResource(id = R.string.ticketing_refund_policy_label),
-                defaultExpanded = false,
-            ) {
-
-            }
+            PaymentInfo()
+            TicketInfo()
+            TicketHolderInfo()
+            DepositorInfo()
+            RefundPolicy()
         }
     }
 }
@@ -235,10 +209,163 @@ private fun DepositInfoRow(
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
         )
         Spacer(modifier = Modifier.weight(1.0f))
         content?.invoke()
+    }
+}
+
+@Composable
+private fun PaymentInfo(
+    modifier: Modifier = Modifier,
+) {
+    Section(
+        modifier = modifier.padding(top = 12.dp),
+        title = stringResource(id = R.string.reservation_pament_info),
+    ) {
+        Column {
+            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "결제 수단", value = "계좌 이체")
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = "총 결제 금액",
+                value = "5,000원"
+            )
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = "결제 상태",
+                value = "입금 확인 중"
+            )
+        }
+    }
+}
+
+@Composable
+private fun TicketInfo(
+    modifier: Modifier = Modifier,
+) {
+    Section(
+        modifier = modifier.padding(top = 12.dp),
+        title = stringResource(id = R.string.reservation_ticket_info),
+    ) {
+        Column {
+            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "티켓 종류", value = "일반 티켓 B")
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = "티켓 개수",
+                value = "1매"
+            )
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = "발권 일시",
+                value = "발권 전"
+            )
+        }
+    }
+}
+
+@Composable
+private fun TicketHolderInfo(
+    modifier: Modifier = Modifier,
+) {
+    Section(
+        modifier = modifier.padding(top = 12.dp),
+        title = stringResource(id = R.string.ticketing_ticket_holder_label),
+        defaultExpanded = false,
+    ) {
+        Column {
+            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "이름", value = "김불티")
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = "연락처",
+                value = "010-1234-5678"
+            )
+        }
+    }
+}
+
+@Composable
+private fun DepositorInfo(
+    modifier: Modifier = Modifier,
+) {
+    Section(
+        modifier = modifier.padding(top = 12.dp),
+        title = stringResource(id = R.string.ticketing_depositor_label),
+        defaultExpanded = false,
+    ) {
+        Column {
+            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "이름", value = "김불티")
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = "연락처",
+                value = "010-1234-5678"
+            )
+        }
+    }
+}
+
+@Composable
+private fun RefundPolicy(
+    modifier: Modifier = Modifier,
+) {
+    Section(
+        modifier = modifier.padding(top = 12.dp, bottom = 40.dp),
+        title = stringResource(id = R.string.ticketing_refund_policy_label),
+        defaultExpanded = false,
+    ) {
+        // todo : 규정 변경하기
+        Column {
+            PolicyLine(text = "하단에 나열된 내용은 전부 임시 텍스트 입니다.\n")
+            PolicyLine(text = "입장 확인이 된 티켓이 있을경우 환불이 불가합니다.\n")
+            PolicyLine(text = "환불 방법 : 티켓 예매 상세내역 > 예매취소\n")
+            PolicyLine(text = "환불 금액 : 당사에서는 주문에 대해 즉시 취소를\u2028하고, 취소 금액에 대한 입금은 카드사 영업일 기준 4~5일이 소요될 수 있습니다.\n")
+            PolicyLine(text = "문의사항 발생시 카카오톡 채널로 문의부탁드립니다.")
+        }
+    }
+}
+
+@Composable
+private fun PolicyLine(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.height(22.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 7.dp)
+                .size(4.dp)
+                .clip(shape = RoundedCornerShape(2.dp))
+                .background(color = Grey50),
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
+        )
+    }
+}
+
+@Composable
+private fun NormalRow(
+    key: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            modifier = Modifier,
+            text = key,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+        )
     }
 }
 

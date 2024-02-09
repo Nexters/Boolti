@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation
 
+import android.Manifest
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
@@ -52,6 +53,7 @@ import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import com.nexters.boolti.domain.exception.QrErrorType
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.requestPermission
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,6 +78,8 @@ class QrScanActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestPermission(Manifest.permission.CAMERA, 100)
 
         setContent {
             BooltiTheme {
@@ -109,7 +113,7 @@ class QrScanActivity : ComponentActivity() {
                     },
                     snackbarHost = {
                         ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 100.dp))
-                    }
+                    },
                 ) { innerPadding ->
                     AndroidView(
                         modifier = Modifier

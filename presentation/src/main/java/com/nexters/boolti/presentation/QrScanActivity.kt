@@ -2,8 +2,10 @@ package com.nexters.boolti.presentation
 
 import android.os.Bundle
 import android.view.KeyEvent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +25,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,16 +41,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import com.nexters.boolti.domain.exception.QrErrorType
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -54,13 +64,14 @@ class QrScanActivity : ComponentActivity() {
 
     private var barcodeView: DecoratedBarcodeView? = null
     private var lastText: String? = null
+    private val viewModel: QrScanViewModel by viewModels()
 
     private val callback = BarcodeCallback { result: BarcodeResult ->
         if (result.text == null || result.text == lastText) return@BarcodeCallback
 
         Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: ${result.text}")
         lastText = result.text
-        barcodeView?.setStatusText(result.text)
+//        barcodeView?.setStatusText(result.text)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +81,24 @@ class QrScanActivity : ComponentActivity() {
             BooltiTheme {
                 var showEntryCodeDialog by remember { mutableStateOf(false) }
                 val snackbarHostState = remember { SnackbarHostState() }
+
+                val tempShowId = "3"
+                val tempEntryCode = "wkjai-qoxzaz"
+                val scope = rememberCoroutineScope()
+
+                LaunchedEffect(tempEntryCode) {
+                    scope.launch {
+                        delay(3000) // TODO 테스트용. 3초 뒤 QR 스캔 요청
+                        viewModel.qrScan(tempShowId, tempEntryCode)
+                    }
+                }
+                LaunchedEffect(viewModel.event) {
+                    lifecycleScope.launch {
+                        repeatOnLifecycle(Lifecycle.State.STARTED) {
+                            viewModel.event.collect(::handleEvent)
+                        }
+                    }
+                }
 
                 Scaffold(
                     topBar = {
@@ -123,6 +152,20 @@ class QrScanActivity : ComponentActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return barcodeView?.onKeyDown(keyCode, event) ?: false || super.onKeyDown(keyCode, event)
+    }
+    private fun handleEvent(event: QrScanEvent) {
+        when (event) {
+            is QrScanEvent.ScanError -> {
+                when (event.errorType) {
+                    QrErrorType.SHOW_NOT_TODAY -> {
+                        Timber.tag("MANGBAAM-(handleEvent)").d("오늘 공연 아님")
+                        Toast.makeText(this, "오늘 공연 아님", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            is QrScanEvent.ScanSuccess -> Timber.tag("MANGBAAM-(handleEvent)").d("스캔 성공")
+        }
     }
 }
 

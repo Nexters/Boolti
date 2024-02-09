@@ -124,7 +124,7 @@ fun ShowDetailScreen(
                         .padding(bottom = 114.dp),
                     snackbarHost = snackbarHostState,
                     showDetail = uiState.showDetail,
-                    host = "김불다람쥐 (010-1234-5678)",
+                    host = "${uiState.showDetail.hostName} (${uiState.showDetail.hostPhoneNumber})",
                     onClickContent = onClickContent,
                 )
             }

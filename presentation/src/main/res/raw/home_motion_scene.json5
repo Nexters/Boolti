@@ -1,0 +1,31 @@
+{
+  ConstraintSets: {
+    start: {
+      sub_title: {
+        start: ['parent', 'start', 20],
+        top: ['parent', 'top', 40],
+        end: ['parent', 'end', 20],
+        visibility: 'visible',
+      },
+      search_bar: {
+        top: ['sub_title', 'bottom', 8],
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+      },
+    },
+
+    end: {
+      sub_title: {
+        start: ['parent', 'start', 20],
+        top: ['parent', 'top', 40],
+        end: ['parent', 'end', 20],
+        visibility: 'gone'
+      },
+      search_bar: {
+        top: ['sub_title', 'bottom', 8],
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+      },
+    }
+  }
+}

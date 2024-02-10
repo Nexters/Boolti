@@ -257,7 +257,7 @@ private fun ContentScaffold(
 
         // 일시
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
-        val indexOfDay = showDetail.date.dayOfWeek.value
+        val indexOfDay = showDetail.date.dayOfWeek.value - 1
         val minute = stringResource(id = R.string.ticketing_minutes)
         // ex. 2024.01.20 (토) / 18:00 (150분)
         val formatter =

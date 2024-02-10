@@ -62,7 +62,7 @@ fun ShowScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var offsetY by remember { mutableFloatStateOf(0f) }
-    var appbarHeight by remember { mutableFloatStateOf(0f) }
+    var changeableAppBarHeight by remember { mutableFloatStateOf(0f) }
     var progress by remember { mutableFloatStateOf(0f) }
     val lazyGridState = rememberLazyGridState()
     val nestedScrollConnection = remember {
@@ -81,8 +81,8 @@ fun ShowScreen(
 
                 // 앱바를 움직여야 할 때!
                 offsetY += available.y
-                offsetY = offsetY.coerceIn(-appbarHeight, 0f)
-                progress = -offsetY / appbarHeight
+                offsetY = offsetY.coerceIn(-changeableAppBarHeight, 0f)
+                progress = -offsetY / changeableAppBarHeight
 
                 return available
             }
@@ -96,10 +96,12 @@ fun ShowScreen(
             modifier = Modifier.padding(innerPadding),
             contentAlignment = Alignment.TopCenter,
         ) {
+            val density = LocalDensity.current.density
+            val currentAppBarHeight = 196.dp - (progress * changeableAppBarHeight / density).dp
             LazyVerticalGrid(
                 modifier = Modifier
                     .padding(horizontal = marginHorizontal)
-                    .padding(top = 196.dp - ((appbarHeight / 2.625f) * progress).dp),
+                    .padding(top = currentAppBarHeight),
                 columns = GridCells.Adaptive(minSize = 150.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalArrangement = Arrangement.spacedBy(28.dp),
@@ -120,8 +122,8 @@ fun ShowScreen(
                 progress = progress,
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
-                onSizeChanged = { size ->
-                    appbarHeight = size.height.toFloat()
+                onChangeableSizeChanged = { size ->
+                    changeableAppBarHeight = size.height.toFloat()
                 },
                 search = viewModel::search,
             )
@@ -129,12 +131,15 @@ fun ShowScreen(
     }
 }
 
+/**
+ * @param onChangeableSizeChanged 변할 수 있는 최대 사이즈를 전달 app bar height - search bar
+ */
 @Composable
 fun ShowAppBar(
     progress: Float,
     text: String,
     onKeywordChanged: (keyword: String) -> Unit,
-    onSizeChanged: (size: IntSize) -> Unit,
+    onChangeableSizeChanged: (size: IntSize) -> Unit,
     search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -146,7 +151,7 @@ fun ShowAppBar(
             .padding(horizontal = marginHorizontal)
             .onSizeChanged(onSizeChanged = { size ->
                 appBarHeight = size.height.toFloat()
-                onSizeChanged(IntSize(size.width, size.height - searchBarHeight.toInt()))
+                onChangeableSizeChanged(IntSize(0, size.height - searchBarHeight.toInt()))
             })
             .graphicsLayer {
                 // 검색 바를 제외한 만큼 올려주기

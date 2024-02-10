@@ -56,10 +56,8 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey05
-import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
-import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
@@ -67,7 +65,6 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.requireActivity
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -119,7 +116,11 @@ fun ShowDetailScreen(
                         .padding(bottom = 114.dp),
                     snackbarHost = snackbarHostState,
                     showDetail = uiState.showDetail,
-                    host = "김불다람쥐 (010-1234-5678)",
+                    host = stringResource(
+                        id = R.string.ticketing_host_format,
+                        uiState.showDetail.hostName,
+                        uiState.showDetail.hostPhoneNumber,
+                    ),
                     onClickContent = onClickContent,
                 )
             }
@@ -263,7 +264,7 @@ private fun ContentScaffold(
             DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = { Text(showDetail.date.format(formatter)) },
+            content = { SectionContent(text = showDetail.date.format(formatter)) },
         )
         Divider(color = Grey85)
 
@@ -389,42 +390,6 @@ private fun Poster(
             color = Grey05,
             fontSize = 24.sp,
             lineHeight = 34.sp,
-        )
-    }
-}
-
-@Composable
-private fun TicketReservationPeriod(
-    startDate: LocalDate,
-    endDate: LocalDate,
-    modifier: Modifier = Modifier,
-) {
-    val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
-    val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-    val startDayIndex = startDate.dayOfWeek.value
-    val endDayIndex = endDate.dayOfWeek.value
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(8.dp))
-            .border(shape = RoundedCornerShape(8.dp), color = Color.White, width = 1.dp)
-            .background(color = Grey70)
-            .padding(vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            stringResource(id = R.string.ticketing_period),
-            style = MaterialTheme.typography.titleMedium.copy(color = Grey15)
-        )
-        Divider(
-            modifier = Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.Black
-        )
-        Text(
-            // ex. 2023.12.01 (토) - 2024.01.20 (월)
-            "${startDate.format(formatter)} (${daysOfWeek[startDayIndex]}) - " +
-                    "${endDate.format(formatter)} (${daysOfWeek[endDayIndex]})",
-            style = MaterialTheme.typography.titleMedium.copy(color = Grey30),
         )
     }
 }

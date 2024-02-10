@@ -5,9 +5,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,9 +46,11 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 
@@ -76,6 +82,9 @@ fun ReservationDetailScreen(
             TicketHolderInfo()
             DepositorInfo()
             RefundPolicy()
+            RefundButton(
+                modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
+                onClick = {})
         }
     }
 }
@@ -436,5 +445,29 @@ private fun Section(
         ) {
             content()
         }
+    }
+}
+
+
+@Composable
+private fun RefundButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Button(
+        modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Grey20,
+            contentColor = Grey90,
+        ),
+        shape = RoundedCornerShape(4.dp),
+        contentPadding = PaddingValues(12.dp),
+        interactionSource = remember { MutableInteractionSource() },
+    ) {
+        Text(
+            text = stringResource(id = R.string.refund_button),
+            style = MaterialTheme.typography.titleMedium
+        )
     }
 }

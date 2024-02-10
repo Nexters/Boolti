@@ -156,6 +156,9 @@
     <string name="reservation_before_completion">발권 전</string>
     <string name="reservation_ticket_count_format">%d매</string>
 
+    <!-- 환불 -->
+    <string name="refund_button">환불 요청하기</string>
+
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>

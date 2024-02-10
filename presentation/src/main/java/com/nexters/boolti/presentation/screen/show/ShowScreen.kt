@@ -100,22 +100,9 @@ fun ShowAppBar(
             .fillMaxWidth()
             .padding(horizontal = marginHorizontal),
     ) {
-        Box(
-            modifier = Modifier.height(44.dp),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            Icon(
-                modifier = Modifier
-                    .width(61.dp)
-                    .height(16.dp),
-                painter = painterResource(id = R.drawable.boolti_logo),
-                contentDescription = stringResource(id = R.string.description_app_logo),
-                tint = Grey50,
-            )
-        }
         Text(
             modifier = Modifier
-                .padding(top = 20.dp)
+                .padding(top = 40.dp)
                 .fillMaxWidth(),
             text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
             style = TextStyle(

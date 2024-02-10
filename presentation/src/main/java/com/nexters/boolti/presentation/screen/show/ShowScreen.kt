@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.show
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,12 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -42,9 +43,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ExperimentalMotionApi
-import androidx.constraintlayout.compose.MotionLayout
-import androidx.constraintlayout.compose.MotionScene
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
@@ -64,7 +62,7 @@ fun ShowScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var offsetY by remember { mutableFloatStateOf(0f) }
-    val appbarHeight = 116 * 2.625f//by remember { mutableFloatStateOf(0f) }
+    var appbarHeight by remember { mutableFloatStateOf(0f) }
     var progress by remember { mutableFloatStateOf(0f) }
     val lazyGridState = rememberLazyGridState()
     val nestedScrollConnection = remember {
@@ -85,7 +83,6 @@ fun ShowScreen(
                 offsetY += available.y
                 offsetY = offsetY.coerceIn(-appbarHeight, 0f)
                 progress = -offsetY / appbarHeight
-                println("프로그레스 : $progress")
 
                 return available
             }
@@ -102,7 +99,7 @@ fun ShowScreen(
             LazyVerticalGrid(
                 modifier = Modifier
                     .padding(horizontal = marginHorizontal)
-                    .padding(top = 208.dp - ((appbarHeight / 2.625f) * progress).dp),
+                    .padding(top = 196.dp - ((appbarHeight / 2.625f) * progress).dp),
                 columns = GridCells.Adaptive(minSize = 150.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalArrangement = Arrangement.spacedBy(28.dp),
@@ -124,7 +121,7 @@ fun ShowScreen(
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
                 onSizeChanged = { size ->
-//                    appbarHeight = size.height.toFloat()
+                    appbarHeight = size.height.toFloat()
                 },
                 search = viewModel::search,
             )
@@ -132,7 +129,6 @@ fun ShowScreen(
     }
 }
 
-@OptIn(ExperimentalMotionApi::class)
 @Composable
 fun ShowAppBar(
     progress: Float,
@@ -142,25 +138,24 @@ fun ShowAppBar(
     search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val motionScene = remember {
-        context.resources
-            .openRawResource(R.raw.home_motion_scene)
-            .readBytes()
-            .decodeToString()
-    }
-
-    MotionLayout(
+    var appBarHeight by remember { mutableFloatStateOf(0f) }
+    val searchBarHeight = with(LocalDensity.current) { 80.dp.toPx() }
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = marginHorizontal)
-            .onSizeChanged(onSizeChanged = onSizeChanged),
-        motionScene = MotionScene(content = motionScene),
-        progress = progress,
+            .onSizeChanged(onSizeChanged = { size ->
+                appBarHeight = size.height.toFloat()
+                onSizeChanged(IntSize(size.width, size.height - searchBarHeight.toInt()))
+            })
+            .graphicsLayer {
+                // 검색 바를 제외한 만큼 올려주기
+                translationY -= progress * (appBarHeight - searchBarHeight)
+            },
     ) {
         Text(
             modifier = Modifier
-                .layoutId("sub_title")
+                .padding(top = 40.dp)
                 .fillMaxWidth(),
             text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
             style = TextStyle(
@@ -172,7 +167,7 @@ fun ShowAppBar(
         )
         SearchBar(
             modifier = Modifier
-                .layoutId("search_bar")
+                .padding(top = 8.dp)
                 .padding(vertical = 16.dp),
             text = text,
             onKeywordChanged = onKeywordChanged,

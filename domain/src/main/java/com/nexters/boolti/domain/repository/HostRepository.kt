@@ -10,4 +10,5 @@ interface HostRepository {
     ): Flow<Boolean>
 
     fun getHostedShows(): Flow<List<Show>>
+    fun getManagerCode(showId: String): Flow<String>
 }

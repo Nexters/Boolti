@@ -11,4 +11,5 @@ class HostDataSource @Inject constructor(
 ) {
     suspend fun requestEntrance(request: QrScanRequest): Response<Boolean> = apiService.requestEntrance(request)
     suspend fun getHostedShows(): List<Show> = apiService.getHostedShows().map { it.toDomain() }
+    suspend fun getManagerCode(showId: String): String = apiService.getManagerCode(showId).toDomain()
 }

@@ -28,4 +28,8 @@ class HostRepositoryImpl @Inject constructor(
     override fun getHostedShows(): Flow<List<Show>> = flow {
         emit(dataSource.getHostedShows())
     }
+
+    override fun getManagerCode(showId: String): Flow<String> = flow {
+        emit(dataSource.getManagerCode(showId))
+    }
 }

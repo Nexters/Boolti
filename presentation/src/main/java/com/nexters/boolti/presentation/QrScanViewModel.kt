@@ -9,9 +9,12 @@ import com.nexters.boolti.domain.repository.HostRepository
 import com.nexters.boolti.domain.request.QrScanRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,10 +27,20 @@ class QrScanViewModel @Inject constructor(
     private var lastCode: String? = null // 테스트 코드: wkjai-qoxzaz
 
     private val showId: String = requireNotNull(savedStateHandle["showId"])
-    val showName: String = requireNotNull(savedStateHandle["showName"])
+
+    private val _uiState = MutableStateFlow(
+        QrScanState(
+            showName = requireNotNull(savedStateHandle["showName"]),
+        )
+    )
+    val uiState = _uiState.asStateFlow()
 
     private val _eventChannel = Channel<QrScanEvent>()
     val event = _eventChannel.receiveAsFlow()
+
+    init {
+        getManagerCode()
+    }
 
     private fun requestEntrance(entryCode: String) {
         viewModelScope.launch {
@@ -41,7 +54,7 @@ class QrScanViewModel @Inject constructor(
                         }
                     }
                 }
-            }.singleOrNull()?.let { success ->
+            }.singleOrNull()?.let {
                 event(QrScanEvent.ScanSuccess)
             }
         }
@@ -52,6 +65,16 @@ class QrScanViewModel @Inject constructor(
             lastCode = entryCode
             Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
             requestEntrance(entryCode)
+        }
+    }
+
+    private fun getManagerCode() {
+        viewModelScope.launch {
+            hostRepository.getManagerCode(showId).catch { e ->
+                e.printStackTrace()
+            }.singleOrNull()?.let { code ->
+                _uiState.update { it.copy(managerCode = code) }
+            }
         }
     }
 

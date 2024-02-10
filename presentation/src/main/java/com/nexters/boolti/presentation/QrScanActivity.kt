@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.zxing.BarcodeFormat
@@ -81,6 +82,8 @@ class QrScanActivity : ComponentActivity() {
                 var showEntryCodeDialog by remember { mutableStateOf(false) }
                 val snackbarHostState = remember { SnackbarHostState() }
 
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
                 LaunchedEffect(viewModel.event) {
                     lifecycleScope.launch {
                         repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -91,7 +94,7 @@ class QrScanActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        QrScanToolbar(showName = viewModel.showName, onClickClose = { finish() }) // TODO 번들로 전달받기
+                        QrScanToolbar(showName = uiState.showName, onClickClose = { finish() }) // TODO 번들로 전달받기
                     },
                     bottomBar = {
                         QrScanBottombar { showEntryCodeDialog = true }
@@ -120,8 +123,8 @@ class QrScanActivity : ComponentActivity() {
 
                     if (showEntryCodeDialog) {
                         EntryCodeDialog(
-                            entryCode = { "123456" },
-                            onDismiss = { showEntryCodeDialog = false }
+                            managerCode = uiState.managerCode,
+                            onDismiss = { showEntryCodeDialog = false },
                         )
                     }
                 }
@@ -142,6 +145,7 @@ class QrScanActivity : ComponentActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return barcodeView?.onKeyDown(keyCode, event) ?: false || super.onKeyDown(keyCode, event)
     }
+
     private fun handleEvent(event: QrScanEvent) {
         when (event) {
             is QrScanEvent.ScanError -> {
@@ -210,7 +214,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
 
 @Composable
 private fun EntryCodeDialog(
-    entryCode: () -> String,
+    managerCode: String,
     onDismiss: () -> Unit,
 ) {
     BTDialog(showCloseButton = false, onDismiss = onDismiss, onClickPositiveButton = onDismiss) {
@@ -222,7 +226,7 @@ private fun EntryCodeDialog(
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(vertical = 13.dp, horizontal = 12.dp),
-            text = entryCode(),
+            text = managerCode,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
         )

@@ -32,7 +32,7 @@ import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
 @Composable
-fun Main(onClickQrScan: (showId: String) -> Unit) {
+fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
     BooltiTheme {
         Surface(modifier) {
@@ -42,7 +42,7 @@ fun Main(onClickQrScan: (showId: String) -> Unit) {
 }
 
 @Composable
-fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String) -> Unit) {
+fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
     val navController = rememberNavController()
 
     // TODO: 하드코딩 된 route 를 각 화면에 정의

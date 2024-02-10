@@ -24,6 +24,7 @@ class QrScanViewModel @Inject constructor(
     private var lastCode: String? = null // 테스트 코드: wkjai-qoxzaz
 
     private val showId: String = requireNotNull(savedStateHandle["showId"])
+    val showName: String = requireNotNull(savedStateHandle["showName"])
 
     private val _eventChannel = Channel<QrScanEvent>()
     val event = _eventChannel.receiveAsFlow()

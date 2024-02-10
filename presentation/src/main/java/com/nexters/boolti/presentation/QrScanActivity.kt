@@ -91,7 +91,7 @@ class QrScanActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        QrScanToolbar(showName = "asdfasdf", onClickClose = { finish() }) // TODO 번들로 전달받기
+                        QrScanToolbar(showName = viewModel.showName, onClickClose = { finish() }) // TODO 번들로 전달받기
                     },
                     bottomBar = {
                         QrScanBottombar { showEntryCodeDialog = true }

@@ -44,7 +44,7 @@ import java.time.LocalDateTime
 fun HostedShowScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
-    onClickShow: (showId: String) -> Unit,
+    onClickShow: (showId: String, showName: String) -> Unit,
     viewModel: HostedShowViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -94,7 +94,7 @@ private fun HostedShowToolbar(
 fun HostedShows(
     modifier: Modifier = Modifier,
     shows: List<Show>,
-    onClick: (showId: String) -> Unit,
+    onClick: (showId: String, showName: String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -110,7 +110,7 @@ fun HostedShows(
 @Composable
 private fun HostedShowItem(
     show: Show,
-    onClick: (showId: String) -> Unit,
+    onClick: (showId: String, showName: String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -124,7 +124,7 @@ private fun HostedShowItem(
             style = MaterialTheme.typography.bodyLarge,
             fontFamily = aggroFamily,
         )
-        IconButton(onClick = { onClick(show.id) }) {
+        IconButton(onClick = { onClick(show.id, show.name) }) {
             Icon(painter = painterResource(id = R.drawable.ic_scan), contentDescription = "QR 스캔 아이콘")
         }
     }
@@ -137,7 +137,7 @@ fun HostedShowItemPreview() {
         Surface {
             HostedShowItem(
                 Show("", "hello world", LocalDateTime.now(), LocalDate.now(), LocalDate.now(), "")
-            ) {}
+            ) { _, _ -> }
         }
     }
 }

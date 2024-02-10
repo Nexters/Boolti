@@ -20,9 +20,10 @@ class MainActivity : ComponentActivity() {
             BooltiTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Main(
-                        onClickQrScan = { showId ->
+                        onClickQrScan = { showId, showName ->
                             startActivity<QrScanActivity> {
                                 putExtra("showId", showId)
+                                putExtra("showName", showName)
                             }
                         }
                     )

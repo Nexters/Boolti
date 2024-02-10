@@ -222,19 +222,23 @@ private fun PaymentInfo(
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.reservation_pament_info),
+        title = stringResource(id = R.string.reservation_payment_info),
     ) {
         Column {
-            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "결제 수단", value = "계좌 이체")
             NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = "총 결제 금액",
-                value = "5,000원"
+                modifier = Modifier.padding(bottom = 8.dp),
+                key = stringResource(id = R.string.ticketing_payment_label),
+                value = stringResource(id = R.string.ticketing_payment_account_transfer)
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = "결제 상태",
-                value = "입금 확인 중"
+                key = stringResource(id = R.string.ticketing_total_payment_amount),
+                value = stringResource(id = R.string.unit_won, 5000)
+            )
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = stringResource(id = R.string.reservation_payment_state),
+                value = stringResource(id = R.string.reservations_depositing)
             )
         }
     }
@@ -249,16 +253,20 @@ private fun TicketInfo(
         title = stringResource(id = R.string.reservation_ticket_info),
     ) {
         Column {
-            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "티켓 종류", value = "일반 티켓 B")
             NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = "티켓 개수",
-                value = "1매"
+                modifier = Modifier.padding(bottom = 8.dp),
+                key = stringResource(id = R.string.reservation_ticket_type),
+                value = "일반 티켓 B",
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = "발권 일시",
-                value = "발권 전"
+                key = stringResource(id = R.string.reservation_ticket_count),
+                value = stringResource(id = R.string.reservation_ticket_count_format, 1),
+            )
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = stringResource(id = R.string.reservation_datetime),
+                value = stringResource(id = R.string.reservation_before_completion), // fixme : 발권 전 | 발권 일시
             )
         }
     }
@@ -274,10 +282,14 @@ private fun TicketHolderInfo(
         defaultExpanded = false,
     ) {
         Column {
-            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "이름", value = "김불티")
+            NormalRow(
+                modifier = Modifier.padding(bottom = 8.dp),
+                key = stringResource(id = R.string.ticketing_name_label),
+                value = "김불티"
+            )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = "연락처",
+                key = stringResource(id = R.string.ticketing_contact_label),
                 value = "010-1234-5678"
             )
         }
@@ -294,10 +306,14 @@ private fun DepositorInfo(
         defaultExpanded = false,
     ) {
         Column {
-            NormalRow(modifier = Modifier.padding(bottom = 8.dp), key = "이름", value = "김불티")
+            NormalRow(
+                modifier = Modifier.padding(bottom = 8.dp),
+                key = stringResource(id = R.string.ticketing_name_label),
+                value = "김불티"
+            )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = "연락처",
+                key = stringResource(id = R.string.ticketing_contact_label),
                 value = "010-1234-5678"
             )
         }

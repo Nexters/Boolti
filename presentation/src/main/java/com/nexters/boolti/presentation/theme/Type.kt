@@ -92,6 +92,13 @@ val point1 = TextStyle(
     lineHeight = 26.sp,
 )
 
+val point2 = TextStyle(
+    fontFamily = aggroFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 20.sp,
+    lineHeight = 30.sp,
+)
+
 val Typography = Typography(
     headlineLarge = headline3,
     headlineMedium = headline2,

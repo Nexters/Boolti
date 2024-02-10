@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
@@ -279,34 +280,17 @@ private fun ContentScaffold(
                     val clipboardManager = LocalClipboardManager.current
                     val copiedMessage =
                         stringResource(id = R.string.ticketing_account_copied_message)
-                    Row(
-                        modifier = Modifier
-                            .clip(shape = RoundedCornerShape(4.dp))
-                            .background(color = Grey85)
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                            .clickable {
-                                clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
-                                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                    scope.launch {
-                                        snackbarHost.showSnackbar(copiedMessage)
-                                    }
+                    CopyButton(
+                        label = stringResource(id = R.string.ticketing_copy_address),
+                        onClick = {
+                            clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                scope.launch {
+                                    snackbarHost.showSnackbar(copiedMessage)
                                 }
                             }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_copy),
-                            contentDescription = stringResource(
-                                id = R.string.ticketing_copy_address
-                            )
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 6.dp),
-                            text = stringResource(
-                                id = R.string.ticketing_copy_address
-                            ),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
+                        }
+                    )
                 }
             },
             content = {

@@ -20,6 +20,7 @@ import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
+import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
@@ -84,6 +85,17 @@ fun MainNavigation(modifier: Modifier) {
         ) {
             ReservationsScreen(onBackPressed = {
                 navController.popBackStack()
+            }, navigateToDetail = { reservationId ->
+                navController.navigate("reservations/$reservationId")
+            })
+        }
+
+        composable(
+            route = "reservations/{reservationId}",
+            arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
+        ) {
+            ReservationDetailScreen(onBackPressed = {
+                navController.popBackStack()
             })
         }
 
@@ -95,7 +107,8 @@ fun MainNavigation(modifier: Modifier) {
             composable(
                 route = "detail",
             ) { entry ->
-                val showViewModel: ShowDetailViewModel = entry.sharedViewModel(navController = navController)
+                val showViewModel: ShowDetailViewModel =
+                    entry.sharedViewModel(navController = navController)
 
                 ShowDetailScreen(
                     onBack = { navController.popBackStack() },
@@ -114,7 +127,8 @@ fun MainNavigation(modifier: Modifier) {
             composable(
                 route = "content",
             ) { entry ->
-                val showViewModel: ShowDetailViewModel = entry.sharedViewModel(navController = navController)
+                val showViewModel: ShowDetailViewModel =
+                    entry.sharedViewModel(navController = navController)
 
                 ShowDetailContentScreen(
                     modifier = modifier,

@@ -97,6 +97,7 @@
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
     <string name="ticketing_account_copied_message">주소가 복사되었어요</string>
+    <string name="ticketing_host_format">%s (%s)</string>
 
     <string-array name="refund_policy">
         <item>하단에 나열된 내용은 전부 임시 텍스트입니다.</item>

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,29 +30,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.aggroFamily
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Composable
 fun HostedShowScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
     onClickShow: (showId: String) -> Unit,
+    viewModel: HostedShowViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = { HostedShowToolbar(onClickBack) }
     ) { innerPadding ->
-        HostedShows(
-            modifier = modifier
-                .padding(innerPadding)
-                .fillMaxWidth(),
-            onClick = {
-                onClickShow("3") // TODO ViewModel 생성 후 showId 는 ViewModel 에서 관리
-            }
-        )
-//        EmptyHostedShow(modifier = modifier.padding(innerPadding))
+        if (uiState.shows.isEmpty()) {
+            EmptyHostedShow(modifier = modifier.padding(innerPadding))
+        } else {
+            HostedShows(
+                modifier = modifier
+                    .padding(innerPadding)
+                    .fillMaxWidth(),
+                shows = uiState.shows,
+                onClick = onClickShow,
+            )
+        }
     }
 }
 
@@ -81,21 +93,25 @@ private fun HostedShowToolbar(
 @Composable
 fun HostedShows(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    shows: List<Show>,
+    onClick: (showId: String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(3) {
-            HostedShowItem(onClick = onClick)
+        items(shows, key = { show -> show.id }) { show ->
+            HostedShowItem(show, onClick = onClick)
         }
     }
 }
 
 @Composable
-private fun HostedShowItem(onClick: () -> Unit) {
+private fun HostedShowItem(
+    show: Show,
+    onClick: (showId: String) -> Unit,
+) {
     Row(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surface)
@@ -104,11 +120,11 @@ private fun HostedShowItem(onClick: () -> Unit) {
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = "일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+            text = show.name,
             style = MaterialTheme.typography.bodyLarge,
             fontFamily = aggroFamily,
         )
-        IconButton(onClick = onClick) {
+        IconButton(onClick = { onClick(show.id) }) {
             Icon(painter = painterResource(id = R.drawable.ic_scan), contentDescription = "QR 스캔 아이콘")
         }
     }
@@ -119,7 +135,9 @@ private fun HostedShowItem(onClick: () -> Unit) {
 fun HostedShowItemPreview() {
     BooltiTheme {
         Surface {
-            HostedShowItem {}
+            HostedShowItem(
+                Show("", "hello world", LocalDateTime.now(), LocalDate.now(), LocalDate.now(), "")
+            ) {}
         }
     }
 }

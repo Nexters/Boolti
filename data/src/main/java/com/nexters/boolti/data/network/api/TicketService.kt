@@ -17,9 +17,4 @@ interface TicketService {
     suspend fun getTicket(
         @Path("ticketId") ticketId: String,
     ): TicketDetailDto
-
-    @POST("/app/api/v1/ticket/entrance")
-    suspend fun requestEntrance(
-        @Body qrScanRequest: QrScanRequest,
-    ): Response<Boolean>
 }

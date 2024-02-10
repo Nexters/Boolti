@@ -11,5 +11,4 @@ class TicketDataSource @Inject constructor(
 ) {
     suspend fun getTickets(): List<Ticket> = apiService.getTickets().map { it.toDomain() }
     suspend fun getTicket(ticketId: String): Ticket = apiService.getTicket(ticketId).toDomain()
-    suspend fun requestEntrance(request: QrScanRequest): Response<Boolean> = apiService.requestEntrance(request)
 }

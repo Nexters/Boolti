@@ -42,6 +42,22 @@ class QrScanViewModel @Inject constructor(
         getManagerCode()
     }
 
+    /**
+     * 스캐너가 QR코드를 스캔하면 호출하는 함수
+     *
+     * @param entryCode 스캔한 QR 의 데이터
+     */
+    fun scan(entryCode: String) {
+        if (entryCode != lastCode) {
+            lastCode = entryCode
+            Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
+            requestEntrance(entryCode)
+        }
+    }
+
+    /**
+     * 입장 확인
+     */
     private fun requestEntrance(entryCode: String) {
         viewModelScope.launch {
             hostRepository.requestEntrance(
@@ -57,14 +73,6 @@ class QrScanViewModel @Inject constructor(
             }.singleOrNull()?.let {
                 event(QrScanEvent.ScanSuccess)
             }
-        }
-    }
-
-    fun scan(entryCode: String) {
-        if (entryCode != lastCode) {
-            lastCode = entryCode
-            Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
-            requestEntrance(entryCode)
         }
     }
 

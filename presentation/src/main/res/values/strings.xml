@@ -107,6 +107,7 @@
     </string-array>
 
     <!-- 입장 코드 -->
+    <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>
     <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
     <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
@@ -138,6 +139,7 @@
     <string name="hostedShowsTitle">QR 스캔</string>
     <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>
     <string name="hosted_shows_empty_desc">공연을 주최하고 QR 스캐너로\n관객 입장을 관리해 보세요</string>
+    <string name="entry_code_validated">입장을 확인했어요</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

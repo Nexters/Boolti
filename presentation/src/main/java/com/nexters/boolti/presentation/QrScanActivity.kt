@@ -42,29 +42,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
-import com.nexters.boolti.domain.exception.QrErrorType
-import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.requestPermission
+import com.nexters.boolti.presentation.screen.qr.QrScanScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
-import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class QrScanActivity : ComponentActivity() {
 
-    private var barcodeView: DecoratedBarcodeView? = null
+    private val barcodeView: DecoratedBarcodeView by lazy {
+        DecoratedBarcodeView(this).apply {
+            barcodeView.decoderFactory =
+                DefaultDecoderFactory(listOf(BarcodeFormat.QR_CODE))
+            initializeFromIntent(intent)
+            decodeContinuous(callback)
+            statusView.isVisible = false
+        }
+    }
+
     private val viewModel: QrScanViewModel by viewModels()
 
     private val callback = BarcodeCallback { result: BarcodeResult ->
@@ -79,156 +79,25 @@ class QrScanActivity : ComponentActivity() {
 
         setContent {
             BooltiTheme {
-                var showEntryCodeDialog by remember { mutableStateOf(false) }
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                LaunchedEffect(viewModel.event) {
-                    lifecycleScope.launch {
-                        repeatOnLifecycle(Lifecycle.State.STARTED) {
-                            viewModel.event.collect(::handleEvent)
-                        }
-                    }
-                }
-
-                Scaffold(
-                    topBar = {
-                        QrScanToolbar(showName = uiState.showName, onClickClose = { finish() }) // TODO 번들로 전달받기
-                    },
-                    bottomBar = {
-                        QrScanBottombar { showEntryCodeDialog = true }
-                    },
-                    snackbarHost = {
-                        ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 100.dp))
-                    },
-                ) { innerPadding ->
-                    AndroidView(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        factory = { context ->
-                            DecoratedBarcodeView(context).apply {
-                                barcodeView.decoderFactory =
-                                    DefaultDecoderFactory(listOf(BarcodeFormat.QR_CODE))
-                                initializeFromIntent(intent)
-                                decodeContinuous(callback)
-                                statusView.isVisible = false
-                            }.also {
-                                barcodeView = it
-                                barcodeView?.resume()
-                            }
-                        },
-                    )
-
-                    if (showEntryCodeDialog) {
-                        EntryCodeDialog(
-                            managerCode = uiState.managerCode,
-                            onDismiss = { showEntryCodeDialog = false },
-                        )
-                    }
-                }
+                QrScanScreen(
+                    barcodeView = barcodeView,
+                    onClickClose = { finish() }
+                )
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        barcodeView?.resume()
+        barcodeView.resume()
     }
 
     override fun onPause() {
         super.onPause()
-        barcodeView?.pause()
+        barcodeView.pause()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        return barcodeView?.onKeyDown(keyCode, event) ?: false || super.onKeyDown(keyCode, event)
-    }
-
-    private fun handleEvent(event: QrScanEvent) {
-        when (event) {
-            is QrScanEvent.ScanError -> {
-                when (event.errorType) {
-                    QrErrorType.SHOW_NOT_TODAY -> {
-                        Timber.tag("MANGBAAM-(handleEvent)").d("오늘 공연 아님")
-                        Toast.makeText(this, "오늘 공연 아님", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-
-            is QrScanEvent.ScanSuccess -> Timber.tag("MANGBAAM-(handleEvent)").d("스캔 성공")
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun QrScanToolbar(
-    showName: String,
-    onClickClose: () -> Unit,
-) {
-    TopAppBar(
-        title = {
-            Text(text = showName, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleLarge)
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-        actions = {
-            IconButton(onClick = onClickClose) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(R.string.description_close_button),
-                )
-            }
-        }
-    )
-}
-
-@Composable
-private fun QrScanBottombar(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(
-            modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Icon(
-                modifier = Modifier.padding(end = 4.dp),
-                painter = painterResource(id = R.drawable.ic_book),
-                contentDescription = stringResource(R.string.show_entry_code),
-            )
-            Text(
-                text = stringResource(id = R.string.show_entry_code),
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
-        }
-    }
-}
-
-@Composable
-private fun EntryCodeDialog(
-    managerCode: String,
-    onDismiss: () -> Unit,
-) {
-    BTDialog(showCloseButton = false, onDismiss = onDismiss, onClickPositiveButton = onDismiss) {
-        Text(text = "입장 코드", style = MaterialTheme.typography.titleLarge)
-        Text(
-            modifier = Modifier
-                .padding(top = 24.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(4.dp))
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-                .padding(vertical = 13.dp, horizontal = 12.dp),
-            text = managerCode,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        return barcodeView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
     }
 }

@@ -68,8 +68,6 @@ class QrScanActivity : ComponentActivity() {
 
     private val callback = BarcodeCallback { result: BarcodeResult ->
         result.text ?: return@BarcodeCallback
-
-        Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: ${result.text}")
         viewModel.scan(result.text)
     }
 

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.QrErrorType
@@ -12,18 +13,22 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class QrScanViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val hostRepository: HostRepository,
 ) : ViewModel() {
+    private var lastCode: String? = null // 테스트 코드: wkjai-qoxzaz
+
+    private val showId: String = requireNotNull(savedStateHandle["showId"])
+
     private val _eventChannel = Channel<QrScanEvent>()
     val event = _eventChannel.receiveAsFlow()
 
-    private var lastCode: String? = null // 테스트 코드: wkjai-qoxzaz
-
-    private fun requestEntrance(showId: String, entryCode: String) {
+    private fun requestEntrance(entryCode: String) {
         viewModelScope.launch {
             hostRepository.requestEntrance(
                 QrScanRequest(showId = showId, entryCode = entryCode)
@@ -44,7 +49,8 @@ class QrScanViewModel @Inject constructor(
     fun scan(entryCode: String) {
         if (entryCode != lastCode) {
             lastCode = entryCode
-            requestEntrance("3", entryCode)
+            Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
+            requestEntrance(entryCode)
         }
     }
 

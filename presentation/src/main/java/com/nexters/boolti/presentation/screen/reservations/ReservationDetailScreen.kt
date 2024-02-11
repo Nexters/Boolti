@@ -41,9 +41,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.PaymentType
+import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
+import com.nexters.boolti.presentation.constants.datetimeFormat
+import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -58,10 +64,17 @@ import com.nexters.boolti.presentation.theme.point2
 fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         modifier = modifier,
         topBar = { ReservationDetailAppBar(onBackPressed = onBackPressed) }) { innerPadding ->
+
+        val state = uiState
+        if (state !is ReservationDetailUiState.Success) return@Scaffold
+
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
@@ -72,15 +85,15 @@ fun ReservationDetailScreen(
                 modifier = Modifier
                     .padding(horizontal = marginHorizontal)
                     .padding(top = 12.dp),
-                text = "No. 1234567890",
+                text = "No. ${state.reservation.id}",
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
             )
-            Header()
-            DepositInfo()
-            PaymentInfo()
-            TicketInfo()
-            TicketHolderInfo()
-            DepositorInfo()
+            Header(reservation = state.reservation)
+            DepositInfo(reservation = state.reservation)
+            PaymentInfo(reservation = state.reservation)
+            TicketInfo(reservation = state.reservation)
+            TicketHolderInfo(reservation = state.reservation)
+            DepositorInfo(reservation = state.reservation)
             RefundPolicy()
             RefundButton(
                 modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
@@ -121,6 +134,7 @@ private fun ReservationDetailAppBar(
 
 @Composable
 private fun Header(
+    reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -132,7 +146,7 @@ private fun Header(
                 .height(98.dp)
                 .border(color = Grey80, width = 1.dp, shape = RoundedCornerShape(4.dp))
                 .clip(shape = RoundedCornerShape(4.dp)),
-            model = "https://picsum.photos/200",
+            model = reservation.showImage,
             contentDescription = stringResource(id = R.string.description_poster),
             contentScale = ContentScale.Crop,
         )
@@ -141,14 +155,14 @@ private fun Header(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "2024 TOGETHER LUCKY CLUB",
+                text = reservation.showName,
                 style = point2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = "일반 티켓 B / 1매",
+                text = "${reservation.ticketName} / ${reservation.ticketCount}매",
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
             )
         }
@@ -157,6 +171,7 @@ private fun Header(
 
 @Composable
 private fun DepositInfo(
+    reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Section(
@@ -169,14 +184,14 @@ private fun DepositInfo(
                     .height(32.dp)
                     .padding(bottom = 8.dp),
                 key = stringResource(id = R.string.bank_name),
-                value = "신한은행",
+                value = reservation.bankName,
             )
             DepositInfoRow(
                 modifier = Modifier
                     .height(40.dp)
                     .padding(bottom = 2.dp),
                 key = stringResource(id = R.string.account_number),
-                value = "1234-56-7890123",
+                value = reservation.accountNumber,
             ) {
                 CopyButton(label = "복사", onClick = { /*TODO*/ })
             }
@@ -185,14 +200,14 @@ private fun DepositInfo(
                     .height(40.dp)
                     .padding(bottom = 2.dp),
                 key = stringResource(id = R.string.account_holder),
-                value = "박불티",
+                value = reservation.accountHolder,
             )
             DepositInfoRow(
                 modifier = Modifier
                     .height(40.dp)
                     .padding(bottom = 2.dp),
                 key = stringResource(id = R.string.account_transfer_due_date),
-                value = "2024.01.19 23:59",
+                value = reservation.salesEndDateTime.format(datetimeFormat),
             )
         }
     }
@@ -227,27 +242,36 @@ private fun DepositInfoRow(
 
 @Composable
 private fun PaymentInfo(
+    reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.reservation_payment_info),
     ) {
+        val paymentType = when (reservation.paymentType) {
+            PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.ticketing_payment_account_transfer)
+            PaymentType.CARD -> stringResource(id = R.string.ticketing_payment_card)
+            else -> stringResource(id = R.string.reservations_unknown)
+        }
+
+        val (stateStringId, _) = reservation.reservationState.toDescriptionAndColorPair()
+
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.ticketing_payment_label),
-                value = stringResource(id = R.string.ticketing_payment_account_transfer)
+                value = paymentType
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.ticketing_total_payment_amount),
-                value = stringResource(id = R.string.unit_won, 5000)
+                value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.reservation_payment_state),
-                value = stringResource(id = R.string.reservations_depositing)
+                value = stringResource(id = stateStringId)
             )
         }
     }
@@ -255,6 +279,7 @@ private fun PaymentInfo(
 
 @Composable
 private fun TicketInfo(
+    reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Section(
@@ -265,17 +290,21 @@ private fun TicketInfo(
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.reservation_ticket_type),
-                value = "일반 티켓 B",
+                value = reservation.ticketName,
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.reservation_ticket_count),
-                value = stringResource(id = R.string.reservation_ticket_count_format, 1),
+                value = stringResource(
+                    id = R.string.reservation_ticket_count_format,
+                    reservation.ticketCount
+                ),
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.reservation_datetime),
-                value = stringResource(id = R.string.reservation_before_completion), // fixme : 발권 전 | 발권 일시
+                value = reservation.completedDateTime?.format(datetimeFormat)
+                    ?: stringResource(id = R.string.reservation_before_completion),
             )
         }
     }
@@ -283,6 +312,7 @@ private fun TicketInfo(
 
 @Composable
 private fun TicketHolderInfo(
+    reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Section(
@@ -294,12 +324,12 @@ private fun TicketHolderInfo(
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.ticketing_name_label),
-                value = "김불티"
+                value = reservation.ticketHolderName
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.ticketing_contact_label),
-                value = "010-1234-5678"
+                value = reservation.ticketHolderPhoneNumber
             )
         }
     }
@@ -307,6 +337,7 @@ private fun TicketHolderInfo(
 
 @Composable
 private fun DepositorInfo(
+    reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Section(
@@ -318,12 +349,12 @@ private fun DepositorInfo(
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.ticketing_name_label),
-                value = "김불티"
+                value = reservation.depositorName
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.ticketing_contact_label),
-                value = "010-1234-5678"
+                value = reservation.depositorPhoneNumber
             )
         }
     }

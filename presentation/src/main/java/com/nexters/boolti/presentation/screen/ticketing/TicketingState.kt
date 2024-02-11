@@ -1,14 +1,18 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
-import com.nexters.boolti.domain.model.TicketingTicket
+import java.time.LocalDateTime
 
 data class TicketingState(
     val loading: Boolean = false,
     val poster: String = "",
+    val showDate: LocalDateTime = LocalDateTime.now(),
+    val showName: String = "",
+    val ticketName: String = "",
+    val ticketCount: Int = 1,
+    val totalPrice: Int = 0,
     val isSameContactInfo: Boolean = false,
+    val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val ticket: TicketingTicket? = null,
-    private val leftAmount: Map<String, Int> = emptyMap(),
 )
 
 sealed interface InviteCodeStatus {

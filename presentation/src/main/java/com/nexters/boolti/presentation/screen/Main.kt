@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
@@ -120,7 +121,9 @@ fun MainNavigation(modifier: Modifier) {
                         navController.navigate("content")
                     },
                     modifier = modifier,
-                    onTicketSelected = { navController.navigate("ticketing/$it") },
+                    onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
+                        navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
+                    },
                     viewModel = showViewModel,
                 )
             }
@@ -145,19 +148,24 @@ fun MainNavigation(modifier: Modifier) {
             TicketDetailScreen(modifier = modifier)
         }
         composable(
-            route = "ticketing/{showId}",
-            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
+            route = "ticketing/{showId}?salesTicketId={salesTicketId}&ticketCount={ticketCount}&inviteTicket={isInviteTicket}",
+            arguments = listOf(
+                navArgument("showId") { type = NavType.StringType },
+                navArgument("salesTicketId") { type = NavType.StringType },
+                navArgument("ticketCount") { type = NavType.IntType },
+                navArgument("isInviteTicket") { type = NavType.BoolType },
+            ),
         ) {
             TicketingScreen(
                 modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onPayClicked = { isInviteTicket, ticketId ->
-                    if (isInviteTicket) {
-                        navController.navigate("payment/inviteTicket?ticketId=$ticketId") {
+                onPayClicked = { ticketingRequest ->
+                    when (ticketingRequest) {
+                        is TicketingRequest.Normal -> navController.navigate("payment/accountTransfer?ticketId=${ticketingRequest.salesTicketTypeId}") {
                             popUpTo("ticketing/{showId}") { inclusive = true }
                         }
-                    } else {
-                        navController.navigate("payment/accountTransfer?ticketId=$ticketId") {
+
+                        is TicketingRequest.Invite -> navController.navigate("payment/inviteTicket?ticketId=${ticketingRequest.salesTicketTypeId}") {
                             popUpTo("ticketing/{showId}") { inclusive = true }
                         }
                     }

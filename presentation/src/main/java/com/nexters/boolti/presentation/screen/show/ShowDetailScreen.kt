@@ -73,7 +73,12 @@ fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onClickContent: () -> Unit,
-    onTicketSelected: (ticketId: String) -> Unit,
+    onTicketSelected: (
+        showId: String,
+        ticketId: String,
+        ticketCount: Int,
+        isInviteTicket: Boolean,
+    ) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
@@ -161,9 +166,14 @@ fun ShowDetailScreen(
         }
         if (showBottomSheet) {
             ChooseTicketBottomSheet(
-                onTicketingClicked = { ticket ->
+                onTicketingClicked = { ticket, count ->
                     Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
-                    onTicketSelected(ticket.id)
+                    onTicketSelected(
+                        uiState.showDetail.id,
+                        ticket.id,
+                        count,
+                        ticket.isInviteTicket,
+                    )
                     showBottomSheet = false
                 },
                 onDismissRequest = {

@@ -45,8 +45,8 @@ fun TicketReservationPeriod(
 ) {
     val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
     val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-    val startDayIndex = startDate.dayOfWeek.value
-    val endDayIndex = endDate.dayOfWeek.value
+    val startDayIndex = startDate.dayOfWeek.value - 1
+    val endDayIndex = endDate.dayOfWeek.value - 1
 
     var size by remember {
         mutableStateOf(IntSize.Zero)

@@ -57,7 +57,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 fun ChooseTicketBottomSheet(
     modifier: Modifier = Modifier,
     viewModel: SalesTicketViewModel = hiltViewModel(),
-    onTicketingClicked: (SalesTicket) -> Unit,
+    onTicketingClicked: (ticket: SalesTicket, count: Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -99,7 +99,7 @@ fun ChooseTicketBottomSheet(
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
                     onTicketingClicked = {
-                        onTicketingClicked(it.ticket)
+                        onTicketingClicked(it.ticket, 1) // TODO 추후 개수 선택 기획 들어오면 변경
                         viewModel.unSelectTicket()
                     },
                 )

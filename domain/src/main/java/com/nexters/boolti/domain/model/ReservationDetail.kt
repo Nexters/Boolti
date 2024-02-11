@@ -1,6 +1,5 @@
 package com.nexters.boolti.domain.model
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReservationDetail(
@@ -8,11 +7,11 @@ data class ReservationDetail(
     val showImage: String,
     val showName: String,
     val salesTicketName: String,
-    val ticketCount: String,
+    val ticketCount: Int,
     val bankName: String,
     val accountNumber: String,
     val accountHolder: String,
-    val salesEndDateTime: LocalDate,
+    val salesEndDateTime: LocalDateTime,
     val paymentType: PaymentType,
     val totalAmountPrice: Int,
     val reservationState: ReservationState,
@@ -26,4 +25,5 @@ data class ReservationDetail(
 enum class PaymentType {
     ACCOUNT_TRANSFER,
     CARD,
+    UNDEFINED,
 }

@@ -16,7 +16,7 @@ class ReservationRepositoryImpl @Inject constructor(
         emit(reservationDataSource.getReservations().toDomains())
     }
 
-    override fun findReservationById(reservationId: String): Flow<ReservationDetail> {
-        TODO("Not yet implemented")
+    override fun findReservationById(id: String): Flow<ReservationDetail> = flow {
+        emit(reservationDataSource.findReservationById(id).toDomain())
     }
 }

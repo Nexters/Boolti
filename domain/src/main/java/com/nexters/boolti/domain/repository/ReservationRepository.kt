@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReservationRepository {
     fun getReservations(): Flow<List<Reservation>>
-    fun findReservationById(reservationId: String): Flow<ReservationDetail>
+    fun findReservationById(id: String): Flow<ReservationDetail>
 }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -15,10 +16,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.nexters.boolti.presentation.QrScanActivity
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
+import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
@@ -30,17 +33,17 @@ import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
 @Composable
-fun Main() {
+fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
     BooltiTheme {
         Surface(modifier) {
-            MainNavigation(modifier)
+            MainNavigation(modifier, onClickQrScan)
         }
     }
 }
 
 @Composable
-fun MainNavigation(modifier: Modifier) {
+fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
     val navController = rememberNavController()
 
     // TODO: 하드코딩 된 route 를 각 화면에 정의
@@ -61,6 +64,9 @@ fun MainNavigation(modifier: Modifier) {
                 },
                 onClickQr = {
                     navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                },
+                onClickQrScan = {
+                    navController.navigate("hostedShows")
                 },
                 navigateToReservations = {
                     navController.navigate("reservations")
@@ -172,6 +178,17 @@ fun MainNavigation(modifier: Modifier) {
             QrFullScreen(modifier = modifier) {
                 navController.popBackStack()
             }
+        }
+        composable(
+            route = "hostedShows"
+        ) {
+            HostedShowScreen(
+                modifier = modifier,
+                onClickShow = onClickQrScan,
+                onClickBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(

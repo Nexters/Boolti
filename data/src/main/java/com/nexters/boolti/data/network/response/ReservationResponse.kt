@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReservationResponse(
-    val reservationsId: String,
+    val reservationId: String,
     val reservationStatus: String,
     val reservationDate: String,
     val showName: String,
@@ -27,7 +27,7 @@ data class ReservationResponse(
         }
 
         return Reservation(
-            id = reservationsId,
+            id = reservationId,
             reservationState = reservationState,
             reservationDateTime = reservationDate.toLocalDateTime(),
             showName = showName,

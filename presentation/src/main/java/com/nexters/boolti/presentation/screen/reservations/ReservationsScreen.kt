@@ -198,6 +198,7 @@ fun ReservationStateLabel(
         ReservationState.CANCELED -> Pair(R.string.reservations_canceled, Error)
         ReservationState.RESERVED -> Pair(R.string.reservations_reserved, Grey30)
         ReservationState.REFUNDED -> Pair(R.string.reservations_refunded, Error)
+        ReservationState.UNDEFINED -> Pair(R.string.reservations_unknown, Error)
     }
 
     Text(

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.nexters.boolti.presentation.QrScanActivity
+import com.nexters.boolti.presentation.extension.startActivity
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,7 +19,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             BooltiTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Main()
+                    Main(
+                        onClickQrScan = { showId, showName ->
+                            startActivity<QrScanActivity> {
+                                putExtra("showId", showId)
+                                putExtra("showName", showName)
+                            }
+                        }
+                    )
                 }
             }
         }

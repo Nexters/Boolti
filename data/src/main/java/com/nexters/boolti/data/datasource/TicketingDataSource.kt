@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.TicketingService
+import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.request.SalesTicketRequest
@@ -22,5 +23,9 @@ class TicketingDataSource @Inject constructor(
             request.salesTicketId,
             request.ticketCount,
         ).toDomain()
+    }
+
+    suspend fun requestReservationSalesTicket(request: ReservationSalesTicketRequest): String {
+        return ticketingService.requestReservationSalesTicket(request).reservationId
     }
 }

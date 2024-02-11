@@ -92,7 +92,7 @@ fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
-    onPayClicked: (ticketingRequest: TicketingRequest) -> Unit,
+    onReservationClicked: (ticketingRequest: TicketingRequest) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -189,7 +189,7 @@ fun TicketingScreen(
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
                     label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
-                    onClick = { onPayClicked(viewModel.paymentRequest) },
+                    onClick = viewModel::reservation,
                 )
             }
         }

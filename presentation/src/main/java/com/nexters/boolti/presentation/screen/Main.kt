@@ -159,7 +159,7 @@ fun MainNavigation(modifier: Modifier) {
             TicketingScreen(
                 modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onPayClicked = { ticketingRequest ->
+                onReservationClicked = { ticketingRequest ->
                     when (ticketingRequest) {
                         is TicketingRequest.Normal -> navController.navigate("payment/accountTransfer?ticketId=${ticketingRequest.salesTicketTypeId}") {
                             popUpTo("ticketing/{showId}") { inclusive = true }

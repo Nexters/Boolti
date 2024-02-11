@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,7 +36,7 @@ class TicketingViewModel @Inject constructor(
     val userInput
         get() = userInputState.value
 
-    val paymentRequest: TicketingRequest
+    private val reservationRequest: TicketingRequest
         get() = when (state.value.isInviteTicket) {
             true -> TicketingRequest.Invite(
                 inviteCode = userInput.inviteCode,
@@ -48,8 +49,8 @@ class TicketingViewModel @Inject constructor(
 
             false -> TicketingRequest.Normal(
                 ticketCount = state.value.ticketCount,
-                depositorName = userInput.depositorName,
-                depositorPhoneNumber = userInput.depositorPhoneNumber,
+                depositorName = if (state.value.isSameContactInfo) userInput.reservationName else userInput.depositorName,
+                depositorPhoneNumber = if (state.value.isSameContactInfo) userInput.reservationPhoneNumber else userInput.depositorPhoneNumber,
                 paymentAmount = state.value.totalPrice,
                 paymentType = state.value.paymentType,
                 userId = userId,
@@ -62,6 +63,21 @@ class TicketingViewModel @Inject constructor(
 
     init {
         load()
+    }
+
+    fun reservation() {
+        viewModelScope.launch {
+            repository.requestReservation(reservationRequest)
+                .onStart { _state.update { it.copy(loading = true) } }
+                .catch { e ->
+                    e.printStackTrace()
+                    _state.update { it.copy(loading = false) }
+                }
+                .singleOrNull()?.let {
+                    Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $it")
+                    _state.update { it.copy(loading = false) }
+                }
+        }
     }
 
     private fun load() {

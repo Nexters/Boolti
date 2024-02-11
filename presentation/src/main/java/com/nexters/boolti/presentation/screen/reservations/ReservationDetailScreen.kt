@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
+import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
@@ -70,6 +71,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
+    navigateToRefund: (id: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
@@ -112,9 +114,12 @@ fun ReservationDetailScreen(
             TicketHolderInfo(reservation = state.reservation)
             DepositorInfo(reservation = state.reservation)
             RefundPolicy()
-            RefundButton(
-                modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
-                onClick = {})
+            if (state.reservation.reservationState == ReservationState.RESERVED) {
+                RefundButton(
+                    modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
+                    onClick = { navigateToRefund(state.reservation.id) }
+                )
+            }
         }
     }
 }

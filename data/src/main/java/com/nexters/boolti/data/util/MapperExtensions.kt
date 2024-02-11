@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.util
 
+import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationState
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -19,5 +20,13 @@ internal fun String.toReservationState(): ReservationState {
         "WAITING_FOR_REFUND" -> ReservationState.REFUNDING
         "REFUND_COMPLETED" -> ReservationState.REFUNDED
         else -> ReservationState.UNDEFINED
+    }
+}
+
+internal fun String.toPaymentType(): PaymentType {
+    return when (this) {
+        "BANK_TRANSFER" -> PaymentType.ACCOUNT_TRANSFER
+        "CARD" -> PaymentType.CARD
+        else -> PaymentType.UNDEFINED
     }
 }

@@ -38,14 +38,12 @@ import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
-import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import java.time.format.DateTimeFormatter
@@ -88,7 +86,9 @@ fun ReservationsScreen(
             modifier = Modifier.padding(innerPadding),
             contentPadding = PaddingValues(top = 20.dp)
         ) {
-            items(count = uiState.reservations.size, key = { uiState.reservations[it].id }) { index ->
+            items(
+                count = uiState.reservations.size,
+                key = { uiState.reservations[it].id }) { index ->
                 ReservationItem(
                     reservation = uiState.reservations[index],
                     navigateToDetail = { navigateToDetail(uiState.reservations[index].id) },
@@ -192,7 +192,12 @@ fun ReservationItem(
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
-                    text = "${reservation.salesTicketName} / ${reservation.ticketCount}매 / ${reservation.ticketPrice}원",
+                    text = stringResource(
+                        id = R.string.reservations_ticket_count_price_format,
+                        reservation.salesTicketName,
+                        reservation.ticketCount,
+                        reservation.ticketPrice,
+                    ),
                 )
             }
         }

@@ -1,8 +1,8 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.data.util.toLocalDateTime
+import com.nexters.boolti.data.util.toPaymentType
 import com.nexters.boolti.data.util.toReservationState
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import kotlinx.serialization.Serializable
 
@@ -27,12 +27,6 @@ data class ReservationDetailResponse(
     val depositorPhoneNumber: String,
 ) {
     fun toDomain(): ReservationDetail {
-        val paymentType = when (meansType) {
-            "BANK_TRANSFER" -> PaymentType.ACCOUNT_TRANSFER
-            "CARD" -> PaymentType.CARD
-            else -> PaymentType.UNDEFINED
-        }
-
         return ReservationDetail(
             id = reservationId,
             showImage = showImg,
@@ -43,7 +37,7 @@ data class ReservationDetailResponse(
             accountNumber = accountNumber,
             accountHolder = accountHolder,
             salesEndDateTime = salesEndTime.toLocalDateTime(),
-            paymentType = paymentType,
+            paymentType = meansType.toPaymentType(),
             totalAmountPrice = totalAmountPrice,
             reservationState = reservationStatus.toReservationState(),
             completedDateTime = completedTimeStamp?.toLocalDateTime(),

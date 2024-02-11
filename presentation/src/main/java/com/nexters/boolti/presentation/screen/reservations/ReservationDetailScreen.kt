@@ -162,7 +162,11 @@ private fun Header(
             )
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = "${reservation.ticketName} / ${reservation.ticketCount}매",
+                text = stringResource(
+                    id = R.string.reservation_ticket_info_format,
+                    reservation.ticketName,
+                    reservation.ticketCount
+                ),
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
             )
         }
@@ -193,7 +197,7 @@ private fun DepositInfo(
                 key = stringResource(id = R.string.account_number),
                 value = reservation.accountNumber,
             ) {
-                CopyButton(label = "복사", onClick = { /*TODO*/ })
+                CopyButton(label = stringResource(id = R.string.copy), onClick = { /*TODO*/ })
             }
             DepositInfoRow(
                 modifier = Modifier

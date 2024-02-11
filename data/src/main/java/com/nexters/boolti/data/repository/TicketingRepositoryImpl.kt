@@ -1,5 +1,6 @@
-package com.nexters.boolti.data.datasource
+package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.repository.TicketingRepository

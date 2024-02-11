@@ -1,6 +1,6 @@
 package com.nexters.boolti.data.di
 
-import com.nexters.boolti.data.datasource.TicketingRepositoryImpl
+import com.nexters.boolti.data.repository.TicketingRepositoryImpl
 import com.nexters.boolti.data.repository.AuthRepositoryImpl
 import com.nexters.boolti.data.repository.ConfigRepositoryImpl
 import com.nexters.boolti.data.repository.ShowRepositoryImpl

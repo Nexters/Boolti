@@ -106,7 +106,7 @@ fun ShowFeed(
         }
 
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
-        val indexOfDay = show.date.dayOfWeek.value
+        val indexOfDay = show.date.dayOfWeek.value - 1
         val formatter =
             DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm")
         Text(

@@ -6,15 +6,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun DottedDivider(
     modifier: Modifier = Modifier,
     color: Color,
     thickness: Dp,
+    dash: Dp = 4.dp,
+    spacedBy: Dp = 4.dp,
 ) {
-    val pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f), 10f)
+    val length = dash.value * LocalDensity.current.density
+    val space = spacedBy.value * LocalDensity.current.density
+    val pathEffect = PathEffect.dashPathEffect(floatArrayOf(length, space), 10f)
     Canvas(
         modifier = modifier,
         onDraw = {

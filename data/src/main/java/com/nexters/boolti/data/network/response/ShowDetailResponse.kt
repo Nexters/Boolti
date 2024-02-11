@@ -18,6 +18,8 @@ data class ShowDetailResponse(
     val salesStartTime: String,
     val salesEndTime: String,
     val showImg: List<ImageResponse>,
+    val hostName: String,
+    val hostPhoneNumber: String,
 ) {
     fun toDomain(): ShowDetail {
         return ShowDetail(
@@ -32,6 +34,8 @@ data class ShowDetailResponse(
             salesStartDate = salesStartTime.toLocalDate(),
             salesEndDate = salesEndTime.toLocalDate(),
             images = showImg.toDomains(),
+            hostName = hostName,
+            hostPhoneNumber = hostPhoneNumber,
         )
     }
 }

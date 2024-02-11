@@ -10,6 +10,7 @@
     <string name="description_more_menu">더보기 메뉴</string>
     <string name="description_qr">입장 QR 코드</string>
     <string name="description_app_logo">앱 로고</string>
+    <string name="description_expand">확장하기</string>
 
     <!-- 홈(Show) -->
     <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
@@ -97,6 +98,7 @@
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
     <string name="ticketing_account_copied_message">주소가 복사되었어요</string>
+    <string name="ticketing_host_format">%s (%s)</string>
 
     <string-array name="refund_policy">
         <item>하단에 나열된 내용은 전부 임시 텍스트입니다.</item>
@@ -140,6 +142,31 @@
     <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>
     <string name="hosted_shows_empty_desc">공연을 주최하고 QR 스캐너로\n관객 입장을 관리해 보세요</string>
     <string name="entry_code_validated">입장을 확인했어요</string>
+
+    <!-- 예매 내역 -->
+    <string name="reservations_empty">예매 내역이 없어요</string>
+    <string name="reservations_empty_sub">티켓을 예매하고 공연을 즐겨보세요!</string>
+    <string name="reservations_depositing">입금 확인 중</string>
+    <string name="reservations_refunding">환불 진행 중</string>
+    <string name="reservations_canceled">예매 취소</string>
+    <string name="reservations_reserved">티켓 발권 완료</string>
+    <string name="reservations_refunded">환불 완료</string>
+    <string name="reservations_detail_view">상세 보기</string>
+
+    <!-- 예매 내역 상세 -->
+    <string name="reservation_detail">예매 내역 상세</string>
+    <string name="reservation_account_info">입금 계좌 정보</string>
+    <string name="reservation_payment_info">결제 정보</string>
+    <string name="reservation_payment_state">결제 상태</string>
+    <string name="reservation_ticket_info">티켓 정보</string>
+    <string name="reservation_ticket_type">티켓 종류</string>
+    <string name="reservation_ticket_count">티켓 개수</string>
+    <string name="reservation_datetime">발권 일시</string>
+    <string name="reservation_before_completion">발권 전</string>
+    <string name="reservation_ticket_count_format">%d매</string>
+
+    <!-- 환불 -->
+    <string name="refund_button">환불 요청하기</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

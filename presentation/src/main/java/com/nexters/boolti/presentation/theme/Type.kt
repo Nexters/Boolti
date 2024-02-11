@@ -85,6 +85,20 @@ private val caption = TextStyle(
     lineHeight = 18.sp,
 )
 
+val point1 = TextStyle(
+    fontFamily = aggroFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 16.sp,
+    lineHeight = 26.sp,
+)
+
+val point2 = TextStyle(
+    fontFamily = aggroFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 20.sp,
+    lineHeight = 30.sp,
+)
+
 val Typography = Typography(
     headlineLarge = headline3,
     headlineMedium = headline2,

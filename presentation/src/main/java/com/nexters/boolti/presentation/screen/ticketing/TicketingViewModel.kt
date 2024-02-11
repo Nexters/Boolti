@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
@@ -32,7 +31,9 @@ class TicketingViewModel @Inject constructor(
     private val _state = MutableStateFlow(TicketingState())
     val state = _state.asStateFlow()
 
-    val userInput = TicketingUserInput()
+    private val userInputState = MutableStateFlow(TicketingUserInput())
+    val userInput
+        get() = userInputState.value
 
     val paymentRequest: TicketingRequest
         get() = when (state.value.isInviteTicket) {
@@ -50,7 +51,7 @@ class TicketingViewModel @Inject constructor(
                 depositorName = userInput.depositorName,
                 depositorPhoneNumber = userInput.depositorPhoneNumber,
                 paymentAmount = state.value.totalPrice,
-                paymentType = userInput.paymentType,
+                paymentType = state.value.paymentType,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
@@ -81,9 +82,9 @@ class TicketingViewModel @Inject constructor(
                             ticketCount = info.ticketCount,
                             totalPrice = info.totalPrice,
                             isInviteTicket = info.isInviteTicket,
+                            paymentType = info.paymentType,
                         )
                     }
-                    userInput.paymentType = info.paymentType
                 }
         }
     }
@@ -93,14 +94,32 @@ class TicketingViewModel @Inject constructor(
             it.copy(isSameContactInfo = !it.isSameContactInfo)
         }
     }
+
+    fun setReservationName(name: String) {
+        userInputState.update { it.copy(reservationName = name) }
+    }
+
+    fun setReservationPhoneNumber(number: String) {
+        userInputState.update { it.copy(reservationPhoneNumber = number) }
+    }
+
+    fun setDepositorName(name: String) {
+        userInputState.update { it.copy(depositorName = name) }
+    }
+
+    fun setDepositorPhoneNumber(number: String) {
+        userInputState.update { it.copy(depositorPhoneNumber = number) }
+    }
+
+    fun setInviteCode(code: String) {
+        userInputState.update { it.copy(inviteCode = code) }
+    }
 }
 
 data class TicketingUserInput(
     var reservationName: String = "",
     var reservationPhoneNumber: String = "",
-    var isSameContactInfo: Boolean = false,
     var depositorName: String = "",
     var depositorPhoneNumber: String = "",
-    var paymentType: PaymentType = PaymentType.AccountTransfer,
     var inviteCode: String = "",
 )

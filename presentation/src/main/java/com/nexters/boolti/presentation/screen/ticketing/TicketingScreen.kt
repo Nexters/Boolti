@@ -71,6 +71,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -135,14 +136,31 @@ fun TicketingScreen(
                     showName = uiState.showName,
                     showDate = uiState.showDate,
                 )
-                TicketHolderSection(uiState.isSameContactInfo) // 예매자 정보
-                if (!uiState.isInviteTicket) DeposorSection(viewModel, uiState) // 입금자 정보
+                TicketHolderSection(
+                    initialName = viewModel.userInput.reservationName,
+                    initialPhoneNumber = viewModel.userInput.reservationPhoneNumber,
+                    isSameContactInfo = uiState.isSameContactInfo,
+                    onNameChanged = viewModel::setReservationName,
+                    onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
+                ) // 예매자 정보
+                if (!uiState.isInviteTicket) DeposorSection(
+                    initialName = viewModel.userInput.depositorName,
+                    initialPhoneNumber = viewModel.userInput.depositorPhoneNumber,
+                    isSameContactInfo = uiState.isSameContactInfo,
+                    onClickSameContact = viewModel::toggleIsSameContactInfo,
+                    onNameChanged = viewModel::setDepositorName,
+                    onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
+                ) // 입금자 정보
                 TicketInfoSection(
                     ticketName = uiState.ticketName,
                     ticketCount = uiState.ticketCount,
                     totalPrice = uiState.totalPrice,
                 ) // 티켓 정보
-                if (uiState.isInviteTicket) InviteCodeSection() // 초청 코드
+                if (uiState.isInviteTicket) InviteCodeSection(
+                    viewModel.userInput.inviteCode,
+                    uiState.inviteCodeStatus,
+                    onInviteCodeChanged = viewModel::setInviteCode,
+                ) // 초청 코드
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection() // 취소/환불 규정
                 Spacer(modifier = Modifier.height(120.dp))
@@ -319,10 +337,13 @@ private fun PaymentSection(
 }
 
 @Composable
-private fun InviteCodeSection() {
+private fun InviteCodeSection(
+    initialInviteCode: String = "",
+    inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
+    onInviteCodeChanged: (String) -> Unit,
+) {
+    var inviteCode by remember { mutableStateOf(initialInviteCode) }
     Section(title = stringResource(R.string.ticketing_invite_code_label)) {
-        var inviteCode by remember { mutableStateOf("") }
-        var inviteCodeUsed by remember { mutableStateOf(false) }
         Row(verticalAlignment = Alignment.CenterVertically) {
             BTTextField(
                 modifier = Modifier
@@ -335,11 +356,14 @@ private fun InviteCodeSection() {
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
                 ),
-                onValueChanged = { inviteCode = it },
+                onValueChanged = {
+                    inviteCode = it
+                    onInviteCodeChanged(it)
+                },
             )
             Button(
-                onClick = { inviteCodeUsed = true },
-                enabled = !inviteCodeUsed,
+                onClick = { inviteCodeStatus is InviteCodeStatus.Valid },
+                enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -355,12 +379,20 @@ private fun InviteCodeSection() {
                 )
             }
         }
-        if (inviteCodeUsed) {
+        if (inviteCodeStatus !is InviteCodeStatus.Default) {
+            val message = when (inviteCodeStatus) {
+                InviteCodeStatus.Default -> ""
+                InviteCodeStatus.Duplicated -> stringResource(R.string.ticketing_invite_code_duplicated)
+                InviteCodeStatus.Empty -> stringResource(R.string.ticketing_invite_code_empty)
+                InviteCodeStatus.Invalid -> stringResource(R.string.ticketing_invite_code_invalid)
+                InviteCodeStatus.Valid -> stringResource(R.string.ticketing_invite_code_success)
+            }
+            val color = if (inviteCodeStatus is InviteCodeStatus.Valid) Success else Error
             Text(
                 modifier = Modifier.padding(top = 12.dp),
-                text = stringResource(R.string.ticketing_invite_code_success),
+                text = message,
                 style = MaterialTheme.typography.bodySmall,
-                color = Success,
+                color = color,
             )
         }
     }
@@ -388,18 +420,24 @@ private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: 
 
 @Composable
 private fun DeposorSection(
-    viewModel: TicketingViewModel,
-    state: TicketingState,
+    initialName: String = "",
+    initialPhoneNumber: String = "",
+    isSameContactInfo: Boolean,
+    onClickSameContact: () -> Unit,
+    onNameChanged: (name: String) -> Unit,
+    onPhoneNumberChanged: (number: String) -> Unit,
 ) {
+    var name by remember { mutableStateOf(initialName) } // TODO remove
+    var phoneNumber by remember { mutableStateOf(initialPhoneNumber) } // TODO remove
     Section(
         title = stringResource(R.string.ticketing_depositor_label),
         titleRowOption = {
             Row(
                 modifier = Modifier
                     .padding(start = 20.dp)
-                    .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
+                    .clickable(role = Role.Checkbox, onClick = onClickSameContact)
             ) {
-                if (state.isSameContactInfo) {
+                if (isSameContactInfo) {
                     Icon(
                         painter = painterResource(R.drawable.ic_checkbox_selected),
                         tint = Grey05,
@@ -429,37 +467,50 @@ private fun DeposorSection(
                 stiffness = Spring.StiffnessMedium,
             )
         ),
-        contentVisible = !state.isSameContactInfo,
+        contentVisible = !isSameContactInfo,
     ) {
-        if (!state.isSameContactInfo) {
+        if (!isSameContactInfo) {
             InputRow(
                 stringResource(R.string.ticketing_name_label),
-                "",
+                name,
                 placeholder = stringResource(R.string.ticketing_name_placeholder),
-            ) {}
+            ) {
+                name = it
+                onNameChanged(it)
+            }
             Spacer(modifier = Modifier.size(16.dp))
             InputRow(
                 stringResource(R.string.ticketing_contact_label),
-                "",
+                phoneNumber,
                 placeholder = stringResource(R.string.ticketing_contact_placeholder),
                 isPhoneNumber = true,
                 imeAction = ImeAction.Default,
-            ) {}
+            ) {
+                phoneNumber = it
+                onPhoneNumberChanged(it)
+            }
         }
     }
 }
 
 @Composable
-private fun TicketHolderSection(isSameContactInfo: Boolean) {
+private fun TicketHolderSection(
+    initialName: String = "",
+    initialPhoneNumber: String = "",
+    isSameContactInfo: Boolean,
+    onNameChanged: (name: String) -> Unit,
+    onPhoneNumberChanged: (number: String) -> Unit,
+) {
+    var name by remember { mutableStateOf(initialName) } // TODO remove
+    var phoneNumber by remember { mutableStateOf(initialPhoneNumber) } // TODO remove
     Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
-        var name by remember { mutableStateOf("") } // TODO remove
-        var phoneNumber by remember { mutableStateOf("") } // TODO remove
         InputRow(
             stringResource(R.string.ticketing_name_label),
             name,
             placeholder = stringResource(R.string.ticketing_name_placeholder),
         ) {
             name = it
+            onNameChanged(it)
         }
         Spacer(modifier = Modifier.size(16.dp))
         InputRow(
@@ -474,6 +525,7 @@ private fun TicketHolderSection(isSameContactInfo: Boolean) {
             },
         ) {
             phoneNumber = it
+            onPhoneNumberChanged(it)
         }
     }
 }

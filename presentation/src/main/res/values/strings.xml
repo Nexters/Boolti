@@ -90,7 +90,10 @@
     <string name="ticketing_contact_placeholder">숫자만 입력해 주세요</string>
     <string name="ticketing_invite_code_placeholder">초청 코드를 입력해주세요</string>
     <string name="ticketing_invite_code_use_button">사용하기</string>
-    <string name="ticketing_invite_code_success">사용되었습니다.</string>
+    <string name="ticketing_invite_code_success">사용되었습니다</string>
+    <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
+    <string name="ticketing_invite_code_invalid">초청 코드가 올바르지 않아요</string>
+    <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
     <string name="ticketing_same_contact_info">예매자와 입금자가 같아요</string>
     <string name="ticketing_selected_ticket">티켓 종류</string>
     <string name="ticketing_selected_ticket_count">티켓 매수</string>

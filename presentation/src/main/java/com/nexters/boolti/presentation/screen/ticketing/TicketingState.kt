@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import com.nexters.boolti.domain.model.PaymentType
 import java.time.LocalDateTime
 
 data class TicketingState(
@@ -13,6 +14,7 @@ data class TicketingState(
     val isSameContactInfo: Boolean = false,
     val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
+    val paymentType: PaymentType = PaymentType.AccountTransfer,
 )
 
 sealed interface InviteCodeStatus {

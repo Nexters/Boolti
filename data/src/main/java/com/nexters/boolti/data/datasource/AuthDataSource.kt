@@ -5,8 +5,11 @@ import androidx.datastore.core.DataStore
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import com.nexters.boolti.data.network.api.LoginService
+import com.nexters.boolti.data.network.request.RefreshRequest
+import com.nexters.boolti.data.network.response.SignUpResponse
 import com.nexters.boolti.domain.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -40,5 +43,10 @@ class AuthDataSource @Inject constructor(
                 refreshToken = ""
             )
         }
+    }
+
+    suspend fun refresh(): Result<SignUpResponse> = runCatching {
+        val refreshToken = data.map { it.refreshToken }.first()
+        loginService.refresh(RefreshRequest(refreshToken))
     }
 }

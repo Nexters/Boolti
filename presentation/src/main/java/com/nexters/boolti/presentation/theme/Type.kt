@@ -99,6 +99,13 @@ val point2 = TextStyle(
     lineHeight = 30.sp,
 )
 
+val point4 = TextStyle(
+    fontFamily = aggroFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 24.sp,
+    lineHeight = 34.sp,
+)
+
 val Typography = Typography(
     headlineLarge = headline3,
     headlineMedium = headline2,

@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,9 +34,9 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey05
-import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
@@ -58,7 +55,12 @@ fun ReservationsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = { ReservationsAppBar(onBackPressed = onBackPressed) }
+        topBar = {
+            BtAppBar(
+                title = stringResource(id = R.string.my_ticketing_history),
+                onBackPressed = onBackPressed,
+            )
+        }
     ) { innerPadding ->
         if (uiState.reservations.isEmpty()) {
             Column(
@@ -95,36 +97,6 @@ fun ReservationsScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ReservationsAppBar(
-    modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(44.dp)
-            .background(color = MaterialTheme.colorScheme.background),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(id = R.string.description_navigate_back),
-                modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
-            )
-        }
-        Text(
-            text = stringResource(id = R.string.my_ticketing_history),
-            style = MaterialTheme.typography.titleMedium.copy(color = Grey10),
-        )
     }
 }
 

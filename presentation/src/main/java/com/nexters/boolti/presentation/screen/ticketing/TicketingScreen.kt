@@ -97,6 +97,7 @@ fun TicketingScreen(
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val reservationButtonEnabled by viewModel.reservationButtonEnabled.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -188,6 +189,7 @@ fun TicketingScreen(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
+                    enabled = reservationButtonEnabled,
                     label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
                     onClick = viewModel::reservation,
                 )

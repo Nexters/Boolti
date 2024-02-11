@@ -9,10 +9,14 @@ import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -35,6 +39,13 @@ class TicketingViewModel @Inject constructor(
     private val userInputState = MutableStateFlow(TicketingUserInput())
     val userInput
         get() = userInputState.value
+
+    val reservationButtonEnabled: StateFlow<Boolean> = combine(state, userInputState) { state, userInput ->
+        userInput.reservationName.isNotBlank() &&
+                userInput.reservationPhoneNumber.isNotBlank() &&
+                (state.isSameContactInfo || userInput.depositorName.isNotBlank()) &&
+                (state.isSameContactInfo || userInput.depositorPhoneNumber.isNotBlank())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val reservationRequest: TicketingRequest
         get() = when (state.value.isInviteTicket) {

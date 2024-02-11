@@ -144,7 +144,7 @@ fun TicketingScreen(
                 ) // 티켓 정보
                 if (uiState.isInviteTicket) InviteCodeSection() // 초청 코드
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
-                RefundPolicySection() // 취소/환불 규정
+                if (!uiState.isInviteTicket) RefundPolicySection() // 취소/환불 규정
                 Spacer(modifier = Modifier.height(120.dp))
             }
 
@@ -312,7 +312,7 @@ private fun PaymentSection(
                 text = stringResource(R.string.ticketing_payment_information),
                 modifier = Modifier.padding(start = 4.dp),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = Grey50,
             )
         }
     }

@@ -71,9 +71,7 @@ fun ShowScreen(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                val newOffset = appbarOffsetHeightPx + delta
-                appbarOffsetHeightPx = newOffset
+                appbarOffsetHeightPx += available.y
 
                 return Offset.Zero
             }

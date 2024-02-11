@@ -7,6 +7,7 @@ import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.network.AuthInterceptor
+import com.nexters.boolti.data.network.api.HostService
 import com.nexters.boolti.data.network.api.ReservationService
 import com.nexters.boolti.data.network.api.ShowService
 import com.nexters.boolti.data.network.api.SignUpService
@@ -95,6 +96,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideReservationService(@Named("auth") retrofit: Retrofit): ReservationService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideHostService(@Named("auth") retrofit: Retrofit): HostService = retrofit.create()
 
     @Singleton
     @Provides

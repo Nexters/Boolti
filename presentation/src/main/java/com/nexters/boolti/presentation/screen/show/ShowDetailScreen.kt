@@ -55,6 +55,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -63,7 +64,6 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.util.requireActivity
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter

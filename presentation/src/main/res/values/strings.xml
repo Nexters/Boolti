@@ -109,13 +109,15 @@
         <item>환불 금액 : 당사에서는 주문에 대해 즉시 취소를 하고, 취소 금액에 대한 입금은 카드사 영업일 기준 4~5일이 소요될 수 있습니다.</item>
         <item>문의사항 발생시 카카오톡 채널로 문의부탁드립니다.</item>
     </string-array>
-    
+
     <!-- 입장 코드 -->
+    <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>
     <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
     <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_msg">올바른 입장 코드를 입력해 주세요</string>
+    <string name="show_entry_code">입장코드 보기</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
@@ -136,6 +138,12 @@
     <string name="my_ticketing_history">예매 내역</string>
     <string name="my_scan_qr">QR 스캔</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
+
+    <!-- QR 스캔 -->
+    <string name="hostedShowsTitle">QR 스캔</string>
+    <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>
+    <string name="hosted_shows_empty_desc">공연을 주최하고 QR 스캐너로\n관객 입장을 관리해 보세요</string>
+    <string name="entry_code_validated">입장을 확인했어요</string>
 
     <!-- 예매 내역 -->
     <string name="reservations_empty">예매 내역이 없어요</string>

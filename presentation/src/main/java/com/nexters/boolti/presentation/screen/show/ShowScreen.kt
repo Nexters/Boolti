@@ -1,15 +1,15 @@
 package com.nexters.boolti.presentation.screen.show
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,14 +23,25 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,7 +49,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.theme.Grey15
-import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
@@ -52,27 +62,36 @@ fun ShowScreen(
     viewModel: ShowViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val appbarHeight = 196.dp
+    val searchBarHeight = 80.dp
+    val changeableAppBarHeightPx =
+        with(LocalDensity.current) { (appbarHeight - searchBarHeight).roundToPx().toFloat() }
+    var appbarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
+    var changeableAppBarHeight by remember { mutableFloatStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                appbarOffsetHeightPx += available.y
+
+                return Offset.Zero
+            }
+        }
+    }
 
     Scaffold(
-        modifier = modifier,
-        topBar = {
-            ShowAppBar(
-                text = uiState.keyword,
-                onKeywordChanged = viewModel::updateKeyword,
-                search = viewModel::search,
-            )
-        },
+        modifier = modifier.nestedScroll(nestedScrollConnection),
     ) { innerPadding ->
         Box(
             modifier = Modifier.padding(innerPadding),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.TopCenter,
         ) {
             LazyVerticalGrid(
-                modifier = Modifier.padding(horizontal = marginHorizontal),
+                modifier = Modifier
+                    .padding(horizontal = marginHorizontal),
                 columns = GridCells.Adaptive(minSize = 150.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalArrangement = Arrangement.spacedBy(28.dp),
-                contentPadding = PaddingValues(top = 12.dp),
+                contentPadding = PaddingValues(top = 12.dp + appbarHeight),
             ) {
                 items(
                     count = uiState.shows.size,
@@ -84,38 +103,49 @@ fun ShowScreen(
                     )
                 }
             }
+            ShowAppBar(
+                modifier = Modifier.offset {
+                    IntOffset(
+                        x = 0,
+                        y = appbarOffsetHeightPx.coerceIn(-changeableAppBarHeightPx, 0f).toInt()
+                    )
+                },
+                text = uiState.keyword,
+                onKeywordChanged = viewModel::updateKeyword,
+                onChangeableSizeChanged = { size ->
+                    changeableAppBarHeight = size.height.toFloat()
+                },
+                search = viewModel::search,
+            )
         }
     }
 }
 
+/**
+ * @param onChangeableSizeChanged 변할 수 있는 최대 사이즈를 전달 app bar height - search bar
+ */
 @Composable
 fun ShowAppBar(
     text: String,
     onKeywordChanged: (keyword: String) -> Unit,
+    onChangeableSizeChanged: (size: IntSize) -> Unit,
     search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var appBarHeight by remember { mutableFloatStateOf(0f) }
+    val searchBarHeight = with(LocalDensity.current) { 80.dp.toPx() }
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = marginHorizontal),
+            .padding(horizontal = marginHorizontal)
+            .onSizeChanged(onSizeChanged = { size ->
+                appBarHeight = size.height.toFloat()
+                onChangeableSizeChanged(IntSize(0, size.height - searchBarHeight.toInt()))
+            })
     ) {
-        Box(
-            modifier = Modifier.height(44.dp),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            Icon(
-                modifier = Modifier
-                    .width(61.dp)
-                    .height(16.dp),
-                painter = painterResource(id = R.drawable.boolti_logo),
-                contentDescription = stringResource(id = R.string.description_app_logo),
-                tint = Grey50,
-            )
-        }
         Text(
             modifier = Modifier
-                .padding(top = 20.dp)
+                .padding(top = 40.dp)
                 .fillMaxWidth(),
             text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
             style = TextStyle(
@@ -126,12 +156,13 @@ fun ShowAppBar(
             ),
         )
         SearchBar(
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(vertical = 16.dp),
             text = text,
             onKeywordChanged = onKeywordChanged,
             search = search,
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .padding(top = 12.dp)
         )
     }
 }

@@ -10,8 +10,10 @@ import kotlinx.serialization.Serializable
 data class TicketingInfoDto(
     @SerialName("meansType")
     val meansType: String,
+    @SerialName("salesTicketType")
+    val salesTicketType: String,
     @SerialName("saleTicketName")
-    val saleTicketName: String,
+    val salesTicketName: String,
     @SerialName("showDate")
     val showDate: String,
     @SerialName("showImg")
@@ -24,12 +26,13 @@ data class TicketingInfoDto(
     val totalAmountPrice: Int,
 ) {
     fun toDomain(): TicketingInfo = TicketingInfo(
-        saleTicketName = saleTicketName,
+        saleTicketName = salesTicketName,
         showDate = showDate.toLocalDateTime(),
         showImg = showImg,
         showName = showName,
         ticketCount = ticketCount,
         totalPrice = totalAmountPrice,
+        isInviteTicket = salesTicketType.trim().uppercase() == "INVITE",
         paymentType = when (meansType.trim().uppercase()) {
             "CARD" -> PaymentType.Card
             else -> PaymentType.AccountTransfer

@@ -9,6 +9,7 @@ data class TicketingInfo(
     val showName: String = "",
     val ticketCount: Int = 0,
     val totalPrice: Int = 0,
+    val isInviteTicket: Boolean = false,
     val paymentType: PaymentType = PaymentType.AccountTransfer,
 )
 

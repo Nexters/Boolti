@@ -27,7 +27,6 @@ class TicketingViewModel @Inject constructor(
     private val showId: String = requireNotNull(savedStateHandle["showId"])
     private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
-    private val isInviteTicket: Boolean = savedStateHandle["isInviteTicket"] ?: false
     private val userId = getUserUsecase().id
 
     private val _state = MutableStateFlow(TicketingState())
@@ -36,7 +35,7 @@ class TicketingViewModel @Inject constructor(
     val userInput = TicketingUserInput()
 
     val paymentRequest: TicketingRequest
-        get() = when (isInviteTicket) {
+        get() = when (state.value.isInviteTicket) {
             true -> TicketingRequest.Invite(
                 inviteCode = userInput.inviteCode,
                 userId = userId,
@@ -81,6 +80,7 @@ class TicketingViewModel @Inject constructor(
                             ticketName = info.saleTicketName,
                             ticketCount = info.ticketCount,
                             totalPrice = info.totalPrice,
+                            isInviteTicket = info.isInviteTicket,
                         )
                     }
                     userInput.paymentType = info.paymentType

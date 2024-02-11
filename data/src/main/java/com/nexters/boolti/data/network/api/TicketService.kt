@@ -2,11 +2,7 @@ package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.response.TicketDetailDto
 import com.nexters.boolti.data.network.response.TicketDto
-import com.nexters.boolti.domain.request.QrScanRequest
-import retrofit2.Response
-import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface TicketService {

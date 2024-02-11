@@ -6,4 +6,5 @@ enum class ReservationState {
     RESERVED,
     REFUNDING,
     REFUNDED,
+    UNDEFINED,
 }

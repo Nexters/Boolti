@@ -3,11 +3,13 @@ package com.nexters.boolti.data.di
 import com.nexters.boolti.data.datasource.TicketingRepositoryImpl
 import com.nexters.boolti.data.repository.AuthRepositoryImpl
 import com.nexters.boolti.data.repository.ConfigRepositoryImpl
+import com.nexters.boolti.data.repository.ReservationRepositoryImpl
 import com.nexters.boolti.data.repository.HostRepositoryImpl
 import com.nexters.boolti.data.repository.ShowRepositoryImpl
 import com.nexters.boolti.data.repository.TicketRepositoryImpl
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ConfigRepository
+import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.HostRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.domain.repository.TicketRepository
@@ -34,6 +36,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTicketRepository(repository: TicketRepositoryImpl): TicketRepository
+
+    @Binds
+    abstract fun bindReservationRepository(repository: ReservationRepositoryImpl): ReservationRepository
 
     @Binds
     abstract fun bindHostRepository(repository: HostRepositoryImpl): HostRepository

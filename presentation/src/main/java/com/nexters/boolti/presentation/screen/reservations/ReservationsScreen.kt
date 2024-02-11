@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,30 +31,36 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.theme.Error
+import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ReservationsScreen(
     onBackPressed: () -> Unit,
-    navigateToDetail: (reservationsId: String) -> Unit,
+    navigateToDetail: (reservationId: String) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: ReservationsViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = { ReservationsAppBar(onBackPressed = onBackPressed) }
     ) { innerPadding ->
-        if (false) { // todo : 예매 내역 존재 여부에 따라 분기
+        if (uiState.reservations.isEmpty()) {
             Column(
                 modifier = modifier
                     .padding(innerPadding)
@@ -75,14 +82,17 @@ fun ReservationsScreen(
             return@Scaffold
         }
 
-        val items = (1..10).toList()
         LazyColumn(
             modifier = Modifier.padding(innerPadding),
             contentPadding = PaddingValues(top = 20.dp)
         ) {
-            items(count = items.size) { index ->
-                // todo : api 연결시 실제 id를 넘겨주어야 함
-                ReservationItem(navigateToDetail = { navigateToDetail("1") })
+            items(
+                count = uiState.reservations.size,
+                key = { uiState.reservations[it].id }) { index ->
+                ReservationItem(
+                    reservation = uiState.reservations[index],
+                    navigateToDetail = { navigateToDetail(uiState.reservations[index].id) },
+                )
             }
         }
     }
@@ -120,6 +130,7 @@ private fun ReservationsAppBar(
 
 @Composable
 fun ReservationItem(
+    reservation: Reservation,
     navigateToDetail: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -134,8 +145,9 @@ fun ReservationItem(
             modifier = Modifier.padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val format = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
             Text(
-                text = "2024.01.18 22:57",
+                text = reservation.reservationDateTime.format(format),
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
             )
@@ -162,7 +174,7 @@ fun ReservationItem(
                     .size(width = 60.dp, height = 84.dp)
                     .clip(shape = RoundedCornerShape(4.dp))
                     .border(shape = RoundedCornerShape(4.dp), color = Grey60, width = 0.5.dp),
-                model = "https://picsum.photos/200",
+                model = reservation.showImage,
                 contentScale = ContentScale.Crop,
                 contentDescription = stringResource(id = R.string.description_poster),
             )
@@ -170,17 +182,22 @@ fun ReservationItem(
                 modifier = Modifier.padding(start = 16.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                ReservationStateLabel(reservationState = ReservationState.REFUNDED)
+                ReservationStateLabel(reservationState = reservation.reservationState)
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
-                    text = "2024 TOGETHER LUCKY CLUB",
+                    text = reservation.showName,
                     overflow = TextOverflow.Ellipsis,
                     style = point1.copy(color = Grey05),
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
-                    text = "일반 티켓 B / 1매 / 5,000원",
+                    text = stringResource(
+                        id = R.string.reservations_ticket_count_price_format,
+                        reservation.salesTicketName,
+                        reservation.ticketCount,
+                        reservation.ticketPrice,
+                    ),
                 )
             }
         }
@@ -192,13 +209,7 @@ fun ReservationStateLabel(
     modifier: Modifier = Modifier,
     reservationState: ReservationState,
 ) {
-    val (stringId, color) = when (reservationState) {
-        ReservationState.DEPOSITING -> Pair(R.string.reservations_depositing, Grey30)
-        ReservationState.REFUNDING -> Pair(R.string.reservations_refunding, Success)
-        ReservationState.CANCELED -> Pair(R.string.reservations_canceled, Error)
-        ReservationState.RESERVED -> Pair(R.string.reservations_reserved, Grey30)
-        ReservationState.REFUNDED -> Pair(R.string.reservations_refunded, Error)
-    }
+    val (stringId, color) = reservationState.toDescriptionAndColorPair()
 
     Text(
         modifier = modifier,

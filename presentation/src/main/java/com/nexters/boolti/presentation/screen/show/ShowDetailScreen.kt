@@ -279,7 +279,7 @@ private fun ContentScaffold(
                     Spacer(modifier = modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current
                     val copiedMessage =
-                        stringResource(id = R.string.ticketing_account_copied_message)
+                        stringResource(id = R.string.ticketing_address_copied_message)
                     CopyButton(
                         label = stringResource(id = R.string.ticketing_copy_address),
                         onClick = {

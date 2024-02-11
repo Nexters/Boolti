@@ -23,6 +23,7 @@ import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
 import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
+import com.nexters.boolti.presentation.screen.refund.RefundScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
@@ -100,9 +101,19 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             route = "reservations/{reservationId}",
             arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
         ) {
-            ReservationDetailScreen(onBackPressed = {
-                navController.popBackStack()
-            })
+            ReservationDetailScreen(
+                onBackPressed = { navController.popBackStack() },
+                navigateToRefund = { id -> navController.navigate("refund/$id") },
+            )
+        }
+
+        composable(
+            route = "refund/{reservationId}",
+            arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
+        ) {
+            RefundScreen(
+                onBackPressed = { navController.popBackStack() },
+            )
         }
 
         navigation(

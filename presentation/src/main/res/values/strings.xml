@@ -36,6 +36,7 @@
     <string name="btn_goto_login">로그인 하러 가기</string>
     <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
     <string name="copy">복사</string>
+    <string name="next">다음</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
@@ -181,6 +182,14 @@
 
     <!-- 환불 -->
     <string name="refund_button">환불 요청하기</string>
+    <string name="refund_reason_label">환불 이유를 입력해 주세요</string>
+    <string name="refund_reason_hint">예) 티켓 종류 재 선택 후 다시 예매할게요</string>
+    <string name="refund_account_holder_info">예금주 정보</string>
+    <string name="refund_account_name_hint">실명을 입력해 주세요</string>
+    <string name="refund_account_info">환불 계좌 정보</string>
+    <string name="refund_bank_selection">은행 선택</string>
+    <string name="refund_account_number_hint">계좌번호를 입력해 주세요</string>
+    <string name="refund_select_bank">선택 완료하기</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

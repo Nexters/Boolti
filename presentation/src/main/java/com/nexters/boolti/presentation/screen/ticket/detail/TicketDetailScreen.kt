@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -39,6 +40,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,12 +49,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -62,6 +68,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -81,8 +88,10 @@ import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -101,6 +110,11 @@ fun TicketDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
+
+    val bottomAreaHeight = 125.dp
+    var contentWidth by remember { mutableFloatStateOf(0f) }
+    var ticketSectionHeight by remember { mutableFloatStateOf(0f) }
+    var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
@@ -127,38 +141,65 @@ fun TicketDetailScreen(
                         1.dp, color = White.copy(alpha = .15f),
                         shape = RoundedCornerShape(8.dp),
                     )
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(8.dp))
+                    .onGloballyPositioned { coordinates ->
+                        contentWidth = coordinates.size.width.toFloat()
+                        ticketSectionHeight = coordinates.size.height.toFloat()
+                    }
+                    .graphicsLayer {
+                        shape = TicketShape(
+                            width = contentWidth,
+                            height = ticketSectionHeight,
+                            circleRadius = 10.dp.toPx(),
+                            cornerRadius = 8.dp.toPx(),
+                            bottomAreaHeight = ticketSectionHeight - ticketSectionHeightUntilTicketInfo + bottomAreaHeight.toPx(),
+                        )
+                        clip = true
+                    },
             ) {
-                Title(ticketName = ticket.ticketName)
-
-                AsyncImage(
+                Column(
                     modifier = Modifier
-                        .padding(marginHorizontal)
-                        .aspectRatio(0.75f)
-                        .clip(RoundedCornerShape(8.dp)),
-                    model = ticket.poster,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = stringResource(R.string.description_poster)
-                )
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFFC5CACD), Grey95),
+                                start = Offset.Zero,
+                                end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
+                            ),
+                        )
+                        .onGloballyPositioned { coordinates ->
+                            ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
+                        }
+                ) {
+                    Title(ticketName = ticket.ticketName)
 
-                DottedDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = marginHorizontal),
-                    color = White.copy(alpha = 0.3f),
-                    thickness = 2.dp
-                )
+                    AsyncImage(
+                        modifier = Modifier
+                            .padding(marginHorizontal)
+                            .aspectRatio(0.75f)
+                            .clip(RoundedCornerShape(8.dp)),
+                        model = ticket.poster,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = stringResource(R.string.description_poster)
+                    )
 
-                Spacer(modifier = Modifier.size(20.dp))
+                    DottedDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = marginHorizontal),
+                        color = White.copy(alpha = 0.3f),
+                        thickness = 2.dp
+                    )
 
-                TicketInfo(
-                    showName = ticket.showName,
-                    showDate = ticket.showDate,
-                    placeName = ticket.placeName,
-                    entryCode = ticket.entryCode,
-                    ticketState = ticket.ticketState,
-                    onClickQr = onClickQr,
-                )
+                    TicketInfo(
+                        bottomAreaHeight = bottomAreaHeight,
+                        showName = ticket.showName,
+                        showDate = ticket.showDate,
+                        placeName = ticket.placeName,
+                        entryCode = ticket.entryCode,
+                        ticketState = ticket.ticketState,
+                        onClickQr = onClickQr,
+                    )
+                }
 
                 Notice(notice = ticket.notice)
 
@@ -254,6 +295,7 @@ private fun Title(
 
 @Composable
 private fun TicketInfo(
+    bottomAreaHeight: Dp,
     showName: String,
     showDate: LocalDateTime,
     placeName: String,
@@ -263,8 +305,13 @@ private fun TicketInfo(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = marginHorizontal)
-            .padding(bottom = 20.dp),
+            .height(bottomAreaHeight)
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(MaterialTheme.colorScheme.background.copy(alpha = .2f), MaterialTheme.colorScheme.background),
+                )
+            )
+            .padding(marginHorizontal),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(

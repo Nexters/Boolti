@@ -19,19 +19,16 @@ class TokenDataSource @Inject constructor(
     private val data: Flow<AppSettings>
         get() = dataStore.data
 
-    fun getAccessToken(): String = runBlocking {
-//        data.first().accessToken
+    suspend fun getAccessToken(): String = // data.first().accessToken
         "5723e4c3-4101-4cc0-8361-7ed6c5c15afd" // TODO 슈퍼준영토큰 제거
-    }
 
     /**
      * 엑세스 토큰, 리프레시 토큰 쌍 반환
      *
      * @return first: **AccessToken**, second: **RefreshToken**
      */
-    fun getTokenPair(): Pair<String, String> = runBlocking {
+    suspend fun getTokenPair(): Pair<String, String> =
         data.first().run { Pair(accessToken, refreshToken) }
-    }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         dataStore.updateData {

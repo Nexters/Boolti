@@ -38,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,13 +62,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -80,6 +84,7 @@ import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,14 +92,12 @@ fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
-    onPayClicked: (isInviteTicket: Boolean, ticketId: String) -> Unit,
+    onReservationClicked: (ticketingRequest: TicketingRequest) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val state by viewModel.state.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-
-    val isInviteTicket by remember { mutableStateOf(true) } // TODO 실제 데이터로 교체 필요
 
     Scaffold(
         topBar = {
@@ -128,13 +131,38 @@ fun TicketingScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(scrollState),
             ) {
-                Header(state)
-                TicketHolderSection(state) // 예매자 정보
-                if (!isInviteTicket) DeposorSection(viewModel, state) // 입금자 정보
-                TicketInfoSection() // 티켓 정보
-                if (isInviteTicket) InviteCodeSection() // 초청 코드
-                if (!isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
-                RefundPolicySection() // 취소/환불 규정
+                Header(
+                    poster = uiState.poster,
+                    showName = uiState.showName,
+                    showDate = uiState.showDate,
+                )
+                TicketHolderSection(
+                    name = uiState.reservationName,
+                    phoneNumber = uiState.reservationPhoneNumber,
+                    isSameContactInfo = uiState.isSameContactInfo,
+                    onNameChanged = viewModel::setReservationName,
+                    onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
+                ) // 예매자 정보
+                if (!uiState.isInviteTicket) DeposorSection(
+                    name = uiState.depositorName,
+                    phoneNumber = uiState.depositorPhoneNumber,
+                    isSameContactInfo = uiState.isSameContactInfo,
+                    onClickSameContact = viewModel::toggleIsSameContactInfo,
+                    onNameChanged = viewModel::setDepositorName,
+                    onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
+                ) // 입금자 정보
+                TicketInfoSection(
+                    ticketName = uiState.ticketName,
+                    ticketCount = uiState.ticketCount,
+                    totalPrice = uiState.totalPrice,
+                ) // 티켓 정보
+                if (uiState.isInviteTicket) InviteCodeSection(
+                    uiState.inviteCode,
+                    uiState.inviteCodeStatus,
+                    onInviteCodeChanged = viewModel::setInviteCode,
+                ) // 초청 코드
+                if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
+                if (!uiState.isInviteTicket) RefundPolicySection() // 취소/환불 규정
                 Spacer(modifier = Modifier.height(120.dp))
             }
 
@@ -160,22 +188,27 @@ fun TicketingScreen(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-                    label = stringResource(R.string.ticketing_payment_button_label, 5000),
-                    onClick = { onPayClicked(isInviteTicket, viewModel.state.value.ticket?.id ?: "") },
-                ) // TODO 데이터 붙일 때 연결
+                    enabled = uiState.reservationButtonEnabled,
+                    label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
+                    onClick = viewModel::reservation,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun Header(state: TicketingState) {
+private fun Header(
+    poster: String,
+    showName: String,
+    showDate: LocalDateTime,
+) {
     Row(
         modifier = Modifier.padding(20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = state.poster,
+            model = poster,
             contentDescription = stringResource(R.string.description_poster),
             modifier = Modifier
                 .size(width = 70.dp, height = 98.dp)
@@ -190,12 +223,12 @@ private fun Header(state: TicketingState) {
 
         Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
             Text(
-                text = state.ticket?.title ?: "",
+                text = showName,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = "2024.03.09 (토) 17:30", // TODO API 나오면 대체하기
+                text = showDate.format("yyyy.MM.dd (${showDate.dayOfWeekString}) HH:mm"),
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey30,
             )
@@ -298,17 +331,19 @@ private fun PaymentSection(
                 text = stringResource(R.string.ticketing_payment_information),
                 modifier = Modifier.padding(start = 4.dp),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = Grey50,
             )
         }
     }
 }
 
 @Composable
-private fun InviteCodeSection() {
+private fun InviteCodeSection(
+    inviteCode: String = "",
+    inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
+    onInviteCodeChanged: (String) -> Unit,
+) {
     Section(title = stringResource(R.string.ticketing_invite_code_label)) {
-        var inviteCode by remember { mutableStateOf("") }
-        var inviteCodeUsed by remember { mutableStateOf(false) }
         Row(verticalAlignment = Alignment.CenterVertically) {
             BTTextField(
                 modifier = Modifier
@@ -321,11 +356,13 @@ private fun InviteCodeSection() {
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
                 ),
-                onValueChanged = { inviteCode = it },
+                onValueChanged = {
+                    onInviteCodeChanged(it)
+                },
             )
             Button(
-                onClick = { inviteCodeUsed = true },
-                enabled = !inviteCodeUsed,
+                onClick = { inviteCodeStatus is InviteCodeStatus.Valid },
+                enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -341,41 +378,53 @@ private fun InviteCodeSection() {
                 )
             }
         }
-        if (inviteCodeUsed) {
+        if (inviteCodeStatus !is InviteCodeStatus.Default) {
+            val message = when (inviteCodeStatus) {
+                InviteCodeStatus.Default -> ""
+                InviteCodeStatus.Duplicated -> stringResource(R.string.ticketing_invite_code_duplicated)
+                InviteCodeStatus.Empty -> stringResource(R.string.ticketing_invite_code_empty)
+                InviteCodeStatus.Invalid -> stringResource(R.string.ticketing_invite_code_invalid)
+                InviteCodeStatus.Valid -> stringResource(R.string.ticketing_invite_code_success)
+            }
+            val color = if (inviteCodeStatus is InviteCodeStatus.Valid) Success else Error
             Text(
                 modifier = Modifier.padding(top = 12.dp),
-                text = stringResource(R.string.ticketing_invite_code_success),
+                text = message,
                 style = MaterialTheme.typography.bodySmall,
-                color = Success,
+                color = color,
             )
         }
     }
 }
 
 @Composable
-private fun TicketInfoSection() {
+private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
     Section(title = stringResource(R.string.ticketing_ticket_info_label)) {
         SectionTicketInfo(
             stringResource(R.string.ticketing_selected_ticket),
-            "일반 티켓 B",
+            ticketName,
             marginTop = 0.dp
-        ) // TODO API 나오면 대체하기
+        )
         SectionTicketInfo(
             label = stringResource(R.string.ticketing_selected_ticket_count),
-            value = "1매"
-        ) // TODO 데이터 붙일 때 연결
+            value = stringResource(R.string.ticket_count, ticketCount),
+        )
         SectionTicketInfo(
             label = stringResource(R.string.ticketing_total_payment_amount),
-            value = "5,000원"
-        ) // TODO 데이터 붙일 때 연결
+            value = stringResource(R.string.unit_won, totalPrice),
+        )
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
     }
 }
 
 @Composable
 private fun DeposorSection(
-    viewModel: TicketingViewModel,
-    state: TicketingState,
+    name: String = "",
+    phoneNumber: String = "",
+    isSameContactInfo: Boolean,
+    onClickSameContact: () -> Unit,
+    onNameChanged: (name: String) -> Unit,
+    onPhoneNumberChanged: (number: String) -> Unit,
 ) {
     Section(
         title = stringResource(R.string.ticketing_depositor_label),
@@ -383,9 +432,9 @@ private fun DeposorSection(
             Row(
                 modifier = Modifier
                     .padding(start = 20.dp)
-                    .clickable(role = Role.Checkbox) { viewModel.toggleIsSameContactInfo() }
+                    .clickable(role = Role.Checkbox, onClick = onClickSameContact)
             ) {
-                if (state.isSameContactInfo) {
+                if (isSameContactInfo) {
                     Icon(
                         painter = painterResource(R.drawable.ic_checkbox_selected),
                         tint = Grey05,
@@ -415,37 +464,45 @@ private fun DeposorSection(
                 stiffness = Spring.StiffnessMedium,
             )
         ),
-        contentVisible = !state.isSameContactInfo,
+        contentVisible = !isSameContactInfo,
     ) {
-        if (!state.isSameContactInfo) {
+        if (!isSameContactInfo) {
             InputRow(
                 stringResource(R.string.ticketing_name_label),
-                "",
+                name,
                 placeholder = stringResource(R.string.ticketing_name_placeholder),
-            ) {}
+            ) {
+                onNameChanged(it)
+            }
             Spacer(modifier = Modifier.size(16.dp))
             InputRow(
                 stringResource(R.string.ticketing_contact_label),
-                "",
+                phoneNumber,
                 placeholder = stringResource(R.string.ticketing_contact_placeholder),
                 isPhoneNumber = true,
                 imeAction = ImeAction.Default,
-            ) {}
+            ) {
+                onPhoneNumberChanged(it)
+            }
         }
     }
 }
 
 @Composable
-private fun TicketHolderSection(state: TicketingState) {
+private fun TicketHolderSection(
+    name: String = "",
+    phoneNumber: String = "",
+    isSameContactInfo: Boolean,
+    onNameChanged: (name: String) -> Unit,
+    onPhoneNumberChanged: (number: String) -> Unit,
+) {
     Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
-        var name by remember { mutableStateOf("") } // TODO remove
-        var phoneNumber by remember { mutableStateOf("") } // TODO remove
         InputRow(
             stringResource(R.string.ticketing_name_label),
             name,
             placeholder = stringResource(R.string.ticketing_name_placeholder),
         ) {
-            name = it
+            onNameChanged(it)
         }
         Spacer(modifier = Modifier.size(16.dp))
         InputRow(
@@ -453,13 +510,13 @@ private fun TicketHolderSection(state: TicketingState) {
             phoneNumber,
             placeholder = stringResource(R.string.ticketing_contact_placeholder),
             isPhoneNumber = true,
-            imeAction = if (state.isSameContactInfo) {
+            imeAction = if (isSameContactInfo) {
                 ImeAction.Default
             } else {
                 ImeAction.Next
             },
         ) {
-            phoneNumber = it
+            onPhoneNumberChanged(it)
         }
     }
 }
@@ -558,7 +615,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen() { _, _ -> }
+            TicketingScreen {}
         }
     }
 }

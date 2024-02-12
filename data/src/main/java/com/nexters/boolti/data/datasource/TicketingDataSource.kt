@@ -1,9 +1,11 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.TicketingService
+import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
 import com.nexters.boolti.domain.model.TicketWithQuantity
+import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.request.SalesTicketRequest
-import kotlinx.coroutines.flow.flow
+import com.nexters.boolti.domain.request.TicketingInfoRequest
 import javax.inject.Inject
 
 class TicketingDataSource @Inject constructor(
@@ -13,5 +15,17 @@ class TicketingDataSource @Inject constructor(
         return ticketingService.getSalesTickets(request.showId).map {
             it.toDomain()
         }
+    }
+
+    suspend fun getTicketingInfo(request: TicketingInfoRequest): TicketingInfo {
+        return ticketingService.getTicketingInfo(
+            request.showId,
+            request.salesTicketId,
+            request.ticketCount,
+        ).toDomain()
+    }
+
+    suspend fun requestReservationSalesTicket(request: ReservationSalesTicketRequest): String {
+        return ticketingService.requestReservationSalesTicket(request).reservationId
     }
 }

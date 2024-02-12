@@ -96,11 +96,8 @@ fun TicketingScreen(
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
-    val reservationButtonEnabled by viewModel.reservationButtonEnabled.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-
-    val userInputState by viewModel.userInputUiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -140,15 +137,15 @@ fun TicketingScreen(
                     showDate = uiState.showDate,
                 )
                 TicketHolderSection(
-                    name = userInputState.reservationName,
-                    phoneNumber = userInputState.reservationPhoneNumber,
+                    name = uiState.reservationName,
+                    phoneNumber = uiState.reservationPhoneNumber,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onNameChanged = viewModel::setReservationName,
                     onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
                 ) // 예매자 정보
                 if (!uiState.isInviteTicket) DeposorSection(
-                    name = userInputState.depositorName,
-                    phoneNumber = userInputState.depositorPhoneNumber,
+                    name = uiState.depositorName,
+                    phoneNumber = uiState.depositorPhoneNumber,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onClickSameContact = viewModel::toggleIsSameContactInfo,
                     onNameChanged = viewModel::setDepositorName,
@@ -160,7 +157,7 @@ fun TicketingScreen(
                     totalPrice = uiState.totalPrice,
                 ) // 티켓 정보
                 if (uiState.isInviteTicket) InviteCodeSection(
-                    userInputState.inviteCode,
+                    uiState.inviteCode,
                     uiState.inviteCodeStatus,
                     onInviteCodeChanged = viewModel::setInviteCode,
                 ) // 초청 코드
@@ -191,7 +188,7 @@ fun TicketingScreen(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-                    enabled = reservationButtonEnabled,
+                    enabled = uiState.reservationButtonEnabled,
                     label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
                     onClick = viewModel::reservation,
                 )
@@ -502,7 +499,6 @@ private fun TicketHolderSection(
     Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
         InputRow(
             stringResource(R.string.ticketing_name_label),
-//            name,
             name,
             placeholder = stringResource(R.string.ticketing_name_placeholder),
         ) {

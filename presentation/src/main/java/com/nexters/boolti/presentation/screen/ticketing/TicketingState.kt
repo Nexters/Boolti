@@ -15,7 +15,18 @@ data class TicketingState(
     val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
     val paymentType: PaymentType = PaymentType.AccountTransfer,
-)
+    val reservationName: String = "",
+    val reservationPhoneNumber: String = "",
+    val depositorName: String = "",
+    val depositorPhoneNumber: String = "",
+    val inviteCode: String = "",
+) {
+    val reservationButtonEnabled: Boolean
+        get() = reservationName.isNotBlank() &&
+                reservationPhoneNumber.isNotBlank() &&
+                (isSameContactInfo || depositorName.isNotBlank()) &&
+                (isSameContactInfo || depositorPhoneNumber.isNotBlank())
+}
 
 sealed interface InviteCodeStatus {
     data object Default : InviteCodeStatus

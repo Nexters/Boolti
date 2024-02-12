@@ -33,43 +33,33 @@ class TicketingViewModel @Inject constructor(
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
     private val userId = getUserUsecase().id
 
-    private val _state = MutableStateFlow(TicketingState())
-    val state = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(TicketingState())
+    val uiState = _uiState.asStateFlow()
 
-    private val userInputState = MutableStateFlow(TicketingUserInput())
-    val userInputUiState = userInputState.asStateFlow()
-    val userInput
-        get() = userInputState.value
-
-    val reservationButtonEnabled: StateFlow<Boolean> = combine(state, userInputState) { state, userInput ->
-        userInput.reservationName.isNotBlank() &&
-                userInput.reservationPhoneNumber.isNotBlank() &&
-                (state.isSameContactInfo || userInput.depositorName.isNotBlank()) &&
-                (state.isSameContactInfo || userInput.depositorPhoneNumber.isNotBlank())
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    private val state = uiState.value
 
     private val reservationRequest: TicketingRequest
-        get() = when (state.value.isInviteTicket) {
+        get() = when (uiState.value.isInviteTicket) {
             true -> TicketingRequest.Invite(
-                inviteCode = userInput.inviteCode,
+                inviteCode = state.inviteCode,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
-                reservationName = userInput.reservationName,
-                reservationPhoneNumber = userInput.reservationPhoneNumber,
+                reservationName = state.reservationName,
+                reservationPhoneNumber = state.reservationPhoneNumber,
             )
 
             false -> TicketingRequest.Normal(
-                ticketCount = state.value.ticketCount,
-                depositorName = if (state.value.isSameContactInfo) userInput.reservationName else userInput.depositorName,
-                depositorPhoneNumber = if (state.value.isSameContactInfo) userInput.reservationPhoneNumber else userInput.depositorPhoneNumber,
-                paymentAmount = state.value.totalPrice,
-                paymentType = state.value.paymentType,
+                ticketCount = uiState.value.ticketCount,
+                depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
+                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationPhoneNumber else state.depositorPhoneNumber,
+                paymentAmount = uiState.value.totalPrice,
+                paymentType = uiState.value.paymentType,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
-                reservationName = userInput.reservationName,
-                reservationPhoneNumber = userInput.reservationPhoneNumber,
+                reservationName = state.reservationName,
+                reservationPhoneNumber = state.reservationPhoneNumber,
             )
         }
 
@@ -80,14 +70,14 @@ class TicketingViewModel @Inject constructor(
     fun reservation() {
         viewModelScope.launch {
             repository.requestReservation(reservationRequest)
-                .onStart { _state.update { it.copy(loading = true) } }
+                .onStart { _uiState.update { it.copy(loading = true) } }
                 .catch { e ->
                     e.printStackTrace()
-                    _state.update { it.copy(loading = false) }
+                    _uiState.update { it.copy(loading = false) }
                 }
                 .singleOrNull()?.let {
                     Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $it")
-                    _state.update { it.copy(loading = false) }
+                    _uiState.update { it.copy(loading = false) }
                 }
         }
     }
@@ -97,10 +87,10 @@ class TicketingViewModel @Inject constructor(
             repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
                 .catch { e -> e.printStackTrace() }
                 .onStart {
-                    _state.update { it.copy(loading = true) }
+                    _uiState.update { it.copy(loading = true) }
                 }
                 .singleOrNull()?.let { info ->
-                    _state.update {
+                    _uiState.update {
                         it.copy(
                             loading = false,
                             poster = info.showImg,
@@ -118,36 +108,28 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun toggleIsSameContactInfo() {
-        _state.update {
+        _uiState.update {
             it.copy(isSameContactInfo = !it.isSameContactInfo)
         }
     }
 
     fun setReservationName(name: String) {
-        userInputState.update { it.copy(reservationName = name) }
+        _uiState.update { it.copy(reservationName = name) }
     }
 
     fun setReservationPhoneNumber(number: String) {
-        userInputState.update { it.copy(reservationPhoneNumber = number) }
+        _uiState.update { it.copy(reservationPhoneNumber = number) }
     }
 
     fun setDepositorName(name: String) {
-        userInputState.update { it.copy(depositorName = name) }
+        _uiState.update { it.copy(depositorName = name) }
     }
 
     fun setDepositorPhoneNumber(number: String) {
-        userInputState.update { it.copy(depositorPhoneNumber = number) }
+        _uiState.update { it.copy(depositorPhoneNumber = number) }
     }
 
     fun setInviteCode(code: String) {
-        userInputState.update { it.copy(inviteCode = code) }
+        _uiState.update { it.copy(inviteCode = code) }
     }
 }
-
-data class TicketingUserInput(
-    var reservationName: String = "",
-    var reservationPhoneNumber: String = "",
-    var depositorName: String = "",
-    var depositorPhoneNumber: String = "",
-    var inviteCode: String = "",
-)

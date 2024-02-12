@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.ticket
+package com.nexters.boolti.presentation.screen.ticket.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

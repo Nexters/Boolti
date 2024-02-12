@@ -34,8 +34,8 @@ data class TicketingInfoDto(
         totalPrice = totalAmountPrice,
         isInviteTicket = salesTicketType.trim().uppercase() == "INVITE",
         paymentType = when (meansType.trim().uppercase()) {
-            "CARD" -> PaymentType.Card
-            else -> PaymentType.AccountTransfer
+            "CARD" -> PaymentType.CARD
+            else -> PaymentType.ACCOUNT_TRANSFER
         },
     )
 }

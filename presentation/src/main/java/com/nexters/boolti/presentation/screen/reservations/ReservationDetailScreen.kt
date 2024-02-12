@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -414,13 +415,11 @@ private fun RefundPolicy(
         title = stringResource(id = R.string.ticketing_refund_policy_label),
         defaultExpanded = false,
     ) {
-        // todo : 규정 변경하기
         Column {
-            PolicyLine(text = "하단에 나열된 내용은 전부 임시 텍스트 입니다.\n")
-            PolicyLine(text = "입장 확인이 된 티켓이 있을경우 환불이 불가합니다.\n")
-            PolicyLine(text = "환불 방법 : 티켓 예매 상세내역 > 예매취소\n")
-            PolicyLine(text = "환불 금액 : 당사에서는 주문에 대해 즉시 취소를\u2028하고, 취소 금액에 대한 입금은 카드사 영업일 기준 4~5일이 소요될 수 있습니다.\n")
-            PolicyLine(text = "문의사항 발생시 카카오톡 채널로 문의부탁드립니다.")
+            val policyLines = stringArrayResource(R.array.refund_policy)
+            policyLines.forEach {
+                PolicyLine(modifier = Modifier.padding(bottom = 4.dp), text = it)
+            }
         }
     }
 }
@@ -430,9 +429,7 @@ private fun PolicyLine(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.height(22.dp),
-    ) {
+    Row(modifier = modifier) {
         Box(
             modifier = Modifier
                 .padding(horizontal = 8.dp, vertical = 7.dp)

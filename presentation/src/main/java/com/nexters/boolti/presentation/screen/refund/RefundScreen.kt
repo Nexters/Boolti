@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.refund
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -423,9 +424,12 @@ fun BankSelection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                (1..20).forEach {
+                BankInfo.entries.forEach { bankInfo ->
                     item {
-                        BackItem()
+                        BackItem(
+                            bankInfo = bankInfo,
+                            onClick = {}
+                        )
                     }
                 }
             }
@@ -458,6 +462,8 @@ fun BankSelection(
 
 @Composable
 fun BackItem(
+    onClick: (bankInfo: BankInfo) -> Unit,
+    bankInfo: BankInfo,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
 ) {
@@ -469,14 +475,14 @@ fun BackItem(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
+        Image(
             modifier = modifier.size(32.dp),
-            painter = painterResource(R.drawable.ic_book),
+            painter = painterResource(bankInfo.icon),
             contentDescription = null,
         )
         Text(
             modifier = Modifier.padding(top = 4.dp),
-            text = "NH농협",
+            text = bankInfo.bankName,
             style = MaterialTheme.typography.bodySmall,
         )
     }

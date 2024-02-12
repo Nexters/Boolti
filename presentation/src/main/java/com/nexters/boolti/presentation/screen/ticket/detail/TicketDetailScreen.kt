@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticket.detail
 
+import android.os.Build
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -29,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,10 +51,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,7 +67,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.DottedDivider
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -75,6 +82,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 @Composable
@@ -83,15 +91,26 @@ fun TicketDetailScreen(
     viewModel: TicketDetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
     onClickQr: (entryCode: String) -> Unit,
+    navigateToShowDetail: (showId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     var showEnterCodeDialog by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val clipboardManager = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val ticket = uiState.ticket
 
     Scaffold(
-        topBar = { TicketDetailToolbar(onBackClicked = onBackClicked) }
+        topBar = { TicketDetailToolbar(onBackClicked = onBackClicked) },
+        snackbarHost = {
+            ToastSnackbarHost(
+                modifier = Modifier.padding(bottom = 54.dp),
+                hostState = snackbarHostState,
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = modifier
@@ -127,11 +146,21 @@ fun TicketDetailScreen(
 
                 Notice(notice = ticket.notice)
 
+                val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
                 Inquiry(
                     hostName = ticket.hostName,
                     hostPhoneNumber = ticket.hostPhoneNumber,
-                    onClickCopyPlace = { /*TODO*/ },
-                    onClickNavigateToShowDetail = {}
+                    onClickCopyPlace = {
+                        clipboardManager.setText(AnnotatedString(ticket.streetAddress + ticket.detailAddress))
+                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(copiedMessage)
+                            }
+                        }
+                    },
+                    onClickNavigateToShowDetail = {
+                        navigateToShowDetail(ticket.showId)
+                    }
                 )
             }
 
@@ -505,7 +534,7 @@ private fun SectionTitle(title: String) {
 fun TicketDetailPreview() {
     BooltiTheme {
         Surface {
-            TicketDetailScreen(modifier = Modifier, onBackClicked = {}, onClickQr = {})
+            TicketDetailScreen(modifier = Modifier, onBackClicked = {}, onClickQr = {}, navigateToShowDetail = {})
         }
     }
 }

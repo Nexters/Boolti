@@ -107,7 +107,7 @@
     <string name="ticketing_payment_information">다음 페이지에서 계좌 번호를 안내해 드릴게요</string>
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
-    <string name="ticketing_address_copied_message">주소가 복사되었어요</string>
+    <string name="ticketing_address_copied_message">공연장 주소가 복사되었어요</string>
     <string name="ticketing_host_format">%s (%s)</string>
 
     <string-array name="refund_policy">

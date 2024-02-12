@@ -162,7 +162,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         ) {
             TicketDetailScreen(modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") }
+                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") },
+                navigateToShowDetail = { navController.navigate("show/$it") }
             )
         }
         composable(

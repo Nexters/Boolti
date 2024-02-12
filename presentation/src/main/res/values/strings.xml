@@ -53,6 +53,7 @@
     <string name="ticket_show_finished_state">공연 종료</string>
     <string name="ticket_used_state">입장 완료</string>
     <string name="ticket_title">%s • %d매</string>
+    <string name="ticket_count">%d매</string>
     <string name="ticket_require_login">지금 로그인하고\n원하는 공연의 티켓을\n예매해보세요!</string>
     <string name="ticket_empty_label">아직 발권된 티켓이 없어요</string>
     <string name="ticket_empty_desc">티켓을 예매하고 공연을 즐겨보세요!</string>
@@ -87,11 +88,14 @@
     <string name="ticketing_payment_card">카드</string>
     <string name="ticketing_name_label">이름</string>
     <string name="ticketing_contact_label">연락처</string>
-    <string name="ticketing_name_placeholder">예) 김불티</string>
-    <string name="ticketing_contact_placeholder">연락처</string>
-    <string name="ticketing_invite_code_placeholder">예) B123456</string>
+    <string name="ticketing_name_placeholder">실명을 입력해 주세요</string>
+    <string name="ticketing_contact_placeholder">숫자만 입력해 주세요</string>
+    <string name="ticketing_invite_code_placeholder">초청 코드를 입력해주세요</string>
     <string name="ticketing_invite_code_use_button">사용하기</string>
-    <string name="ticketing_invite_code_success">사용되었습니다.</string>
+    <string name="ticketing_invite_code_success">사용되었습니다</string>
+    <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
+    <string name="ticketing_invite_code_invalid">초청 코드가 올바르지 않아요</string>
+    <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
     <string name="ticketing_same_contact_info">예매자와 입금자가 같아요</string>
     <string name="ticketing_selected_ticket">티켓 종류</string>
     <string name="ticketing_selected_ticket_count">티켓 매수</string>

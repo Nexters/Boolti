@@ -10,9 +10,5 @@ data class TicketingInfo(
     val ticketCount: Int = 0,
     val totalPrice: Int = 0,
     val isInviteTicket: Boolean = false,
-    val paymentType: PaymentType = PaymentType.AccountTransfer,
+    val paymentType: PaymentType = PaymentType.ACCOUNT_TRANSFER,
 )
-
-enum class PaymentType {
-    Card, AccountTransfer
-}

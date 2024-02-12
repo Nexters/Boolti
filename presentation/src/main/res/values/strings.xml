@@ -179,6 +179,8 @@
     <string name="refund_button">환불 요청하기</string>
     <string name="refund_reason_label">환불 이유를 입력해 주세요</string>
     <string name="refund_reason_hint">예) 티켓 종류 재 선택 후 다시 예매할게요</string>
+    <string name="refund_account_holder_info">예금주 정보</string>
+    <string name="refund_account_info">환불 계좌 정보</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

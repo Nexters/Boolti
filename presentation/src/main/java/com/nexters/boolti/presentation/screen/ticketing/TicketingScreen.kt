@@ -69,7 +69,9 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -80,8 +82,6 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
-import com.nexters.boolti.presentation.util.format
-import com.nexters.boolti.presentation.util.dayOfWeekString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

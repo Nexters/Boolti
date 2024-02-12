@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.util
+package com.nexters.boolti.presentation.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringArrayResource

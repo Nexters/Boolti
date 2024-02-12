@@ -39,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -57,7 +57,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -98,7 +97,6 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
-import com.nexters.boolti.presentation.util.ticketPath
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -127,6 +125,16 @@ fun TicketDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
     val ticket = uiState.ticket
+
+    val entranceSuccessMsg = stringResource(R.string.entry_code_validated)
+    LaunchedEffect(viewModel.event) {
+        viewModel.event.collect {
+            when (it) {
+                TicketDetailEvent.ManagerCodeValid -> snackbarHostState.showSnackbar(entranceSuccessMsg)
+                TicketDetailEvent.OnRefresh -> showEnterCodeDialog = false
+            }
+        }
+    }
 
     Scaffold(
         topBar = { TicketDetailToolbar(onBackClicked = onBackClicked) },

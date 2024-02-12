@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -47,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -119,22 +121,35 @@ fun TicketDetailScreen(
                 .padding(horizontal = 29.dp)
                 .verticalScroll(scrollState),
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .border(
+                        1.dp, color = White.copy(alpha = .15f),
+                        shape = RoundedCornerShape(8.dp),
+                    )
+                    .clip(RoundedCornerShape(8.dp)),
+            ) {
                 Title(ticketName = ticket.ticketName)
 
                 AsyncImage(
                     modifier = Modifier
                         .padding(marginHorizontal)
-                        .aspectRatio(0.75f),
+                        .aspectRatio(0.75f)
+                        .clip(RoundedCornerShape(8.dp)),
                     model = ticket.poster,
+                    contentScale = ContentScale.Crop,
                     contentDescription = stringResource(R.string.description_poster)
                 )
 
                 DottedDivider(
-                    modifier = Modifier.padding(horizontal = marginHorizontal),
-                    color = Color.White.copy(alpha = 0.3f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = marginHorizontal),
+                    color = White.copy(alpha = 0.3f),
                     thickness = 2.dp
                 )
+
+                Spacer(modifier = Modifier.size(20.dp))
 
                 TicketInfo(
                     showName = ticket.showName,
@@ -164,6 +179,8 @@ fun TicketDetailScreen(
                     }
                 )
             }
+
+            Spacer(modifier = Modifier.size(20.dp))
 
             RefundPolicySection()
 
@@ -218,7 +235,7 @@ private fun Title(
 ) {
     Row(
         modifier = Modifier
-            .background(Color.White.copy(alpha = 0.3f))
+            .background(White.copy(alpha = 0.3f))
             .padding(horizontal = 20.dp, vertical = 10.dp),
     ) {
         Text(
@@ -405,6 +422,8 @@ fun Inquiry(
                 color = Grey50,
             )
 
+            Spacer(modifier = Modifier.size(16.dp))
+
             val hostInfo = String.format("%s (%s)", hostName, hostPhoneNumber)
             Text(
                 text = hostInfo,
@@ -417,27 +436,25 @@ fun Inquiry(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             TextButton(
-                modifier = Modifier
-                    .padding(vertical = 13.dp)
-                    .weight(1f),
+                modifier = Modifier.weight(1f),
                 onClick = onClickCopyPlace,
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Grey70,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
+                contentPadding = PaddingValues(vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
             ) {
                 Text(text = stringResource(R.string.copy_show_place_button))
             }
             TextButton(
-                modifier = Modifier
-                    .padding(vertical = 13.dp)
-                    .weight(1f),
+                modifier = Modifier.weight(1f),
                 onClick = onClickNavigateToShowDetail,
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Grey20,
                     contentColor = MaterialTheme.colorScheme.surface,
                 ),
+                contentPadding = PaddingValues(vertical = 13.dp),
                 shape = RoundedCornerShape(8.dp),
             ) {
                 Text(text = stringResource(R.string.navigate_to_show_button))
@@ -513,7 +530,7 @@ private fun Section(
         modifier
             .padding(bottom = 12.dp)
             .fillMaxWidth()
-            .background((MaterialTheme.colorScheme.surface))
+            .border(1.dp, color = White.copy(alpha = .15f), shape = RoundedCornerShape(8.dp))
             .padding(start = 20.dp, end = 20.dp, bottom = if (contentVisible) 20.dp else 0.dp)
     ) {
         Row(

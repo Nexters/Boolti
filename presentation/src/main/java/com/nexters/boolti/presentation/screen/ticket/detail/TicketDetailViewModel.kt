@@ -3,6 +3,8 @@ package com.nexters.boolti.presentation.screen.ticket.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.exception.ManagerCodeErrorType
+import com.nexters.boolti.domain.exception.ManagerCodeException
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +28,9 @@ class TicketDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TicketDetailUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _managerCodeState = MutableStateFlow(ManagerCodeState())
+    val managerCodeState = _managerCodeState.asStateFlow()
+
     init {
         load()
     }
@@ -47,7 +52,16 @@ class TicketDetailViewModel @Inject constructor(
                 ManagerCodeRequest(showId = ticket.showId, ticketId = ticket.ticketId, managerCode = managerCode)
             ).catch { e ->
                 e.printStackTrace()
+                when (e) {
+                    is ManagerCodeException -> {
+                        _managerCodeState.update { it.copy(error = e.errorType) }
+                    }
+                }
             }.singleOrNull()
         }
+    }
+
+    fun setManagerCode(code: String) {
+        _managerCodeState.update { it.copy(code = code, error = null) }
     }
 }

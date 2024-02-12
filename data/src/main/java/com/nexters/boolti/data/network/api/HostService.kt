@@ -22,7 +22,7 @@ interface HostService {
     @POST("/app/api/v1/ticket/entrance/manager")
     suspend fun requestEntranceWithManagerCode(
         @Body request: ManagerCodeRequest,
-    ): Boolean
+    ): Response<Boolean>
 
     @GET("/app/api/v1/host/manager-code/{showId}")
     suspend fun getManagerCode(

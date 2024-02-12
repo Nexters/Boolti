@@ -11,7 +11,7 @@ class HostDataSource @Inject constructor(
     private val apiService: HostService,
 ) {
     suspend fun requestEntrance(request: QrScanRequest): Response<Boolean> = apiService.requestEntrance(request)
-    suspend fun requestEntranceWithManagerCode(request: ManagerCodeRequest): Boolean =
+    suspend fun requestEntranceWithManagerCode(request: ManagerCodeRequest): Response<Boolean> =
         apiService.requestEntranceWithManagerCode(request)
 
     suspend fun getHostedShows(): List<Show> = apiService.getHostedShows().map { it.toDomain() }

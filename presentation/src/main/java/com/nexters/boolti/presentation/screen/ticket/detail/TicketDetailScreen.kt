@@ -101,6 +101,7 @@ fun TicketDetailScreen(
     val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
     val ticket = uiState.ticket
 
     Scaffold(
@@ -181,6 +182,9 @@ fun TicketDetailScreen(
 
     if (showEnterCodeDialog) {
         ManagerCodeDialog(
+            managerCode = managerCodeState.code,
+            onManagerCodeChanged = viewModel::setManagerCode,
+            error = managerCodeState.error,
             onDismiss = { showEnterCodeDialog = false },
             onClickConfirm = { viewModel.requestEntrance(it) }
         )

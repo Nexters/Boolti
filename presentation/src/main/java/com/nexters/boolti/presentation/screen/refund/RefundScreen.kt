@@ -32,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -46,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.reservations.ReservationDetailUiState
@@ -99,7 +101,9 @@ fun RefundScreen(
                 )
             } else {
                 RefundInfoPage(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
                     reservation = state.reservation,
                     onRequest = {},
                 )
@@ -176,12 +180,52 @@ fun RefundInfoPage(
         Section(
             title = stringResource(id = R.string.refund_account_holder_info)
         ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.width(56.dp),
+                        text = stringResource(id = R.string.ticketing_name_label),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
+                    )
+                    BTTextField(
+                        modifier = Modifier.weight(1.0f),
+                        text = "",
+                        placeholder = stringResource(id = R.string.refund_account_name_hint),
+                        onValueChanged = {}
+                    )
+                }
 
+                Row(
+                    modifier = Modifier.padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.width(56.dp),
+                        text = stringResource(id = R.string.ticketing_contact_label),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
+                    )
+                    BTTextField(
+                        modifier = Modifier.weight(1.0f),
+                        text = "",
+                        placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
+                        onValueChanged = {},
+                    )
+                }
+            }
         }
         Section(
-            title = stringResource(id = R.string.refund_account_info)
+            modifier = Modifier.padding(top = 12.dp),
+            title = stringResource(id = R.string.refund_account_info),
+            expandable = false,
         ) {
-
+            BTTextField(
+                modifier = Modifier.fillMaxWidth(),
+                text = "",
+                placeholder = stringResource(id = R.string.refund_account_number_hint),
+                onValueChanged = {},
+            )
         }
 
         Spacer(modifier = Modifier.weight(1.0f))

@@ -29,7 +29,7 @@ import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
-import com.nexters.boolti.presentation.screen.ticket.TicketDetailScreen
+import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 
@@ -177,7 +177,11 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             route = "tickets/{ticketId}",
             arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
         ) {
-            TicketDetailScreen(modifier = modifier)
+            TicketDetailScreen(modifier = modifier,
+                onBackClicked = { navController.popBackStack() },
+                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") },
+                navigateToShowDetail = { navController.navigate("show/$it") }
+            )
         }
         composable(
             route = "ticketing/{showId}?salesTicketId={salesTicketId}&ticketCount={ticketCount}&inviteTicket={isInviteTicket}",

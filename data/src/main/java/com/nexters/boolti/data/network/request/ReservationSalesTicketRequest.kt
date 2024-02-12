@@ -29,8 +29,8 @@ fun TicketingRequest.Normal.toData(): ReservationSalesTicketRequest = Reservatio
     depositorPhoneNumber = depositorPhoneNumber,
     paymentAmount = paymentAmount,
     means = when (paymentType) {
-        PaymentType.CARD -> "CARD"
         PaymentType.ACCOUNT_TRANSFER -> "ACCOUNT_TRANSFER"
+        PaymentType.CARD -> "CARD"
         PaymentType.UNDEFINED -> ""
     },
 )

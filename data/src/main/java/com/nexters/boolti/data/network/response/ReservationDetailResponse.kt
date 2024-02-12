@@ -17,14 +17,14 @@ data class ReservationDetailResponse(
     val accountNumber: String,
     val accountHolder: String,
     val salesEndTime: String,
-    val meansType: String,
-    val totalAmountPrice: Int,
+    val meansType: String?,
+    val totalAmountPrice: Int = 0,
     val reservationStatus: String,
     val completedTimeStamp: String?,
     val reservationName: String,
     val reservationPhoneNumber: String,
-    val depositorName: String,
-    val depositorPhoneNumber: String,
+    val depositorName: String = "",
+    val depositorPhoneNumber: String = "",
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(

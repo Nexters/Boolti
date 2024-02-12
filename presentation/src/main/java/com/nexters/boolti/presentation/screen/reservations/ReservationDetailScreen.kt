@@ -106,15 +106,22 @@ fun ReservationDetailScreen(
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
             )
             Header(reservation = state.reservation)
-            DepositInfo(reservation = state.reservation, showMessage = { message ->
-                scope.launch { snackbarHostState.showSnackbar(message) }
-            })
+            if (!state.reservation.isInviteTicket) {
+                DepositInfo(
+                    reservation = state.reservation,
+                    showMessage = { message ->
+                        scope.launch { snackbarHostState.showSnackbar(message) }
+                    })
+            }
             PaymentInfo(reservation = state.reservation)
             TicketInfo(reservation = state.reservation)
             TicketHolderInfo(reservation = state.reservation)
-            DepositorInfo(reservation = state.reservation)
-            RefundPolicy()
-            if (state.reservation.reservationState == ReservationState.RESERVED) {
+            if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
+            if (!state.reservation.isInviteTicket) RefundPolicy()
+            Spacer(modifier = Modifier.height(40.dp))
+            if (state.reservation.reservationState == ReservationState.RESERVED &&
+                !state.reservation.isInviteTicket
+            ) {
                 RefundButton(
                     modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
                     onClick = { navigateToRefund(state.reservation.id) }
@@ -299,7 +306,7 @@ private fun PaymentInfo(
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.ticketing_payment_label),
-                value = paymentType
+                value = if (reservation.isInviteTicket) stringResource(id = R.string.ticketing_invite_code_label) else paymentType
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
@@ -403,7 +410,7 @@ private fun RefundPolicy(
     modifier: Modifier = Modifier,
 ) {
     Section(
-        modifier = modifier.padding(top = 12.dp, bottom = 40.dp),
+        modifier = modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.ticketing_refund_policy_label),
         defaultExpanded = false,
     ) {

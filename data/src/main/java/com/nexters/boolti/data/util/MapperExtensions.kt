@@ -23,7 +23,7 @@ internal fun String.toReservationState(): ReservationState {
     }
 }
 
-internal fun String.toPaymentType(): PaymentType {
+internal fun String?.toPaymentType(): PaymentType {
     return when (this) {
         "BANK_TRANSFER" -> PaymentType.ACCOUNT_TRANSFER
         "CARD" -> PaymentType.CARD

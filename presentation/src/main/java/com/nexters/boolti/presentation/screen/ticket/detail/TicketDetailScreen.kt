@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -56,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -82,6 +84,7 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toDp
+import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -95,6 +98,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
+import com.nexters.boolti.presentation.util.ticketPath
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -114,10 +118,11 @@ fun TicketDetailScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val bottomAreaHeight = 125.dp
+    val ticketInfoHeight = 125.dp
     var contentWidth by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeight by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
+    val bottomAreaHeight = ticketSectionHeight - ticketSectionHeightUntilTicketInfo + ticketInfoHeight.toPx()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
@@ -138,27 +143,21 @@ fun TicketDetailScreen(
                 .padding(horizontal = 29.dp)
                 .verticalScroll(scrollState),
         ) {
+            val ticketShape = TicketShape(
+                width = contentWidth,
+                height = ticketSectionHeight,
+                circleRadius = 10.dp.toPx(),
+                cornerRadius = 8.dp.toPx(),
+                bottomAreaHeight = bottomAreaHeight,
+            )
             Column(
                 modifier = Modifier
-                    .border(
-                        1.dp, color = White.copy(alpha = .15f),
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .clip(RoundedCornerShape(8.dp))
                     .onGloballyPositioned { coordinates ->
                         contentWidth = coordinates.size.width.toFloat()
                         ticketSectionHeight = coordinates.size.height.toFloat()
                     }
-                    .graphicsLayer {
-                        shape = TicketShape(
-                            width = contentWidth,
-                            height = ticketSectionHeight,
-                            circleRadius = 10.dp.toPx(),
-                            cornerRadius = 8.dp.toPx(),
-                            bottomAreaHeight = ticketSectionHeight - ticketSectionHeightUntilTicketInfo + bottomAreaHeight.toPx(),
-                        )
-                        clip = true
-                    },
+                    .clip(ticketShape)
+                    .border(1.dp, color = White.copy(alpha = .3f), shape = ticketShape),
             ) {
                 Box {
                     // 배경 블러된 이미지
@@ -215,7 +214,7 @@ fun TicketDetailScreen(
                         )
 
                         TicketInfo(
-                            bottomAreaHeight = bottomAreaHeight,
+                            bottomAreaHeight = ticketInfoHeight,
                             showName = ticket.showName,
                             showDate = ticket.showDate,
                             placeName = ticket.placeName,

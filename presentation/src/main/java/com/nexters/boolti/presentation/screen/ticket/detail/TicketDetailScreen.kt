@@ -180,9 +180,10 @@ fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        ManagerCodeDialog {
-            showEnterCodeDialog = false
-        }
+        ManagerCodeDialog(
+            onDismiss = { showEnterCodeDialog = false },
+            onClickConfirm = { viewModel.requestEntrance(it) }
+        )
     }
 }
 

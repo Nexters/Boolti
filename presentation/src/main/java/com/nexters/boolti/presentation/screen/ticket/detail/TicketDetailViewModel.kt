@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.TicketRepository
+import com.nexters.boolti.domain.request.ManagerCodeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,17 @@ class TicketDetailViewModel @Inject constructor(
             }.singleOrNull()?.let { ticket ->
                 _uiState.update { it.copy(ticket = ticket) }
             }
+        }
+    }
+
+    fun requestEntrance(managerCode: String) {
+        val ticket = uiState.value.ticket
+        viewModelScope.launch {
+            repository.requestEntrance(
+                ManagerCodeRequest(showId = ticket.showId, ticketId = ticket.ticketId, managerCode = managerCode)
+            ).catch { e ->
+                e.printStackTrace()
+            }.singleOrNull()
         }
     }
 }

@@ -29,17 +29,19 @@ import com.nexters.boolti.presentation.theme.Grey60
 @Composable
 fun ManagerCodeDialog(
     onDismiss: () -> Unit,
+    onClickConfirm: (managerCode: String) -> Unit,
 ) {
-    var enterCodeError by remember { mutableStateOf(false) }
-    var enterCode by remember { mutableStateOf("") }
+    var managerCodeError by remember { mutableStateOf(false) }
+    var managerCode by remember { mutableStateOf("") }
 
     BTDialog(
         onDismiss = {
-            enterCodeError = false
-            enterCode = ""
+            managerCodeError = false
+            managerCode = ""
             onDismiss()
         },
-        onClickPositiveButton = { /* TODO 입장 코드 검증 */ }
+        onClickPositiveButton = { onClickConfirm(managerCode) },
+        positiveButtonEnabled = managerCode.isNotEmpty(),
     ) {
         Text(
             text = stringResource(R.string.enter_code_dialog_title),
@@ -58,11 +60,11 @@ fun ManagerCodeDialog(
             color = Grey50,
         )
         BTTextField(
-            text = enterCode,
+            text = managerCode,
             placeholder = stringResource(R.string.enter_code_dialog_placeholder),
             onValueChanged = {
-                enterCodeError = false
-                enterCode = it
+                managerCodeError = false
+                managerCode = it
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,7 +76,7 @@ fun ManagerCodeDialog(
                 imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
-                onDone = { /* TODO 입장 코드 검증 */ }
+                onDone = { onClickConfirm(managerCode) }
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -88,7 +90,7 @@ fun ManagerCodeDialog(
                 unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
-        if (enterCodeError) {
+        if (managerCodeError) {
             Text(
                 text = stringResource(R.string.enter_code_dialog_error_msg),
                 style = MaterialTheme.typography.bodySmall,

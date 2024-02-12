@@ -100,6 +100,8 @@ fun TicketingScreen(
     val reservationButtonEnabled by viewModel.reservationButtonEnabled.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
 
+    val userInputState by viewModel.userInputUiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -138,15 +140,15 @@ fun TicketingScreen(
                     showDate = uiState.showDate,
                 )
                 TicketHolderSection(
-                    initialName = viewModel.userInput.reservationName,
-                    initialPhoneNumber = viewModel.userInput.reservationPhoneNumber,
+                    name = userInputState.reservationName,
+                    phoneNumber = userInputState.reservationPhoneNumber,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onNameChanged = viewModel::setReservationName,
                     onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
                 ) // 예매자 정보
                 if (!uiState.isInviteTicket) DeposorSection(
-                    initialName = viewModel.userInput.depositorName,
-                    initialPhoneNumber = viewModel.userInput.depositorPhoneNumber,
+                    name = userInputState.depositorName,
+                    phoneNumber = userInputState.depositorPhoneNumber,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onClickSameContact = viewModel::toggleIsSameContactInfo,
                     onNameChanged = viewModel::setDepositorName,
@@ -158,7 +160,7 @@ fun TicketingScreen(
                     totalPrice = uiState.totalPrice,
                 ) // 티켓 정보
                 if (uiState.isInviteTicket) InviteCodeSection(
-                    viewModel.userInput.inviteCode,
+                    userInputState.inviteCode,
                     uiState.inviteCodeStatus,
                     onInviteCodeChanged = viewModel::setInviteCode,
                 ) // 초청 코드
@@ -340,11 +342,10 @@ private fun PaymentSection(
 
 @Composable
 private fun InviteCodeSection(
-    initialInviteCode: String = "",
+    inviteCode: String = "",
     inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
     onInviteCodeChanged: (String) -> Unit,
 ) {
-    var inviteCode by remember { mutableStateOf(initialInviteCode) }
     Section(title = stringResource(R.string.ticketing_invite_code_label)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BTTextField(
@@ -359,7 +360,6 @@ private fun InviteCodeSection(
                     imeAction = ImeAction.Done,
                 ),
                 onValueChanged = {
-                    inviteCode = it
                     onInviteCodeChanged(it)
                 },
             )
@@ -422,15 +422,13 @@ private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: 
 
 @Composable
 private fun DeposorSection(
-    initialName: String = "",
-    initialPhoneNumber: String = "",
+    name: String = "",
+    phoneNumber: String = "",
     isSameContactInfo: Boolean,
     onClickSameContact: () -> Unit,
     onNameChanged: (name: String) -> Unit,
     onPhoneNumberChanged: (number: String) -> Unit,
 ) {
-    var name by remember { mutableStateOf(initialName) } // TODO remove
-    var phoneNumber by remember { mutableStateOf(initialPhoneNumber) } // TODO remove
     Section(
         title = stringResource(R.string.ticketing_depositor_label),
         titleRowOption = {
@@ -477,7 +475,6 @@ private fun DeposorSection(
                 name,
                 placeholder = stringResource(R.string.ticketing_name_placeholder),
             ) {
-                name = it
                 onNameChanged(it)
             }
             Spacer(modifier = Modifier.size(16.dp))
@@ -488,7 +485,6 @@ private fun DeposorSection(
                 isPhoneNumber = true,
                 imeAction = ImeAction.Default,
             ) {
-                phoneNumber = it
                 onPhoneNumberChanged(it)
             }
         }
@@ -497,21 +493,19 @@ private fun DeposorSection(
 
 @Composable
 private fun TicketHolderSection(
-    initialName: String = "",
-    initialPhoneNumber: String = "",
+    name: String = "",
+    phoneNumber: String = "",
     isSameContactInfo: Boolean,
     onNameChanged: (name: String) -> Unit,
     onPhoneNumberChanged: (number: String) -> Unit,
 ) {
-    var name by remember { mutableStateOf(initialName) } // TODO remove
-    var phoneNumber by remember { mutableStateOf(initialPhoneNumber) } // TODO remove
     Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
         InputRow(
             stringResource(R.string.ticketing_name_label),
+//            name,
             name,
             placeholder = stringResource(R.string.ticketing_name_placeholder),
         ) {
-            name = it
             onNameChanged(it)
         }
         Spacer(modifier = Modifier.size(16.dp))
@@ -526,7 +520,6 @@ private fun TicketHolderSection(
                 ImeAction.Next
             },
         ) {
-            phoneNumber = it
             onPhoneNumberChanged(it)
         }
     }

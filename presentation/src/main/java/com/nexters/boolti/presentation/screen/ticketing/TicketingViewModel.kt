@@ -37,6 +37,7 @@ class TicketingViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     private val userInputState = MutableStateFlow(TicketingUserInput())
+    val userInputUiState = userInputState.asStateFlow()
     val userInput
         get() = userInputState.value
 

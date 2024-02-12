@@ -148,6 +148,5 @@ object NetworkModule {
     fun provideAuthenticator(
         tokenDataSource: TokenDataSource,
         authDataSource: AuthDataSource,
-        loginService: LoginService,
-    ): AuthAuthenticator = AuthAuthenticator(tokenDataSource, authDataSource, loginService)
+    ): AuthAuthenticator = AuthAuthenticator(tokenDataSource, authDataSource)
 }

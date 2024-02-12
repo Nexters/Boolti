@@ -39,8 +39,6 @@ fun TicketDetailScreen(
     viewModel: TicketDetailViewModel = hiltViewModel(),
 ) {
     var showEnterCodeDialog by remember { mutableStateOf(false) }
-    var enterCodeError by remember { mutableStateOf(false) }
-    var enterCode by remember { mutableStateOf("") }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -61,69 +59,8 @@ fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        BTDialog(
-            onDismiss = {
-                enterCodeError = false
-                enterCode = ""
-                showEnterCodeDialog = false
-            },
-            onClickPositiveButton = { /* TODO 입장 코드 검증 */ }
-        ) {
-            Text(
-                text = stringResource(R.string.enter_code_dialog_title),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = stringResource(R.string.enter_code_dialog_desc),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 4.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
-            BTTextField(
-                text = enterCode,
-                placeholder = stringResource(R.string.enter_code_dialog_placeholder),
-                onValueChanged = {
-                    enterCodeError = false
-                    enterCode = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { /* TODO 입장 코드 검증 */ }
-                ),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedPlaceholderColor = Grey60,
-                    unfocusedPlaceholderColor = Grey60,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-            )
-            if (enterCodeError) {
-                Text(
-                    text = stringResource(R.string.enter_code_dialog_error_msg),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
-            }
+        ManagerCodeDialog {
+            showEnterCodeDialog = false
         }
     }
 }

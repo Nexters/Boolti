@@ -14,7 +14,7 @@ data class TicketingState(
     val isSameContactInfo: Boolean = false,
     val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val paymentType: PaymentType = PaymentType.AccountTransfer,
+    val paymentType: PaymentType = PaymentType.ACCOUNT_TRANSFER,
     val reservationName: String = "",
     val reservationPhoneNumber: String = "",
     val depositorName: String = "",

@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen
 
-import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.domain.request.TicketingRequest
-import com.nexters.boolti.presentation.QrScanActivity
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
@@ -25,6 +23,7 @@ import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
+import com.nexters.boolti.presentation.screen.report.ReportScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
@@ -142,6 +141,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                         navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
                     },
                     viewModel = showViewModel,
+                    navigateToReport = {
+                        val showId = entry.arguments?.getString("showId")
+                        navController.navigate("report/$showId")
+                    }
                 )
             }
             composable(
@@ -154,6 +157,14 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                     modifier = modifier,
                     viewModel = showViewModel,
                     onBackPressed = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = "report/{showId}",
+            ) {
+                ReportScreen(
+                    onBackPressed = { navController.popBackStack() },
+                    modifier = modifier,
                 )
             }
         }

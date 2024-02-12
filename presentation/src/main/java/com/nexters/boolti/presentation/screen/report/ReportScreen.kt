@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
@@ -28,9 +29,11 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
+import com.nexters.boolti.presentation.theme.point4
 
 @Composable
 fun ReportScreen(
+    onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
@@ -39,11 +42,7 @@ fun ReportScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            // TODO 41번 이슈에 대한 PR 머지된 후 BtAppbar 적용, 현재는 임시
-            Text(
-                text = stringResource(id = R.string.report),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            BtAppBar(title = stringResource(id = R.string.report), onBackPressed = onBackPressed)
         }
     ) { innerPadding ->
         Column(
@@ -54,13 +53,13 @@ fun ReportScreen(
                     .padding(top = 20.dp)
                     .padding(horizontal = marginHorizontal),
                 text = stringResource(id = R.string.report_sub_title),
-                style = point2, // TODO PR 머지되고 point4로 바꾸기
+                style = point4,
             )
             Text(
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .padding(horizontal = marginHorizontal),
-                text = stringResource(id = R.string.report_sub_title),
+                text = stringResource(id = R.string.report_description),
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
             TextField(modifier = Modifier

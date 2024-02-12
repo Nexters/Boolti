@@ -21,9 +21,3 @@ data class ReservationDetail(
     val depositorName: String,
     val depositorPhoneNumber: String,
 )
-
-enum class PaymentType {
-    ACCOUNT_TRANSFER,
-    CARD,
-    UNDEFINED,
-}

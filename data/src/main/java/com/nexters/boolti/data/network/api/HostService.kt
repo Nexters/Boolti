@@ -2,6 +2,7 @@ package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.response.HostedShowDto
 import com.nexters.boolti.data.network.response.ManagerCodeDto
+import com.nexters.boolti.domain.request.ManagerCodeRequest
 import com.nexters.boolti.domain.request.QrScanRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,6 +17,11 @@ interface HostService {
     @POST("/app/api/v1/ticket/entrance")
     suspend fun requestEntrance(
         @Body qrScanRequest: QrScanRequest,
+    ): Response<Boolean>
+
+    @POST("/app/api/v1/ticket/entrance/manager")
+    suspend fun requestEntranceWithManagerCode(
+        @Body request: ManagerCodeRequest,
     ): Response<Boolean>
 
     @GET("/app/api/v1/host/manager-code/{showId}")

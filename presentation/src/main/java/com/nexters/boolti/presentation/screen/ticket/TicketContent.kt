@@ -47,6 +47,8 @@ import com.nexters.boolti.domain.model.Ticket
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.DottedDivider
+import com.nexters.boolti.presentation.extension.dayOfWeekString
+import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
@@ -58,6 +60,7 @@ import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import com.nexters.boolti.presentation.util.ticketPath
+import java.time.LocalDateTime
 
 @Composable
 fun TicketContent(
@@ -165,7 +168,15 @@ fun TicketContent(
                 thickness = 2.dp,
                 color = White.copy(alpha = .3f),
             )
-            TicketInfo(bottomAreaHeight, ticket.entryCode, ticket.ticketState, onClickQr)
+            TicketInfo(
+                bottomAreaHeight = bottomAreaHeight,
+                showName = ticket.showName,
+                showDate = ticket.showDate,
+                placeName = ticket.placeName,
+                entryCode = ticket.entryCode,
+                ticketState = ticket.ticketState,
+                onClickQr = onClickQr,
+            )
         }
     }
 }
@@ -197,6 +208,9 @@ private fun Title(
 @Composable
 private fun TicketInfo(
     bottomAreaHeight: Dp,
+    showName: String,
+    showDate: LocalDateTime,
+    placeName: String,
     entryCode: String,
     ticketState: TicketState,
     onClickQr: (entryCode: String) -> Unit,
@@ -211,7 +225,7 @@ private fun TicketInfo(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB2024 TOGETHER LUCKY CLUB",
+                text = showName,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontFamily = aggroFamily,
                 ),
@@ -224,7 +238,7 @@ private fun TicketInfo(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "2024.01.20 (토)",
+                    text = showDate.format("yyyy.MM.dd (${showDate.dayOfWeekString})"),
                     style = MaterialTheme.typography.bodySmall,
                     color = Grey30,
                 )
@@ -235,7 +249,7 @@ private fun TicketInfo(
                         .background(Grey50),
                 )
                 Text(
-                    text = "클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프클럽 샤프",
+                    text = placeName,
                     style = MaterialTheme.typography.bodySmall,
                     color = Grey30,
                     maxLines = 1,

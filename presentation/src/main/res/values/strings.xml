@@ -191,6 +191,13 @@
     <string name="refund_account_number_hint">계좌번호를 입력해 주세요</string>
     <string name="refund_select_bank">선택 완료하기</string>
 
+    <!-- 신고 -->
+    <string name="report">신고하기</string>
+    <string name="report_sub_title">신고 사유를 입력해 주세요</string>
+    <string name="report_description">관리자 확인 후 공연이 삭제되며\n적절한 사유가 아닌 경우 반려될 수 있어요</string>
+    <string name="report_reason_hint">예) 부적절한 목적을 가진 공연이에요</string>
+    <string name="report_finished">신고를 완료했어요</string>
+
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>

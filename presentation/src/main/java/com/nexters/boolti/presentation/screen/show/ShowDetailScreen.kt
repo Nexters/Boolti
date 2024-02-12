@@ -16,10 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,6 +83,7 @@ fun ShowDetailScreen(
         ticketCount: Int,
         isInviteTicket: Boolean,
     ) -> Unit,
+    navigateToReport: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
@@ -99,7 +104,13 @@ fun ShowDetailScreen(
                 hostState = snackbarHostState,
             )
         },
-        topBar = { ShowDetailAppBar(onBack = onBack, onClickHome = onClickHome) },
+        topBar = {
+            ShowDetailAppBar(
+                onBack = onBack,
+                onClickHome = onClickHome,
+                navigateToReport = navigateToReport,
+            )
+        },
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
@@ -188,8 +199,13 @@ fun ShowDetailScreen(
 private fun ShowDetailAppBar(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
+    navigateToReport: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var isContextMenuVisible by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Row(
         modifier = modifier
             .height(44.dp)
@@ -236,12 +252,32 @@ private fun ShowDetailAppBar(
             modifier = Modifier
                 .padding(end = marginHorizontal)
                 .size(24.dp),
-            onClick = {},
+            onClick = {
+                isContextMenuVisible = true
+            },
         ) {
             Icon(
                 modifier = Modifier.size(24.dp),
                 painter = painterResource(R.drawable.ic_verticle_more),
                 contentDescription = stringResource(id = R.string.description_more_menu),
+            )
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd),
+    ) {
+        DropdownMenu(
+            expanded = isContextMenuVisible,
+            onDismissRequest = { isContextMenuVisible = false }) {
+            DropdownMenuItem(
+                text = { Text(text = stringResource(id = R.string.report)) },
+                onClick = {
+                    navigateToReport()
+                    isContextMenuVisible = false
+                }
             )
         }
     }

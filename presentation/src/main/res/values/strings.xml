@@ -57,6 +57,10 @@
     <string name="ticket_require_login">지금 로그인하고\n원하는 공연의 티켓을\n예매해보세요!</string>
     <string name="ticket_empty_label">아직 발권된 티켓이 없어요</string>
     <string name="ticket_empty_desc">티켓을 예매하고 공연을 즐겨보세요!</string>
+    <string name="ticket_notice_title">안내사항 for 주최자</string>
+    <string name="ticket_show_inquiry_title">공연 관련 문의</string>
+    <string name="copy_show_place_button">공연장 주소 복사</string>
+    <string name="navigate_to_show_button">공연장 정보 보기</string>
 
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
@@ -107,11 +111,11 @@
     <string name="ticketing_host_format">%s (%s)</string>
 
     <string-array name="refund_policy">
-        <item>하단에 나열된 내용은 전부 임시 텍스트입니다.</item>
-        <item>입장 확인이 된 티켓이 있을 경우 환불이 불가합니다.</item>
-        <item>환불 방법 : 티켓 예매 상세내역 > 예매취소</item>
-        <item>환불 금액 : 당사에서는 주문에 대해 즉시 취소를 하고, 취소 금액에 대한 입금은 카드사 영업일 기준 4~5일이 소요될 수 있습니다.</item>
-        <item>문의사항 발생시 카카오톡 채널로 문의부탁드립니다.</item>
+        <item>티켓 판매 기간 내 발권 취소 및 환불은\n서비스 내 처리가 가능하며, 판매 기간 이후에는\n주최자에게 직접 연락 바랍니다.</item>
+        <item>티켓 판매 기간 내 환불 신청은 발권 후\n마이 > 예매 내역 > 예매 상세에서 가능합니다.</item>
+        <item>계좌 이체를 통한 환불은 환불 계좌 정보가\n필요하며 영업일 기준 약 1~2일이 소요됩니다.</item>
+        <item>환불 수수료는 부과되지 않습니다.</item>
+        <item>기타 사항은 카카오톡 채널 @스튜디오불티로 문의 부탁드립니다.</item>
     </string-array>
 
     <!-- 입장 코드 -->

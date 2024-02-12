@@ -160,7 +160,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             route = "tickets/{ticketId}",
             arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
         ) {
-            TicketDetailScreen(modifier = modifier)
+            TicketDetailScreen(modifier = modifier,
+                onBackClicked = { navController.popBackStack() },
+                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") }
+            )
         }
         composable(
             route = "ticketing/{showId}?salesTicketId={salesTicketId}&ticketCount={ticketCount}&inviteTicket={isInviteTicket}",

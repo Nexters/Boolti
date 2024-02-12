@@ -47,12 +47,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -76,11 +77,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
+import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -92,6 +93,7 @@ import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.TicketShape
+import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -110,6 +112,7 @@ fun TicketDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val bottomAreaHeight = 125.dp
     var contentWidth by remember { mutableFloatStateOf(0f) }
@@ -157,48 +160,70 @@ fun TicketDetailScreen(
                         clip = true
                     },
             ) {
-                Column(
-                    modifier = Modifier
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFFC5CACD), Grey95),
-                                start = Offset.Zero,
-                                end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
-                            ),
-                        )
-                        .onGloballyPositioned { coordinates ->
-                            ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
-                        }
-                ) {
-                    Title(ticketName = ticket.ticketName)
-
+                Box {
+                    // 배경 블러된 이미지
                     AsyncImage(
+                        model = asyncImageBlurModel(context, ticket.poster, radius = 24),
                         modifier = Modifier
-                            .padding(marginHorizontal)
-                            .aspectRatio(0.75f)
-                            .clip(RoundedCornerShape(8.dp)),
-                        model = ticket.poster,
+                            .size(
+                                width = contentWidth.toDp(),
+                                height = ticketSectionHeightUntilTicketInfo.toDp(),
+                            )
+                            .alpha(.8f),
                         contentScale = ContentScale.Crop,
-                        contentDescription = stringResource(R.string.description_poster)
+                        contentDescription = null,
                     )
-
-                    DottedDivider(
+                    // 배경 블러된 이미지 위에 올라가는 그라데이션 배경
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = marginHorizontal),
-                        color = White.copy(alpha = 0.3f),
-                        thickness = 2.dp
+                            .size(
+                                width = contentWidth.toDp(),
+                                height = ticketSectionHeightUntilTicketInfo.toDp(),
+                            )
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
+                                    start = Offset.Zero,
+                                    end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
+                                ),
+                            )
                     )
+                    Column(
+                        modifier = Modifier
+                            .onGloballyPositioned { coordinates ->
+                                ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
+                            }
+                    ) {
+                        Title(ticketName = ticket.ticketName)
 
-                    TicketInfo(
-                        bottomAreaHeight = bottomAreaHeight,
-                        showName = ticket.showName,
-                        showDate = ticket.showDate,
-                        placeName = ticket.placeName,
-                        entryCode = ticket.entryCode,
-                        ticketState = ticket.ticketState,
-                        onClickQr = onClickQr,
-                    )
+                        AsyncImage(
+                            modifier = Modifier
+                                .padding(marginHorizontal)
+                                .aspectRatio(0.75f)
+                                .clip(RoundedCornerShape(8.dp)),
+                            model = ticket.poster,
+                            contentScale = ContentScale.Crop,
+                            contentDescription = stringResource(R.string.description_poster)
+                        )
+
+                        DottedDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = marginHorizontal),
+                            color = White.copy(alpha = 0.3f),
+                            thickness = 2.dp
+                        )
+
+                        TicketInfo(
+                            bottomAreaHeight = bottomAreaHeight,
+                            showName = ticket.showName,
+                            showDate = ticket.showDate,
+                            placeName = ticket.placeName,
+                            entryCode = ticket.entryCode,
+                            ticketState = ticket.ticketState,
+                            onClickQr = onClickQr,
+                        )
+                    }
                 }
 
                 Notice(notice = ticket.notice)
@@ -308,7 +333,10 @@ private fun TicketInfo(
             .height(bottomAreaHeight)
             .background(
                 brush = Brush.verticalGradient(
-                    listOf(MaterialTheme.colorScheme.background.copy(alpha = .2f), MaterialTheme.colorScheme.background),
+                    listOf(
+                        MaterialTheme.colorScheme.background.copy(alpha = .2f),
+                        MaterialTheme.colorScheme.background
+                    ),
                 )
             )
             .padding(marginHorizontal),

@@ -184,6 +184,7 @@
     <string name="refund_account_info">환불 계좌 정보</string>
     <string name="refund_bank_selection">은행 선택</string>
     <string name="refund_account_number_hint">계좌번호를 입력해 주세요</string>
+    <string name="refund_select_bank">선택 완료하기</string>
 
     <!-- 다이얼로그 -->
     <string name="force_update_title">업데이트 알림</string>

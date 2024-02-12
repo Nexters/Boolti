@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.report
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,9 +15,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,19 +32,26 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point4
 
 @Composable
 fun ReportScreen(
     onBackPressed: () -> Unit,
+    popupToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReportViewModel = hiltViewModel(),
 ) {
-    val reason by viewModel.reason.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) {
+            keyboardController?.hide()
+        },
         topBar = {
             BtAppBar(title = stringResource(id = R.string.report), onBackPressed = onBackPressed)
         }
@@ -68,7 +79,7 @@ fun ReportScreen(
                 .height(160.dp)
                 .padding(top = 20.dp)
                 .clip(shape = RoundedCornerShape(4.dp)),
-                value = reason,
+                value = uiState.reason,
                 onValueChange = viewModel::updateReason,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey10),
                 colors = TextFieldDefaults.colors(
@@ -90,7 +101,11 @@ fun ReportScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
-                    .padding(bottom = 8.dp), onClick = { /* TODO */ }, enabled = true, // TODO 입력 여부
+                    .padding(bottom = 8.dp),
+                onClick = {
+                    popupToHome()
+                },
+                enabled = uiState.reportable,
                 label = stringResource(id = R.string.report)
             )
         }

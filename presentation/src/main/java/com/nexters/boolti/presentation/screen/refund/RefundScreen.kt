@@ -64,6 +64,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
@@ -92,6 +93,7 @@ fun RefundScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { 2 }
+    var openDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -125,11 +127,58 @@ fun RefundScreen(
                         .padding(innerPadding),
                     reservation = reservation,
                     onNameChanged = viewModel::updateName,
-                    onPhoneNumberChanged = viewModel::updatePhoneNumber,
+                    onContactNumberChanged = viewModel::updateContact,
                     onBankInfoChanged = viewModel::updateBankInfo,
                     onAccountNumberChanged = viewModel::updateAccountNumber,
-                    onRequest = {},
+                    onRequest = { openDialog = true },
                 )
+            }
+        }
+    }
+
+    if (openDialog) {
+        BTDialog(
+            positiveButtonLabel = stringResource(id = R.string.refund_button),
+            onDismiss = { openDialog = false }
+        ) {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.refund_dialog_title),
+                    style = MaterialTheme.typography.titleLarge.copy(color = Grey15),
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Grey80)
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    InfoRow(
+                        type = stringResource(id = R.string.account_holder),
+                        value = uiState.name
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        type = stringResource(id = R.string.ticketing_contact_label),
+                        value = StringBuilder(uiState.contact).apply {
+                            if (uiState.contact.length > 7) {
+                                insert(7, '-')
+                                insert(3, '-')
+                            }
+                        }.toString()
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        type = stringResource(id = R.string.bank_name),
+                        value = uiState.bankInfo?.bankName ?: ""
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        type = stringResource(id = R.string.account_number),
+                        value = uiState.accountNumber
+                    )
+                }
             }
         }
     }
@@ -191,7 +240,7 @@ fun RefundInfoPage(
     reservation: ReservationDetail,
     onRequest: () -> Unit,
     onNameChanged: (String) -> Unit,
-    onPhoneNumberChanged: (String) -> Unit,
+    onContactNumberChanged: (String) -> Unit,
     onBankInfoChanged: (BankInfo) -> Unit,
     onAccountNumberChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -260,7 +309,7 @@ fun RefundInfoPage(
                         ),
                         isError = showContactError,
                         placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
-                        onValueChanged = onPhoneNumberChanged,
+                        onValueChanged = onContactNumberChanged,
                         visualTransformation = PhoneNumberVisualTransformation('-'),
                     )
                 }
@@ -301,7 +350,8 @@ fun RefundInfoPage(
                         tint = Grey50,
                     )
                 }
-                val showAccountError = uiState.accountNumber.isNotEmpty() && !uiState.isValidAccountNumber
+                val showAccountError =
+                    uiState.accountNumber.isNotEmpty() && !uiState.isValidAccountNumber
                 BTTextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -563,5 +613,26 @@ fun BackItem(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
+    }
+}
+
+@Composable
+fun InfoRow(
+    type: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = type,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey15),
+        )
     }
 }

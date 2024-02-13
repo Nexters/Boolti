@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.ReservationRepository
-import com.nexters.boolti.presentation.screen.reservations.ReservationDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,5 +39,21 @@ class RefundViewModel @Inject constructor(
                 it.printStackTrace()
             }
             .launchIn(viewModelScope)
+    }
+
+    fun updateName(newName: String) {
+        _uiState.update { it.copy(name = newName) }
+    }
+
+    fun updatePhoneNumber(newPhoneNumber: String) {
+        _uiState.update { it.copy(phoneNumber = newPhoneNumber) }
+    }
+
+    fun updateBankInfo(newBankInfo: BankInfo) {
+        _uiState.update { it.copy(bankInfo = newBankInfo) }
+    }
+
+    fun updateAccountNumber(newAccountNumber: String) {
+        _uiState.update { it.copy(accountNumber = newAccountNumber) }
     }
 }

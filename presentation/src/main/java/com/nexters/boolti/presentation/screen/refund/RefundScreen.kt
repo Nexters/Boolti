@@ -64,7 +64,6 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.screen.reservations.ReservationDetailUiState
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -114,10 +113,15 @@ fun RefundScreen(
                 )
             } else {
                 RefundInfoPage(
+                    uiState = uiState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
                     reservation = reservation,
+                    onNameChanged = viewModel::updateName,
+                    onPhoneNumberChanged = viewModel::updatePhoneNumber,
+                    onBankInfoChanged = viewModel::updateBankInfo,
+                    onAccountNumberChanged = viewModel::updateAccountNumber,
                     onRequest = {},
                 )
             }
@@ -177,8 +181,13 @@ fun ReasonPage(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefundInfoPage(
+    uiState: RefundUiState,
     reservation: ReservationDetail,
     onRequest: () -> Unit,
+    onNameChanged: (String) -> Unit,
+    onPhoneNumberChanged: (String) -> Unit,
+    onBankInfoChanged: (BankInfo) -> Unit,
+    onAccountNumberChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isSheetOpen by remember { mutableStateOf(false) }
@@ -204,10 +213,12 @@ fun RefundInfoPage(
                         text = stringResource(id = R.string.ticketing_name_label),
                         style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
                     )
-                    BTTextField(modifier = Modifier.weight(1.0f),
-                        text = "",
+                    BTTextField(
+                        modifier = Modifier.weight(1.0f),
+                        text = uiState.name,
                         placeholder = stringResource(id = R.string.refund_account_name_hint),
-                        onValueChanged = {})
+                        onValueChanged = onNameChanged
+                    )
                 }
 
                 Row(
@@ -221,9 +232,9 @@ fun RefundInfoPage(
                     )
                     BTTextField(
                         modifier = Modifier.weight(1.0f),
-                        text = "",
+                        text = uiState.phoneNumber,
                         placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
-                        onValueChanged = {},
+                        onValueChanged = onPhoneNumberChanged,
                     )
                 }
             }
@@ -244,8 +255,9 @@ fun RefundInfoPage(
                         containerColor = MaterialTheme.colorScheme.surfaceTint,
                     )
                 ) {
+                    val bankSelection = stringResource(id = R.string.refund_bank_selection)
                     Text(
-                        text = stringResource(id = R.string.refund_bank_selection),
+                        text = if (uiState.bankInfo == null) bankSelection else uiState.bankInfo.bankName,
                         style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
                     )
                     Spacer(modifier = Modifier.weight(1.0f))
@@ -259,9 +271,9 @@ fun RefundInfoPage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp),
-                    text = "",
+                    text = uiState.accountNumber,
                     placeholder = stringResource(id = R.string.refund_account_number_hint),
-                    onValueChanged = {},
+                    onValueChanged = onAccountNumberChanged,
                 )
             }
         }
@@ -294,7 +306,10 @@ fun RefundInfoPage(
             },
             containerColor = Grey85,
         ) {
-            BankSelection()
+            BankSelection(
+                selectedBank = uiState.bankInfo,
+                onClick = onBankInfoChanged,
+                onDismiss = { isSheetOpen = false })
         }
     }
 }
@@ -401,6 +416,9 @@ private fun Section(
 
 @Composable
 fun BankSelection(
+    onDismiss: () -> Unit,
+    selectedBank: BankInfo?,
+    onClick: (bankInfo: BankInfo) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -427,8 +445,8 @@ fun BankSelection(
                     item {
                         BackItem(
                             bankInfo = bankInfo,
-                            onClick = {},
-                            selected = bankInfo.code == "003"
+                            onClick = onClick,
+                            selected = if (selectedBank == null) null else selectedBank == bankInfo,
                         )
                     }
                 }
@@ -453,9 +471,8 @@ fun BankSelection(
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal),
                 label = stringResource(id = R.string.refund_select_bank),
-            ) {
-
-            }
+                onClick = onDismiss,
+            )
         }
     }
 }
@@ -472,15 +489,18 @@ fun BackItem(
             .height(74.dp)
             .border(
                 shape = RoundedCornerShape(4.dp),
-                color = if(selected == true) Grey10 else Color.Transparent,
+                color = if (selected == true) Grey10 else Color.Transparent,
                 width = 1.dp,
             )
             .clip(RoundedCornerShape(4.dp))
-            .background(Grey80),
+            .background(Grey80)
+            .clickable {
+                onClick(bankInfo)
+            },
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier.alpha(alpha = if(selected == false) 0.4f else 1.0f),
+            modifier = Modifier.alpha(alpha = if (selected == false) 0.4f else 1.0f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

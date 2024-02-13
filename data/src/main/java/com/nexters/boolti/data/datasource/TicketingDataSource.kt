@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.TicketingService
+import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
 import com.nexters.boolti.data.network.response.CheckInviteCodeResponse
 import com.nexters.boolti.domain.model.TicketWithQuantity
@@ -30,6 +31,10 @@ class TicketingDataSource @Inject constructor(
 
     suspend fun requestReservationSalesTicket(request: ReservationSalesTicketRequest): String {
         return ticketingService.requestReservationSalesTicket(request).reservationId
+    }
+
+    suspend fun requestReservationInviteTicket(request: ReservationInviteTicketRequest): String {
+        return ticketingService.requestReservationInviteTicket(request).reservationId
     }
 
     suspend fun checkInviteCode(request: CheckInviteCodeRequest): Response<CheckInviteCodeResponse> {

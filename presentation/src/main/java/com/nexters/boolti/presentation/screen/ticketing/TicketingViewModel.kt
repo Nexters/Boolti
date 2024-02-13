@@ -10,10 +10,12 @@ import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,6 +35,9 @@ class TicketingViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(TicketingState())
     val uiState = _uiState.asStateFlow()
+
+    private val _event = Channel<TicketingEvent>()
+    val event = _event.receiveAsFlow()
 
     private val state: TicketingState
         get() = uiState.value
@@ -74,9 +79,10 @@ class TicketingViewModel @Inject constructor(
                     e.printStackTrace()
                     _uiState.update { it.copy(loading = false) }
                 }
-                .singleOrNull()?.let {
-                    Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $it")
+                .singleOrNull()?.let { reservationId ->
+                    Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
                     _uiState.update { it.copy(loading = false) }
+                    event(TicketingEvent.TicketingSuccess(reservationId))
                 }
         }
     }
@@ -151,5 +157,11 @@ class TicketingViewModel @Inject constructor(
 
     fun setInviteCode(code: String) {
         _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
+    }
+
+    private fun event(event: TicketingEvent) {
+        viewModelScope.launch {
+            _event.send(event)
+        }
     }
 }

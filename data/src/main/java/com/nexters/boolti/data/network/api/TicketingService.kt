@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
 import com.nexters.boolti.data.network.response.CheckInviteCodeResponse
 import com.nexters.boolti.data.network.response.ReservationDto
@@ -28,6 +29,11 @@ interface TicketingService {
     @POST("/app/api/v1/reservation/sales-ticket")
     suspend fun requestReservationSalesTicket(
         @Body request: ReservationSalesTicketRequest,
+    ): ReservationDto
+
+    @POST("/app/api/v1/reservation/invite-ticket")
+    suspend fun requestReservationInviteTicket(
+        @Body request: ReservationInviteTicketRequest,
     ): ReservationDto
 
     @GET("/app/api/v1/check/invite-code")

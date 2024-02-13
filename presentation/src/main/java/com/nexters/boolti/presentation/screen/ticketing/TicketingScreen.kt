@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -93,12 +94,20 @@ fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
-    onReservationClicked: (ticketingRequest: TicketingRequest) -> Unit,
+    onReserved: (reservationId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(viewModel.event) {
+        viewModel.event.collect {
+            when (it) {
+                is TicketingEvent.TicketingSuccess -> onReserved(it.reservationId)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

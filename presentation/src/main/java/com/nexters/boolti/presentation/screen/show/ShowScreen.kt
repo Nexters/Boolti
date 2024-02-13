@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +67,7 @@ fun ShowScreen(
     val searchBarHeight = 80.dp
     val changeableAppBarHeightPx =
         with(LocalDensity.current) { (appbarHeight - searchBarHeight).roundToPx().toFloat() }
-    var appbarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
+    var appbarOffsetHeightPx by rememberSaveable { mutableFloatStateOf(0f) }
     var changeableAppBarHeight by remember { mutableFloatStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {

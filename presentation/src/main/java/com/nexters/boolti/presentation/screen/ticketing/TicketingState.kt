@@ -23,8 +23,14 @@ data class TicketingState(
     val inviteCode: String = "",
 ) {
     val reservationButtonEnabled: Boolean
-        get() = reservationName.isNotBlank() &&
-                reservationPhoneNumber.isNotBlank() &&
-                (isSameContactInfo || depositorName.isNotBlank()) &&
-                (isSameContactInfo || depositorPhoneNumber.isNotBlank())
+        get() = if (isInviteTicket) {
+            reservationName.isNotBlank() &&
+                    reservationPhoneNumber.isNotBlank() &&
+                    inviteCodeStatus is InviteCodeStatus.Valid
+        } else {
+            reservationName.isNotBlank() &&
+                    reservationPhoneNumber.isNotBlank() &&
+                    (isSameContactInfo || depositorName.isNotBlank()) &&
+                    (isSameContactInfo || depositorPhoneNumber.isNotBlank())
+        }
 }

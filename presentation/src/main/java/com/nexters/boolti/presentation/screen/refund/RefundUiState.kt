@@ -24,4 +24,8 @@ data class RefundUiState(
         val regex = "^[0-9]{11,14}$".toRegex()
         return regex.matches(accountNumber)
     }
+
+    val isAbleToRequest: Boolean get() {
+        return reason.isNotBlank() && isValidName && isValidContact && (bankInfo != null) && isValidAccountNumber
+    }
 }

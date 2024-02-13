@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -56,6 +58,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -159,7 +162,8 @@ fun RefundScreen(
     if (openDialog) {
         BTDialog(
             positiveButtonLabel = stringResource(id = R.string.refund_button),
-            onDismiss = { openDialog = false }
+            onDismiss = { openDialog = false },
+            onClickPositiveButton = viewModel::refund,
         ) {
             Column {
                 Text(
@@ -211,8 +215,16 @@ fun ReasonPage(
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
+
     Column(
-        modifier = modifier
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) {
+            keyboardController?.hide()
+        }
     ) {
         Text(
             modifier = Modifier
@@ -249,7 +261,9 @@ fun ReasonPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 8.dp), onClick = onNextClick, enabled = true, // TODO 입력 여부
+                .padding(bottom = 8.dp),
+            onClick = onNextClick,
+            enabled = reason.isNotBlank(),
             label = stringResource(id = R.string.next)
         )
     }
@@ -383,7 +397,7 @@ fun RefundInfoPage(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Next
+                        imeAction = ImeAction.Done
                     ),
                     placeholder = stringResource(id = R.string.refund_account_number_hint),
                     onValueChanged = onAccountNumberChanged,
@@ -403,8 +417,10 @@ fun RefundInfoPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 8.dp), onClick = onRequest, enabled = true, // TODO 입력 여부
-            label = stringResource(id = R.string.next)
+                .padding(bottom = 8.dp),
+            onClick = onRequest,
+            enabled = uiState.isAbleToRequest,
+            label = stringResource(id = R.string.refund_button)
         )
     }
 

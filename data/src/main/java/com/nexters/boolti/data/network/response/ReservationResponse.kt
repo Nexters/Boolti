@@ -14,7 +14,7 @@ data class ReservationResponse(
     val showImg: String,
     val salesTicketName: String,
     val ticketCount: Int,
-    val ticketPrice: Int,
+    val ticketPrice: Int = 0,
 ) {
     fun toDomain(): Reservation {
         return Reservation(

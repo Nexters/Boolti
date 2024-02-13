@@ -7,6 +7,7 @@ data class ReservationDetail(
     val showImage: String,
     val showName: String,
     val ticketName: String,
+    val isInviteTicket: Boolean,
     val ticketCount: Int,
     val bankName: String,
     val accountNumber: String,
@@ -20,6 +21,4 @@ data class ReservationDetail(
     val ticketHolderPhoneNumber: String,
     val depositorName: String,
     val depositorPhoneNumber: String,
-) {
-    val isInviteTicket: Boolean get() = totalAmountPrice == 0
-}
+)

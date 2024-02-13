@@ -72,7 +72,6 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point4
@@ -97,8 +96,7 @@ fun RefundScreen(
         },
         modifier = modifier,
     ) { innerPadding ->
-        val state = uiState
-        if (state !is ReservationDetailUiState.Success) return@Scaffold
+        val reservation = uiState.reservation ?: return@Scaffold
 
         HorizontalPager(
             modifier = Modifier.fillMaxSize(),
@@ -119,7 +117,7 @@ fun RefundScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    reservation = state.reservation,
+                    reservation = reservation,
                     onRequest = {},
                 )
             }

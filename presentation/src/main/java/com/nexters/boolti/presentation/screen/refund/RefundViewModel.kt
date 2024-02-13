@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -25,9 +24,8 @@ class RefundViewModel @Inject constructor(
         "reservationId가 전달되어야 합니다."
     }
 
-    private val _uiState: MutableStateFlow<ReservationDetailUiState> =
-        MutableStateFlow(ReservationDetailUiState.Loading)
-    val uiState: StateFlow<ReservationDetailUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<RefundUiState> = MutableStateFlow(RefundUiState())
+    val uiState: StateFlow<RefundUiState> = _uiState.asStateFlow()
 
     init {
         fetchReservation()
@@ -35,15 +33,11 @@ class RefundViewModel @Inject constructor(
 
     private fun fetchReservation() {
         reservationRepository.findReservationById(reservationId)
-            .onStart {
-                _uiState.update { ReservationDetailUiState.Loading }
-            }
             .onEach { reservation ->
-                _uiState.update { ReservationDetailUiState.Success(reservation) }
+                _uiState.update { it.copy(reservation = reservation) }
             }
             .catch {
                 it.printStackTrace()
-                _uiState.update { ReservationDetailUiState.Error() }
             }
             .launchIn(viewModelScope)
     }

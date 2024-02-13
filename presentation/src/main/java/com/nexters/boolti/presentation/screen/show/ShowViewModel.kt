@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -25,7 +26,8 @@ class ShowViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ShowUiState())
     val uiState: StateFlow<ShowUiState> = _uiState.asStateFlow()
 
-    init {
+    fun refresh() {
+        _uiState.update { ShowUiState() }
         search()
         fetchReservationInfo()
     }
@@ -57,6 +59,9 @@ class ShowViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(hasPendingTicket = hasPendingTicket)
                 }
+            }
+            .catch {
+                // TODO 예외 처리
             }
             .launchIn(viewModelScope)
     }

@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
@@ -159,6 +160,7 @@ fun TicketingScreen(
                 if (uiState.isInviteTicket) InviteCodeSection(
                     uiState.inviteCode,
                     uiState.inviteCodeStatus,
+                    onClickCheckInviteCode = viewModel::checkInviteCode,
                     onInviteCodeChanged = viewModel::setInviteCode,
                 ) // 초청 코드
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
@@ -342,6 +344,7 @@ private fun InviteCodeSection(
     inviteCode: String = "",
     inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
     onInviteCodeChanged: (String) -> Unit,
+    onClickCheckInviteCode: () -> Unit,
 ) {
     Section(title = stringResource(R.string.ticketing_invite_code_label)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -351,6 +354,7 @@ private fun InviteCodeSection(
                     .padding(end = 6.dp),
                 text = inviteCode,
                 singleLine = true,
+                enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
                 placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
@@ -361,8 +365,8 @@ private fun InviteCodeSection(
                 },
             )
             Button(
-                onClick = { inviteCodeStatus is InviteCodeStatus.Valid },
-                enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
+                onClick = onClickCheckInviteCode,
+                enabled = inviteCodeStatus !is InviteCodeStatus.Valid && inviteCode.isNotBlank(),
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(

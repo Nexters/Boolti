@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.PaymentType
 import java.time.LocalDateTime
 
@@ -26,12 +27,4 @@ data class TicketingState(
                 reservationPhoneNumber.isNotBlank() &&
                 (isSameContactInfo || depositorName.isNotBlank()) &&
                 (isSameContactInfo || depositorPhoneNumber.isNotBlank())
-}
-
-sealed interface InviteCodeStatus {
-    data object Default : InviteCodeStatus
-    data object Empty : InviteCodeStatus
-    data object Invalid : InviteCodeStatus
-    data object Duplicated : InviteCodeStatus
-    data object Valid : InviteCodeStatus
 }

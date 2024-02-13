@@ -2,9 +2,13 @@ package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
+import com.nexters.boolti.domain.exception.InviteCodeException
+import com.nexters.boolti.domain.extension.errorType
+import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
@@ -29,5 +33,21 @@ class TicketingRepositoryImpl @Inject constructor(
             is TicketingRequest.Normal -> dataSource.requestReservationSalesTicket(request.toData())
         }
         emit(response)
+    }
+
+    override fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus> = flow {
+        val response = dataSource.checkInviteCode(request)
+        if (response.isSuccessful) {
+            if (response.body()?.isUsed?.not() == true) {
+                emit(InviteCodeStatus.Valid)
+            } else {
+                emit(InviteCodeStatus.Duplicated)
+            }
+        } else {
+            val errMsg = response.errorBody()?.string()
+            val status = InviteCodeStatus.fromString(errMsg?.errorType)
+            emit(status)
+            throw InviteCodeException(status)
+        }
     }
 }

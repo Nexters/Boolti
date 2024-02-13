@@ -3,20 +3,18 @@ package com.nexters.boolti.presentation.screen.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.singleOrNull
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -36,7 +34,8 @@ class TicketingViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TicketingState())
     val uiState = _uiState.asStateFlow()
 
-    private val state = uiState.value
+    private val state: TicketingState
+        get() = uiState.value
 
     private val reservationRequest: TicketingRequest
         get() = when (uiState.value.isInviteTicket) {
@@ -113,6 +112,27 @@ class TicketingViewModel @Inject constructor(
         }
     }
 
+    fun checkInviteCode() {
+        viewModelScope.launch {
+            repository.checkInviteCode(
+                CheckInviteCodeRequest(
+                    showId = showId,
+                    salesTicketId = salesTicketTypeId,
+                    inviteCode = state.inviteCode,
+                )
+            ).onStart {
+                _uiState.update { it.copy(loading = true) }
+            }.catch { e ->
+                e.printStackTrace()
+                _uiState.update { it.copy(loading = false) }
+            }.singleOrNull()?.let { status ->
+                _uiState.update {
+                    it.copy(loading = false, inviteCodeStatus = status)
+                }
+            }
+        }
+    }
+
     fun setReservationName(name: String) {
         _uiState.update { it.copy(reservationName = name) }
     }
@@ -130,6 +150,6 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun setInviteCode(code: String) {
-        _uiState.update { it.copy(inviteCode = code) }
+        _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
     }
 }

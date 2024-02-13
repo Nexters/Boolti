@@ -7,6 +7,7 @@ data class ReservationDetail(
     val showImage: String,
     val showName: String,
     val ticketName: String,
+    val isInviteTicket: Boolean,
     val ticketCount: Int,
     val bankName: String,
     val accountNumber: String,

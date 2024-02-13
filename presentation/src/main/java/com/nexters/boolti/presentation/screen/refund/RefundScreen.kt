@@ -136,6 +136,8 @@ fun RefundScreen(
                             pagerState.animateScrollToPage(1)
                         }
                     },
+                    onReasonChanged = viewModel::updateReason,
+                    reason = uiState.reason
                 )
             } else {
                 RefundInfoPage(
@@ -204,6 +206,8 @@ fun RefundScreen(
 
 @Composable
 fun ReasonPage(
+    reason: String,
+    onReasonChanged: (String) -> Unit,
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -223,8 +227,8 @@ fun ReasonPage(
             .height(160.dp)
             .padding(top = 20.dp)
             .clip(shape = RoundedCornerShape(4.dp)),
-            value = "",
-            onValueChange = {},
+            value = reason,
+            onValueChange = onReasonChanged,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey10),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Grey85,

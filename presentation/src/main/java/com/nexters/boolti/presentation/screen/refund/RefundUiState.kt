@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.refund
 import com.nexters.boolti.domain.model.ReservationDetail
 
 data class RefundUiState(
+    val reason: String = "",
     val name: String = "",
     val contact: String = "",
     val bankInfo: BankInfo? = null,

@@ -58,7 +58,7 @@ class RefundViewModel @Inject constructor(
     fun refund() {
         val request = RefundRequest(
             reservationId = reservationId,
-            reason = "", // TODO 이유 추가
+            reason = uiState.value.reason,
             phoneNumber = uiState.value.contact,
             accountName = uiState.value.name,
             accountNumber = uiState.value.accountNumber,
@@ -69,6 +69,10 @@ class RefundViewModel @Inject constructor(
         }.catch {
             it.printStackTrace()
         }.launchIn(viewModelScope)
+    }
+
+    fun updateReason(newReason: String) {
+        _uiState.update { it.copy(reason = newReason) }
     }
 
     fun updateName(newName: String) {

@@ -46,7 +46,7 @@ class RefundViewModel @Inject constructor(
     }
 
     fun updatePhoneNumber(newPhoneNumber: String) {
-        _uiState.update { it.copy(phoneNumber = newPhoneNumber) }
+        _uiState.update { it.copy(contact = newPhoneNumber) }
     }
 
     fun updateBankInfo(newBankInfo: BankInfo) {

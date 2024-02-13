@@ -26,6 +26,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -54,6 +55,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -64,6 +67,8 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -74,6 +79,7 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point4
+import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -205,6 +211,7 @@ fun RefundInfoPage(
             title = stringResource(id = R.string.refund_account_holder_info)
         ) {
             Column {
+                val showNameError = uiState.name.isNotEmpty() && !uiState.isValidName
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -216,11 +223,24 @@ fun RefundInfoPage(
                     BTTextField(
                         modifier = Modifier.weight(1.0f),
                         text = uiState.name,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
                         placeholder = stringResource(id = R.string.refund_account_name_hint),
                         onValueChanged = onNameChanged
                     )
                 }
+                if (showNameError) {
+                    Text(
+                        modifier = Modifier.padding(start = 56.dp, top = 12.dp),
+                        text = stringResource(id = R.string.validation_name),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
+                    )
+                }
 
+                val showContactError = uiState.contact.isNotEmpty() && !uiState.isValidContact
                 Row(
                     modifier = Modifier.padding(top = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -232,9 +252,23 @@ fun RefundInfoPage(
                     )
                     BTTextField(
                         modifier = Modifier.weight(1.0f),
-                        text = uiState.phoneNumber,
+                        text = uiState.contact.filterToPhoneNumber(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next
+                        ),
+                        isError = showContactError,
                         placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
                         onValueChanged = onPhoneNumberChanged,
+                        visualTransformation = PhoneNumberVisualTransformation('-'),
+                    )
+                }
+                if (showContactError) {
+                    Text(
+                        modifier = Modifier.padding(start = 56.dp, top = 12.dp),
+                        text = stringResource(id = R.string.validation_contact),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
                     )
                 }
             }
@@ -267,14 +301,28 @@ fun RefundInfoPage(
                         tint = Grey50,
                     )
                 }
+                val showAccountError = uiState.accountNumber.isNotEmpty() && !uiState.isValidAccountNumber
                 BTTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp),
                     text = uiState.accountNumber,
+                    isError = showAccountError,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
                     placeholder = stringResource(id = R.string.refund_account_number_hint),
                     onValueChanged = onAccountNumberChanged,
                 )
+                if (showAccountError) {
+                    Text(
+                        modifier = Modifier.padding(top = 12.dp),
+                        text = stringResource(id = R.string.validation_account),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
+                    )
+                }
             }
         }
 

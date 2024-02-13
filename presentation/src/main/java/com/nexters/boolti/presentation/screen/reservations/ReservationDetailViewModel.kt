@@ -27,11 +27,7 @@ class ReservationDetailViewModel @Inject constructor(
         MutableStateFlow(ReservationDetailUiState.Loading)
     val uiState: StateFlow<ReservationDetailUiState> = _uiState.asStateFlow()
 
-    init {
-        fetchReservation()
-    }
-
-    private fun fetchReservation() {
+    fun fetchReservation() {
         reservationRepository.findReservationById(reservationId)
             .onStart {
                 _uiState.update { ReservationDetailUiState.Loading }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.refund
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -40,6 +41,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +55,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -91,9 +94,24 @@ fun RefundScreen(
     viewModel: RefundViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val events = viewModel.events
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val pagerState = rememberPagerState { 2 }
     var openDialog by remember { mutableStateOf(false) }
+
+    val refundMessage = stringResource(id = R.string.refund_completed)
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            when (event) {
+                RefundEvent.SuccessfullyRefunded -> {
+                    // TODO 스낵바로 변경
+                    Toast.makeText(context, refundMessage, Toast.LENGTH_LONG).show()
+                    onBackPressed()
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {

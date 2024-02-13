@@ -4,14 +4,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.ReservationRepository
+import com.nexters.boolti.domain.request.RefundRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,8 +31,17 @@ class RefundViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<RefundUiState> = MutableStateFlow(RefundUiState())
     val uiState: StateFlow<RefundUiState> = _uiState.asStateFlow()
 
+    private val _events = MutableSharedFlow<RefundEvent>()
+    val events: SharedFlow<RefundEvent> = _events.asSharedFlow()
+
     init {
         fetchReservation()
+    }
+
+    private fun sendEvent(event: RefundEvent) {
+        viewModelScope.launch {
+            _events.emit(event)
+        }
     }
 
     private fun fetchReservation() {
@@ -39,6 +53,22 @@ class RefundViewModel @Inject constructor(
                 it.printStackTrace()
             }
             .launchIn(viewModelScope)
+    }
+
+    fun refund() {
+        val request = RefundRequest(
+            reservationId = reservationId,
+            reason = "", // TODO 이유 추가
+            phoneNumber = uiState.value.contact,
+            accountName = uiState.value.name,
+            accountNumber = uiState.value.accountNumber,
+            bankCode = uiState.value.bankInfo!!.code,
+        )
+        reservationRepository.refund(request).onEach {
+            sendEvent(RefundEvent.SuccessfullyRefunded)
+        }.catch {
+            it.printStackTrace()
+        }.launchIn(viewModelScope)
     }
 
     fun updateName(newName: String) {

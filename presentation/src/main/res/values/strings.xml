@@ -16,6 +16,7 @@
     <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
+    <string name="has_pending_ticket">입금 확인 중인 티켓이 있어요!</string>
     <string-array name="days_of_week">
         <item>월</item>
         <item>화</item>

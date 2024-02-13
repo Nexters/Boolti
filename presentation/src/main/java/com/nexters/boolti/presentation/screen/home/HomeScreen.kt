@@ -71,7 +71,8 @@ fun HomeScreen(
             ) {
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
-                    onClickShowItem,
+                    onClickShowItem = onClickShowItem,
+                    navigateToReservations = navigateToReservations,
                 )
             }
             composable(

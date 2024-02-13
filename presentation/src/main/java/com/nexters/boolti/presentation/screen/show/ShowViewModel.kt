@@ -53,9 +53,9 @@ class ShowViewModel @Inject constructor(
             .map { reservations ->
                 reservations.firstOrNull { it.reservationState == ReservationState.DEPOSITING } != null
             }
-            .onEach { hasPendingReservation ->
+            .onEach { hasPendingTicket ->
                 _uiState.update {
-                    it.copy(hasPendingReservation = hasPendingReservation)
+                    it.copy(hasPendingTicket = hasPendingTicket)
                 }
             }
             .launchIn(viewModelScope)

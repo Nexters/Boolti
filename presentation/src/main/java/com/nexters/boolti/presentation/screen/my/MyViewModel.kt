@@ -30,7 +30,7 @@ class MyViewModel @Inject constructor(
     }
 
     fun fetchMyInfo() {
-        authRepository.getUser()
+        authRepository.getUserAndCache()
             .onStart {
                 _uiState.update { MyUiState.Loading }
             }

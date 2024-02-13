@@ -61,6 +61,8 @@ fun ShowScreen(
     onClickShowItem: (showId: String) -> Unit,
     viewModel: ShowViewModel = hiltViewModel()
 ) {
+    val user by viewModel.user.collectAsStateWithLifecycle()
+    val nickname = user?.nickname ?: ""
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val appbarHeight = 196.dp
     val searchBarHeight = 80.dp
@@ -110,6 +112,7 @@ fun ShowScreen(
                         y = appbarOffsetHeightPx.coerceIn(-changeableAppBarHeightPx, 0f).toInt()
                     )
                 },
+                nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
                 onChangeableSizeChanged = { size ->
@@ -127,6 +130,7 @@ fun ShowScreen(
 @Composable
 fun ShowAppBar(
     text: String,
+    nickname: String,
     onKeywordChanged: (keyword: String) -> Unit,
     onChangeableSizeChanged: (size: IntSize) -> Unit,
     search: () -> Unit,
@@ -147,7 +151,7 @@ fun ShowAppBar(
             modifier = Modifier
                 .padding(top = 40.dp)
                 .fillMaxWidth(),
-            text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
+            text = stringResource(id = R.string.home_sub_title, nickname),
             style = TextStyle(
                 lineHeight = 34.sp,
                 fontWeight = FontWeight.Normal,

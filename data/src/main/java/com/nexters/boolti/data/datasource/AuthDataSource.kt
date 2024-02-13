@@ -7,6 +7,7 @@ import com.nexters.boolti.data.db.dataStore
 import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.request.RefreshRequest
 import com.nexters.boolti.data.network.response.SignUpResponse
+import com.nexters.boolti.data.network.response.UserResponse
 import com.nexters.boolti.domain.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -20,7 +21,7 @@ class AuthDataSource @Inject constructor(
     private val dataStore: DataStore<AppSettings>
         get() = context.dataStore
 
-    private val data: Flow<AppSettings>
+    val data: Flow<AppSettings>
         get() = dataStore.data
 
     val loggedIn: Flow<Boolean>
@@ -48,5 +49,15 @@ class AuthDataSource @Inject constructor(
     suspend fun refresh(): Result<SignUpResponse> = runCatching {
         val refreshToken = data.map { it.refreshToken }.first()
         loginService.refresh(RefreshRequest(refreshToken))
+    }
+
+    suspend fun updateUser(user: UserResponse) {
+        dataStore.updateData {
+            it.copy(
+                userId = user.id,
+                nickname = user.nickname,
+                email = user.email,
+            )
+        }
     }
 }

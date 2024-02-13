@@ -195,8 +195,9 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             TicketingScreen(
                 modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onReservationClicked = { ticketingRequest ->
-                    when (ticketingRequest) {
+                onReserved = { reservationId ->
+                    // TODO 예매 완료 페이지로 이동
+                    /*when (ticketingRequest) {
                         is TicketingRequest.Normal -> navController.navigate("payment/accountTransfer?ticketId=${ticketingRequest.salesTicketTypeId}") {
                             popUpTo("ticketing/{showId}") { inclusive = true }
                         }
@@ -204,7 +205,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                         is TicketingRequest.Invite -> navController.navigate("payment/inviteTicket?ticketId=${ticketingRequest.salesTicketTypeId}") {
                             popUpTo("ticketing/{showId}") { inclusive = true }
                         }
-                    }
+                    }*/
                 }
             )
         }

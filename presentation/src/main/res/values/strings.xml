@@ -162,6 +162,7 @@
     <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>
     <string name="hosted_shows_empty_desc">공연을 주최하고 QR 스캐너로\n관객 입장을 관리해 보세요</string>
     <string name="entry_code_validated">입장을 확인했어요</string>
+    <string name="entry_code_not_today">입장 확인은 공연 당일에만 가능해요</string>
 
     <!-- 예매 내역 -->
     <string name="reservations_empty">예매 내역이 없어요</string>

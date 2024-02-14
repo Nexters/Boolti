@@ -44,16 +44,14 @@ class ShowViewModel @Inject constructor(
     private val _events = MutableSharedFlow<ShowEvent>()
     val events: SharedFlow<ShowEvent> = _events.asSharedFlow()
 
-    fun sendEvent(event: ShowEvent) {
+    init {
+        search()
+    }
+
+    private fun sendEvent(event: ShowEvent) {
         viewModelScope.launch {
             _events.emit(event)
         }
-    }
-
-    fun refresh() {
-        _uiState.update { ShowUiState() }
-        search()
-        fetchReservationInfo()
     }
 
     fun search() {
@@ -71,7 +69,7 @@ class ShowViewModel @Inject constructor(
         _uiState.update { it.copy(keyword = newKeyword) }
     }
 
-    private fun fetchReservationInfo() {
+    fun fetchReservationInfo() {
         reservationRepository.getReservations()
             .map { reservations ->
                 reservations.firstOrNull { it.reservationState == ReservationState.DEPOSITING } != null

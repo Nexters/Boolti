@@ -39,6 +39,7 @@ fun KakaoLoginButton(
                     // TODO 로그인 실패 처리
                     Timber.e("KakaoLoginButton", "로그인 실패", error)
                 } else if (token != null) {
+                    Timber.d("Kakao idToken ${token.idToken}")
                     onClick(token.accessToken, token.idToken!!) // todo : id token이 null일 경우 처리하기
                 }
             }

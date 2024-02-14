@@ -88,7 +88,12 @@ fun ShowScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.refresh()
+        viewModel.fetchReservationInfo()
+        viewModel.events.collect { event ->
+            when (event) {
+                ShowEvent.Search -> appbarOffsetHeightPx = 0f
+            }
+        }
     }
 
     Scaffold(

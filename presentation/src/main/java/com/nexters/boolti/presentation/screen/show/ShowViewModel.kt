@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.show
 
+import android.view.SearchEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.ReservationState
@@ -8,9 +9,12 @@ import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -37,20 +41,24 @@ class ShowViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ShowUiState())
     val uiState: StateFlow<ShowUiState> = _uiState.asStateFlow()
 
-    fun refresh() {
-        _uiState.update { ShowUiState() }
+    private val _events = MutableSharedFlow<ShowEvent>()
+    val events: SharedFlow<ShowEvent> = _events.asSharedFlow()
+
+    init {
         search()
-        fetchReservationInfo()
+    }
+
+    private fun sendEvent(event: ShowEvent) {
+        viewModelScope.launch {
+            _events.emit(event)
+        }
     }
 
     fun search() {
         viewModelScope.launch {
             showRepository.search(uiState.value.keyword).onSuccess { shows ->
-                _uiState.update {
-                    it.copy(
-                        shows = shows,
-                    )
-                }
+                _uiState.update { it.copy(shows = shows) }
+                sendEvent(ShowEvent.Search)
             }.onFailure {
                 Timber.e(it)
             }
@@ -61,7 +69,7 @@ class ShowViewModel @Inject constructor(
         _uiState.update { it.copy(keyword = newKeyword) }
     }
 
-    private fun fetchReservationInfo() {
+    fun fetchReservationInfo() {
         reservationRepository.getReservations()
             .map { reservations ->
                 reservations.firstOrNull { it.reservationState == ReservationState.DEPOSITING } != null

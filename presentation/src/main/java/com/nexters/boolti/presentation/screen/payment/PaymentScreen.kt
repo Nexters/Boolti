@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.payment
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -34,6 +35,8 @@ fun PaymentScreen(
     val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler(onBack = onClickClose)
 
     Scaffold(
         topBar = { PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose) },

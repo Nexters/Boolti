@@ -38,7 +38,6 @@ class MyViewModel @Inject constructor(
                 _uiState.update { MyUiState.Success(user) }
             }
             .catch {
-                authRepository.logout()
                 _uiState.update { MyUiState.Failure }
             }
             .launchIn(viewModelScope)

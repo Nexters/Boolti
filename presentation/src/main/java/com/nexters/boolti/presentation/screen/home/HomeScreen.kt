@@ -115,9 +115,9 @@ private enum class Destination(
     @StringRes val label: Int,
     @DrawableRes val icon: Int,
 ) {
-    Show(route = "show", label = R.string.menu_show, icon = R.drawable.menu_home),
-    Ticket(route = "tickets", label = R.string.menu_tickets, R.drawable.menu_ticket),
-    My(route = "my", label = R.string.menu_my, icon = R.drawable.menu_my)
+    Show(route = "show", label = R.string.menu_show, icon = R.drawable.ic_home),
+    Ticket(route = "tickets", label = R.string.menu_tickets, R.drawable.ic_ticket),
+    My(route = "my", label = R.string.menu_my, icon = R.drawable.ic_person)
 }
 
 @Composable

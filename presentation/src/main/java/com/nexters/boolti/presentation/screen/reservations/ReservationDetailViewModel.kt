@@ -3,7 +3,9 @@ package com.nexters.boolti.presentation.screen.reservations
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.repository.ConfigRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class ReservationDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
+    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : ViewModel() {
     private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
         "reservationId가 전달되어야 합니다."
@@ -26,6 +29,10 @@ class ReservationDetailViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<ReservationDetailUiState> =
         MutableStateFlow(ReservationDetailUiState.Loading)
     val uiState: StateFlow<ReservationDetailUiState> = _uiState.asStateFlow()
+
+    init {
+        fetchRefundPolicy()
+    }
 
     fun fetchReservation() {
         reservationRepository.findReservationById(reservationId)
@@ -39,6 +46,16 @@ class ReservationDetailViewModel @Inject constructor(
                 it.printStackTrace()
                 _uiState.update { ReservationDetailUiState.Error() }
             }
+            .launchIn(viewModelScope)
+    }
+
+    private fun fetchRefundPolicy() {
+        getRefundPolicyUsecase()
+            .onEach { refundPolicy ->
+                (uiState.value as? ReservationDetailUiState.Success)?.let { state ->
+                    _uiState.update { state.copy(refundPolicy = refundPolicy) }
+                }
+            }.catch { it.printStackTrace() }
             .launchIn(viewModelScope)
     }
 }

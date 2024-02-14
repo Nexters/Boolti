@@ -255,7 +255,7 @@ fun TicketDetailScreen(
 
             Spacer(modifier = Modifier.size(20.dp))
 
-            RefundPolicySection()
+            RefundPolicySection(uiState.refundPolicy)
 
             Text(
                 modifier = Modifier
@@ -546,9 +546,8 @@ fun Inquiry(
 }
 
 @Composable
-private fun RefundPolicySection() {
+private fun RefundPolicySection(refundPolicy: List<String>) {
     var expanded by remember { mutableStateOf(false) }
-    val refundPolicy = stringArrayResource(R.array.refund_policy)
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0F else 180F,
         animationSpec = tween(),

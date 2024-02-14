@@ -172,7 +172,7 @@ fun TicketingScreen(
                     onInviteCodeChanged = viewModel::setInviteCode,
                 ) // 초청 코드
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
-                if (!uiState.isInviteTicket) RefundPolicySection() // 취소/환불 규정
+                if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
                 Spacer(modifier = Modifier.height(120.dp))
             }
 
@@ -247,9 +247,9 @@ private fun Header(
 }
 
 @Composable
-private fun RefundPolicySection() {
+private fun RefundPolicySection(refundPolicy: List<String>) {
     var expanded by remember { mutableStateOf(false) }
-    val refundPolicy = stringArrayResource(R.array.refund_policy)
+//    val refundPolicy = stringArrayResource(R.array.refund_policy)
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0F else 180F,
         animationSpec = tween(),
@@ -281,7 +281,7 @@ private fun RefundPolicySection() {
         ) {
             if (expanded) {
                 refundPolicy.forEach {
-                    Row {
+                    Row(modifier = Modifier.padding(top = 2.dp)) {
                         Text(
                             text = stringResource(R.string.bullet),
                             style = MaterialTheme.typography.bodySmall,

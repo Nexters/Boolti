@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.refund
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -7,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -39,6 +43,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,8 +57,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,10 +70,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.screen.reservations.ReservationDetailUiState
+import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -72,10 +83,10 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point4
+import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -86,8 +97,24 @@ fun RefundScreen(
     viewModel: RefundViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val events = viewModel.events
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val pagerState = rememberPagerState { 2 }
+    var openDialog by remember { mutableStateOf(false) }
+
+    val refundMessage = stringResource(id = R.string.refund_completed)
+    LaunchedEffect(Unit) {
+        events.collect { event ->
+            when (event) {
+                RefundEvent.SuccessfullyRefunded -> {
+                    // TODO 스낵바로 변경
+                    Toast.makeText(context, refundMessage, Toast.LENGTH_LONG).show()
+                    onBackPressed()
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -97,8 +124,7 @@ fun RefundScreen(
         },
         modifier = modifier,
     ) { innerPadding ->
-        val state = uiState
-        if (state !is ReservationDetailUiState.Success) return@Scaffold
+        val reservation = uiState.reservation ?: return@Scaffold
 
         HorizontalPager(
             modifier = Modifier.fillMaxSize(),
@@ -113,15 +139,70 @@ fun RefundScreen(
                             pagerState.animateScrollToPage(1)
                         }
                     },
+                    onReasonChanged = viewModel::updateReason,
+                    reason = uiState.reason
                 )
             } else {
                 RefundInfoPage(
+                    uiState = uiState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    reservation = state.reservation,
-                    onRequest = {},
+                    reservation = reservation,
+                    onNameChanged = viewModel::updateName,
+                    onContactNumberChanged = viewModel::updateContact,
+                    onBankInfoChanged = viewModel::updateBankInfo,
+                    onAccountNumberChanged = viewModel::updateAccountNumber,
+                    onRequest = { openDialog = true },
                 )
+            }
+        }
+    }
+
+    if (openDialog) {
+        BTDialog(
+            positiveButtonLabel = stringResource(id = R.string.refund_button),
+            onDismiss = { openDialog = false },
+            onClickPositiveButton = viewModel::refund,
+        ) {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.refund_dialog_title),
+                    style = MaterialTheme.typography.titleLarge.copy(color = Grey15),
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Grey80)
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    InfoRow(
+                        type = stringResource(id = R.string.account_holder),
+                        value = uiState.name
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        type = stringResource(id = R.string.ticketing_contact_label),
+                        value = StringBuilder(uiState.contact).apply {
+                            if (uiState.contact.length > 7) {
+                                insert(7, '-')
+                                insert(3, '-')
+                            }
+                        }.toString()
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        type = stringResource(id = R.string.bank_name),
+                        value = uiState.bankInfo?.bankName ?: ""
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        type = stringResource(id = R.string.account_number),
+                        value = uiState.accountNumber
+                    )
+                }
             }
         }
     }
@@ -129,11 +210,21 @@ fun RefundScreen(
 
 @Composable
 fun ReasonPage(
+    reason: String,
+    onReasonChanged: (String) -> Unit,
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
+
     Column(
-        modifier = modifier
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) {
+            keyboardController?.hide()
+        }
     ) {
         Text(
             modifier = Modifier
@@ -148,8 +239,8 @@ fun ReasonPage(
             .height(160.dp)
             .padding(top = 20.dp)
             .clip(shape = RoundedCornerShape(4.dp)),
-            value = "",
-            onValueChange = {},
+            value = reason,
+            onValueChange = onReasonChanged,
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey10),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Grey85,
@@ -170,7 +261,9 @@ fun ReasonPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 8.dp), onClick = onNextClick, enabled = true, // TODO 입력 여부
+                .padding(bottom = 8.dp),
+            onClick = onNextClick,
+            enabled = reason.isNotBlank(),
             label = stringResource(id = R.string.next)
         )
     }
@@ -179,8 +272,13 @@ fun ReasonPage(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefundInfoPage(
+    uiState: RefundUiState,
     reservation: ReservationDetail,
     onRequest: () -> Unit,
+    onNameChanged: (String) -> Unit,
+    onContactNumberChanged: (String) -> Unit,
+    onBankInfoChanged: (BankInfo) -> Unit,
+    onAccountNumberChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isSheetOpen by remember { mutableStateOf(false) }
@@ -198,6 +296,7 @@ fun RefundInfoPage(
             title = stringResource(id = R.string.refund_account_holder_info)
         ) {
             Column {
+                val showNameError = uiState.name.isNotEmpty() && !uiState.isValidName
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -206,12 +305,27 @@ fun RefundInfoPage(
                         text = stringResource(id = R.string.ticketing_name_label),
                         style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
                     )
-                    BTTextField(modifier = Modifier.weight(1.0f),
-                        text = "",
+                    BTTextField(
+                        modifier = Modifier.weight(1.0f),
+                        text = uiState.name,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
                         placeholder = stringResource(id = R.string.refund_account_name_hint),
-                        onValueChanged = {})
+                        onValueChanged = onNameChanged
+                    )
+                }
+                if (showNameError) {
+                    Text(
+                        modifier = Modifier.padding(start = 56.dp, top = 12.dp),
+                        text = stringResource(id = R.string.validation_name),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
+                    )
                 }
 
+                val showContactError = uiState.contact.isNotEmpty() && !uiState.isValidContact
                 Row(
                     modifier = Modifier.padding(top = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -223,9 +337,23 @@ fun RefundInfoPage(
                     )
                     BTTextField(
                         modifier = Modifier.weight(1.0f),
-                        text = "",
+                        text = uiState.contact.filterToPhoneNumber(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next
+                        ),
+                        isError = showContactError,
                         placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
-                        onValueChanged = {},
+                        onValueChanged = onContactNumberChanged,
+                        visualTransformation = PhoneNumberVisualTransformation('-'),
+                    )
+                }
+                if (showContactError) {
+                    Text(
+                        modifier = Modifier.padding(start = 56.dp, top = 12.dp),
+                        text = stringResource(id = R.string.validation_contact),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
                     )
                 }
             }
@@ -246,8 +374,9 @@ fun RefundInfoPage(
                         containerColor = MaterialTheme.colorScheme.surfaceTint,
                     )
                 ) {
+                    val bankSelection = stringResource(id = R.string.refund_bank_selection)
                     Text(
-                        text = stringResource(id = R.string.refund_bank_selection),
+                        text = if (uiState.bankInfo == null) bankSelection else uiState.bankInfo.bankName,
                         style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
                     )
                     Spacer(modifier = Modifier.weight(1.0f))
@@ -257,14 +386,29 @@ fun RefundInfoPage(
                         tint = Grey50,
                     )
                 }
+                val showAccountError =
+                    uiState.accountNumber.isNotEmpty() && !uiState.isValidAccountNumber
                 BTTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp),
-                    text = "",
+                    text = uiState.accountNumber,
+                    isError = showAccountError,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done
+                    ),
                     placeholder = stringResource(id = R.string.refund_account_number_hint),
-                    onValueChanged = {},
+                    onValueChanged = onAccountNumberChanged,
                 )
+                if (showAccountError) {
+                    Text(
+                        modifier = Modifier.padding(top = 12.dp),
+                        text = stringResource(id = R.string.validation_account),
+                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
+                    )
+                }
             }
         }
 
@@ -273,8 +417,10 @@ fun RefundInfoPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 8.dp), onClick = onRequest, enabled = true, // TODO 입력 여부
-            label = stringResource(id = R.string.next)
+                .padding(bottom = 8.dp),
+            onClick = onRequest,
+            enabled = uiState.isAbleToRequest,
+            label = stringResource(id = R.string.refund_button)
         )
     }
 
@@ -296,7 +442,10 @@ fun RefundInfoPage(
             },
             containerColor = Grey85,
         ) {
-            BankSelection()
+            BankSelection(
+                selectedBank = uiState.bankInfo,
+                onClick = onBankInfoChanged,
+                onDismiss = { isSheetOpen = false })
         }
     }
 }
@@ -403,6 +552,9 @@ private fun Section(
 
 @Composable
 fun BankSelection(
+    onDismiss: () -> Unit,
+    selectedBank: BankInfo?,
+    onClick: (bankInfo: BankInfo) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -429,8 +581,8 @@ fun BankSelection(
                     item {
                         BackItem(
                             bankInfo = bankInfo,
-                            onClick = {},
-                            selected = bankInfo.code == "003"
+                            onClick = onClick,
+                            selected = if (selectedBank == null) null else selectedBank == bankInfo,
                         )
                     }
                 }
@@ -455,9 +607,8 @@ fun BankSelection(
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal),
                 label = stringResource(id = R.string.refund_select_bank),
-            ) {
-
-            }
+                onClick = onDismiss,
+            )
         }
     }
 }
@@ -474,15 +625,18 @@ fun BackItem(
             .height(74.dp)
             .border(
                 shape = RoundedCornerShape(4.dp),
-                color = if(selected == true) Grey10 else Color.Transparent,
+                color = if (selected == true) Grey10 else Color.Transparent,
                 width = 1.dp,
             )
             .clip(RoundedCornerShape(4.dp))
-            .background(Grey80),
+            .background(Grey80)
+            .clickable {
+                onClick(bankInfo)
+            },
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier.alpha(alpha = if(selected == false) 0.4f else 1.0f),
+            modifier = Modifier.alpha(alpha = if (selected == false) 0.4f else 1.0f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -497,5 +651,26 @@ fun BackItem(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
+    }
+}
+
+@Composable
+fun InfoRow(
+    type: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = type,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey15),
+        )
     }
 }

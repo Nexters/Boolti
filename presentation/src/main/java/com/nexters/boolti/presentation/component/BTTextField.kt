@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey70
 
 @Composable
@@ -42,6 +43,7 @@ fun BTTextField(
         focusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
         disabledContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        errorContainerColor = MaterialTheme.colorScheme.surfaceTint,
         focusedPlaceholderColor = Grey70,
         unfocusedPlaceholderColor = Grey70,
         disabledPlaceholderColor = Grey70,
@@ -49,7 +51,7 @@ fun BTTextField(
         focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
         unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
         disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
-        errorBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        errorBorderColor = Error,
     ),
 ) {
     val interactionSource = remember { MutableInteractionSource() }

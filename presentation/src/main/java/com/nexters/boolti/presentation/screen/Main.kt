@@ -15,11 +15,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.nexters.boolti.domain.request.TicketingRequest
+import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
-import com.nexters.boolti.presentation.screen.payment.AccountTransferScreen
-import com.nexters.boolti.presentation.screen.payment.InviteTicketCompleteScreen
+import com.nexters.boolti.presentation.screen.payment.PaymentScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
@@ -193,17 +192,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             TicketingScreen(
                 modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onReserved = { reservationId ->
-                    // TODO 예매 완료 페이지로 이동
-                    /*when (ticketingRequest) {
-                        is TicketingRequest.Normal -> navController.navigate("payment/accountTransfer?ticketId=${ticketingRequest.salesTicketTypeId}") {
-                            popUpTo("ticketing/{showId}") { inclusive = true }
-                        }
-
-                        is TicketingRequest.Invite -> navController.navigate("payment/inviteTicket?ticketId=${ticketingRequest.salesTicketTypeId}") {
-                            popUpTo("ticketing/{showId}") { inclusive = true }
-                        }
-                    }*/
+                onReserved = { reservationId, showId ->
+                    navController.navigate("payment/$reservationId?showId=$showId")
                 }
             )
         }
@@ -229,31 +219,20 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "payment/accountTransfer?ticketId={ticketId}",
+            route = "payment/{reservationId}?showId={showId}",
+            arguments = listOf(
+                navArgument("reservationId") { type = NavType.StringType },
+                navArgument("showId") { type = NavType.StringType }),
         ) {
-            val ticketId = it.arguments?.getString("ticketId") ?: return@composable
-            AccountTransferScreen(
-                onClickHome = {
-                    navController.popBackStack(navController.graph.startDestinationId, true)
-                    navController.navigate("home")
-                },
+            val showId = it.arguments?.getString("showId")
+            PaymentScreen(
+                onClickHome = { navController.navigateToHome() },
                 onClickClose = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        composable(
-            route = "payment/inviteTicket?ticketId={ticketId}",
-            arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
-        ) {
-            InviteTicketCompleteScreen(
-                onClickHome = {
-                    navController.popBackStack(navController.graph.startDestinationId, true)
-                    navController.navigate("home")
+                    showId?.let { showId ->
+                        navController.popBackStack("show/$showId", inclusive = true)
+                        navController.navigate("show/$showId")
+                    } ?: navController.popBackStack()
                 },
-                onClickClose = {
-                    navController.popBackStack()
-                }
             )
         }
     }

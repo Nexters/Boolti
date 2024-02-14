@@ -1,10 +1,12 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.datasource.ReservationDataSource
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
 import com.nexters.boolti.domain.exception.InviteCodeException
 import com.nexters.boolti.domain.extension.errorType
 import com.nexters.boolti.domain.model.InviteCodeStatus
+import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.repository.TicketingRepository
@@ -18,6 +20,7 @@ import javax.inject.Inject
 
 class TicketingRepositoryImpl @Inject constructor(
     private val dataSource: TicketingDataSource,
+    private val reservationDataSource: ReservationDataSource,
 ) : TicketingRepository {
     override fun getSalesTickets(request: SalesTicketRequest): Flow<List<TicketWithQuantity>> = flow {
         emit(dataSource.getSalesTickets(request))
@@ -49,5 +52,9 @@ class TicketingRepositoryImpl @Inject constructor(
             emit(status)
             throw InviteCodeException(status)
         }
+    }
+
+    override fun getPaymentInfo(reservationId: String): Flow<ReservationDetail> = flow {
+        emit(reservationDataSource.findReservationById(reservationId).toDomain())
     }
 }

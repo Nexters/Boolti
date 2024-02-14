@@ -56,6 +56,7 @@ fun QrScanScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val successMessage = stringResource(R.string.entry_code_validated)
+    val notTodayErrMessage = stringResource(R.string.entry_code_not_today)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -69,7 +70,7 @@ fun QrScanScreen(
                 when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.SHOW_NOT_TODAY -> {}
+                            QrErrorType.SHOW_NOT_TODAY -> snackbarHostState.showSnackbar(notTodayErrMessage)
                         }
                     }
 

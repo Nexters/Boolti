@@ -102,7 +102,7 @@ private fun HeaderSection(price: Int, dueDate: LocalDateTime) {
         modifier = Modifier.padding(top = 8.dp),
         text = stringResource(R.string.account_transfer_description),
         style = MaterialTheme.typography.bodySmall,
-        color = Grey30,
+        color = Grey50,
     )
 }
 
@@ -113,7 +113,9 @@ private fun PaymentInfoSection(
     accountHolder: String,
     dueDate: LocalDateTime,
 ) {
-    Column {
+    Column(
+        modifier = Modifier.clip(RoundedCornerShape(4.dp))
+    ) {
         PaymentInfoRow(stringResource(R.string.bank_name), bankName)
         PaymentInfoRow(stringResource(R.string.account_number), accountNumber)
         PaymentInfoRow(stringResource(R.string.account_holder), accountHolder)
@@ -127,7 +129,7 @@ private fun PaymentInfoRow(label: String, value: String) {
         Text(
             modifier = Modifier.weight(100F),
             text = label,
-            color = Grey50,
+            color = Grey30,
         )
         Text(
             modifier = Modifier

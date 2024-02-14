@@ -19,6 +19,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.point1
 
 @Composable
 fun TicketSummarySection(
@@ -51,7 +52,7 @@ fun TicketSummarySection(
         ) {
             Text(
                 text = showName,
-                style = MaterialTheme.typography.titleLarge,
+                style = point1,
                 color = Grey05,
             )
             Text(

@@ -27,6 +27,7 @@ data class Ticket(
             val now = LocalDateTime.now()
             when {
                 now > showDate -> TicketState.Finished
+                usedAt == null -> TicketState.Ready
                 now > usedAt -> TicketState.Used
                 else -> TicketState.Ready
             }

@@ -2,7 +2,7 @@ package com.nexters.boolti.presentation.extension
 
 import androidx.navigation.NavController
 
-fun NavController.navigateToHome(homeRoute: String = "home") {
+fun NavController.navigateToHome() {
     popBackStack(graph.startDestinationId, true)
-    navigate(homeRoute)
+    navigate(graph.startDestinationId)
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="menu_show">홈</string>
-    <string name="menu_tickets">티켓내역</string>
-    <string name="menu_my">마이페이지</string>
+    <string name="menu_tickets">티켓</string>
+    <string name="menu_my">마이</string>
 
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>

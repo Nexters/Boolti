@@ -19,8 +19,7 @@ class TokenDataSource @Inject constructor(
     private val data: Flow<AppSettings>
         get() = dataStore.data
 
-    suspend fun getAccessToken(): String = // data.first().accessToken
-        "5723e4c3-4101-4cc0-8361-7ed6c5c15afd" // TODO 슈퍼준영토큰 제거
+    suspend fun getAccessToken(): String = data.first().accessToken
 
     /**
      * 엑세스 토큰, 리프레시 토큰 쌍 반환

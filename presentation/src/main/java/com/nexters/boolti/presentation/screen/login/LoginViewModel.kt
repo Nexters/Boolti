@@ -47,9 +47,11 @@ class LoginViewModel @Inject constructor(
         val profileImageUrl = payloadMap["picture"]?.replace("http:", "https:")
         val nickname = payloadMap["nickname"]
         val userId = payloadMap["sub"]!! // todo : sub가 null일 때 처리하기. 근데 그러면 안 되는데...
+        val email = payloadMap["email"]
 
         _uiState.update {
             it.copy(
+                email = email,
                 nickname = nickname,
                 profileImageUrl = profileImageUrl,
                 userId = userId,

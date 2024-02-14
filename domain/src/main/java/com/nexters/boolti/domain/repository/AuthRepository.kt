@@ -17,7 +17,8 @@ interface AuthRepository {
     suspend fun kakaoLogin(request: LoginRequest): Result<Boolean>
     suspend fun logout(): Result<Unit>
     suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit>
-    fun getUser(): Flow<User>
+    fun getUserAndCache(): Flow<User>
 
     val loggedIn: Flow<Boolean>
+    val cachedUser: Flow<User>
 }

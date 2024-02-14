@@ -68,6 +68,8 @@ fun ShowScreen(
     modifier: Modifier = Modifier,
     viewModel: ShowViewModel = hiltViewModel()
 ) {
+    val user by viewModel.user.collectAsStateWithLifecycle()
+    val nickname = user?.nickname ?: ""
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val appbarHeight = if(uiState.hasPendingTicket) 196.dp + 52.dp else 196.dp
     val searchBarHeight = 80.dp
@@ -123,6 +125,7 @@ fun ShowScreen(
                 },
                 navigateToReservations = navigateToReservations,
                 hasPendingTicket = uiState.hasPendingTicket,
+                nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
                 onChangeableSizeChanged = { size ->
@@ -142,6 +145,7 @@ fun ShowAppBar(
     text: String,
     hasPendingTicket: Boolean,
     navigateToReservations: () -> Unit,
+    nickname: String,
     onKeywordChanged: (keyword: String) -> Unit,
     onChangeableSizeChanged: (size: IntSize) -> Unit,
     search: () -> Unit,
@@ -167,7 +171,7 @@ fun ShowAppBar(
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
-            text = stringResource(id = R.string.home_sub_title, "닉네임"), // todo : 실 유저 네임으로 변경
+            text = stringResource(id = R.string.home_sub_title, nickname),
             style = TextStyle(
                 lineHeight = 34.sp,
                 fontWeight = FontWeight.Normal,

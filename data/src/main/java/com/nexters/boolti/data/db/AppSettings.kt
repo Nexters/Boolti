@@ -14,6 +14,7 @@ data class AppSettings(
     val nickname: String? = null,
     val email: String? = null,
     val phoneNumber: String? = null,
+    val photo: String? = null,
     val accessToken: String = "",
     val refreshToken: String = "",
 )

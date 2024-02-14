@@ -10,6 +10,7 @@ import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -18,6 +19,12 @@ class AuthRepositoryImpl @Inject constructor(
     private val signUpDataSource: SignUpDataSource,
     private val userDateSource: UserDataSource,
 ) : AuthRepository {
+    override val loggedIn: Flow<Boolean>
+        get() = authDataSource.loggedIn
+
+    override val cachedUser: Flow<User>
+        get() = authDataSource.user.map { it.toDomain() }
+
     override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
         return authDataSource.login(request)
             .onSuccess { response ->
@@ -38,10 +45,9 @@ class AuthRepositoryImpl @Inject constructor(
             .mapCatching { }
     }
 
-    override val loggedIn: Flow<Boolean>
-        get() = authDataSource.loggedIn
-
-    override fun getUser(): Flow<User> = flow {
-        emit(userDateSource.getUser().toDomain())
+    override fun getUserAndCache(): Flow<User> = flow {
+        val response = userDateSource.getUser()
+        authDataSource.updateUser(response)
+        emit(response.toDomain())
     }
 }

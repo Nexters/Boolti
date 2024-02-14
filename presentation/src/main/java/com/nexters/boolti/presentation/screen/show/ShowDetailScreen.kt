@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.show
 
+import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -202,6 +203,7 @@ private fun ShowDetailAppBar(
     navigateToReport: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
@@ -240,7 +242,19 @@ private fun ShowDetailAppBar(
             modifier = Modifier
                 .padding(end = 10.dp)
                 .size(44.dp),
-            onClick = {},
+            onClick = {
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        "https://play.google.com/store/apps/details?id=${context.applicationContext.packageName}"
+                    )
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                context.startActivity(shareIntent)
+            },
         ) {
             Icon(
                 modifier = Modifier.size(24.dp),

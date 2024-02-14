@@ -82,7 +82,7 @@ class TicketingViewModel @Inject constructor(
                 .singleOrNull()?.let { reservationId ->
                     Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
                     _uiState.update { it.copy(loading = false) }
-                    event(TicketingEvent.TicketingSuccess(reservationId))
+                    event(TicketingEvent.TicketingSuccess(reservationId, showId))
                 }
         }
     }

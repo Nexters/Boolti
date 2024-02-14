@@ -31,6 +31,7 @@
     <string name="sold_out_label">품절</string>
     <string name="bullet">•</string>
     <string name="unit_won">%,d원</string>
+    <string name="date_format_kor">%d월 %d일</string>
 
     <string name="btn_ok">확인</string>
     <string name="btn_goto_login">로그인 하러 가기</string>

@@ -23,13 +23,18 @@ import com.nexters.boolti.presentation.theme.Grey30
 @Composable
 fun TicketSummarySection(
     modifier: Modifier = Modifier,
+    poster: String,
+    showName: String,
+    ticketName: String,
+    ticketCount: Int,
+    price: Int,
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = "https://images.khan.co.kr/article/2023/09/12/news-p.v1.20230912.69ec17ff44f14cc28a10fff6e935e41b_P1.png", // TODO 제거
+            model = poster,
             contentDescription = stringResource(R.string.description_poster),
             modifier = Modifier
                 .size(width = 70.dp, height = 98.dp)
@@ -45,19 +50,19 @@ fun TicketSummarySection(
             modifier = Modifier.padding(start = 16.dp),
         ) {
             Text(
-                text = "2024 TOGETHER LUCKY CLUB",
+                text = showName,
                 style = MaterialTheme.typography.titleLarge,
                 color = Grey05,
             )
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = "일반 티켓 B / 1매",
+                text = "$ticketName / ${stringResource(R.string.ticket_count, ticketCount)}",
                 style = MaterialTheme.typography.labelMedium,
                 color = Grey30,
             )
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = "5,000원",
+                text = stringResource(R.string.unit_won, price),
                 style = MaterialTheme.typography.labelMedium,
                 color = Grey30,
             )

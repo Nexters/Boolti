@@ -1,21 +1,25 @@
 package com.nexters.boolti.presentation.screen.home
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,6 +33,9 @@ import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketScreen
+import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey85
 
 @Composable
 fun HomeScreen(
@@ -71,7 +78,8 @@ fun HomeScreen(
             ) {
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
-                    onClickShowItem,
+                    onClickShowItem = onClickShowItem,
+                    navigateToReservations = navigateToReservations,
                 )
             }
             composable(
@@ -102,14 +110,15 @@ fun HomeScreen(
     }
 }
 
+@Stable
 private enum class Destination(
     val route: String,
     @StringRes val label: Int,
-    val icon: ImageVector,
+    @DrawableRes val icon: Int,
 ) {
-    Show(route = "show", label = R.string.menu_show, icon = Icons.Default.Home),
-    Ticket(route = "tickets", label = R.string.menu_tickets, icon = Icons.Default.List),
-    My(route = "my", label = R.string.menu_my, icon = Icons.Default.Person)
+    Show(route = "show", label = R.string.menu_show, icon = R.drawable.ic_home),
+    Ticket(route = "tickets", label = R.string.menu_tickets, R.drawable.ic_ticket),
+    My(route = "my", label = R.string.menu_my, icon = R.drawable.ic_person)
 }
 
 @Composable
@@ -118,23 +127,40 @@ private fun HomeNavigationBar(
     onDestinationChanged: (Destination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavigationBar(modifier) {
-        Destination.entries.forEach { dest ->
-            val selected = currentDestination == dest.route
-            val label = stringResource(dest.label)
-            NavigationBarItem(
-                selected = selected,
-                onClick = { onDestinationChanged(dest) },
-                icon = {
-                    Icon(
-                        imageVector = dest.icon,
-                        contentDescription = label,
-                    )
-                },
-                label = {
-                    Text(label)
-                }
-            )
+    Column {
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 1.dp,
+            color = Grey85,
+        )
+        NavigationBar(
+            modifier = modifier,
+            containerColor = MaterialTheme.colorScheme.background,
+        ) {
+            Destination.entries.forEach { dest ->
+                val selected = currentDestination == dest.route
+                val label = stringResource(dest.label)
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { onDestinationChanged(dest) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(dest.icon),
+                            contentDescription = label,
+                        )
+                    },
+                    label = {
+                        Text(label, style = MaterialTheme.typography.labelMedium)
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Grey10,
+                        selectedTextColor = Grey10,
+                        unselectedIconColor = Grey50,
+                        unselectedTextColor = Grey50,
+                        indicatorColor = MaterialTheme.colorScheme.background,
+                    ),
+                )
+            }
         }
     }
 }

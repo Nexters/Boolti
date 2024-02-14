@@ -66,7 +66,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
-import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.MainButton
@@ -94,7 +93,7 @@ fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
-    onReserved: (reservationId: String) -> Unit,
+    onReserved: (reservationId: String, showId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -104,7 +103,7 @@ fun TicketingScreen(
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
-                is TicketingEvent.TicketingSuccess -> onReserved(it.reservationId)
+                is TicketingEvent.TicketingSuccess -> onReserved(it.reservationId, it.showId)
             }
         }
     }
@@ -628,7 +627,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen {}
+            TicketingScreen { _, _ -> }
         }
     }
 }

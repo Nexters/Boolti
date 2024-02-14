@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,13 +25,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -57,18 +63,19 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun ShowScreen(
-    modifier: Modifier = Modifier,
+    navigateToReservations: () -> Unit,
     onClickShowItem: (showId: String) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ShowViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
     val nickname = user?.nickname ?: ""
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val appbarHeight = 196.dp
+    val appbarHeight = if(uiState.hasPendingTicket) 196.dp + 52.dp else 196.dp
     val searchBarHeight = 80.dp
     val changeableAppBarHeightPx =
         with(LocalDensity.current) { (appbarHeight - searchBarHeight).roundToPx().toFloat() }
-    var appbarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
+    var appbarOffsetHeightPx by rememberSaveable { mutableFloatStateOf(0f) }
     var changeableAppBarHeight by remember { mutableFloatStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -78,6 +85,10 @@ fun ShowScreen(
                 return Offset.Zero
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
     }
 
     Scaffold(
@@ -112,6 +123,8 @@ fun ShowScreen(
                         y = appbarOffsetHeightPx.coerceIn(-changeableAppBarHeightPx, 0f).toInt()
                     )
                 },
+                navigateToReservations = navigateToReservations,
+                hasPendingTicket = uiState.hasPendingTicket,
                 nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
@@ -130,6 +143,8 @@ fun ShowScreen(
 @Composable
 fun ShowAppBar(
     text: String,
+    hasPendingTicket: Boolean,
+    navigateToReservations: () -> Unit,
     nickname: String,
     onKeywordChanged: (keyword: String) -> Unit,
     onChangeableSizeChanged: (size: IntSize) -> Unit,
@@ -147,9 +162,14 @@ fun ShowAppBar(
                 onChangeableSizeChanged(IntSize(0, size.height - searchBarHeight.toInt()))
             })
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
+        if (hasPendingTicket) Banner(
+            modifier = Modifier.fillMaxWidth(),
+            navigateToReservations = navigateToReservations,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             modifier = Modifier
-                .padding(top = 40.dp)
                 .fillMaxWidth(),
             text = stringResource(id = R.string.home_sub_title, nickname),
             style = TextStyle(
@@ -208,4 +228,31 @@ fun SearchBar(
             focusedContainerColor = Grey85,
         ),
     )
+}
+
+@Composable
+private fun Banner(
+    navigateToReservations: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .height(52.dp)
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(MaterialTheme.colorScheme.primary, Color(0xFFEB955B))
+                ),
+                shape = RoundedCornerShape(4.dp),
+            )
+            .clickable(onClick = navigateToReservations)
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = stringResource(R.string.has_pending_ticket),
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Icon(painter = painterResource(id = R.drawable.ic_arrow_right), contentDescription = null)
+    }
 }

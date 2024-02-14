@@ -12,7 +12,7 @@ data class ShowResponse(
     val date: String,
     val salesStartTime: String,
     val salesEndTime: String,
-    val showImg: String,
+    val showImg: String = "",
 ) {
     fun toDomain(): Show {
         return Show(

@@ -11,6 +11,7 @@
     <string name="description_qr">입장 QR 코드</string>
     <string name="description_app_logo">앱 로고</string>
     <string name="description_expand">확장하기</string>
+    <string name="description_qr_icon">QR 스캔 아이콘</string>
 
     <!-- 유효성 검사 -->
     <string name="validation_name">이름을 올바르게 입력해 주세요</string>

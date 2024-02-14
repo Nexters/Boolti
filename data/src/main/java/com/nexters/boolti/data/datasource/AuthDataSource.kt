@@ -21,8 +21,20 @@ class AuthDataSource @Inject constructor(
     private val dataStore: DataStore<AppSettings>
         get() = context.dataStore
 
-    val data: Flow<AppSettings>
+    private val data: Flow<AppSettings>
         get() = dataStore.data
+
+    val user: Flow<UserResponse>
+        get() {
+            return dataStore.data.map {
+                UserResponse(
+                    id = it.userId ?: "",
+                    nickname = it.nickname ?: "",
+                    email = it.email ?: "",
+                    imgPath = it.photo,
+                )
+            }
+        }
 
     val loggedIn: Flow<Boolean>
         get() = data.map { it.accessToken.isNotEmpty() }
@@ -57,6 +69,7 @@ class AuthDataSource @Inject constructor(
                 userId = user.id,
                 nickname = user.nickname,
                 email = user.email,
+                photo = user.imgPath,
             )
         }
     }

@@ -50,6 +50,8 @@ class TicketDetailViewModel @Inject constructor(
         }
     }
 
+    fun refresh() = load()
+
     fun requestEntrance(managerCode: String) {
         val ticket = uiState.value.ticket
         viewModelScope.launch {

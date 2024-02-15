@@ -38,6 +38,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,6 +60,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -100,6 +103,7 @@ import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketDetailScreen(
     modifier: Modifier = Modifier,
@@ -126,6 +130,8 @@ fun TicketDetailScreen(
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
     val ticket = uiState.ticket
 
+    val pullToRefreshState = rememberPullToRefreshState()
+
     val entranceSuccessMsg = stringResource(R.string.entry_code_validated)
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -145,127 +151,139 @@ fun TicketDetailScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .padding(horizontal = 29.dp)
-                .verticalScroll(scrollState),
-        ) {
-            val ticketShape = TicketShape(
-                width = contentWidth,
-                height = ticketSectionHeight,
-                circleRadius = 10.dp.toPx(),
-                cornerRadius = 8.dp.toPx(),
-                bottomAreaHeight = bottomAreaHeight,
-            )
+        if (pullToRefreshState.isRefreshing) {
+            viewModel.refresh().invokeOnCompletion {
+                pullToRefreshState.endRefresh()
+            }
+        }
+
+        Box(modifier = Modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
             Column(
-                modifier = Modifier
-                    .onGloballyPositioned { coordinates ->
-                        contentWidth = coordinates.size.width.toFloat()
-                        ticketSectionHeight = coordinates.size.height.toFloat()
-                    }
-                    .clip(ticketShape)
-                    .border(1.dp, color = White.copy(alpha = .3f), shape = ticketShape),
+                modifier = modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 29.dp)
+                    .verticalScroll(scrollState),
             ) {
-                Box {
-                    // 배경 블러된 이미지
-                    AsyncImage(
-                        model = asyncImageBlurModel(context, ticket.poster, radius = 24),
-                        modifier = Modifier
-                            .size(
-                                width = contentWidth.toDp(),
-                                height = ticketSectionHeightUntilTicketInfo.toDp(),
-                            )
-                            .alpha(.8f),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                    )
-                    // 배경 블러된 이미지 위에 올라가는 그라데이션 배경
-                    Box(
-                        modifier = Modifier
-                            .size(
-                                width = contentWidth.toDp(),
-                                height = ticketSectionHeightUntilTicketInfo.toDp(),
-                            )
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
-                                    start = Offset.Zero,
-                                    end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
-                                ),
-                            )
-                    )
-                    Column(
-                        modifier = Modifier
-                            .onGloballyPositioned { coordinates ->
-                                ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
-                            }
-                    ) {
-                        Title(ticketName = ticket.ticketName)
-
+                val ticketShape = TicketShape(
+                    width = contentWidth,
+                    height = ticketSectionHeight,
+                    circleRadius = 10.dp.toPx(),
+                    cornerRadius = 8.dp.toPx(),
+                    bottomAreaHeight = bottomAreaHeight,
+                )
+                Column(
+                    modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            contentWidth = coordinates.size.width.toFloat()
+                            ticketSectionHeight = coordinates.size.height.toFloat()
+                        }
+                        .clip(ticketShape)
+                        .border(1.dp, color = White.copy(alpha = .3f), shape = ticketShape),
+                ) {
+                    Box {
+                        // 배경 블러된 이미지
                         AsyncImage(
+                            model = asyncImageBlurModel(context, ticket.poster, radius = 24),
                             modifier = Modifier
-                                .padding(marginHorizontal)
-                                .aspectRatio(0.75f)
-                                .clip(RoundedCornerShape(8.dp)),
-                            model = ticket.poster,
+                                .size(
+                                    width = contentWidth.toDp(),
+                                    height = ticketSectionHeightUntilTicketInfo.toDp(),
+                                )
+                                .alpha(.8f),
                             contentScale = ContentScale.Crop,
-                            contentDescription = stringResource(R.string.description_poster)
+                            contentDescription = null,
                         )
-
-                        DottedDivider(
+                        // 배경 블러된 이미지 위에 올라가는 그라데이션 배경
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = marginHorizontal),
-                            color = White.copy(alpha = 0.3f),
-                            thickness = 2.dp
+                                .size(
+                                    width = contentWidth.toDp(),
+                                    height = ticketSectionHeightUntilTicketInfo.toDp(),
+                                )
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
+                                        start = Offset.Zero,
+                                        end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
+                                    ),
+                                )
                         )
+                        Column(
+                            modifier = Modifier
+                                .onGloballyPositioned { coordinates ->
+                                    ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
+                                }
+                        ) {
+                            Title(ticketName = ticket.ticketName)
 
-                        TicketInfo(
-                            bottomAreaHeight = ticketInfoHeight,
-                            showName = ticket.showName,
-                            showDate = ticket.showDate,
-                            placeName = ticket.placeName,
-                            entryCode = ticket.entryCode,
-                            ticketState = ticket.ticketState,
-                            onClickQr = onClickQr,
-                        )
+                            AsyncImage(
+                                modifier = Modifier
+                                    .padding(marginHorizontal)
+                                    .aspectRatio(0.75f)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                model = ticket.poster,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = stringResource(R.string.description_poster)
+                            )
+
+                            DottedDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = marginHorizontal),
+                                color = White.copy(alpha = 0.3f),
+                                thickness = 2.dp
+                            )
+
+                            TicketInfo(
+                                bottomAreaHeight = ticketInfoHeight,
+                                showName = ticket.showName,
+                                showDate = ticket.showDate,
+                                placeName = ticket.placeName,
+                                entryCode = ticket.entryCode,
+                                ticketState = ticket.ticketState,
+                                onClickQr = onClickQr,
+                            )
+                        }
                     }
+
+                    Notice(notice = ticket.notice)
+
+                    val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                    Inquiry(
+                        hostName = ticket.hostName,
+                        hostPhoneNumber = ticket.hostPhoneNumber,
+                        onClickCopyPlace = {
+                            clipboardManager.setText(AnnotatedString(ticket.streetAddress + ticket.detailAddress))
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(copiedMessage)
+                                }
+                            }
+                        },
+                        onClickNavigateToShowDetail = {
+                            navigateToShowDetail(ticket.showId)
+                        }
+                    )
                 }
 
-                Notice(notice = ticket.notice)
+                Spacer(modifier = Modifier.size(20.dp))
 
-                val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
-                Inquiry(
-                    hostName = ticket.hostName,
-                    hostPhoneNumber = ticket.hostPhoneNumber,
-                    onClickCopyPlace = {
-                        clipboardManager.setText(AnnotatedString(ticket.streetAddress + ticket.detailAddress))
-                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(copiedMessage)
-                            }
-                        }
-                    },
-                    onClickNavigateToShowDetail = {
-                        navigateToShowDetail(ticket.showId)
-                    }
+                RefundPolicySection()
+
+                Text(
+                    modifier = Modifier
+                        .padding(top = 20.dp, bottom = 60.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .clickable { showEnterCodeDialog = true },
+                    text = stringResource(R.string.input_enter_code_button),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                    textDecoration = TextDecoration.Underline,
                 )
             }
-
-            Spacer(modifier = Modifier.size(20.dp))
-
-            RefundPolicySection()
-
-            Text(
-                modifier = Modifier
-                    .padding(top = 20.dp, bottom = 60.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .clickable { showEnterCodeDialog = true },
-                text = stringResource(R.string.input_enter_code_button),
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-                textDecoration = TextDecoration.Underline,
+            PullToRefreshContainer(
+                modifier = Modifier.align(Alignment.TopCenter),
+                state = pullToRefreshState,
             )
         }
     }

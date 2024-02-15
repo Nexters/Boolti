@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey95
@@ -34,7 +35,9 @@ fun KakaoLoginButton(
     val localContext = LocalContext.current
     TextButton(
         onClick = {
-            UserApiClient.instance.loginWithKakaoTalk(localContext) { token, error ->
+            val kakaoInstance = UserApiClient.instance
+            val available = kakaoInstance.isKakaoTalkLoginAvailable(localContext)
+            val loginCallback = { token: OAuthToken?, error: Throwable? ->
                 if (error != null) {
                     // TODO 로그인 실패 처리
                     Timber.e("KakaoLoginButton", "로그인 실패", error)
@@ -42,6 +45,12 @@ fun KakaoLoginButton(
                     Timber.d("Kakao idToken ${token.idToken}")
                     onClick(token.accessToken, token.idToken!!) // todo : id token이 null일 경우 처리하기
                 }
+            }
+
+            if (available) {
+                kakaoInstance.loginWithKakaoTalk(localContext, callback = loginCallback)
+            } else {
+                kakaoInstance.loginWithKakaoAccount(localContext, callback = loginCallback)
             }
         },
         modifier = modifier

@@ -1,7 +1,7 @@
 [versions]
 minSdk = "26"
 targetSdk = "34"
-versionCode = "1"
+versionCode = "3"
 versionName = "1.0.0"
 packageName = "com.nexters.boolti"
 compileSdk = "34"
@@ -34,6 +34,7 @@ serializationConverter = "1.0.0"
 logging-interceptor = "4.11.0"
 lottie = "6.1.0"
 material = "1.11.0"
+material3Android = "1.2.0"
 retrofit = "2.9.0"
 room = "2.6.1"
 google-services = "4.4.0"
@@ -52,7 +53,6 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
-androidx-compose-material3-material3 = { module = "androidx.compose.material3:material3" }
 andoridx-compose-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-ui-ui = { module = "androidx.compose.ui:ui", version.require = "false" }
 androidx-compose-ui-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.require = "false" }
@@ -95,6 +95,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "logging-interceptor" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.require = "false" }
@@ -126,4 +127,4 @@ db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-roo
 firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
 coil = ["coil", "coil-compose"]
-compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-compose-material3-material3", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]
+compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-material3-android", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]

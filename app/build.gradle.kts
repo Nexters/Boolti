@@ -16,6 +16,10 @@ val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties()
+localProperties.load(FileInputStream(localPropertiesFile))
+
 android {
     namespace = libs.versions.packageName.get()
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -42,6 +46,7 @@ android {
         }
 
         buildConfigField("String", "KAKAO_APP_KEY", getApiKey("KAKAO_APP_KEY"))
+        manifestPlaceholders["KAKAO_APP_KEY"] = (localProperties["KAKAO_APP_KEY"] as String).trim('"')
     }
 
     buildTypes {

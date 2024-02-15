@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.my
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +50,8 @@ fun MyScreen(
     viewModel: MyViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showSignoutDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.fetchMyInfo()
@@ -75,8 +79,26 @@ fun MyScreen(
             onClick = onClickQrScan,
         )
 
+        if (user != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            MyButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.signout_button),
+                onClick = { showSignoutDialog = true },
+            )
+        }
+
         Spacer(modifier = Modifier.weight(1.0f))
-        if(user != null) LogoutButton(logout = viewModel::logout)
+        if (user != null) LogoutButton(logout = viewModel::logout)
+    }
+
+    if (showSignoutDialog) {
+        SignoutDialog(
+            onDismiss = { showSignoutDialog = false },
+            onClickButton = {
+                Toast.makeText(context, "탈퇴 요청이 접수되었습니다.", Toast.LENGTH_LONG).show()
+            },
+        )
     }
 }
 
@@ -180,5 +202,36 @@ fun LogoutButton(
                 textAlign = TextAlign.Center,
             )
         }
+    }
+}
+
+@Composable
+private fun SignoutDialog(
+    onDismiss: () -> Unit,
+    onClickButton: () -> Unit,
+) {
+    BTDialog(
+        positiveButtonLabel = stringResource(R.string.signout),
+        onClickPositiveButton = {
+            onClickButton()
+            onDismiss()
+        },
+        onDismiss = onDismiss,
+    ) {
+        Text(
+            text = stringResource(R.string.signout_dialog_title),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.signout_dialog_message),
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = Grey50,
+        )
     }
 }

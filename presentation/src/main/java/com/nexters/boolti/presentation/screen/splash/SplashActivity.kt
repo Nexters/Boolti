@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.ConfigRepository
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
@@ -32,6 +33,7 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -125,5 +127,11 @@ fun UpdateDialogPreview() {
 class SplashViewModel @Inject constructor(
     configRepository: ConfigRepository,
 ) : ViewModel() {
+    init {
+        viewModelScope.launch {
+            configRepository.cacheRefundPolicy()
+        }
+    }
+
     val shouldUpdate = configRepository.shouldUpdate()
 }

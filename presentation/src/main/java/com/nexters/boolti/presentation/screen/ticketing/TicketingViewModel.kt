@@ -8,12 +8,15 @@ import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
@@ -27,6 +30,7 @@ class TicketingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
     getUserUsecase: GetUserUsecase,
+    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : ViewModel() {
     private val showId: String = requireNotNull(savedStateHandle["showId"])
     private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
@@ -109,6 +113,14 @@ class TicketingViewModel @Inject constructor(
                         )
                     }
                 }
+            getRefundPolicyUsecase()
+                .catch { e -> e.printStackTrace() }
+                .onEach { refundPolicy ->
+                    _uiState.update {
+                        it.copy(refundPolicy = refundPolicy)
+                    }
+                }
+                .launchIn(viewModelScope)
         }
     }
 

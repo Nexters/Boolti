@@ -17,6 +17,7 @@ data class AppSettings(
     val photo: String? = null,
     val accessToken: String = "",
     val refreshToken: String = "",
+    val refundPolicy: List<String> = emptyList(),
 )
 
 object AppSettingsSerializer : Serializer<AppSettings> {

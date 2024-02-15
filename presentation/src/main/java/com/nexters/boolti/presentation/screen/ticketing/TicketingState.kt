@@ -21,6 +21,7 @@ data class TicketingState(
     val depositorName: String = "",
     val depositorPhoneNumber: String = "",
     val inviteCode: String = "",
+    val refundPolicy: List<String> = emptyList(),
 ) {
     val reservationButtonEnabled: Boolean
         get() = if (isInviteTicket) {

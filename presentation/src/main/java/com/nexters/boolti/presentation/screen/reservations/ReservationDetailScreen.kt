@@ -78,6 +78,7 @@ fun ReservationDetailScreen(
     viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -123,7 +124,7 @@ fun ReservationDetailScreen(
             TicketInfo(reservation = state.reservation)
             TicketHolderInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
-            if (!state.reservation.isInviteTicket) RefundPolicy()
+            if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             Spacer(modifier = Modifier.height(40.dp))
             if (state.reservation.reservationState == ReservationState.RESERVED &&
                 !state.reservation.isInviteTicket
@@ -414,6 +415,7 @@ private fun DepositorInfo(
 @Composable
 private fun RefundPolicy(
     modifier: Modifier = Modifier,
+    refundPolicy: List<String>,
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
@@ -421,8 +423,7 @@ private fun RefundPolicy(
         defaultExpanded = false,
     ) {
         Column {
-            val policyLines = stringArrayResource(R.array.refund_policy)
-            policyLines.forEach {
+            refundPolicy.forEach {
                 PolicyLine(modifier = Modifier.padding(bottom = 4.dp), text = it)
             }
         }

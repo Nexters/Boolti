@@ -3,6 +3,7 @@ package com.nexters.boolti.data.datasource
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue
 import com.google.firebase.remoteconfig.get
+import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -13,7 +14,9 @@ class RemoteConfigDataSource(
     suspend fun getValue(key: String): FirebaseRemoteConfigValue? = suspendCoroutine { continuation ->
         remoteConfig.fetchAndActivate().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                continuation.resume(remoteConfig[key])
+                continuation.resume(remoteConfig[key].also {
+                    Timber.tag("MANGBAAM-RemoteConfigDataSource(getValue)").d(it.asString())
+                })
             } else {
                 continuation.resume(null)
             }

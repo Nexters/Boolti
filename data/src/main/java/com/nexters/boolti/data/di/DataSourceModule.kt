@@ -3,6 +3,7 @@ package com.nexters.boolti.data.di
 import android.content.Context
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.PolicyDataSource
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.network.api.LoginService
@@ -31,4 +32,8 @@ object DataSourceModule {
     @Singleton
     @Provides
     fun provideTokenDataSource(@ApplicationContext context: Context): TokenDataSource = TokenDataSource(context)
+
+    @Singleton
+    @Provides
+    fun providePolicyDataSource(@ApplicationContext context: Context): PolicyDataSource = PolicyDataSource(context)
 }

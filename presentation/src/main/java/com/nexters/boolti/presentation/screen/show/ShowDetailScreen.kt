@@ -54,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
@@ -78,6 +79,7 @@ fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onClickContent: () -> Unit,
+    navigateToLogin: () -> Unit,
     onTicketSelected: (
         showId: String,
         ticketId: String,
@@ -88,7 +90,8 @@ fun ShowDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -170,7 +173,11 @@ fun ShowDetailScreen(
                     },
                     onClick = {
                         scope.launch {
-                            showBottomSheet = true
+                            if (isLoggedIn == true) {
+                                showBottomSheet = true
+                            } else {
+                                navigateToLogin()
+                            }
                         }
                     },
                 )

@@ -137,6 +137,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                         navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
                     },
                     viewModel = showViewModel,
+                    navigateToLogin = { navController.navigate("login") },
                     navigateToReport = {
                         val showId = entry.arguments?.getString("showId")
                         navController.navigate("report/$showId")

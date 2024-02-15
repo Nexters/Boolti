@@ -318,7 +318,7 @@ private fun Title(
             color = Grey80,
         )
         Image(
-            painter = painterResource(R.drawable.boolti_logo),
+            painter = painterResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(Grey20),
             contentDescription = null,
         )

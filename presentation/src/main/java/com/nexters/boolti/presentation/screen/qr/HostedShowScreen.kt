@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +37,7 @@ import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.aggroFamily
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -112,6 +114,9 @@ private fun HostedShowItem(
     show: Show,
     onClick: (showId: String, showName: String) -> Unit,
 ) {
+    val enable = show.date.toLocalDate().toEpochDay() < LocalDate.now().toEpochDay()
+    val tint = if (enable) White else Grey50
+
     Row(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surface)
@@ -122,10 +127,15 @@ private fun HostedShowItem(
             modifier = Modifier.weight(1f),
             text = show.name,
             style = MaterialTheme.typography.bodyLarge,
+            color = tint,
             fontFamily = aggroFamily,
         )
         IconButton(onClick = { onClick(show.id, show.name) }) {
-            Icon(painter = painterResource(id = R.drawable.ic_scan), contentDescription = "QR 스캔 아이콘")
+            Icon(
+                painter = painterResource(id = R.drawable.ic_scan),
+                tint = tint,
+                contentDescription = stringResource(R.string.description_qr_icon),
+            )
         }
     }
 }

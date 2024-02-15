@@ -52,11 +52,10 @@ fun QrFullScreen(
             modifier = Modifier
                 .constrainAs(logo) {
                     centerHorizontallyTo(parent)
-                    bottom.linkTo(qr.top, margin = 8.dp)
+                    bottom.linkTo(qr.top, margin = 16.dp)
                 }
                 .width(84.dp),
-            painter = painterResource(R.drawable.boolti_logo),
-            colorFilter = ColorFilter.tint(Color.Black),
+            painter = painterResource(R.drawable.ic_logo_boolti),
             contentScale = ContentScale.FillWidth,
             contentDescription = null,
         )

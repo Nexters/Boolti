@@ -128,9 +128,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
 
                 ShowDetailScreen(
                     onBack = { navController.popBackStack() },
-                    onClickHome = {
-                        navController.popBackStack(navController.graph.startDestinationId, false)
-                    },
+                    onClickHome = { navController.navigateToHome() },
                     onClickContent = {
                         navController.navigate("content")
                     },
@@ -162,9 +160,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             ) {
                 ReportScreen(
                     onBackPressed = { navController.popBackStack() },
-                    popupToHome = {
-                        navController.popBackStack(navController.graph.startDestinationId, false)
-                    },
+                    popupToHome = { navController.navigateToHome() },
                     modifier = modifier,
                 )
             }

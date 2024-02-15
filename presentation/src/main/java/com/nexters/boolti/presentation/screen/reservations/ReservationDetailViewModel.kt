@@ -30,6 +30,9 @@ class ReservationDetailViewModel @Inject constructor(
         MutableStateFlow(ReservationDetailUiState.Loading)
     val uiState: StateFlow<ReservationDetailUiState> = _uiState.asStateFlow()
 
+    private val _refundPolicy = MutableStateFlow<List<String>>(emptyList())
+    val refundPolicy = _refundPolicy.asStateFlow()
+
     init {
         fetchRefundPolicy()
     }
@@ -51,11 +54,10 @@ class ReservationDetailViewModel @Inject constructor(
 
     private fun fetchRefundPolicy() {
         getRefundPolicyUsecase()
+            .catch { it.printStackTrace() }
             .onEach { refundPolicy ->
-                (uiState.value as? ReservationDetailUiState.Success)?.let { state ->
-                    _uiState.update { state.copy(refundPolicy = refundPolicy) }
-                }
-            }.catch { it.printStackTrace() }
+                _refundPolicy.value = refundPolicy
+            }
             .launchIn(viewModelScope)
     }
 }

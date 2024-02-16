@@ -58,9 +58,10 @@ class AuthDataSource @Inject constructor(
         }
     }
 
-    suspend fun refresh(): Result<SignUpResponse> = runCatching {
+    suspend fun refresh(): Result<SignUpResponse?> = runCatching {
         val refreshToken = data.map { it.refreshToken }.first()
-        loginService.refresh(RefreshRequest(refreshToken))
+
+        if(refreshToken.isNotBlank()) loginService.refresh(RefreshRequest(refreshToken)) else null
     }
 
     suspend fun updateUser(user: UserResponse) {

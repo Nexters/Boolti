@@ -36,31 +36,7 @@ class ShowDetailViewModel @Inject constructor(
     )
 
     init {
-        fetchDummyTickets()
         fetchShowDetail()
-    }
-
-    private fun fetchDummyTickets() {
-        val tickets = buildList {
-            repeat(30) {
-                add(
-                    TicketingTicket(
-                        id = UUID.randomUUID().toString(),
-                        isInviteTicket = listOf(true, false).random(),
-                        title = "티켓 ${it + 1}",
-                        price = (100..100000).random(),
-                    )
-                )
-            }
-        }
-
-        val leftAmount = buildMap {
-            tickets.forEach {
-                put(it.id, listOf(0, 50, 100).random())
-            }
-        }
-
-        _uiState.value = uiState.value.copy(tickets = tickets, leftAmount = leftAmount)
     }
 
     private fun fetchShowDetail() {

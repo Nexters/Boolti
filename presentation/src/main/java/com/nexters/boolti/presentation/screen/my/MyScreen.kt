@@ -49,17 +49,12 @@ fun MyScreen(
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsStateWithLifecycle()
     var showSignoutDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.fetchMyInfo()
-    }
-
-    val user = when (val state = uiState) {
-        is MyUiState.Success -> state.user
-        else -> null
     }
 
     Column(

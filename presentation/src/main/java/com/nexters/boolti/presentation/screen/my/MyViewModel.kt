@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,26 +21,22 @@ import javax.inject.Inject
 class MyViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<MyUiState> = MutableStateFlow(MyUiState.Loading)
-    val uiState: StateFlow<MyUiState> = _uiState.asStateFlow()
+    val user = authRepository.cachedUser.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        null,
+    )
 
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
-            _uiState.update { MyUiState.Failure }
         }
     }
 
     fun fetchMyInfo() {
         authRepository.getUserAndCache()
-            .onStart {
-                _uiState.update { MyUiState.Loading }
-            }
-            .onEach { user ->
-                _uiState.update { MyUiState.Success(user) }
-            }
             .catch {
-                _uiState.update { MyUiState.Failure }
+                // TODO 예외처리
             }
             .launchIn(viewModelScope)
     }

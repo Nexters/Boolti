@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -55,7 +58,6 @@ import com.nexters.boolti.presentation.theme.Grey80
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseTicketBottomSheet(
-    modifier: Modifier = Modifier,
     viewModel: SalesTicketViewModel = hiltViewModel(),
     onTicketingClicked: (ticket: SalesTicket, count: Int) -> Unit,
     onDismissRequest: () -> Unit,
@@ -83,8 +85,8 @@ fun ChooseTicketBottomSheet(
         contentColor = MaterialTheme.colorScheme.surfaceTint,
     ) {
         Column(
-            modifier = modifier
-                .padding(bottom = 20.dp)
+            modifier = Modifier
+                .padding(bottom = 20.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
                 .heightIn(max = 564.dp)
         ) {
             Text(
@@ -95,7 +97,6 @@ fun ChooseTicketBottomSheet(
             )
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
-                    modifier,
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
                     onTicketingClicked = {
@@ -105,7 +106,6 @@ fun ChooseTicketBottomSheet(
                 )
             } ?: run {
                 ChooseTicketBottomSheetContent1(
-                    modifier = modifier,
                     listState = listState,
                     tickets = uiState.tickets,
                     onSelectItem = viewModel::selectTicket,
@@ -117,7 +117,7 @@ fun ChooseTicketBottomSheet(
 
 @Composable
 private fun ChooseTicketBottomSheetContent1(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     listState: LazyListState,
     tickets: List<TicketWithQuantity>,
     onSelectItem: (TicketWithQuantity) -> Unit,
@@ -137,7 +137,7 @@ private fun ChooseTicketBottomSheetContent1(
 
 @Composable
 private fun ChooseTicketBottomSheetContent2(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     ticket: TicketWithQuantity,
     onCloseClicked: () -> Unit,
     onTicketingClicked: (TicketWithQuantity) -> Unit,

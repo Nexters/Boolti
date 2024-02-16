@@ -78,8 +78,8 @@ fun ChooseTicketBottomSheet(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .size(45.dp, 4.dp)
-                    .background(Grey70)
-                    .clip(RoundedCornerShape(100.dp)),
+                    .clip(RoundedCornerShape(100.dp))
+                    .background(Grey70),
             )
         },
         contentColor = MaterialTheme.colorScheme.surfaceTint,
@@ -164,7 +164,7 @@ private fun ChooseTicketBottomSheetContent2(
                 }
                 Text(
                     text = stringResource(R.string.format_price, ticket.ticket.price),
-                    style = MaterialTheme.typography.titleSmall.copy(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         color = Grey15,
                     ),
                     modifier = Modifier.padding(top = 12.dp),

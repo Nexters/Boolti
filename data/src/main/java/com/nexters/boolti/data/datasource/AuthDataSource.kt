@@ -56,6 +56,7 @@ class AuthDataSource @Inject constructor(
                 nickname = null,
                 email = null,
                 phoneNumber = null,
+                photo = null,
                 accessToken = "",
                 refreshToken = ""
             )

@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,13 +54,14 @@ fun MyScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     var showSignoutDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var openLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMyInfo()
     }
 
     Column(
-        modifier = modifier,
+        modifier = modifier.verticalScroll(state = rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MyHeader(user = user, requireLogin = requireLogin)
@@ -78,13 +81,13 @@ fun MyScreen(
             Spacer(modifier = Modifier.height(12.dp))
             MyButton(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.signout_button),
-                onClick = { showSignoutDialog = true },
+                text = stringResource(id = R.string.my_logout),
+                onClick = { openLogoutDialog = true },
             )
         }
 
         Spacer(modifier = Modifier.weight(1.0f))
-        if (user != null) LogoutButton(logout = viewModel::logout)
+        if (user != null) SignoutButton(onClick = { showSignoutDialog = true })
     }
 
     if (showSignoutDialog) {
@@ -95,6 +98,23 @@ fun MyScreen(
                 viewModel.logout()
             },
         )
+    }
+
+    if (openLogoutDialog) {
+        BTDialog(
+            positiveButtonLabel = stringResource(id = R.string.my_logout),
+            onClickPositiveButton = {
+                openLogoutDialog = false
+                viewModel.logout()
+            },
+            onDismiss = { openLogoutDialog = false }
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.my_logout_popup),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
@@ -168,37 +188,18 @@ private fun MyButton(
 }
 
 @Composable
-fun LogoutButton(
+fun SignoutButton(
     modifier: Modifier = Modifier,
-    logout: () -> Unit,
+    onClick: () -> Unit,
 ) {
-    var openDialog by remember { mutableStateOf(false) }
-
     Text(
         modifier = modifier
             .padding(bottom = 40.dp)
-            .clickable { openDialog = true },
-        text = stringResource(id = R.string.my_logout),
+            .clickable(onClick = onClick),
+        text = stringResource(id = R.string.signout_button),
         style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
         textDecoration = TextDecoration.Underline,
     )
-
-    if (openDialog) {
-        BTDialog(
-            positiveButtonLabel = stringResource(id = R.string.my_logout),
-            onClickPositiveButton = {
-                openDialog = false
-                logout()
-            },
-            onDismiss = { openDialog = false }
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.my_logout_popup),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
 }
 
 @Composable

@@ -107,7 +107,8 @@ fun LoginScreen(
                 Text(
                     stringResource(id = R.string.catch_phrase_sub),
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = subTextPadding)
+                    modifier = Modifier.padding(top = subTextPadding),
+                    color = Grey30,
                 )
 
                 KakaoLoginButton(

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.subTextPadding
 
 @Composable
 fun TicketEmptyScreen(
@@ -40,7 +41,7 @@ fun TicketEmptyScreen(
                 style = MaterialTheme.typography.headlineSmall,
             )
             Text(
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier.padding(top = subTextPadding),
                 text = stringResource(R.string.ticket_empty_desc),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,

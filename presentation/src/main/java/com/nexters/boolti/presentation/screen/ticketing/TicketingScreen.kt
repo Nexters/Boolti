@@ -309,6 +309,7 @@ private fun PaymentSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(48.dp)
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.secondaryContainer,
@@ -323,9 +324,10 @@ private fun PaymentSection(
                         )
                     }
                 }
-                .padding(12.dp),
+                .padding(horizontal = 12.dp),
         ) {
             Text(
+                modifier = Modifier.align(Alignment.CenterStart),
                 text = stringResource(R.string.ticketing_payment_account_transfer),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,

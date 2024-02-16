@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
@@ -30,6 +31,7 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.subTextPadding
 import java.time.LocalDateTime
 
 @Composable
@@ -117,15 +119,27 @@ private fun PaymentInfoSection(
         modifier = Modifier.clip(RoundedCornerShape(4.dp))
     ) {
         PaymentInfoRow(stringResource(R.string.bank_name), bankName)
-        PaymentInfoRow(stringResource(R.string.account_number), accountNumber)
-        PaymentInfoRow(stringResource(R.string.account_holder), accountHolder)
-        PaymentInfoRow(stringResource(R.string.account_transfer_due_date), dueDate.format("yyyy.MM.dd HH:mm"))
+        PaymentInfoRow(
+            modifier = Modifier.padding(top = subTextPadding),
+            label = stringResource(R.string.account_number),
+            value = accountNumber,
+        )
+        PaymentInfoRow(
+            modifier = Modifier.padding(top = subTextPadding),
+            label = stringResource(R.string.account_holder),
+            value = accountHolder,
+        )
+        PaymentInfoRow(
+            modifier = Modifier.padding(top = subTextPadding),
+            label = stringResource(R.string.account_transfer_due_date),
+            value = dueDate.format("yyyy.MM.dd HH:mm"),
+        )
     }
 }
 
 @Composable
-private fun PaymentInfoRow(label: String, value: String) {
-    Row {
+private fun PaymentInfoRow(label: String, value: String, modifier: Modifier = Modifier) {
+    Row(modifier) {
         Text(
             modifier = Modifier.weight(100F),
             text = label,
@@ -137,6 +151,7 @@ private fun PaymentInfoRow(label: String, value: String) {
                 .padding(start = 12.dp),
             text = value,
             color = Grey15,
+            textAlign = TextAlign.End,
         )
     }
 }

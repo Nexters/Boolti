@@ -82,6 +82,7 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
+import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -234,7 +235,7 @@ private fun Header(
         Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
             Text(
                 text = showName,
-                style = MaterialTheme.typography.headlineSmall,
+                style = point2,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
@@ -468,6 +469,7 @@ private fun DeposorSection(
                 Text(
                     text = stringResource(R.string.ticketing_same_contact_info),
                     color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }

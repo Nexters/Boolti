@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,6 +21,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun MainButton(
@@ -30,7 +32,7 @@ fun MainButton(
     onClick: () -> Unit,
 ) {
     Button(
-        modifier = modifier,
+        modifier = modifier.height(48.dp),
         onClick = onClick,
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(
@@ -40,7 +42,7 @@ fun MainButton(
             disabledContentColor = disabledContentColor,
         ),
         shape = RoundedCornerShape(4.dp),
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(horizontal = marginHorizontal),
         interactionSource = remember { MutableInteractionSource() },
     ) {
         Text(text = label, style = MaterialTheme.typography.titleMedium)

@@ -63,6 +63,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -669,8 +670,10 @@ fun InfoRow(
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
         )
         Text(
+            modifier = Modifier.weight(1.0f),
             text = value,
             style = MaterialTheme.typography.bodySmall.copy(color = Grey15),
+            textAlign = TextAlign.End,
         )
     }
 }

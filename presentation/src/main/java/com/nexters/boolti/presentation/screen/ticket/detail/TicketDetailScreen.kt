@@ -246,7 +246,7 @@ fun TicketDetailScreen(
                         }
                     }
 
-                    Notice(notice = ticket.notice)
+                    Notice(notice = ticket.ticketNotice)
 
                     val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
                     Inquiry(

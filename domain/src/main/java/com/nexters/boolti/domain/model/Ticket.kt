@@ -2,6 +2,27 @@ package com.nexters.boolti.domain.model
 
 import java.time.LocalDateTime
 
+/**
+ * @property userId
+ * @property showId
+ * @property ticketId
+ * @property reservationId
+ * @property salesTicketTypeId
+ * @property showName
+ * @property streetAddress
+ * @property detailAddress
+ * @property showDate
+ * @property poster
+ * @property isInviteTicket
+ * @property ticketName
+ * @property notice 공연 내용 (공연 상세에서 사용)
+ * @property ticketNotice 안내사항 for 주최자
+ * @property placeName
+ * @property entryCode QR 에 담길 정보
+ * @property usedAt
+ * @property hostName
+ * @property hostPhoneNumber
+ */
 data class Ticket(
     val userId: String = "",
     val showId: String = "",
@@ -16,6 +37,7 @@ data class Ticket(
     val isInviteTicket: Boolean = false,
     val ticketName: String = "",
     val notice: String = "",
+    val ticketNotice: String = "",
     val placeName: String = "",
     val entryCode: String = "",
     val usedAt: LocalDateTime? = null,

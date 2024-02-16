@@ -92,6 +92,7 @@ fun MyScreen(
             onDismiss = { showSignoutDialog = false },
             onClickButton = {
                 Toast.makeText(context, "탈퇴 요청이 접수되었습니다.", Toast.LENGTH_LONG).show()
+                viewModel.logout()
             },
         )
     }

@@ -93,7 +93,7 @@ fun BTTextField(
                 isError = isError,
                 interactionSource = interactionSource,
                 colors = colors,
-                contentPadding = PaddingValues(horizontal = 12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
                 container = {
                     OutlinedTextFieldDefaults.ContainerBox(
                         shape = shape,

@@ -55,6 +55,7 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey85
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +85,7 @@ fun ChooseTicketBottomSheet(
             )
         },
         contentColor = MaterialTheme.colorScheme.surfaceTint,
+        containerColor = Grey85,
     ) {
         Column(
             modifier = Modifier

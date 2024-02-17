@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -114,6 +116,7 @@ private fun QrScanToolbar(
     onClickClose: () -> Unit,
 ) {
     TopAppBar(
+        modifier = Modifier.height(44.dp),
         title = {
             Text(text = showName, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleLarge)
         },
@@ -144,8 +147,11 @@ private fun QrScanBottombar(onClick: () -> Unit) {
             horizontalArrangement = Arrangement.Center,
         ) {
             Icon(
-                modifier = Modifier.padding(end = 4.dp),
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(end = 4.dp),
                 painter = painterResource(id = R.drawable.ic_book),
+                tint = Grey50,
                 contentDescription = stringResource(R.string.show_entry_code),
             )
             Text(

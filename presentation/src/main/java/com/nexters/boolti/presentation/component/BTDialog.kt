@@ -63,7 +63,7 @@ fun BTDialog(
             ) {
                 Box(
                     modifier = Modifier
-                        .height(48.dp)
+                        .height(if (showCloseButton) 48.dp else 32.dp)
                         .fillMaxWidth()
                 ) {
                     if (showCloseButton) {

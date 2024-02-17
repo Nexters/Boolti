@@ -6,15 +6,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Divider
@@ -56,7 +60,6 @@ import com.nexters.boolti.presentation.theme.Grey85
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseTicketBottomSheet(
-    modifier: Modifier = Modifier,
     viewModel: SalesTicketViewModel = hiltViewModel(),
     onTicketingClicked: (ticket: SalesTicket, count: Int) -> Unit,
     onDismissRequest: () -> Unit,
@@ -77,16 +80,16 @@ fun ChooseTicketBottomSheet(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .size(45.dp, 4.dp)
-                    .background(Grey70)
-                    .clip(RoundedCornerShape(100.dp)),
+                    .clip(CircleShape)
+                    .background(Grey70),
             )
         },
         contentColor = MaterialTheme.colorScheme.surfaceTint,
         containerColor = Grey85,
     ) {
         Column(
-            modifier = modifier
-                .padding(bottom = 20.dp)
+            modifier = Modifier
+                .padding(bottom = 20.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
                 .heightIn(max = 564.dp)
         ) {
             Text(
@@ -97,7 +100,6 @@ fun ChooseTicketBottomSheet(
             )
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
-                    modifier,
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
                     onTicketingClicked = {
@@ -107,7 +109,6 @@ fun ChooseTicketBottomSheet(
                 )
             } ?: run {
                 ChooseTicketBottomSheetContent1(
-                    modifier = modifier,
                     listState = listState,
                     tickets = uiState.tickets,
                     onSelectItem = viewModel::selectTicket,
@@ -119,7 +120,7 @@ fun ChooseTicketBottomSheet(
 
 @Composable
 private fun ChooseTicketBottomSheetContent1(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     listState: LazyListState,
     tickets: List<TicketWithQuantity>,
     onSelectItem: (TicketWithQuantity) -> Unit,
@@ -139,7 +140,7 @@ private fun ChooseTicketBottomSheetContent1(
 
 @Composable
 private fun ChooseTicketBottomSheetContent2(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     ticket: TicketWithQuantity,
     onCloseClicked: () -> Unit,
     onTicketingClicked: (TicketWithQuantity) -> Unit,
@@ -166,7 +167,7 @@ private fun ChooseTicketBottomSheetContent2(
                 }
                 Text(
                     text = stringResource(R.string.format_price, ticket.ticket.price),
-                    style = MaterialTheme.typography.titleSmall.copy(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         color = Grey15,
                     ),
                     modifier = Modifier.padding(top = 12.dp),

@@ -42,6 +42,7 @@ import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.subTextPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,8 +106,9 @@ fun LoginScreen(
                 )
                 Text(
                     stringResource(id = R.string.catch_phrase_sub),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                    modifier = Modifier.padding(top = 6.dp)
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = subTextPadding),
+                    color = Grey30,
                 )
 
                 KakaoLoginButton(

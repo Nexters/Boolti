@@ -31,7 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +63,7 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
@@ -294,11 +294,17 @@ private fun ShowDetailAppBar(
             expanded = isContextMenuVisible,
             onDismissRequest = { isContextMenuVisible = false }) {
             DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.report)) },
+                modifier = Modifier.background(Grey20),
+                text = {
+                    Text(
+                        text = stringResource(id = R.string.report),
+                        color = Color.Black,
+                    )
+                },
                 onClick = {
                     navigateToReport()
                     isContextMenuVisible = false
-                }
+                },
             )
         }
     }
@@ -517,8 +523,8 @@ fun ShowDetailCtaButton(
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background)
-            .padding(horizontal = marginHorizontal, vertical = 8.dp)
-            .padding(bottom = 34.dp),
+            .padding(horizontal = marginHorizontal)
+            .padding(top = 8.dp, bottom = 20.dp),
         label = text,
         onClick = onClick,
         enabled = enabled,

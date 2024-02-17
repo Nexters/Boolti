@@ -43,6 +43,7 @@ import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
+import com.nexters.boolti.presentation.theme.subTextPadding
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -75,7 +76,7 @@ fun ReservationsScreen(
                     style = MaterialTheme.typography.titleLarge.copy(color = Grey05),
                 )
                 Text(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = subTextPadding),
                     text = stringResource(id = R.string.reservations_empty_sub),
                     style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
                 )

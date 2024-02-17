@@ -130,7 +130,7 @@
     <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>
     <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
-    <string name="enter_code_dialog_desc">입장 코드는 공연관리 > 입장 관리\n페이지에서 확인 가능합니다.</string>
+    <string name="enter_code_dialog_desc">입장 코드는 주최자 계정의 마이 > QR 스캔 > 해당 공연 스캐너에서 확인 가능해요.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_mismatch">올바른 입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_not_today">오늘 공연이 아닙니다</string>

@@ -20,5 +20,5 @@ interface AuthRepository {
     fun getUserAndCache(): Flow<User>
 
     val loggedIn: Flow<Boolean>
-    val cachedUser: Flow<User>
+    val cachedUser: Flow<User?>
 }

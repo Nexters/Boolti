@@ -24,15 +24,19 @@ class AuthDataSource @Inject constructor(
     private val data: Flow<AppSettings>
         get() = dataStore.data
 
-    val user: Flow<UserResponse>
+    val user: Flow<UserResponse?>
         get() {
             return dataStore.data.map {
-                UserResponse(
-                    id = it.userId ?: "",
-                    nickname = it.nickname ?: "",
-                    email = it.email ?: "",
-                    imgPath = it.photo,
-                )
+                if (it.userId == null) {
+                    null
+                } else {
+                    UserResponse(
+                        id = it.userId ?: "",
+                        nickname = it.nickname ?: "",
+                        email = it.email ?: "",
+                        imgPath = it.photo,
+                    )
+                }
             }
         }
 
@@ -52,6 +56,7 @@ class AuthDataSource @Inject constructor(
                 nickname = null,
                 email = null,
                 phoneNumber = null,
+                photo = null,
                 accessToken = "",
                 refreshToken = ""
             )
@@ -61,7 +66,7 @@ class AuthDataSource @Inject constructor(
     suspend fun refresh(): Result<SignUpResponse?> = runCatching {
         val refreshToken = data.map { it.refreshToken }.first()
 
-        if(refreshToken.isNotBlank()) loginService.refresh(RefreshRequest(refreshToken)) else null
+        if (refreshToken.isNotBlank()) loginService.refresh(RefreshRequest(refreshToken)) else null
     }
 
     suspend fun updateUser(user: UserResponse) {

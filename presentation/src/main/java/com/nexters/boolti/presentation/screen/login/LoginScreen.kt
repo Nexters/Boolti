@@ -105,7 +105,7 @@ fun LoginScreen(
                 )
                 Text(
                     stringResource(id = R.string.catch_phrase_sub),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
                     modifier = Modifier.padding(top = 6.dp)
                 )
 

@@ -8,8 +8,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -31,13 +35,20 @@ fun ManagerCodeDialog(
     onDismiss: () -> Unit,
     onClickConfirm: (managerCode: String) -> Unit,
 ) {
+    val code = managerCode.filter { it.isDigit() }
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
+    }
+
     BTDialog(
+        modifier = Modifier.focusRequester(focusRequester),
         onDismiss = {
             onManagerCodeChanged("")
             onDismiss()
         },
-        onClickPositiveButton = { onClickConfirm(managerCode) },
-        positiveButtonEnabled = managerCode.isNotEmpty(),
+        onClickPositiveButton = { onClickConfirm(code) },
+        positiveButtonEnabled = code.isNotEmpty(),
     ) {
         Text(
             text = stringResource(R.string.enter_code_dialog_title),
@@ -56,7 +67,7 @@ fun ManagerCodeDialog(
             color = Grey50,
         )
         BTTextField(
-            text = managerCode,
+            text = code,
             placeholder = stringResource(R.string.enter_code_dialog_placeholder),
             onValueChanged = {
                 onManagerCodeChanged(it)
@@ -65,13 +76,12 @@ fun ManagerCodeDialog(
                 .fillMaxWidth()
                 .padding(top = 24.dp),
             keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
                 autoCorrect = false,
-                keyboardType = KeyboardType.Text,
+                keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
-                onDone = { onClickConfirm(managerCode) }
+                onDone = { onClickConfirm(code) }
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -95,7 +105,9 @@ fun ManagerCodeDialog(
                 text = message,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 8.dp).align(Alignment.Start),
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .align(Alignment.Start),
             )
         }
     }

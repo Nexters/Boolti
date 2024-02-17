@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Divider
@@ -78,7 +79,7 @@ fun ChooseTicketBottomSheet(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .size(45.dp, 4.dp)
-                    .clip(RoundedCornerShape(100.dp))
+                    .clip(CircleShape)
                     .background(Grey70),
             )
         },

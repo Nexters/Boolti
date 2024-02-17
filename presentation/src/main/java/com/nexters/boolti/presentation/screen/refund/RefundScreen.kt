@@ -28,7 +28,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -185,7 +184,7 @@ fun RefundScreen(
                     )
                     InfoRow(
                         modifier = Modifier.padding(top = 8.dp),
-                        type = stringResource(id = R.string.ticketing_contact_label),
+                        type = stringResource(id = R.string.contact_label),
                         value = StringBuilder(uiState.contact).apply {
                             if (uiState.contact.length > 7) {
                                 insert(7, '-')
@@ -303,7 +302,7 @@ fun RefundInfoPage(
                 ) {
                     Text(
                         modifier = Modifier.width(56.dp),
-                        text = stringResource(id = R.string.ticketing_name_label),
+                        text = stringResource(id = R.string.name_label),
                         style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
                     )
                     BTTextField(
@@ -333,7 +332,7 @@ fun RefundInfoPage(
                 ) {
                     Text(
                         modifier = Modifier.width(56.dp),
-                        text = stringResource(id = R.string.ticketing_contact_label),
+                        text = stringResource(id = R.string.contact_label),
                         style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
                     )
                     BTTextField(

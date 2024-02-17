@@ -53,7 +53,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -257,7 +256,7 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
         label = "expandIconRotation"
     )
     Section(
-        title = stringResource(R.string.ticketing_refund_policy_label),
+        title = stringResource(R.string.refund_policy_label),
         titleRowOption = {
             Icon(
                 modifier = Modifier
@@ -306,7 +305,7 @@ private fun PaymentSection(
     snackbarHostState: SnackbarHostState,
 ) {
     val context = LocalContext.current
-    Section(title = stringResource(R.string.ticketing_payment_label)) {
+    Section(title = stringResource(R.string.payment_type_label)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -329,7 +328,7 @@ private fun PaymentSection(
         ) {
             Text(
                 modifier = Modifier.align(Alignment.CenterStart),
-                text = stringResource(R.string.ticketing_payment_account_transfer),
+                text = stringResource(R.string.payment_account_transfer),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
             )
@@ -357,7 +356,7 @@ private fun InviteCodeSection(
     onInviteCodeChanged: (String) -> Unit,
     onClickCheckInviteCode: () -> Unit,
 ) {
-    Section(title = stringResource(R.string.ticketing_invite_code_label)) {
+    Section(title = stringResource(R.string.invite_code_label)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BTTextField(
                 modifier = Modifier
@@ -414,18 +413,18 @@ private fun InviteCodeSection(
 
 @Composable
 private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
-    Section(title = stringResource(R.string.ticketing_ticket_info_label)) {
+    Section(title = stringResource(R.string.ticket_info_label)) {
         SectionTicketInfo(
-            stringResource(R.string.ticketing_selected_ticket),
+            stringResource(R.string.ticket_type_label),
             ticketName,
             marginTop = 0.dp
         )
         SectionTicketInfo(
-            label = stringResource(R.string.ticketing_selected_ticket_count),
+            label = stringResource(R.string.ticket_count_label),
             value = stringResource(R.string.ticket_count, ticketCount),
         )
         SectionTicketInfo(
-            label = stringResource(R.string.ticketing_total_payment_amount),
+            label = stringResource(R.string.total_payment_amount_label),
             value = stringResource(R.string.unit_won, totalPrice),
         )
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
@@ -442,7 +441,7 @@ private fun DeposorSection(
     onPhoneNumberChanged: (number: String) -> Unit,
 ) {
     Section(
-        title = stringResource(R.string.ticketing_depositor_label),
+        title = stringResource(R.string.depositor_info_label),
         titleRowOption = {
             Row(
                 modifier = Modifier
@@ -484,7 +483,7 @@ private fun DeposorSection(
     ) {
         if (!isSameContactInfo) {
             InputRow(
-                stringResource(R.string.ticketing_name_label),
+                stringResource(R.string.name_label),
                 name,
                 placeholder = stringResource(R.string.ticketing_name_placeholder),
             ) {
@@ -492,7 +491,7 @@ private fun DeposorSection(
             }
             Spacer(modifier = Modifier.size(16.dp))
             InputRow(
-                stringResource(R.string.ticketing_contact_label),
+                stringResource(R.string.contact_label),
                 phoneNumber,
                 placeholder = stringResource(R.string.ticketing_contact_placeholder),
                 isPhoneNumber = true,
@@ -514,7 +513,7 @@ private fun TicketHolderSection(
 ) {
     Section(title = stringResource(R.string.ticketing_ticket_holder_label)) {
         InputRow(
-            stringResource(R.string.ticketing_name_label),
+            stringResource(R.string.name_label),
             name,
             placeholder = stringResource(R.string.ticketing_name_placeholder),
         ) {
@@ -522,7 +521,7 @@ private fun TicketHolderSection(
         }
         Spacer(modifier = Modifier.size(16.dp))
         InputRow(
-            stringResource(R.string.ticketing_contact_label),
+            stringResource(R.string.contact_label),
             phoneNumber,
             placeholder = stringResource(R.string.ticketing_contact_placeholder),
             isPhoneNumber = true,

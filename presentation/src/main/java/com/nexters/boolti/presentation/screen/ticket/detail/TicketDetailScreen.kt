@@ -66,7 +66,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
@@ -571,7 +570,7 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
         label = "expandIconRotation"
     )
     Section(
-        title = stringResource(R.string.ticketing_refund_policy_label),
+        title = stringResource(R.string.refund_policy_label),
         titleRowOption = {
             Icon(
                 modifier = Modifier

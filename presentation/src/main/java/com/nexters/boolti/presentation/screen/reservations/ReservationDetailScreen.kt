@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -299,11 +298,11 @@ private fun PaymentInfo(
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.reservation_payment_info),
+        title = stringResource(id = R.string.payment_info_label),
     ) {
         val paymentType = when (reservation.paymentType) {
-            PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.ticketing_payment_account_transfer)
-            PaymentType.CARD -> stringResource(id = R.string.ticketing_payment_card)
+            PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
+            PaymentType.CARD -> stringResource(id = R.string.payment_card)
             else -> stringResource(id = R.string.reservations_unknown)
         }
 
@@ -312,17 +311,17 @@ private fun PaymentInfo(
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
-                key = stringResource(id = R.string.ticketing_payment_label),
-                value = if (reservation.isInviteTicket) stringResource(id = R.string.ticketing_invite_code_label) else paymentType
+                key = stringResource(id = R.string.payment_type_label),
+                value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.ticketing_total_payment_amount),
+                key = stringResource(id = R.string.total_payment_amount_label),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.reservation_payment_state),
+                key = stringResource(id = R.string.payment_state_label),
                 value = stringResource(id = stateStringId)
             )
         }
@@ -341,12 +340,12 @@ private fun TicketInfo(
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
-                key = stringResource(id = R.string.reservation_ticket_type),
+                key = stringResource(id = R.string.ticket_type_label),
                 value = reservation.ticketName,
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.reservation_ticket_count),
+                key = stringResource(id = R.string.ticket_count_label),
                 value = stringResource(
                     id = R.string.reservation_ticket_count_format,
                     reservation.ticketCount
@@ -375,12 +374,12 @@ private fun TicketHolderInfo(
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
-                key = stringResource(id = R.string.ticketing_name_label),
+                key = stringResource(id = R.string.name_label),
                 value = reservation.ticketHolderName
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.ticketing_contact_label),
+                key = stringResource(id = R.string.contact_label),
                 value = reservation.ticketHolderPhoneNumber
             )
         }
@@ -394,18 +393,18 @@ private fun DepositorInfo(
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.ticketing_depositor_label),
+        title = stringResource(id = R.string.depositor_info_label),
         defaultExpanded = false,
     ) {
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
-                key = stringResource(id = R.string.ticketing_name_label),
+                key = stringResource(id = R.string.name_label),
                 value = reservation.depositorName
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.ticketing_contact_label),
+                key = stringResource(id = R.string.contact_label),
                 value = reservation.depositorPhoneNumber
             )
         }
@@ -419,7 +418,7 @@ private fun RefundPolicy(
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.ticketing_refund_policy_label),
+        title = stringResource(id = R.string.refund_policy_label),
         defaultExpanded = false,
     ) {
         Column {

@@ -49,13 +49,12 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
-import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
-import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
@@ -190,6 +189,7 @@ private fun Title(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
@@ -199,7 +199,7 @@ private fun Title(
         )
         Image(
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey20),
+            colorFilter = ColorFilter.tint(Grey80),
             contentDescription = null,
         )
     }
@@ -226,9 +226,7 @@ private fun TicketInfo(
         ) {
             Text(
                 text = showName,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontFamily = aggroFamily,
-                ),
+                style = point2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onPrimary,

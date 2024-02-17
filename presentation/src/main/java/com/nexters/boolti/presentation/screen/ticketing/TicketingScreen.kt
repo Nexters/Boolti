@@ -363,6 +363,7 @@ private fun InviteCodeSection(
                 text = inviteCode.uppercase(),
                 singleLine = true,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
+                isError = inviteCodeStatus is InviteCodeStatus.Invalid,
                 placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
@@ -374,9 +375,10 @@ private fun InviteCodeSection(
                 },
             )
             Button(
+                modifier = Modifier.height(48.dp),
                 onClick = onClickCheckInviteCode,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid && inviteCode.isNotBlank(),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp),
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Grey20,

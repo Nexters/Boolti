@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey10
@@ -77,29 +78,16 @@ fun ReportScreen(
                 text = stringResource(id = R.string.report_description),
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
-            TextField(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = marginHorizontal)
-                .height(160.dp)
-                .padding(top = 20.dp)
-                .clip(shape = RoundedCornerShape(4.dp)),
-                value = uiState.reason,
-                onValueChange = viewModel::updateReason,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey10),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Grey85,
-                    unfocusedContainerColor = Grey85,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                shape = RoundedCornerShape(4.dp),
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.report_reason_hint),
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
-                    )
-                })
-
+            BTTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal)
+                    .height(160.dp)
+                    .padding(top = 20.dp),
+                text = uiState.reason,
+                placeholder = stringResource(id = R.string.report_reason_hint),
+                onValueChanged = viewModel::updateReason,
+            )
             Spacer(modifier = Modifier.weight(1.0f))
             MainButton(
                 modifier = Modifier

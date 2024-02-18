@@ -28,7 +28,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -39,8 +38,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -234,28 +231,16 @@ fun ReasonPage(
             text = stringResource(id = R.string.refund_reason_label),
             style = point4,
         )
-        TextField(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = marginHorizontal)
-            .height(160.dp)
-            .padding(top = 20.dp)
-            .clip(shape = RoundedCornerShape(4.dp)),
-            value = reason,
-            onValueChange = onReasonChanged,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey10),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Grey85,
-                unfocusedContainerColor = Grey85,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            shape = RoundedCornerShape(4.dp),
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.refund_reason_hint),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
-                )
-            })
+        BTTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = marginHorizontal)
+                .height(160.dp)
+                .padding(top = 20.dp),
+            text = reason,
+            onValueChanged = onReasonChanged,
+            placeholder = stringResource(id = R.string.refund_reason_hint),
+        )
 
         Spacer(modifier = Modifier.weight(1.0f))
         MainButton(

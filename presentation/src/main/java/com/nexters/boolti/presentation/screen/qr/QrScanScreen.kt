@@ -112,7 +112,6 @@ fun QrScanScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun QrScanToolbar(
     showName: String,
@@ -162,7 +161,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
             Icon(
                 modifier = Modifier
                     .size(20.dp)
-                    .padding(end = 4.dp),
+                    .padding(top = 2.dp, end = 4.dp),
                 painter = painterResource(id = R.drawable.ic_book),
                 tint = Grey50,
                 contentDescription = stringResource(R.string.show_entry_code),

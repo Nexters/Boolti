@@ -450,7 +450,8 @@ private fun DeposorSection(
             Row(
                 modifier = Modifier
                     .padding(start = 20.dp)
-                    .clickable(role = Role.Checkbox, onClick = onClickSameContact)
+                    .clickable(role = Role.Checkbox, onClick = onClickSameContact),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (isSameContactInfo) {
                     Icon(

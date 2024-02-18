@@ -48,7 +48,7 @@ fun ManagerCodeDialog(
             onDismiss()
         },
         onClickPositiveButton = { onClickConfirm(code) },
-        positiveButtonEnabled = code.isNotEmpty(),
+        positiveButtonEnabled = code.isNotEmpty() && error == null,
     ) {
         Text(
             text = stringResource(R.string.enter_code_dialog_title),

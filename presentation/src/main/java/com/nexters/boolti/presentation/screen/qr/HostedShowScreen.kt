@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.qr
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,7 +38,7 @@ import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.aggroFamily
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -115,10 +116,11 @@ private fun HostedShowItem(
     onClick: (showId: String, showName: String) -> Unit,
 ) {
     val enable = show.date.toLocalDate().toEpochDay() < LocalDate.now().toEpochDay()
-    val tint = if (enable) White else Grey50
+    val tint = if (enable) White else Grey60
 
     Row(
         modifier = Modifier
+            .clickable(enable) { onClick(show.id, show.name) }
             .background(MaterialTheme.colorScheme.surface)
             .padding(20.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -130,13 +132,11 @@ private fun HostedShowItem(
             color = tint,
             fontFamily = aggroFamily,
         )
-        IconButton(onClick = { onClick(show.id, show.name) }) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_scan),
-                tint = tint,
-                contentDescription = stringResource(R.string.description_qr_icon),
-            )
-        }
+        Icon(
+            painter = painterResource(id = R.drawable.ic_scan),
+            tint = tint,
+            contentDescription = stringResource(R.string.description_qr_icon),
+        )
     }
 }
 

@@ -31,6 +31,7 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.theme.subTextPadding
 import java.time.LocalDateTime
 
@@ -98,7 +99,7 @@ private fun HeaderSection(price: Int, dueDate: LocalDateTime) {
                 )
             }
         },
-        style = MaterialTheme.typography.headlineMedium,
+        style = point4,
     )
     Text(
         modifier = Modifier.padding(top = 8.dp),
@@ -141,13 +142,12 @@ private fun PaymentInfoSection(
 private fun PaymentInfoRow(label: String, value: String, modifier: Modifier = Modifier) {
     Row(modifier) {
         Text(
-            modifier = Modifier.weight(100F),
             text = label,
             color = Grey30,
         )
         Text(
             modifier = Modifier
-                .weight(195F)
+                .weight(1f)
                 .padding(start = 12.dp),
             text = value,
             color = Grey15,
@@ -155,7 +155,6 @@ private fun PaymentInfoRow(label: String, value: String, modifier: Modifier = Mo
         )
     }
 }
-
 
 @Composable
 private fun AccountNumberCopyButton(

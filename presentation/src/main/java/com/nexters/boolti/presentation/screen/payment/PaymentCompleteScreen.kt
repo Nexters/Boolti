@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.payment
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,6 +12,7 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point4
 
 @Composable
 fun PaymentCompleteScreen(
@@ -44,6 +44,6 @@ private fun HeaderSection() {
     Text(
         modifier = Modifier.padding(top = 20.dp),
         text = stringResource(R.string.invite_ticket_complete_title),
-        style = MaterialTheme.typography.headlineMedium,
+        style = point4,
     )
 }

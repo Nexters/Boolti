@@ -115,6 +115,7 @@ private fun TicketNotEmptyScreen(
                     }
                     .clickable { onClickTicket(uiState.tickets[page].ticketId) },
                 shape = RectangleShape,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             ) {
                 val ticket = uiState.tickets[page]
                 TicketContent(

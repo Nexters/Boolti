@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -32,7 +33,6 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -49,17 +49,17 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
-import com.nexters.boolti.presentation.theme.Grey20
+import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
-import com.nexters.boolti.presentation.theme.aggroFamily
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
-import com.nexters.boolti.presentation.util.ticketPath
 import java.time.LocalDateTime
 
 @Composable
@@ -74,80 +74,60 @@ fun TicketContent(
     var ticketWidth by remember { mutableFloatStateOf(0f) }
     var ticketHeight by remember { mutableFloatStateOf(0f) }
 
+    val ticketShape = TicketShape(
+        width = ticketWidth,
+        height = ticketHeight,
+        circleRadius = 10.dp.toPx(),
+        cornerRadius = 8.dp.toPx(),
+        bottomAreaHeight = bottomAreaHeight.toPx(),
+    )
+
     Box(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
             .onGloballyPositioned { coordinates ->
                 ticketWidth = coordinates.size.width.toFloat()
                 ticketHeight = coordinates.size.height.toFloat()
             }
-            .graphicsLayer {
-                shape = TicketShape(
-                    width = ticketWidth,
-                    height = ticketHeight,
-                    circleRadius = 10.dp.toPx(),
-                    cornerRadius = 8.dp.toPx(),
-                    bottomAreaHeight = bottomAreaHeight.toPx(),
-                )
-                clip = true
-            }
-            .drawBehind {
-                // 보더 Line
-                drawPath(
-                    brush = Brush.linearGradient(
-                        listOf(
-                            White.copy(alpha = .5f),
-                            White.copy(alpha = .2f),
-                        ),
-                        start = Offset(ticketWidth / 2, 0f),
-                        end = Offset(0f, ticketHeight / 0f),
-                    ),
-                    path = ticketPath(
-                        width = ticketWidth,
-                        height = ticketHeight,
-                        circleRadius = 10.dp.toPx(),
-                        cornerRadius = 8.dp.toPx(),
-                        bottomAreaHeight = bottomAreaHeight.toPx(),
-                    ),
-                    style = Stroke(
-                        width = 1.dp.toPx(),
-                    )
-                )
-            }
+            .background(MaterialTheme.colorScheme.background)
+            .clip(ticketShape)
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
+                shape = ticketShape,
+            ),
     ) {
+        // 배경 블러된 이미지
         AsyncImage(
             model = asyncImageBlurModel(context, ticket.poster, radius = 24),
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .alpha(.8f),
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )
-        // 포스터 위에 올라가는 그라데이션
+        // 배경 블러된 이미지 위에 올라가는 그라데이션 배경
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xCCC5CACD),
-                            Color(0xCC090A0B),
-                        ),
+                        colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
                         start = Offset.Zero,
                         end = Offset(ticketWidth, ticketHeight),
                     ),
-                    alpha = .8f,
                 )
         )
         // 텍스트 뒤에 깔린 DIM 그라데이션
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
                 .height(bottomAreaHeight)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(Black.copy(alpha = .2f), Black.copy(alpha = .8f))
                     )
-                )
+                ),
         )
         Column {
             Title(ticket.ticketName, 1) // TODO 개수 정보 생기면 업데이트
@@ -178,6 +158,19 @@ fun TicketContent(
                 onClickQr = onClickQr,
             )
         }
+        // 티켓 좌상단 꼭지점 그라데이션
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .size(105.dp)
+                .alpha(.45f)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(White, White.copy(alpha = 0f)),
+                        end = Offset(50f, 50f),
+                    )
+                ),
+        )
     }
 }
 
@@ -190,6 +183,7 @@ private fun Title(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
@@ -199,7 +193,7 @@ private fun Title(
         )
         Image(
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey20),
+            colorFilter = ColorFilter.tint(Grey80),
             contentDescription = null,
         )
     }
@@ -226,9 +220,7 @@ private fun TicketInfo(
         ) {
             Text(
                 text = showName,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontFamily = aggroFamily,
-                ),
+                style = point2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onPrimary,

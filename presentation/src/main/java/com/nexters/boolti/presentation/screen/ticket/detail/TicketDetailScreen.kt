@@ -66,7 +66,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
@@ -95,8 +94,8 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
-import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
@@ -178,7 +177,11 @@ fun TicketDetailScreen(
                             ticketSectionHeight = coordinates.size.height.toFloat()
                         }
                         .clip(ticketShape)
-                        .border(1.dp, color = White.copy(alpha = .3f), shape = ticketShape),
+                        .border(
+                            width = 1.dp,
+                            brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
+                            shape = ticketShape,
+                        ),
                 ) {
                     Box {
                         // 배경 블러된 이미지
@@ -244,6 +247,19 @@ fun TicketDetailScreen(
                                 onClickQr = onClickQr,
                             )
                         }
+                        // 티켓 좌상단 꼭지점 그라데이션
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .size(105.dp)
+                                .alpha(.45f)
+                                .background(
+                                    Brush.linearGradient(
+                                        colors = listOf(White, White.copy(alpha = 0f)),
+                                        end = Offset(50f, 50f),
+                                    )
+                                ),
+                        )
                     }
 
                     Notice(notice = ticket.ticketNotice)
@@ -327,6 +343,7 @@ private fun Title(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
@@ -336,7 +353,7 @@ private fun Title(
         )
         Image(
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey20),
+            colorFilter = ColorFilter.tint(Grey80),
             contentDescription = null,
         )
     }
@@ -371,9 +388,7 @@ private fun TicketInfo(
         ) {
             Text(
                 text = showName,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontFamily = aggroFamily,
-                ),
+                style = point2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onPrimary,
@@ -544,7 +559,10 @@ fun Inquiry(
                 contentPadding = PaddingValues(vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
             ) {
-                Text(text = stringResource(R.string.copy_show_place_button))
+                Text(
+                    text = stringResource(R.string.copy_show_place_button),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             TextButton(
                 modifier = Modifier.weight(1f),
@@ -554,9 +572,12 @@ fun Inquiry(
                     contentColor = MaterialTheme.colorScheme.surface,
                 ),
                 contentPadding = PaddingValues(vertical = 13.dp),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(4.dp),
             ) {
-                Text(text = stringResource(R.string.navigate_to_show_button))
+                Text(
+                    text = stringResource(R.string.navigate_to_show_button),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }
@@ -571,7 +592,7 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
         label = "expandIconRotation"
     )
     Section(
-        title = stringResource(R.string.ticketing_refund_policy_label),
+        title = stringResource(R.string.refund_policy_label),
         titleRowOption = {
             Icon(
                 modifier = Modifier
@@ -592,10 +613,12 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                         dampingRatio = Spring.DampingRatioNoBouncy,
                         stiffness = Spring.StiffnessMedium,
                     )
-                )
+                ),
+            verticalArrangement = Arrangement.Center,
         ) {
             if (expanded) {
-                refundPolicy.forEach {
+                refundPolicy.forEachIndexed { index, policy ->
+                    if (index > 0) Spacer(modifier = Modifier.size(6.dp))
                     Row {
                         Text(
                             text = stringResource(R.string.bullet),
@@ -603,13 +626,12 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                             color = Grey50,
                         )
                         Text(
-                            text = it,
+                            text = policy,
                             style = MaterialTheme.typography.bodySmall,
                             color = Grey50,
                             lineHeight = 22.sp,
                         )
                     }
-                    Spacer(modifier = Modifier.size(6.dp))
                 }
             }
         }

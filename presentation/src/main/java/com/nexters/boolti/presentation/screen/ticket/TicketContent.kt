@@ -54,6 +54,7 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
@@ -99,7 +100,8 @@ fun TicketContent(
         AsyncImage(
             model = asyncImageBlurModel(context, ticket.poster, radius = 24),
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .alpha(.8f),
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )
@@ -109,20 +111,17 @@ fun TicketContent(
                 .fillMaxSize()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xCCC5CACD),
-                            Color(0xCC090A0B),
-                        ),
+                        colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
                         start = Offset.Zero,
                         end = Offset(ticketWidth, ticketHeight),
                     ),
-                    alpha = .8f,
                 )
         )
         // 텍스트 뒤에 깔린 DIM 그라데이션
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
                 .height(bottomAreaHeight)
                 .background(
                     brush = Brush.verticalGradient(

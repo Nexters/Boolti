@@ -18,8 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -115,21 +113,30 @@ private fun QrScanToolbar(
     showName: String,
     onClickClose: () -> Unit,
 ) {
-    TopAppBar(
-        modifier = Modifier.height(44.dp),
-        title = {
-            Text(text = showName, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleLarge)
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-        actions = {
-            IconButton(onClick = onClickClose) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(R.string.description_close_button),
-                )
-            }
+    Row(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .height(44.dp)
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(end = 20.dp)
+                .weight(1f),
+            text = showName,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        IconButton(onClick = onClickClose) {
+            Icon(
+                painter = painterResource(R.drawable.ic_close),
+                tint = MaterialTheme.colorScheme.onBackground,
+                contentDescription = stringResource(R.string.description_close_button),
+            )
         }
-    )
+    }
 }
 
 @Composable
@@ -144,6 +151,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
             modifier = Modifier
                 .clickable(onClick = onClick)
                 .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
             Icon(

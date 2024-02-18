@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -70,17 +69,18 @@ fun QrScanScreen(
     LaunchedEffect(viewModel.event) {
         scope.launch {
             viewModel.event.collect { event ->
-                when (event) {
+                val errMessage = when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.ShowNotToday -> snackbarHostState.showSnackbar(notTodayErrMessage)
-                            QrErrorType.UsedTicket -> snackbarHostState.showSnackbar(usedTicketErrMessage)
-                            QrErrorType.TicketNotFound -> snackbarHostState.showSnackbar(notMatchedErrMessage)
+                            QrErrorType.ShowNotToday -> notTodayErrMessage
+                            QrErrorType.UsedTicket -> usedTicketErrMessage
+                            QrErrorType.TicketNotFound -> notMatchedErrMessage
                         }
                     }
 
-                    is QrScanEvent.ScanSuccess -> snackbarHostState.showSnackbar(successMessage)
+                    is QrScanEvent.ScanSuccess -> successMessage
                 }
+                snackbarHostState.showSnackbar(errMessage)
             }
         }
     }

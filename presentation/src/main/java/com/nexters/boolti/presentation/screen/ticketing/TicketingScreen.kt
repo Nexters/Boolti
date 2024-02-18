@@ -56,6 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -362,22 +363,25 @@ private fun InviteCodeSection(
                 modifier = Modifier
                     .weight(1F)
                     .padding(end = 6.dp),
-                text = inviteCode,
+                text = inviteCode.uppercase(),
                 singleLine = true,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
+                isError = inviteCodeStatus is InviteCodeStatus.Invalid,
                 placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
+                    capitalization = KeyboardCapitalization.Characters,
                 ),
                 onValueChanged = {
-                    onInviteCodeChanged(it)
+                    onInviteCodeChanged(it.uppercase())
                 },
             )
             Button(
+                modifier = Modifier.height(48.dp),
                 onClick = onClickCheckInviteCode,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid && inviteCode.isNotBlank(),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 13.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp),
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Grey20,

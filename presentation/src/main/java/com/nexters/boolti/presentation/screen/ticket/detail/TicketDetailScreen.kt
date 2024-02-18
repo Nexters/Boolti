@@ -285,16 +285,18 @@ fun TicketDetailScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
-                Text(
-                    modifier = Modifier
-                        .padding(top = 20.dp, bottom = 60.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .clickable { showEnterCodeDialog = true },
-                    text = stringResource(R.string.input_enter_code_button),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Grey50,
-                    textDecoration = TextDecoration.Underline,
-                )
+                if (uiState.ticket.ticketState == TicketState.Ready) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 60.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable { showEnterCodeDialog = true },
+                        text = stringResource(R.string.input_enter_code_button),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Grey50,
+                        textDecoration = TextDecoration.Underline,
+                    )
+                }
             }
             PullToRefreshContainer(
                 modifier = Modifier.align(Alignment.TopCenter),

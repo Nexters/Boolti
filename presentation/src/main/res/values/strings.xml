@@ -76,7 +76,7 @@
     <string name="ticket_notice_title">안내사항 for 주최자</string>
     <string name="ticket_show_inquiry_title">공연 관련 문의</string>
     <string name="copy_show_place_button">공연장 주소 복사</string>
-    <string name="navigate_to_show_button">공연장 정보 보기</string>
+    <string name="navigate_to_show_button">공연 정보 보기</string>
 
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">티켓 선택</string>

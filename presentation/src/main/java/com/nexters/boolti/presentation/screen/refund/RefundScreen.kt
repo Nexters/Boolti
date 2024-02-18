@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -163,7 +164,9 @@ fun RefundScreen(
             onDismiss = { openDialog = false },
             onClickPositiveButton = viewModel::refund,
         ) {
-            Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
                     text = stringResource(id = R.string.refund_dialog_title),
                     style = MaterialTheme.typography.titleLarge.copy(color = Grey15),
@@ -271,6 +274,9 @@ fun RefundInfoPage(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+    var showNameError by remember { mutableStateOf(false) }
+    var showAccountError by remember { mutableStateOf(false) }
+    var showContactError by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -282,7 +288,6 @@ fun RefundInfoPage(
             title = stringResource(id = R.string.refund_account_holder_info)
         ) {
             Column {
-                val showNameError = uiState.name.isNotEmpty() && !uiState.isValidName
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -292,7 +297,14 @@ fun RefundInfoPage(
                         style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
                     )
                     BTTextField(
-                        modifier = Modifier.weight(1.0f),
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .onFocusChanged { focusState ->
+                                showNameError = uiState.name.isNotEmpty() &&
+                                        !uiState.isValidName &&
+                                        !focusState.isFocused
+                            },
+                        isError = showNameError,
                         text = uiState.name,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
@@ -311,7 +323,6 @@ fun RefundInfoPage(
                     )
                 }
 
-                val showContactError = uiState.contact.isNotEmpty() && !uiState.isValidContact
                 Row(
                     modifier = Modifier.padding(top = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -322,7 +333,14 @@ fun RefundInfoPage(
                         style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
                     )
                     BTTextField(
-                        modifier = Modifier.weight(1.0f),
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .onFocusChanged { focusState ->
+                                showContactError =
+                                    uiState.contact.isNotEmpty() &&
+                                            !uiState.isValidContact &&
+                                            !focusState.isFocused
+                            },
                         text = uiState.contact.filterToPhoneNumber(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
@@ -372,12 +390,15 @@ fun RefundInfoPage(
                         tint = Grey50,
                     )
                 }
-                val showAccountError =
-                    uiState.accountNumber.isNotEmpty() && !uiState.isValidAccountNumber
                 BTTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp),
+                        .padding(top = 12.dp)
+                        .onFocusChanged { focusState ->
+                            showAccountError = uiState.accountNumber.isNotEmpty() &&
+                                    !uiState.isValidAccountNumber &&
+                                    !focusState.isFocused
+                        },
                     text = uiState.accountNumber,
                     isError = showAccountError,
                     singleLine = true,
@@ -594,6 +615,7 @@ fun BankSelection(
                     .padding(horizontal = marginHorizontal),
                 label = stringResource(id = R.string.refund_select_bank),
                 onClick = onDismiss,
+                enabled = selectedBank != null,
             )
         }
     }

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,13 +17,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -46,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -71,7 +76,7 @@ fun ShowScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val nickname = user?.nickname ?: ""
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val appbarHeight = if(uiState.hasPendingTicket) 196.dp + 52.dp else 196.dp
+    val appbarHeight = if (uiState.hasPendingTicket) 196.dp + 52.dp else 196.dp
     val searchBarHeight = 80.dp
     val changeableAppBarHeightPx =
         with(LocalDensity.current) { (appbarHeight - searchBarHeight).roundToPx().toFloat() }
@@ -196,6 +201,7 @@ fun ShowAppBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     text: String,
@@ -203,35 +209,50 @@ fun SearchBar(
     search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TextField(
-        modifier = modifier.fillMaxWidth(),
+    val interactionSource = remember { MutableInteractionSource() }
+    val colors = TextFieldDefaults.colors(
+        unfocusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedContainerColor = Grey85,
+        focusedContainerColor = Grey85,
+    )
+
+    BasicTextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp),
         value = text,
         onValueChange = onKeywordChanged,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { search() }),
-        placeholder = {
-            Text(
-                stringResource(id = R.string.search_bar_hint),
-                style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
+        decorationBox = { innerTextField ->
+            OutlinedTextFieldDefaults.DecorationBox(
+                value = text,
+                innerTextField = innerTextField,
+                enabled = true,
+                singleLine = true,
+                visualTransformation = VisualTransformation.None,
+                placeholder = {
+                    Text(
+                        stringResource(id = R.string.search_bar_hint),
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey70),
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = R.drawable.ic_search),
+                        contentDescription = null,
+                        tint = Grey60,
+                    )
+                },
+                colors = colors,
+                interactionSource = interactionSource,
+                contentPadding = PaddingValues(horizontal = 12.dp),
             )
         },
-        shape = RoundedCornerShape(4.dp),
-        trailingIcon = {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "검색",
-                tint = Grey60,
-            )
-        },
+        cursorBrush = SolidColor(Color.White),
         textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-        colors = TextFieldDefaults.colors(
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            cursorColor = Color.White,
-            unfocusedContainerColor = Grey85,
-            focusedContainerColor = Grey85,
-        ),
     )
 }
 

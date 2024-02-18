@@ -115,7 +115,7 @@ private fun HostedShowItem(
     show: Show,
     onClick: (showId: String, showName: String) -> Unit,
 ) {
-    val enable = show.date.toLocalDate().toEpochDay() < LocalDate.now().toEpochDay()
+    val enable = LocalDate.now().toEpochDay() <= show.date.toLocalDate().toEpochDay()
     val tint = if (enable) White else Grey60
 
     Row(

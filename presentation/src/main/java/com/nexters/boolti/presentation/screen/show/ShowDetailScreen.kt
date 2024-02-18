@@ -164,8 +164,8 @@ fun ShowDetailScreen(
                         )
                 )
                 ShowDetailCtaButton(
-                    showState = ShowState.TicketingInProgress,
-                    purchased = uiState.purchased,
+                    showState = uiState.showDetail.state,
+                    purchased = uiState.showDetail.isReserved,
                     showMessage = { message ->
                         scope.launch {
                             snackbarHostState.showSnackbar(message = message)

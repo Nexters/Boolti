@@ -20,6 +20,7 @@ data class ShowDetailResponse(
     val showImg: List<ImageResponse>,
     val hostName: String,
     val hostPhoneNumber: String,
+    val reservationStatus: Boolean = false,
 ) {
     fun toDomain(): ShowDetail {
         return ShowDetail(
@@ -36,6 +37,7 @@ data class ShowDetailResponse(
             images = showImg.toDomains(),
             hostName = hostName,
             hostPhoneNumber = hostPhoneNumber,
+            isReserved = reservationStatus,
         )
     }
 }

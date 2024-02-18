@@ -47,18 +47,6 @@ fun ShowFeed(
         Box(
             contentAlignment = Alignment.BottomEnd,
         ) {
-            if (showState !is ShowState.TicketingInProgress) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(210f / 297f)
-                        .background(
-                            brush = SolidColor(Color.Black),
-                            alpha = 0.5f,
-                        )
-                )
-            }
-
             AsyncImage(
                 model = show.thumbnailImage,
                 contentDescription = stringResource(id = R.string.description_poster),
@@ -73,6 +61,18 @@ fun ShowFeed(
                     ),
                 contentScale = ContentScale.Crop,
             )
+
+            if (showState !is ShowState.TicketingInProgress) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(210f / 297f)
+                        .background(
+                            brush = SolidColor(Color.Black),
+                            alpha = 0.5f,
+                        )
+                )
+            }
 
             when (showState) {
                 is ShowState.WaitingTicketing -> {

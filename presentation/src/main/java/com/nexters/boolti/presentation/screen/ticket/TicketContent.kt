@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -177,6 +178,19 @@ fun TicketContent(
                 onClickQr = onClickQr,
             )
         }
+        // 티켓 좌상단 꼭지점 그라데이션
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .size(105.dp)
+                .alpha(.45f)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(White, White.copy(alpha = 0f)),
+                        end = Offset(50f, 50f),
+                    )
+                ),
+        )
     }
 }
 

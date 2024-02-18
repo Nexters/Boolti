@@ -243,6 +243,19 @@ fun TicketDetailScreen(
                                 onClickQr = onClickQr,
                             )
                         }
+                        // 티켓 좌상단 꼭지점 그라데이션
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .size(105.dp)
+                                .alpha(.45f)
+                                .background(
+                                    Brush.linearGradient(
+                                        colors = listOf(White, White.copy(alpha = 0f)),
+                                        end = Offset(50f, 50f),
+                                    )
+                                ),
+                        )
                     }
 
                     Notice(notice = ticket.ticketNotice)

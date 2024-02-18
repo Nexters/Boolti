@@ -187,7 +187,7 @@ private fun Title(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = stringResource(R.string.ticket_title, ticketName, count),
+            text = if (count > 1) stringResource(R.string.ticket_title, ticketName, count) else ticketName,
             style = MaterialTheme.typography.bodySmall,
             color = Grey80,
         )

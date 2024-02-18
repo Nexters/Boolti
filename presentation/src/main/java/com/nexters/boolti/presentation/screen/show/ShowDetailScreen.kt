@@ -291,10 +291,11 @@ private fun ShowDetailAppBar(
             .wrapContentSize(Alignment.TopEnd),
     ) {
         DropdownMenu(
+            modifier = Modifier.background(Grey20),
             expanded = isContextMenuVisible,
-            onDismissRequest = { isContextMenuVisible = false }) {
+            onDismissRequest = { isContextMenuVisible = false },
+        ) {
             DropdownMenuItem(
-                modifier = Modifier.background(Grey20),
                 text = {
                     Text(
                         text = stringResource(id = R.string.report),

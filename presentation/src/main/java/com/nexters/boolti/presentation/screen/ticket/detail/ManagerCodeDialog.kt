@@ -16,7 +16,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -99,7 +98,7 @@ fun ManagerCodeDialog(
             val message = when (error) {
                 ManagerCodeErrorType.Unknown -> stringResource(R.string.message_unknown_error)
                 ManagerCodeErrorType.Mismatch -> stringResource(R.string.enter_code_dialog_error_mismatch)
-                ManagerCodeErrorType.NotToday -> stringResource(R.string.enter_code_dialog_error_not_today)
+                ManagerCodeErrorType.ShowNotToday -> stringResource(R.string.error_show_not_today)
             }
             Text(
                 text = message,

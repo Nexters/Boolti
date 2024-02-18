@@ -28,10 +28,10 @@ fun CopyButton(
     Row(
         modifier = modifier
             .clip(shape = RoundedCornerShape(4.dp))
+            .clickable(onClick = onClick)
             .height(30.dp)
             .background(color = Grey85)
-            .padding(horizontal = 12.dp)
-            .clickable(onClick = onClick),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

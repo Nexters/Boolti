@@ -11,15 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,8 +54,11 @@ fun QrScanScreen(
     var showEntryCodeDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val successMessage = stringResource(R.string.entry_code_validated)
-    val notTodayErrMessage = stringResource(R.string.entry_code_not_today)
+
+    val successMessage = stringResource(R.string.message_ticket_validated)
+    val notTodayErrMessage = stringResource(R.string.error_show_not_today)
+    val usedTicketErrMessage = stringResource(R.string.error_used_ticket)
+    val notMatchedErrMessage = stringResource(R.string.error_ticket_not_matched)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -69,15 +69,18 @@ fun QrScanScreen(
     LaunchedEffect(viewModel.event) {
         scope.launch {
             viewModel.event.collect { event ->
-                when (event) {
+                val errMessage = when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.SHOW_NOT_TODAY -> snackbarHostState.showSnackbar(notTodayErrMessage)
+                            QrErrorType.ShowNotToday -> notTodayErrMessage
+                            QrErrorType.UsedTicket -> usedTicketErrMessage
+                            QrErrorType.TicketNotFound -> notMatchedErrMessage
                         }
                     }
 
-                    is QrScanEvent.ScanSuccess -> snackbarHostState.showSnackbar(successMessage)
+                    is QrScanEvent.ScanSuccess -> successMessage
                 }
+                snackbarHostState.showSnackbar(errMessage)
             }
         }
     }
@@ -109,27 +112,35 @@ fun QrScanScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun QrScanToolbar(
     showName: String,
     onClickClose: () -> Unit,
 ) {
-    TopAppBar(
-        modifier = Modifier.height(44.dp),
-        title = {
-            Text(text = showName, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleLarge)
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-        actions = {
-            IconButton(onClick = onClickClose) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(R.string.description_close_button),
-                )
-            }
+    Row(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .height(44.dp)
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(end = 20.dp)
+                .weight(1f),
+            text = showName,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        IconButton(onClick = onClickClose) {
+            Icon(
+                painter = painterResource(R.drawable.ic_close),
+                tint = MaterialTheme.colorScheme.onBackground,
+                contentDescription = stringResource(R.string.description_close_button),
+            )
         }
-    )
+    }
 }
 
 @Composable
@@ -144,12 +155,13 @@ private fun QrScanBottombar(onClick: () -> Unit) {
             modifier = Modifier
                 .clickable(onClick = onClick)
                 .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
             Icon(
                 modifier = Modifier
                     .size(20.dp)
-                    .padding(end = 4.dp),
+                    .padding(top = 2.dp, end = 4.dp),
                 painter = painterResource(id = R.drawable.ic_book),
                 tint = Grey50,
                 contentDescription = stringResource(R.string.show_entry_code),

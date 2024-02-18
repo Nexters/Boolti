@@ -177,7 +177,11 @@ fun TicketDetailScreen(
                             ticketSectionHeight = coordinates.size.height.toFloat()
                         }
                         .clip(ticketShape)
-                        .border(1.dp, color = White.copy(alpha = .3f), shape = ticketShape),
+                        .border(
+                            width = 1.dp,
+                            brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
+                            shape = ticketShape,
+                        ),
                 ) {
                     Box {
                         // 배경 블러된 이미지
@@ -555,7 +559,10 @@ fun Inquiry(
                 contentPadding = PaddingValues(vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
             ) {
-                Text(text = stringResource(R.string.copy_show_place_button), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = stringResource(R.string.copy_show_place_button),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             TextButton(
                 modifier = Modifier.weight(1f),
@@ -567,7 +574,10 @@ fun Inquiry(
                 contentPadding = PaddingValues(vertical = 13.dp),
                 shape = RoundedCornerShape(4.dp),
             ) {
-                Text(text = stringResource(R.string.navigate_to_show_button), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = stringResource(R.string.navigate_to_show_button),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

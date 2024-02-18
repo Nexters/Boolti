@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -50,6 +49,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
+import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
@@ -59,7 +59,6 @@ import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
-import com.nexters.boolti.presentation.util.ticketPath
 import java.time.LocalDateTime
 
 @Composable
@@ -74,47 +73,29 @@ fun TicketContent(
     var ticketWidth by remember { mutableFloatStateOf(0f) }
     var ticketHeight by remember { mutableFloatStateOf(0f) }
 
+    val ticketShape = TicketShape(
+        width = ticketWidth,
+        height = ticketHeight,
+        circleRadius = 10.dp.toPx(),
+        cornerRadius = 8.dp.toPx(),
+        bottomAreaHeight = bottomAreaHeight.toPx(),
+    )
+
     Box(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
             .onGloballyPositioned { coordinates ->
                 ticketWidth = coordinates.size.width.toFloat()
                 ticketHeight = coordinates.size.height.toFloat()
             }
-            .graphicsLayer {
-                shape = TicketShape(
-                    width = ticketWidth,
-                    height = ticketHeight,
-                    circleRadius = 10.dp.toPx(),
-                    cornerRadius = 8.dp.toPx(),
-                    bottomAreaHeight = bottomAreaHeight.toPx(),
-                )
-                clip = true
-            }
-            .drawBehind {
-                // 보더 Line
-                drawPath(
-                    brush = Brush.linearGradient(
-                        listOf(
-                            White.copy(alpha = .5f),
-                            White.copy(alpha = .2f),
-                        ),
-                        start = Offset(ticketWidth / 2, 0f),
-                        end = Offset(0f, ticketHeight / 0f),
-                    ),
-                    path = ticketPath(
-                        width = ticketWidth,
-                        height = ticketHeight,
-                        circleRadius = 10.dp.toPx(),
-                        cornerRadius = 8.dp.toPx(),
-                        bottomAreaHeight = bottomAreaHeight.toPx(),
-                    ),
-                    style = Stroke(
-                        width = 1.dp.toPx(),
-                    )
-                )
-            }
+            .background(MaterialTheme.colorScheme.background)
+            .clip(ticketShape)
+            .border(
+                width = 1.dp,
+                brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
+                shape = ticketShape,
+            ),
     ) {
+        // 배경 블러된 이미지
         AsyncImage(
             model = asyncImageBlurModel(context, ticket.poster, radius = 24),
             modifier = Modifier
@@ -122,7 +103,7 @@ fun TicketContent(
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )
-        // 포스터 위에 올라가는 그라데이션
+        // 배경 블러된 이미지 위에 올라가는 그라데이션 배경
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -147,7 +128,7 @@ fun TicketContent(
                     brush = Brush.verticalGradient(
                         colors = listOf(Black.copy(alpha = .2f), Black.copy(alpha = .8f))
                     )
-                )
+                ),
         )
         Column {
             Title(ticket.ticketName, 1) // TODO 개수 정보 생기면 업데이트

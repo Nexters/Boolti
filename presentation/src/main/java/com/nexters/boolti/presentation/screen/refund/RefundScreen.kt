@@ -164,7 +164,9 @@ fun RefundScreen(
             onDismiss = { openDialog = false },
             onClickPositiveButton = viewModel::refund,
         ) {
-            Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
                     text = stringResource(id = R.string.refund_dialog_title),
                     style = MaterialTheme.typography.titleLarge.copy(color = Grey15),
@@ -613,6 +615,7 @@ fun BankSelection(
                     .padding(horizontal = marginHorizontal),
                 label = stringResource(id = R.string.refund_select_bank),
                 onClick = onDismiss,
+                enabled = selectedBank != null,
             )
         }
     }

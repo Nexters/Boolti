@@ -80,6 +80,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
@@ -100,6 +101,7 @@ import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,7 +133,7 @@ fun TicketDetailScreen(
 
     val pullToRefreshState = rememberPullToRefreshState()
 
-    val entranceSuccessMsg = stringResource(R.string.entry_code_validated)
+    val entranceSuccessMsg = stringResource(R.string.message_ticket_validated)
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
@@ -306,13 +308,28 @@ fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        ManagerCodeDialog(
-            managerCode = managerCodeState.code,
-            onManagerCodeChanged = viewModel::setManagerCode,
-            error = managerCodeState.error,
-            onDismiss = { showEnterCodeDialog = false },
-            onClickConfirm = { viewModel.requestEntrance(it) }
-        )
+        if (LocalDate.now().toEpochDay() < uiState.ticket.showDate.toLocalDate().toEpochDay()) {
+            // 아직 공연일 아님
+            BTDialog(
+                showCloseButton = false,
+                onClickPositiveButton = { showEnterCodeDialog = false },
+                onDismiss = { showEnterCodeDialog = false },
+            ) {
+                Text(
+                    text = stringResource(R.string.error_show_not_today),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        } else if (uiState.ticket.ticketState == TicketState.Ready) {
+            ManagerCodeDialog(
+                managerCode = managerCodeState.code,
+                onManagerCodeChanged = viewModel::setManagerCode,
+                error = managerCodeState.error,
+                onDismiss = { showEnterCodeDialog = false },
+                onClickConfirm = { viewModel.requestEntrance(it) }
+            )
+        }
     }
 }
 

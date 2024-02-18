@@ -55,8 +55,11 @@ fun QrScanScreen(
     var showEntryCodeDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val successMessage = stringResource(R.string.entry_code_validated)
-    val notTodayErrMessage = stringResource(R.string.entry_code_not_today)
+
+    val successMessage = stringResource(R.string.message_ticket_validated)
+    val notTodayErrMessage = stringResource(R.string.error_show_not_today)
+    val usedTicketErrMessage = stringResource(R.string.error_used_ticket)
+    val notMatchedErrMessage = stringResource(R.string.error_ticket_not_matched)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -70,7 +73,9 @@ fun QrScanScreen(
                 when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.SHOW_NOT_TODAY -> snackbarHostState.showSnackbar(notTodayErrMessage)
+                            QrErrorType.ShowNotToday -> snackbarHostState.showSnackbar(notTodayErrMessage)
+                            QrErrorType.UsedTicket -> snackbarHostState.showSnackbar(usedTicketErrMessage)
+                            QrErrorType.TicketNotFound -> snackbarHostState.showSnackbar(notMatchedErrMessage)
                         }
                     }
 

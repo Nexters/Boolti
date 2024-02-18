@@ -4,8 +4,6 @@ import com.nexters.boolti.data.datasource.HostDataSource
 import com.nexters.boolti.data.datasource.TicketDataSource
 import com.nexters.boolti.domain.exception.ManagerCodeErrorType
 import com.nexters.boolti.domain.exception.ManagerCodeException
-import com.nexters.boolti.domain.exception.QrErrorType
-import com.nexters.boolti.domain.exception.QrScanException
 import com.nexters.boolti.domain.extension.errorType
 import com.nexters.boolti.domain.model.Ticket
 import com.nexters.boolti.domain.repository.TicketRepository

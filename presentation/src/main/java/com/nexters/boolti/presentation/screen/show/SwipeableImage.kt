@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -26,8 +27,9 @@ import com.nexters.boolti.presentation.theme.Grey95
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SwipeableImage(
-    modifier: Modifier = Modifier,
     models: List<String>,
+    onImageClick: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val pageState = rememberPagerState(
         initialPage = 0, initialPageOffsetFraction = 0f
@@ -35,14 +37,15 @@ fun SwipeableImage(
 
     Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
         HorizontalPager(
-            modifier = modifier,
+            modifier = Modifier,
             state = pageState,
             key = { it },
         ) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(210f / 297f),
+                    .aspectRatio(210f / 297f)
+                    .clickable { onImageClick(it) },
                 model = models[it],
                 contentDescription = null,
                 contentScale = ContentScale.Crop,

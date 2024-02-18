@@ -23,13 +23,15 @@ fun ToastSnackbarHost(
     ) { data ->
         Card(
             shape = RoundedCornerShape(4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = .8f),
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            ),
         ) {
             Text(
                 modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
                 text = data.visuals.message,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }

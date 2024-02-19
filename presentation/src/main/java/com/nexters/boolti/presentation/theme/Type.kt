@@ -19,7 +19,7 @@ val pretendardFamily = FontFamily(
 )
 
 val aggroFamily = FontFamily(
-    Font(R.font.sb_aggro_b, FontWeight.Normal),
+    Font(R.font.sb_aggro_m, FontWeight.Normal),
 )
 
 private val headline3 = TextStyle(

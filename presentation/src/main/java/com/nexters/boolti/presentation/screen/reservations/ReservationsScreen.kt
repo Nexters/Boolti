@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +36,7 @@ import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -72,13 +71,11 @@ fun ReservationsScreen(
                 .fillMaxSize(),
         ) {
             when (val state = uiState) {
-                ReservationsUiState.Loading -> CircularProgressIndicator(
-                    modifier = Modifier
-                        .width(64.dp)
-                        .align(Alignment.Center),
-                    color = Grey60,
-                    trackColor = Grey85,
-                )
+                ReservationsUiState.Loading -> {
+                    BtCircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
 
                 ReservationsUiState.Error -> Unit // TODO 에러 화면
 

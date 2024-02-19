@@ -33,7 +33,6 @@ class ReservationsViewModel @Inject constructor(
                 _uiState.update { ReservationsUiState.Loading }
             }
             .onEach { reservations ->
-                delay(2000)
                 _uiState.update { ReservationsUiState.Success(reservations) }
             }
             .catch {

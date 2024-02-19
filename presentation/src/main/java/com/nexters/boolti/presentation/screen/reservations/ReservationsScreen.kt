@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,10 +66,21 @@ fun ReservationsScreen(
             )
         }
     ) { innerPadding ->
-        Box(modifier = modifier.padding(innerPadding)) {
+        Box(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
             when (val state = uiState) {
-                ReservationsUiState.Loading -> Unit
-                ReservationsUiState.Error -> Unit
+                ReservationsUiState.Loading -> CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(64.dp)
+                        .align(Alignment.Center),
+                    color = Grey60,
+                    trackColor = Grey85,
+                )
+
+                ReservationsUiState.Error -> Unit // TODO 에러 화면
 
                 is ReservationsUiState.Success -> SuccessContent(
                     reservations = state.reservations,
@@ -84,7 +97,7 @@ private fun SuccessContent(
     navigateToDetail: (String) -> Unit,
     reservations: List<Reservation>,
 ) {
-    if (reservations.isEmpty()) {
+    if (reservations.isNotEmpty()) {
         ReservationsContent(
             modifier = modifier,
             reservations = reservations,

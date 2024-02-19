@@ -5,7 +5,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.nexters.boolti.presentation.R
 
@@ -22,142 +24,115 @@ val aggroFamily = FontFamily(
     Font(R.font.sb_aggro_m, FontWeight.Normal),
 )
 
-private val headline3 = TextStyle(
+private val headline3 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 28.sp,
     lineHeight = 40.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
-private val headline2 = TextStyle(
+
+private val headline2 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 24.sp,
     lineHeight = 32.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
-private val headline1 = TextStyle(
+
+private val headline1 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 20.sp,
     lineHeight = 28.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
 
-private val subhead2 = TextStyle(
+private val subhead2 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 18.sp,
     lineHeight = 26.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
-private val subhead1 = TextStyle(
+
+private val subhead1 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.SemiBold,
     fontSize = 16.sp,
     lineHeight = 24.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
 
-private val body4 = TextStyle(
+private val body4 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 18.sp,
     lineHeight = 26.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
-private val body3 = TextStyle(
+
+private val body3 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 16.sp,
     lineHeight = 24.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
-private val body2 = TextStyle(
+
+private val body2 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 15.sp,
     lineHeight = 23.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
-private val body1 = TextStyle(
+
+private val body1 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 14.sp,
     lineHeight = 22.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
 
-private val caption = TextStyle(
+private val caption = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 12.sp,
     lineHeight = 18.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
 
-val point1 = TextStyle(
+val point1 = createTextStyle(
     fontFamily = aggroFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 16.sp,
     lineHeight = 26.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
 
-val point2 = TextStyle(
+val point2 = createTextStyle(
     fontFamily = aggroFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 20.sp,
     lineHeight = 30.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
 
-val point4 = TextStyle(
+val point4 = createTextStyle(
     fontFamily = aggroFamily,
     fontWeight = FontWeight.Normal,
     fontSize = 24.sp,
     lineHeight = 34.sp,
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Proportional,
-        trim = LineHeightStyle.Trim.None
-    ),
 )
+
+private fun createTextStyle(
+    fontSize: TextUnit,
+    lineHeight: TextUnit,
+    fontFamily: FontFamily = pretendardFamily,
+    fontWeight: FontWeight = FontWeight.Normal,
+): TextStyle {
+    return TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = fontWeight,
+        fontSize = fontSize,
+        lineHeight = lineHeight,
+        lineHeightStyle = LineHeightStyle(
+            alignment = LineHeightStyle.Alignment.Proportional,
+            trim = LineHeightStyle.Trim.None
+        ),
+        baselineShift = BaselineShift(0.12f),
+    )
+}
 
 val Typography = Typography(
     headlineLarge = headline3,

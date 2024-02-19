@@ -80,6 +80,7 @@ fun ShowDetailScreen(
     onClickHome: () -> Unit,
     onClickContent: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToImages: (index: Int) -> Unit,
     onTicketSelected: (
         showId: String,
         ticketId: String,
@@ -128,6 +129,7 @@ fun ShowDetailScreen(
             ) {
                 Poster(
                     modifier = modifier.fillMaxWidth(),
+                    navigateToImages = navigateToImages,
                     title = uiState.showDetail.name,
                     images = uiState.showDetail.images.map { it.originImage }
                 )
@@ -425,6 +427,7 @@ private fun ContentScaffold(
 private fun Poster(
     images: List<String>,
     title: String,
+    navigateToImages: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -440,6 +443,7 @@ private fun Poster(
                 .clip(shape = RoundedCornerShape(8.dp))
                 .border(width = 1.dp, color = Grey80, shape = RoundedCornerShape(8.dp)),
             models = images,
+            onImageClick = navigateToImages,
         )
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),

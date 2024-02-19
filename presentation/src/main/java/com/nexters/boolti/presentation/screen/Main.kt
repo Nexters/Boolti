@@ -28,6 +28,7 @@ import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
+import com.nexters.boolti.presentation.screen.show.ShowImagesScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -138,10 +139,25 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                     },
                     viewModel = showViewModel,
                     navigateToLogin = { navController.navigate("login") },
+                    navigateToImages = { index -> navController.navigate("images/$index") },
                     navigateToReport = {
                         val showId = entry.arguments?.getString("showId")
                         navController.navigate("report/$showId")
                     }
+                )
+            }
+            composable(
+                route = "images/{index}",
+                arguments = listOf(navArgument("index") { type = NavType.IntType }),
+            ) { entry ->
+                val showViewModel: ShowDetailViewModel =
+                    entry.sharedViewModel(navController = navController)
+                val index = entry.arguments!!.getInt("index")
+
+                ShowImagesScreen(
+                    index = index,
+                    viewModel = showViewModel,
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
             composable(

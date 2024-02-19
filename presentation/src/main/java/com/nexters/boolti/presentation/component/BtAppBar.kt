@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,7 @@ fun BtAppBar(
     title: String,
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
+    @DrawableRes navIconRes: Int = R.drawable.ic_arrow_back,
 ) {
     Row(
         modifier = modifier
@@ -37,7 +39,7 @@ fun BtAppBar(
             modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
+                painter = painterResource(navIconRes),
                 contentDescription = stringResource(id = R.string.description_navigate_back),
                 modifier
                     .padding(start = marginHorizontal)

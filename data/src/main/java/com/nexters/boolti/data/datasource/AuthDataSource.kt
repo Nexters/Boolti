@@ -41,7 +41,7 @@ class AuthDataSource @Inject constructor(
         }
 
     val loggedIn: Flow<Boolean>
-        get() = data.map { it.accessToken.isNotEmpty() }
+        get() = data.map { it.accessToken.isNotBlank() }
 
     suspend fun login(request: LoginRequest) = runCatching {
         loginService.kakaoLogin(request)

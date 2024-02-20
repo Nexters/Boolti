@@ -376,7 +376,8 @@ fun RefundInfoPage(
                     shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceTint,
-                    )
+                    ),
+                    contentPadding = PaddingValues(horizontal = 12.dp),
                 ) {
                     val bankSelection = stringResource(id = R.string.refund_bank_selection)
                     Text(

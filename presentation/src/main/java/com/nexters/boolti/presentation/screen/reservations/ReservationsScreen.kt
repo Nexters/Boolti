@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -63,38 +65,23 @@ fun ReservationsScreen(
             )
         }
     ) { innerPadding ->
-        if (uiState.reservations.isEmpty()) {
-            Column(
-                modifier = modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    text = stringResource(id = R.string.reservations_empty),
-                    style = MaterialTheme.typography.titleLarge.copy(color = Grey05),
-                )
-                Text(
-                    modifier = Modifier.padding(top = subTextPadding),
-                    text = stringResource(id = R.string.reservations_empty_sub),
-                    style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
-                )
-            }
-
-            return@Scaffold
-        }
-
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(top = 20.dp)
+        Box(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
         ) {
-            items(
-                count = uiState.reservations.size,
-                key = { uiState.reservations[it].id }) { index ->
-                ReservationItem(
-                    reservation = uiState.reservations[index],
-                    navigateToDetail = { navigateToDetail(uiState.reservations[index].id) },
+            when (val state = uiState) {
+                ReservationsUiState.Loading -> {
+                    BtCircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+
+                ReservationsUiState.Error -> Unit // TODO 에러 화면
+
+                is ReservationsUiState.Success -> SuccessContent(
+                    reservations = state.reservations,
+                    navigateToDetail = navigateToDetail,
                 )
             }
         }
@@ -102,7 +89,67 @@ fun ReservationsScreen(
 }
 
 @Composable
-fun ReservationItem(
+private fun SuccessContent(
+    modifier: Modifier = Modifier,
+    navigateToDetail: (String) -> Unit,
+    reservations: List<Reservation>,
+) {
+    if (reservations.isNotEmpty()) {
+        ReservationsContent(
+            modifier = modifier,
+            reservations = reservations,
+            navigateToDetail = navigateToDetail,
+        )
+    } else {
+        EmptyContent()
+    }
+}
+
+@Composable
+private fun ReservationsContent(
+    reservations: List<Reservation>,
+    navigateToDetail: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(top = 20.dp)
+    ) {
+        items(
+            count = reservations.size,
+            key = { reservations[it].id }) { index ->
+            ReservationItem(
+                reservation = reservations[index],
+                navigateToDetail = { navigateToDetail(reservations[index].id) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyContent(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(id = R.string.reservations_empty),
+            style = MaterialTheme.typography.titleLarge.copy(color = Grey05),
+        )
+        Text(
+            modifier = Modifier.padding(top = subTextPadding),
+            text = stringResource(id = R.string.reservations_empty_sub),
+            style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
+        )
+    }
+}
+
+@Composable
+private fun ReservationItem(
     reservation: Reservation,
     navigateToDetail: () -> Unit,
     modifier: Modifier = Modifier,

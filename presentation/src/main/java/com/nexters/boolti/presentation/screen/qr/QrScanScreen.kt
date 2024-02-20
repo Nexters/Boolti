@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -161,7 +162,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
             Icon(
                 modifier = Modifier
                     .size(20.dp)
-                    .padding(top = 2.dp, end = 4.dp),
+                    .padding(end = 4.dp),
                 painter = painterResource(id = R.drawable.ic_book),
                 tint = Grey50,
                 contentDescription = stringResource(R.string.show_entry_code),

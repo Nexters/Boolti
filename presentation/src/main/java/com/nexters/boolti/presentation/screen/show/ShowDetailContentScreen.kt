@@ -34,13 +34,15 @@ fun ShowDetailContentScreen(
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
 
     Scaffold(
-        modifier = modifier.verticalScroll(state = rememberScrollState()),
+        modifier = modifier,
         topBar = { ShowDetailContentAppBar(onBackPressed = onBackPressed) }
     ) { innerPadding ->
         Text(
             modifier = Modifier
+                .verticalScroll(state = scrollState)
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal)
                 .padding(top = 20.dp),

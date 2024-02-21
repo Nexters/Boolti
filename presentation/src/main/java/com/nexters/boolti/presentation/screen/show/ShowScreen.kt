@@ -81,7 +81,6 @@ fun ShowScreen(
     val changeableAppBarHeightPx =
         with(LocalDensity.current) { (appbarHeight - searchBarHeight).roundToPx().toFloat() }
     var appbarOffsetHeightPx by rememberSaveable { mutableFloatStateOf(0f) }
-    var changeableAppBarHeight by remember { mutableFloatStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -138,18 +137,12 @@ fun ShowScreen(
                 nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
-                onChangeableSizeChanged = { size ->
-                    changeableAppBarHeight = size.height.toFloat()
-                },
                 search = viewModel::search,
             )
         }
     }
 }
 
-/**
- * @param onChangeableSizeChanged 변할 수 있는 최대 사이즈를 전달 app bar height - search bar
- */
 @Composable
 fun ShowAppBar(
     text: String,
@@ -157,20 +150,13 @@ fun ShowAppBar(
     navigateToReservations: () -> Unit,
     nickname: String,
     onKeywordChanged: (keyword: String) -> Unit,
-    onChangeableSizeChanged: (size: IntSize) -> Unit,
     search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var appBarHeight by remember { mutableFloatStateOf(0f) }
-    val searchBarHeight = with(LocalDensity.current) { 80.dp.toPx() }
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = marginHorizontal)
-            .onSizeChanged(onSizeChanged = { size ->
-                appBarHeight = size.height.toFloat()
-                onChangeableSizeChanged(IntSize(0, size.height - searchBarHeight.toInt()))
-            })
     ) {
         Spacer(modifier = Modifier.height(20.dp))
         if (hasPendingTicket) Banner(

@@ -65,7 +65,7 @@ import java.time.LocalDateTime
 @Composable
 fun TicketContent(
     ticket: Ticket,
-    onClickQr: (data: String) -> Unit,
+    onClickQr: (data: String, ticketName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -155,7 +155,7 @@ fun TicketContent(
                 placeName = ticket.placeName,
                 entryCode = ticket.entryCode,
                 ticketState = ticket.ticketState,
-                onClickQr = onClickQr,
+                onClickQr = { onClickQr(it, ticket.ticketName) },
             )
         }
         // 티켓 좌상단 꼭지점 그라데이션

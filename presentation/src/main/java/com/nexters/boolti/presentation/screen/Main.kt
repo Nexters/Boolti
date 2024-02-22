@@ -63,8 +63,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                 onClickTicket = {
                     navController.navigate("tickets/$it")
                 },
-                onClickQr = {
-                    navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                onClickQr = { code, ticketName ->
+                    navController.navigate(
+                        "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                    )
                 },
                 onClickQrScan = {
                     navController.navigate("hostedShows")
@@ -189,7 +191,11 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         ) {
             TicketDetailScreen(modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") },
+                onClickQr = { code, ticketName ->
+                    navController.navigate(
+                        "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                    )
+                },
                 navigateToShowDetail = { navController.navigate("show/$it") }
             )
         }
@@ -212,8 +218,11 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "qr/{data}",
-            arguments = listOf(navArgument("data") { type = NavType.StringType }),
+            route = "qr/{data}?ticketName={ticketName}",
+            arguments = listOf(
+                navArgument("data") { type = NavType.StringType },
+                navArgument("ticketName") { type = NavType.StringType },
+            ),
         ) {
             QrFullScreen(modifier = modifier) {
                 navController.popBackStack()

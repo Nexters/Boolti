@@ -61,10 +61,18 @@
     <string name="nickname_default">불티 유저</string>
 
     <!-- 탈퇴 -->
-    <string name="signout_button">회원 탈퇴</string>
-    <string name="signout">탈퇴</string>
+    <string name="signout">회원 탈퇴</string>
+    <string name="signout_button">탈퇴하기</string>
     <string name="signout_dialog_title">탈퇴하시겠어요?</string>
     <string name="signout_dialog_message">탈퇴일로부터 30일 이내로 로그인 시 계정 삭제를 취소할 수 있습니다. 30일이 지나면 계정 및 정보가 영구 삭제됩니다.</string>
+    <string name="signout_notice_title">탈퇴 전, 꼭 읽어보세요!</string>
+    <string-array name="signout_notice">
+        <item>주최한 공연 정보는 사라지지 않아요</item>
+        <item>예매한 티켓은 전부 사라지며 복구할 수 없어요</item>
+        <item>탈퇴 일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
+    </string-array>
+    <string name="signout_reason_title">탈퇴 이유를 입력해주세요</string>
+    <string name="signout_reason_placeholder">예) 계정 탈퇴 후 재가입할게요</string>
 
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>

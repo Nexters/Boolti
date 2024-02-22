@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -59,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.ShowFeed
+import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
@@ -76,18 +78,27 @@ fun ShowScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val nickname = user?.nickname ?: ""
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val lazyGridState = rememberLazyGridState()
     val appbarHeight = if (uiState.hasPendingTicket) 196.dp + 52.dp else 196.dp
     val searchBarHeight = 80.dp
-    val changeableAppBarHeightPx =
-        with(LocalDensity.current) { (appbarHeight - searchBarHeight).roundToPx().toFloat() }
+    val changeableAppBarHeightPx = (appbarHeight - searchBarHeight).toPx()
     var appbarOffsetHeightPx by rememberSaveable { mutableFloatStateOf(0f) }
-    var changeableAppBarHeight by remember { mutableFloatStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 appbarOffsetHeightPx += available.y
 
                 return Offset.Zero
+            }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                appbarOffsetHeightPx -= available.y
+                return super.onPostScroll(consumed, available, source)
             }
         }
     }
@@ -111,6 +122,7 @@ fun ShowScreen(
             LazyVerticalGrid(
                 modifier = Modifier
                     .padding(horizontal = marginHorizontal),
+                state = lazyGridState,
                 columns = GridCells.Adaptive(minSize = 150.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalArrangement = Arrangement.spacedBy(28.dp),
@@ -130,7 +142,7 @@ fun ShowScreen(
                 modifier = Modifier.offset {
                     IntOffset(
                         x = 0,
-                        y = appbarOffsetHeightPx.coerceIn(-changeableAppBarHeightPx, 0f).toInt()
+                        y = appbarOffsetHeightPx.coerceAtLeast(-changeableAppBarHeightPx).toInt(),
                     )
                 },
                 navigateToReservations = navigateToReservations,
@@ -138,18 +150,12 @@ fun ShowScreen(
                 nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
-                onChangeableSizeChanged = { size ->
-                    changeableAppBarHeight = size.height.toFloat()
-                },
                 search = viewModel::search,
             )
         }
     }
 }
 
-/**
- * @param onChangeableSizeChanged 변할 수 있는 최대 사이즈를 전달 app bar height - search bar
- */
 @Composable
 fun ShowAppBar(
     text: String,
@@ -157,20 +163,13 @@ fun ShowAppBar(
     navigateToReservations: () -> Unit,
     nickname: String,
     onKeywordChanged: (keyword: String) -> Unit,
-    onChangeableSizeChanged: (size: IntSize) -> Unit,
     search: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var appBarHeight by remember { mutableFloatStateOf(0f) }
-    val searchBarHeight = with(LocalDensity.current) { 80.dp.toPx() }
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = marginHorizontal)
-            .onSizeChanged(onSizeChanged = { size ->
-                appBarHeight = size.height.toFloat()
-                onChangeableSizeChanged(IntSize(0, size.height - searchBarHeight.toInt()))
-            })
     ) {
         Spacer(modifier = Modifier.height(20.dp))
         if (hasPendingTicket) Banner(

@@ -3,6 +3,7 @@ package com.nexters.boolti.domain.repository
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
+import com.nexters.boolti.domain.request.SignoutRequest
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
@@ -17,6 +18,7 @@ interface AuthRepository {
     suspend fun kakaoLogin(request: LoginRequest): Result<Boolean>
     suspend fun logout(): Result<Unit>
     suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit>
+    suspend fun signout(request: SignoutRequest): Result<Unit>
     fun getUserAndCache(): Flow<User>
 
     val loggedIn: Flow<Boolean>

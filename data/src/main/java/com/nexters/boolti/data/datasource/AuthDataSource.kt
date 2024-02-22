@@ -49,6 +49,10 @@ class AuthDataSource @Inject constructor(
 
     suspend fun logout(): Result<Unit> = runCatching {
         loginService.logout()
+        localLogout()
+    }
+
+    suspend fun localLogout() {
         dataStore.updateData {
             it.copy(
                 userId = null,
@@ -58,7 +62,7 @@ class AuthDataSource @Inject constructor(
                 phoneNumber = null,
                 photo = null,
                 accessToken = "",
-                refreshToken = ""
+                refreshToken = "",
             )
         }
     }

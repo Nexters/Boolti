@@ -29,6 +29,7 @@ import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
 import com.nexters.boolti.presentation.screen.show.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -71,6 +72,9 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                 onClickQrScan = {
                     navController.navigate("hostedShows")
                 },
+                onClickSignout = {
+                    navController.navigate("signout")
+                },
                 navigateToReservations = {
                     navController.navigate("reservations")
                 }
@@ -87,6 +91,14 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             ) {
                 navController.popBackStack()
             }
+        }
+        composable(
+            route = "signout",
+        ) {
+            SignoutScreen(
+                navigateToHome = { navController.navigateToHome() },
+                navigateBack = { navController.popBackStack() },
+            )
         }
 
         composable(

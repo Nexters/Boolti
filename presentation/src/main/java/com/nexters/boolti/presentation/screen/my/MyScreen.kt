@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.my
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,12 +46,11 @@ fun MyScreen(
     requireLogin: () -> Unit,
     navigateToReservations: () -> Unit,
     onClickQrScan: () -> Unit,
+    onClickSignout: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
-    var showSignoutDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     var openLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -87,17 +84,7 @@ fun MyScreen(
         }
 
         Spacer(modifier = Modifier.weight(1.0f))
-        if (user != null) SignoutButton(onClick = { showSignoutDialog = true })
-    }
-
-    if (showSignoutDialog) {
-        SignoutDialog(
-            onDismiss = { showSignoutDialog = false },
-            onClickButton = {
-                Toast.makeText(context, "탈퇴 요청이 접수되었습니다.", Toast.LENGTH_LONG).show()
-                viewModel.logout()
-            },
-        )
+        if (user != null) SignoutButton(onClick = onClickSignout)
     }
 
     if (openLogoutDialog) {
@@ -196,39 +183,8 @@ fun SignoutButton(
         modifier = modifier
             .padding(bottom = 40.dp)
             .clickable(onClick = onClick),
-        text = stringResource(id = R.string.signout_button),
+        text = stringResource(id = R.string.signout),
         style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
         textDecoration = TextDecoration.Underline,
     )
-}
-
-@Composable
-private fun SignoutDialog(
-    onDismiss: () -> Unit,
-    onClickButton: () -> Unit,
-) {
-    BTDialog(
-        positiveButtonLabel = stringResource(R.string.signout),
-        onClickPositiveButton = {
-            onClickButton()
-            onDismiss()
-        },
-        onDismiss = onDismiss,
-    ) {
-        Text(
-            text = stringResource(R.string.signout_dialog_title),
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .align(Alignment.CenterHorizontally),
-            text = stringResource(R.string.signout_dialog_message),
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            color = Grey50,
-        )
-    }
 }

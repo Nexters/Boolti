@@ -41,6 +41,7 @@ google-services = "4.4.0"
 firebase-crashlytics = "2.9.9"
 firebase-config = "21.6.0"
 kotest = "5.8.0"
+zoomable = "1.6.0"
 zxing = "4.3.0"
 kakao = "2.19.0"
 timber = "5.0.1"
@@ -101,6 +102,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.require = "false" }
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.require = "false" }
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config" }
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxing" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }

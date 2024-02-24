@@ -394,7 +394,7 @@ fun RefundInfoPage(
                 BTTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp)
+                        .padding(top = 16.dp)
                         .onFocusChanged { focusState ->
                             showAccountError = uiState.accountNumber.isNotEmpty() &&
                                     !uiState.isValidAccountNumber &&

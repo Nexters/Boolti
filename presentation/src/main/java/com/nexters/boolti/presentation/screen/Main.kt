@@ -29,6 +29,7 @@ import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
 import com.nexters.boolti.presentation.screen.show.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -63,11 +64,16 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                 onClickTicket = {
                     navController.navigate("tickets/$it")
                 },
-                onClickQr = {
-                    navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
+                onClickQr = { code, ticketName ->
+                    navController.navigate(
+                        "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                    )
                 },
                 onClickQrScan = {
                     navController.navigate("hostedShows")
+                },
+                onClickSignout = {
+                    navController.navigate("signout")
                 },
                 navigateToReservations = {
                     navController.navigate("reservations")
@@ -85,6 +91,14 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             ) {
                 navController.popBackStack()
             }
+        }
+        composable(
+            route = "signout",
+        ) {
+            SignoutScreen(
+                navigateToHome = { navController.navigateToHome() },
+                navigateBack = { navController.popBackStack() },
+            )
         }
 
         composable(
@@ -189,7 +203,11 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         ) {
             TicketDetailScreen(modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
-                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") },
+                onClickQr = { code, ticketName ->
+                    navController.navigate(
+                        "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                    )
+                },
                 navigateToShowDetail = { navController.navigate("show/$it") }
             )
         }
@@ -212,8 +230,11 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "qr/{data}",
-            arguments = listOf(navArgument("data") { type = NavType.StringType }),
+            route = "qr/{data}?ticketName={ticketName}",
+            arguments = listOf(
+                navArgument("data") { type = NavType.StringType },
+                navArgument("ticketName") { type = NavType.StringType },
+            ),
         ) {
             QrFullScreen(modifier = modifier) {
                 navController.popBackStack()

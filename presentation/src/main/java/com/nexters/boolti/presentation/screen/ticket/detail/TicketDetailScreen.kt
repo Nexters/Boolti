@@ -110,7 +110,7 @@ fun TicketDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketDetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     navigateToShowDetail: (showId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -246,7 +246,7 @@ fun TicketDetailScreen(
                                 placeName = ticket.placeName,
                                 entryCode = ticket.entryCode,
                                 ticketState = ticket.ticketState,
-                                onClickQr = onClickQr,
+                                onClickQr = { onClickQr(it, ticket.ticketName) },
                             )
                         }
                         // 티켓 좌상단 꼭지점 그라데이션
@@ -695,7 +695,11 @@ private fun SectionTitle(title: String) {
 fun TicketDetailPreview() {
     BooltiTheme {
         Surface {
-            TicketDetailScreen(modifier = Modifier, onBackClicked = {}, onClickQr = {}, navigateToShowDetail = {})
+            TicketDetailScreen(
+                modifier = Modifier,
+                onBackClicked = {},
+                onClickQr = { _, _ -> },
+                navigateToShowDetail = {})
         }
     }
 }

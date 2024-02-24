@@ -27,6 +27,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -67,7 +69,8 @@ fun ShowImagesScreen(
             ) {
                 AsyncImage(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .zoomable(rememberZoomState()),
                     model = uiState.showDetail.images[it].originImage,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,

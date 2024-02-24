@@ -43,8 +43,9 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
-    onClickQr: (data: String) -> Unit,
+    onClickQr: (data: String, ticketName: String) -> Unit,
     onClickQrScan: () -> Unit,
+    onClickSignout: () -> Unit,
     navigateToReservations: () -> Unit,
     requireLogin: () -> Unit,
 ) {
@@ -104,6 +105,7 @@ fun HomeScreen(
                     requireLogin = requireLogin,
                     navigateToReservations = navigateToReservations,
                     onClickQrScan = onClickQrScan,
+                    onClickSignout = onClickSignout,
                 )
             }
         }

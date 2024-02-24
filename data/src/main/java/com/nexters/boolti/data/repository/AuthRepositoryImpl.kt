@@ -8,6 +8,7 @@ import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
+import com.nexters.boolti.domain.request.SignoutRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -43,6 +44,12 @@ class AuthRepositoryImpl @Inject constructor(
                 tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
             }
             .mapCatching { }
+    }
+
+    override suspend fun signout(request: SignoutRequest): Result<Unit> = runCatching {
+        userDateSource.signout(request)
+    }.onSuccess {
+        authDataSource.localLogout()
     }
 
     override fun getUserAndCache(): Flow<User> = flow {

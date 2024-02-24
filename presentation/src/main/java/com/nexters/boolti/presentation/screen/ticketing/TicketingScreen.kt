@@ -289,6 +289,7 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                             color = Grey50,
                         )
                         Text(
+                            modifier = Modifier.padding(start = 2.dp),
                             text = it,
                             style = MaterialTheme.typography.bodySmall,
                             color = Grey50,

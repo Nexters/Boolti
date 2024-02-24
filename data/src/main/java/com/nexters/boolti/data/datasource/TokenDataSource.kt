@@ -2,13 +2,15 @@ package com.nexters.boolti.data.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class TokenDataSource @Inject constructor(
     private val context: Context,
@@ -36,5 +38,19 @@ class TokenDataSource @Inject constructor(
                 refreshToken = refreshToken,
             )
         }
+    }
+
+    suspend fun getFcmToken(): String? = suspendCoroutine { continuation ->
+        val firebaseMessaging = FirebaseMessaging.getInstance()
+        firebaseMessaging.token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                continuation.resume(null)
+                return@OnCompleteListener
+            }
+
+            val token = task.result
+
+            continuation.resume(token)
+        })
     }
 }

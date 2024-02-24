@@ -29,18 +29,23 @@ class AuthRepositoryImpl @Inject constructor(
         return authDataSource.login(request)
             .onSuccess { response ->
                 tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
+                // TODO fcm 토큰 서버에 전송하기
             }
             .mapCatching {
                 !it.signUpRequired
             }
     }
 
-    override suspend fun logout(): Result<Unit> = authDataSource.logout()
+    override suspend fun logout(): Result<Unit> {
+        // TODO 서버에서 fcm 토큰 삭제하기
+        return authDataSource.logout()
+    }
 
     override suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit> {
         return signUpDataSource.signUp(signUpRequest)
             .onSuccess { response ->
                 tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
+                // TODO fcm 토큰 서버에 전송하기
             }
             .mapCatching { }
     }
@@ -49,5 +54,10 @@ class AuthRepositoryImpl @Inject constructor(
         val response = userDateSource.getUser()
         authDataSource.updateUser(response)
         emit(response.toDomain())
+    }
+
+    override suspend fun sendFcmToken(): Result<Unit> = runCatching {
+        val token = tokenDataSource.getFcmToken()
+        // TODO : 서버에 토큰 전송하기
     }
 }

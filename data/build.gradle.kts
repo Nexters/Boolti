@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.bundles.network)
 
     implementation(libs.firebase.config.ktx)
+    implementation(libs.bundles.firebase)
+    implementation(platform(libs.firebase.bom))
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)

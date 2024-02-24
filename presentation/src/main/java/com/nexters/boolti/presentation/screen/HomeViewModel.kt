@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,11 +23,21 @@ class HomeViewModel @Inject constructor(
 
     init {
         initUserInfo()
+        sendFcmToken()
     }
 
     private fun initUserInfo() {
         authRepository.getUserAndCache()
             .catch { }
             .launchIn(viewModelScope)
+    }
+
+    private fun sendFcmToken() {
+        viewModelScope.launch {
+            authRepository.sendFcmToken()
+                .onFailure {
+                    // TODO 실패했을 때 처리 어떡하지? retry를 해야 하나?
+                }
+        }
     }
 }

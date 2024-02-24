@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,8 +41,12 @@ import com.nexters.boolti.presentation.QrScanEvent
 import com.nexters.boolti.presentation.QrScanViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.CircleBgIcon
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Success
+import com.nexters.boolti.presentation.theme.Warning
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,6 +57,7 @@ fun QrScanScreen(
 ) {
     var showEntryCodeDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var snackbarIconId by remember { mutableStateOf<Int?>(null) }
     val scope = rememberCoroutineScope()
 
     val successMessage = stringResource(R.string.message_ticket_validated)
@@ -70,17 +74,18 @@ fun QrScanScreen(
     LaunchedEffect(viewModel.event) {
         scope.launch {
             viewModel.event.collect { event ->
-                val errMessage = when (event) {
+                val (iconId, errMessage) = when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.ShowNotToday -> notTodayErrMessage
-                            QrErrorType.UsedTicket -> usedTicketErrMessage
-                            QrErrorType.TicketNotFound -> notMatchedErrMessage
+                            QrErrorType.ShowNotToday -> Pair(R.drawable.ic_warning, notTodayErrMessage)
+                            QrErrorType.UsedTicket -> Pair(R.drawable.ic_error, usedTicketErrMessage)
+                            QrErrorType.TicketNotFound -> Pair(R.drawable.ic_error, notMatchedErrMessage)
                         }
                     }
 
-                    is QrScanEvent.ScanSuccess -> successMessage
+                    is QrScanEvent.ScanSuccess -> Pair(R.drawable.ic_error, successMessage)
                 }
+                snackbarIconId = iconId
                 snackbarHostState.showSnackbar(errMessage)
             }
         }
@@ -94,7 +99,22 @@ fun QrScanScreen(
             QrScanBottombar { showEntryCodeDialog = true }
         },
         snackbarHost = {
-            ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 100.dp))
+            ToastSnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 100.dp),
+                leadingIcon = {
+                    snackbarIconId?.let {
+                        CircleBgIcon(
+                            painter = painterResource(it),
+                            bgColor = when (it) {
+                                R.drawable.ic_check -> Success
+                                R.drawable.ic_error -> Error
+                                else -> Warning
+                            }
+                        )
+                    }
+                },
+            )
         },
     ) { innerPadding ->
         AndroidView(

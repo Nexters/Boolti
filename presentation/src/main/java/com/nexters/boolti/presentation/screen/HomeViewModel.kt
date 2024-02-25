@@ -6,6 +6,7 @@ import com.nexters.boolti.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -34,10 +35,9 @@ class HomeViewModel @Inject constructor(
 
     private fun sendFcmToken() {
         viewModelScope.launch {
-            authRepository.sendFcmToken()
-                .onFailure {
-                    // TODO 실패했을 때 처리 어떡하지? retry를 해야 하나?
-                }
+            loggedIn.collectLatest {
+                if (it == true) authRepository.sendFcmToken()
+            }
         }
     }
 }

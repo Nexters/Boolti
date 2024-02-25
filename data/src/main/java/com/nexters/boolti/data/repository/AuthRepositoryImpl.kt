@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.DeviceTokenDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
@@ -18,6 +19,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenDataSource: TokenDataSource,
     private val signUpDataSource: SignUpDataSource,
     private val userDateSource: UserDataSource,
+    private val deviceTokenDataSource: DeviceTokenDataSource,
 ) : AuthRepository {
     override val loggedIn: Flow<Boolean>
         get() = authDataSource.loggedIn
@@ -26,28 +28,21 @@ class AuthRepositoryImpl @Inject constructor(
         get() = authDataSource.user.map { it?.toDomain() }
 
     override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
-        return authDataSource.login(request)
-            .onSuccess { response ->
-                tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
-                // TODO fcm 토큰 서버에 전송하기
-            }
-            .mapCatching {
-                !it.signUpRequired
-            }
+        return authDataSource.login(request).onSuccess { response ->
+            tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
+            deviceTokenDataSource.sendFcmToken()
+        }.mapCatching {
+            !it.signUpRequired
+        }
     }
 
-    override suspend fun logout(): Result<Unit> {
-        // TODO 서버에서 fcm 토큰 삭제하기
-        return authDataSource.logout()
-    }
+    override suspend fun logout(): Result<Unit> = authDataSource.logout()
 
     override suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit> {
-        return signUpDataSource.signUp(signUpRequest)
-            .onSuccess { response ->
-                tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
-                // TODO fcm 토큰 서버에 전송하기
-            }
-            .mapCatching { }
+        return signUpDataSource.signUp(signUpRequest).onSuccess { response ->
+            tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
+            deviceTokenDataSource.sendFcmToken()
+        }.mapCatching { }
     }
 
     override fun getUserAndCache(): Flow<User> = flow {
@@ -56,8 +51,5 @@ class AuthRepositoryImpl @Inject constructor(
         emit(response.toDomain())
     }
 
-    override suspend fun sendFcmToken(): Result<Unit> = runCatching {
-        val token = tokenDataSource.getFcmToken()
-        // TODO : 서버에 토큰 전송하기
-    }
+    override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()
 }

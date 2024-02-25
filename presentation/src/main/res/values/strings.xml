@@ -53,6 +53,7 @@
     <string name="ticket_holder">예매자</string>
     <string name="depositor">입금자</string>
     <string name="ticket">티켓</string>
+    <string name="invite_ticket">초청 티켓</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>

@@ -206,17 +206,14 @@ fun TicketingScreen(
                     enabled = uiState.reservationButtonEnabled,
                     label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
                     onClick = {
-                        if (uiState.isInviteTicket) {
-                            viewModel.reservation()
-                        } else {
-                            showConfirmDialog = true
-                        }
+                        showConfirmDialog = true
                     },
                 )
             }
         }
         if (showConfirmDialog) {
             TicketingConfirmDialog(
+                isInviteTicket = uiState.isInviteTicket,
                 reservationName = uiState.reservationName,
                 reservationContact = uiState.reservationContact,
                 depositor = if (uiState.isSameContactInfo) uiState.reservationName else uiState.depositorName,
@@ -274,7 +271,6 @@ private fun Header(
 @Composable
 private fun RefundPolicySection(refundPolicy: List<String>) {
     var expanded by remember { mutableStateOf(false) }
-//    val refundPolicy = stringArrayResource(R.array.refund_policy)
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0F else 180F,
         animationSpec = tween(),

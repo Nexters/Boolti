@@ -22,6 +22,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun TicketingConfirmDialog(
+    isInviteTicket: Boolean,
     reservationName: String,
     reservationContact: String,
     depositor: String,
@@ -87,33 +88,39 @@ fun TicketingConfirmDialog(
             )
 
             // 입금자
-            Label(
-                modifier = Modifier.constrainAs(depositorRef) {
-                    top.linkTo(reservationContactRef.bottom, 16.dp)
-                    start.linkTo(parent.start)
-                },
-                label = stringResource(R.string.depositor),
-            )
             val (depositorNameRef, depositorContactRef) = createRefs()
-            InfoText(
-                modifier = Modifier.constrainAs(depositorNameRef) {
-                    start.linkTo(barrier)
-                    baseline.linkTo(depositorRef.baseline)
-                },
-                value = depositor
-            )
-            InfoText(
-                modifier = Modifier.constrainAs(depositorContactRef) {
-                    start.linkTo(depositorNameRef.start)
-                    top.linkTo(depositorNameRef.bottom, 4.dp)
-                },
-                value = depositorContact.toContactFormat(),
-            )
+            if (!isInviteTicket) {
+                Label(
+                    modifier = Modifier.constrainAs(depositorRef) {
+                        top.linkTo(reservationContactRef.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                    },
+                    label = stringResource(R.string.depositor),
+                )
+                InfoText(
+                    modifier = Modifier.constrainAs(depositorNameRef) {
+                        start.linkTo(barrier)
+                        baseline.linkTo(depositorRef.baseline)
+                    },
+                    value = depositor
+                )
+                InfoText(
+                    modifier = Modifier.constrainAs(depositorContactRef) {
+                        start.linkTo(depositorNameRef.start)
+                        top.linkTo(depositorNameRef.bottom, 4.dp)
+                    },
+                    value = depositorContact.toContactFormat(),
+                )
+            }
 
             // 티켓
             Label(
                 modifier = Modifier.constrainAs(ticketRef) {
-                    top.linkTo(depositorContactRef.bottom, 16.dp)
+                    if (isInviteTicket) {
+                        top.linkTo(reservationContactRef.bottom, 16.dp)
+                    } else {
+                        top.linkTo(depositorContactRef.bottom, 16.dp)
+                    }
                     start.linkTo(parent.start)
                 },
                 label = stringResource(R.string.ticket),
@@ -148,10 +155,14 @@ fun TicketingConfirmDialog(
                     start.linkTo(barrier)
                     baseline.linkTo(paymentTypeRef.baseline)
                 },
-                value = when (paymentType) {
-                    PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
-                    PaymentType.CARD -> stringResource(R.string.payment_card)
-                    PaymentType.UNDEFINED -> ""
+                value = if (isInviteTicket) {
+                    stringResource(R.string.invite_ticket)
+                } else {
+                    when (paymentType) {
+                        PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
+                        PaymentType.CARD -> stringResource(R.string.payment_card)
+                        PaymentType.UNDEFINED -> ""
+                    }
                 }
             )
         }

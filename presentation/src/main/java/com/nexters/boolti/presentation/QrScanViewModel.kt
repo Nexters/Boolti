@@ -48,11 +48,8 @@ class QrScanViewModel @Inject constructor(
      * @param entryCode 스캔한 QR 의 데이터
      */
     fun scan(entryCode: String) {
-        if (entryCode != lastCode) {
-            lastCode = entryCode
-            Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
-            requestEntrance(entryCode)
-        }
+        Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
+        requestEntrance(entryCode)
     }
 
     /**

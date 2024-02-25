@@ -13,6 +13,7 @@ val Orange01 = Color(0xFFFF6827)
 
 val Error = Color(0xFFFF4D4F)
 val Success = Color(0xFF52C41A)
+val Warning = Color(0xFFFAAD14)
 
 val Grey05 = Color(0xFFF6F7FF)
 val Grey10 = Color(0xFFE7EAF2)

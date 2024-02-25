@@ -5,20 +5,13 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.extension.toContactFormat
 
 class PhoneNumberVisualTransformation(
     private val sep: Char = '-',
 ) : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
-        val filtered = text.text.filterToPhoneNumber()
-        val annotatedString = AnnotatedString.Builder().run {
-            filtered.forEachIndexed { i, n ->
-                if (i in listOf(3, 7)) append(sep)
-                append(n)
-            }
-            toAnnotatedString()
-        }
-
+        val annotatedString = AnnotatedString(text.text.toContactFormat(sep))
         return TransformedText(annotatedString, phoneNumberOffsetMapping)
     }
 

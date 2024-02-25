@@ -138,7 +138,7 @@ fun TicketContent(
                     .padding(top = 20.dp, start = 20.dp, end = 20.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 model = ticket.poster,
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Crop,
                 contentDescription = stringResource(R.string.description_poster),
             )
             DottedDivider(

@@ -100,11 +100,15 @@ fun TicketingScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
-                is TicketingEvent.TicketingSuccess -> onReserved(it.reservationId, it.showId)
+                is TicketingEvent.TicketingSuccess -> {
+                    showConfirmDialog = false
+                    onReserved(it.reservationId, it.showId)
+                }
             }
         }
     }
@@ -148,14 +152,14 @@ fun TicketingScreen(
                 )
                 TicketHolderSection(
                     name = uiState.reservationName,
-                    phoneNumber = uiState.reservationPhoneNumber,
+                    phoneNumber = uiState.reservationContact,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onNameChanged = viewModel::setReservationName,
                     onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
                 ) // 예매자 정보
                 if (!uiState.isInviteTicket) DeposorSection(
                     name = uiState.depositorName,
-                    phoneNumber = uiState.depositorPhoneNumber,
+                    phoneNumber = uiState.depositorContact,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onClickSameContact = viewModel::toggleIsSameContactInfo,
                     onNameChanged = viewModel::setDepositorName,
@@ -201,9 +205,29 @@ fun TicketingScreen(
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
                     enabled = uiState.reservationButtonEnabled,
                     label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
-                    onClick = viewModel::reservation,
+                    onClick = {
+                        if (uiState.isInviteTicket) {
+                            viewModel.reservation()
+                        } else {
+                            showConfirmDialog = true
+                        }
+                    },
                 )
             }
+        }
+        if (showConfirmDialog) {
+            TicketingConfirmDialog(
+                reservationName = uiState.reservationName,
+                reservationContact = uiState.reservationContact,
+                depositor = if (uiState.isSameContactInfo) uiState.reservationName else uiState.depositorName,
+                depositorContact = if (uiState.isSameContactInfo) uiState.reservationContact else uiState.depositorContact,
+                ticketName = uiState.ticketName,
+                ticketCount = uiState.ticketCount,
+                totalPrice = uiState.totalPrice,
+                paymentType = uiState.paymentType,
+                onClick = viewModel::reservation,
+                onDismiss = { showConfirmDialog = false },
+            )
         }
     }
 }

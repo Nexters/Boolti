@@ -50,6 +50,10 @@
     <string name="copy">복사</string>
     <string name="next">다음</string>
 
+    <string name="ticket_holder">예매자</string>
+    <string name="depositor">입금자</string>
+    <string name="ticket">티켓</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 티켓을 예매하고 공연을 즐겨보세요!</string>
@@ -135,6 +139,8 @@
     <string name="ticketing_payment_information">다음 페이지에서 계좌 번호를 안내해 드릴게요</string>
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
+    <string name="ticketing_payment_button_label_short">결제하기</string>
+    <string name="ticketing_confirm_dialog_title">결제 정보를 확인해주세요</string>
     <string name="ticketing_address_copied_message">공연장 주소가 복사되었어요</string>
     <string name="ticketing_host_format">%s (%s)</string>
 

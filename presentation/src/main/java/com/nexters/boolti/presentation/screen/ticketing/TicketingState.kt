@@ -17,21 +17,21 @@ data class TicketingState(
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
     val paymentType: PaymentType = PaymentType.ACCOUNT_TRANSFER,
     val reservationName: String = "",
-    val reservationPhoneNumber: String = "",
+    val reservationContact: String = "",
     val depositorName: String = "",
-    val depositorPhoneNumber: String = "",
+    val depositorContact: String = "",
     val inviteCode: String = "",
     val refundPolicy: List<String> = emptyList(),
 ) {
     val reservationButtonEnabled: Boolean
         get() = if (isInviteTicket) {
             reservationName.isNotBlank() &&
-                    reservationPhoneNumber.isNotBlank() &&
+                    reservationContact.isNotBlank() &&
                     inviteCodeStatus is InviteCodeStatus.Valid
         } else {
             reservationName.isNotBlank() &&
-                    reservationPhoneNumber.isNotBlank() &&
+                    reservationContact.isNotBlank() &&
                     (isSameContactInfo || depositorName.isNotBlank()) &&
-                    (isSameContactInfo || depositorPhoneNumber.isNotBlank())
+                    (isSameContactInfo || depositorContact.isNotBlank())
         }
 }

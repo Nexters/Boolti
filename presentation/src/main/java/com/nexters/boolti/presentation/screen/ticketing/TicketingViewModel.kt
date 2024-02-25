@@ -54,20 +54,20 @@ class TicketingViewModel @Inject constructor(
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
                 reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationPhoneNumber,
+                reservationPhoneNumber = state.reservationContact,
             )
 
             false -> TicketingRequest.Normal(
                 ticketCount = uiState.value.ticketCount,
                 depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
-                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationPhoneNumber else state.depositorPhoneNumber,
+                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationContact else state.depositorContact,
                 paymentAmount = uiState.value.totalPrice,
                 paymentType = uiState.value.paymentType,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
                 reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationPhoneNumber,
+                reservationPhoneNumber = state.reservationContact,
             )
         }
 
@@ -156,7 +156,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun setReservationPhoneNumber(number: String) {
-        _uiState.update { it.copy(reservationPhoneNumber = number) }
+        _uiState.update { it.copy(reservationContact = number) }
     }
 
     fun setDepositorName(name: String) {
@@ -164,7 +164,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun setDepositorPhoneNumber(number: String) {
-        _uiState.update { it.copy(depositorPhoneNumber = number) }
+        _uiState.update { it.copy(depositorContact = number) }
     }
 
     fun setInviteCode(code: String) {

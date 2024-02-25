@@ -15,6 +15,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.extension.toContactFormat
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -82,7 +83,7 @@ fun TicketingConfirmDialog(
                     start.linkTo(reservationNameRef.start)
                     top.linkTo(reservationNameRef.bottom, 4.dp)
                 },
-                value = reservationContact,
+                value = reservationContact.toContactFormat(),
             )
 
             // 입금자
@@ -106,7 +107,7 @@ fun TicketingConfirmDialog(
                     start.linkTo(depositorNameRef.start)
                     top.linkTo(depositorNameRef.bottom, 4.dp)
                 },
-                value = depositorContact
+                value = depositorContact.toContactFormat(),
             )
 
             // 티켓
@@ -130,7 +131,7 @@ fun TicketingConfirmDialog(
                     start.linkTo(ticketNameRef.start)
                     top.linkTo(ticketNameRef.bottom, 4.dp)
                 },
-                value = "${ticketCount}매 / ${totalPrice}원"
+                value = stringResource(R.string.reservations_ticket_count_price_format_short, ticketCount, totalPrice),
             )
 
             // 결제 수단

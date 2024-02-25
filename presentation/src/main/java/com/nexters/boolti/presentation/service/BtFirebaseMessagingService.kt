@@ -1,14 +1,20 @@
 package com.nexters.boolti.presentation.service
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.presentation.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -21,6 +27,25 @@ class BtFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         scope.launch {
             authRepository.sendFcmToken()
+        }
+    }
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
+
+        remoteMessage.notification?.let { notification ->
+            val defaultChannelId = getString(R.string.default_notification_channel_id)
+            val builder =
+                NotificationCompat.Builder(this, notification.channelId ?: defaultChannelId)
+                    .setContentTitle(notification.title)
+                    .setContentText(notification.body)
+                    .setSmallIcon(R.drawable.ic_logo)
+
+            NotificationManagerCompat.from(this).notify(0, builder.build())
         }
     }
 

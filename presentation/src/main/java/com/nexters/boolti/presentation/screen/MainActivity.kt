@@ -11,12 +11,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.QrScanActivity
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requestPermission
 import com.nexters.boolti.presentation.extension.startActivity
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -45,6 +49,7 @@ class MainActivity : ComponentActivity() {
         }
 
         createDefaultFcmChannel()
+        subscribeDefaultTopic()
     }
 
     private fun createDefaultFcmChannel() {
@@ -56,5 +61,16 @@ class MainActivity : ComponentActivity() {
         channel.description = description
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun subscribeDefaultTopic() {
+        val defaultTopic = if (BuildConfig.DEBUG) "dev" else "prod"
+
+        Firebase.messaging.subscribeToTopic(defaultTopic)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Timber.d("구독 실패")
+                }
+            }
     }
 }

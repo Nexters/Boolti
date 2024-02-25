@@ -212,4 +212,9 @@
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>
     <string name="force_update_button">업데이트 하러가기</string>
+
+    <!-- 알림 -->
+    <string name="default_notification_channel_id">fcm</string>
+    <string name="fcm_default_channel_name">불티 알림</string>
+    <string name="fcm_default_channel_description">티켓 발권 알림을 받습니다.</string>
 </resources>

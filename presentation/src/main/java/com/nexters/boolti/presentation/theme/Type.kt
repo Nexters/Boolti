@@ -127,10 +127,9 @@ private fun createTextStyle(
         fontSize = fontSize,
         lineHeight = lineHeight,
         lineHeightStyle = LineHeightStyle(
-            alignment = LineHeightStyle.Alignment.Proportional,
+            alignment = LineHeightStyle.Alignment.Center,
             trim = LineHeightStyle.Trim.None
         ),
-        baselineShift = BaselineShift(0.12f),
     )
 }
 

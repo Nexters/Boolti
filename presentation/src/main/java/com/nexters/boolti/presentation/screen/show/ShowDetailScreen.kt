@@ -61,6 +61,7 @@ import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
@@ -95,7 +96,6 @@ fun ShowDetailScreen(
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val window = LocalContext.current.requireActivity().window
@@ -103,12 +103,6 @@ fun ShowDetailScreen(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = {
-            ToastSnackbarHost(
-                modifier = Modifier.padding(bottom = 80.dp),
-                hostState = snackbarHostState,
-            )
-        },
         topBar = {
             ShowDetailAppBar(
                 onBack = onBack,
@@ -137,7 +131,6 @@ fun ShowDetailScreen(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
                         .padding(bottom = 114.dp),
-                    snackbarHost = snackbarHostState,
                     showDetail = uiState.showDetail,
                     host = stringResource(
                         id = R.string.ticketing_host_format,
@@ -168,11 +161,6 @@ fun ShowDetailScreen(
                 ShowDetailCtaButton(
                     showState = uiState.showDetail.state,
                     purchased = uiState.showDetail.isReserved,
-                    showMessage = { message ->
-                        scope.launch {
-                            snackbarHostState.showSnackbar(message = message)
-                        }
-                    },
                     onClick = {
                         scope.launch {
                             if (isLoggedIn == true) {
@@ -315,13 +303,12 @@ private fun ShowDetailAppBar(
 
 @Composable
 private fun ContentScaffold(
-    snackbarHost: SnackbarHostState,
     showDetail: ShowDetail,
     host: String,
     onClickContent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
+    val snackbarController = LocalSnackbarController.current
 
     Column(
         modifier = modifier,
@@ -361,9 +348,7 @@ private fun ContentScaffold(
                         onClick = {
                             clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                scope.launch {
-                                    snackbarHost.showSnackbar(copiedMessage)
-                                }
+                                snackbarController.showMessage(copiedMessage)
                             }
                         }
                     )
@@ -498,7 +483,6 @@ private fun SectionContent(
 @Composable
 fun ShowDetailCtaButton(
     onClick: () -> Unit,
-    showMessage: (message: String) -> Unit,
     purchased: Boolean,
     showState: ShowState,
     modifier: Modifier = Modifier,

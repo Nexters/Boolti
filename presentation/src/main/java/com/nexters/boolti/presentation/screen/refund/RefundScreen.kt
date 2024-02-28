@@ -184,7 +184,7 @@ fun RefundScreen(
                         value = uiState.name
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         type = stringResource(id = R.string.contact_label),
                         value = StringBuilder(uiState.contact).apply {
                             if (uiState.contact.length > 7) {
@@ -194,12 +194,12 @@ fun RefundScreen(
                         }.toString()
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         type = stringResource(id = R.string.bank_name),
                         value = uiState.bankInfo?.bankName ?: ""
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         type = stringResource(id = R.string.account_number),
                         value = uiState.accountNumber
                     )
@@ -671,17 +671,16 @@ fun InfoRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
+            modifier = Modifier.width(70.dp),
             text = type,
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
         )
         Text(
-            modifier = Modifier.weight(1.0f),
+            modifier = Modifier.padding(start = 12.dp),
             text = value,
             style = MaterialTheme.typography.bodySmall.copy(color = Grey15),
-            textAlign = TextAlign.End,
         )
     }
 }

@@ -44,18 +44,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
@@ -65,8 +59,8 @@ import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point4
 
 @Composable
 fun ShowScreen(
@@ -181,12 +175,7 @@ fun ShowAppBar(
             modifier = Modifier
                 .fillMaxWidth(),
             text = stringResource(id = R.string.home_sub_title, nickname),
-            style = TextStyle(
-                lineHeight = 34.sp,
-                fontWeight = FontWeight.Normal,
-                fontSize = 24.sp,
-                fontFamily = aggroFamily,
-            ),
+            style = point4,
         )
         SearchBar(
             modifier = Modifier

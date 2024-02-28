@@ -19,10 +19,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
@@ -30,7 +28,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
-import com.nexters.boolti.presentation.theme.aggroFamily
+import com.nexters.boolti.presentation.theme.point1
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -119,11 +117,8 @@ fun ShowFeed(
             modifier = Modifier.padding(top = 2.dp),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            fontSize = 16.sp,
-            lineHeight = 26.sp,
-            fontFamily = aggroFamily,
-            fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onBackground,
+            style = point1,
         )
     }
 }

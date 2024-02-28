@@ -51,7 +51,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.ShowDetail
@@ -62,14 +61,13 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
-import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
@@ -448,10 +446,7 @@ private fun Poster(
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),
             text = title,
-            fontFamily = aggroFamily,
-            color = Grey05,
-            fontSize = 24.sp,
-            lineHeight = 34.sp,
+            style = point3,
         )
     }
 }

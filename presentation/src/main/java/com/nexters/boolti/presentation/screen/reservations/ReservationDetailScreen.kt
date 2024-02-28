@@ -108,7 +108,7 @@ fun ReservationDetailScreen(
                 modifier = Modifier
                     .padding(horizontal = marginHorizontal)
                     .padding(top = 12.dp),
-                text = "No. ${state.reservation.id}",
+                text = "No. ${state.reservation.csReservationId}",
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
             )
             Header(reservation = state.reservation)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +29,9 @@ import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.aggroFamily
 import java.time.format.DateTimeFormatter
@@ -74,35 +77,10 @@ fun ShowFeed(
                 )
             }
 
-            when (showState) {
-                is ShowState.WaitingTicketing -> {
-                    Badge(
-                        label = stringResource(
-                            id = R.string.ticketing_button_upcoming_ticket,
-                            showState.dDay
-                        ),
-                        modifier = Modifier.padding(all = 10.dp),
-                        color = Grey05,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                    )
-                }
-
-                is ShowState.FinishedShow -> {
-                    Badge(
-                        label = stringResource(id = R.string.finished_show),
-                        modifier = Modifier.padding(all = 10.dp)
-                    )
-                }
-
-                is ShowState.ClosedTicketing -> {
-                    Badge(
-                        label = stringResource(id = R.string.ticketing_button_closed_ticket),
-                        modifier = Modifier.padding(all = 10.dp)
-                    )
-                }
-
-                else -> {}
-            }
+            ShowBadge(
+                modifier = Modifier.padding(all = 10.dp),
+                showState = showState
+            )
         }
 
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
@@ -126,4 +104,42 @@ fun ShowFeed(
             color = MaterialTheme.colorScheme.onBackground,
         )
     }
+}
+
+@Composable
+private fun ShowBadge(
+    showState: ShowState,
+    modifier: Modifier = Modifier,
+) {
+    var dDay: Int? = null
+    val (color, containerColor, labelId) = when (showState) {
+        is ShowState.WaitingTicketing -> {
+            dDay = showState.dDay
+            Triple(
+                MaterialTheme.colorScheme.primary,
+                Grey80,
+                R.string.ticketing_button_upcoming_ticket,
+            )
+        }
+
+        ShowState.TicketingInProgress -> Triple(
+            Grey05,
+            MaterialTheme.colorScheme.primary,
+            R.string.ticketing_in_progress,
+        )
+
+        ShowState.ClosedTicketing -> Triple(Grey80, Grey20, R.string.ticketing_button_closed_ticket)
+        ShowState.FinishedShow -> Triple(Grey40, Grey80, R.string.finished_show)
+    }
+    val label = if (dDay == null) stringResource(labelId) else stringResource(labelId, dDay)
+
+
+    Text(
+        text = label,
+        modifier = modifier
+            .clip(RoundedCornerShape(100.dp))
+            .background(containerColor.copy(0.9f))
+            .padding(horizontal = 12.dp, vertical = 3.dp),
+        style = MaterialTheme.typography.labelMedium.copy(color = color),
+    )
 }

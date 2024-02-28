@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -28,11 +28,13 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.aggroFamily
 import java.time.format.DateTimeFormatter
 
@@ -65,13 +67,26 @@ fun ShowFeed(
                 contentScale = ContentScale.Crop,
             )
 
-            if (showState !is ShowState.TicketingInProgress) {
+            if (showState is ShowState.WaitingTicketing || showState is ShowState.FinishedShow) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(210f / 297f)
                         .background(
                             brush = SolidColor(Color.Black),
+                            alpha = 0.5f,
+                        )
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(210f / 297f)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(Color.Transparent, Grey95),
+                                startY = 48.dp.toPx(),
+                            ),
                             alpha = 0.5f,
                         )
                 )

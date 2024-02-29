@@ -28,6 +28,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.constants.posterRatio
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
@@ -57,7 +58,7 @@ fun ShowFeed(
                 contentDescription = stringResource(id = R.string.description_poster),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(210f / 297f)
+                    .aspectRatio(posterRatio)
                     .clip(RoundedCornerShape(borderRadius))
                     .border(
                         width = 1.dp,
@@ -71,7 +72,7 @@ fun ShowFeed(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(210f / 297f)
+                        .aspectRatio(posterRatio)
                         .background(
                             brush = SolidColor(Color.Black),
                             alpha = 0.5f,
@@ -81,7 +82,7 @@ fun ShowFeed(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(210f / 297f)
+                        .aspectRatio(posterRatio)
                         .background(
                             brush = Brush.verticalGradient(
                                 listOf(Color.Transparent, Grey95),

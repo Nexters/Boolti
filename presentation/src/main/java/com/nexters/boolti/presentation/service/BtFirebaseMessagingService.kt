@@ -1,14 +1,13 @@
 package com.nexters.boolti.presentation.service
 
 import android.Manifest
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.extension.checkGrantedPermission
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +30,7 @@ class BtFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return
+        if(!checkGrantedPermission(Manifest.permission.POST_NOTIFICATIONS)) return
 
         remoteMessage.notification?.let { notification ->
             val defaultChannelId = getString(R.string.default_notification_channel_id)

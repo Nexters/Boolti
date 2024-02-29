@@ -29,8 +29,6 @@ import com.nexters.boolti.presentation.screen.MainDestination.HostedShows
 import com.nexters.boolti.presentation.screen.MainDestination.Payment
 import com.nexters.boolti.presentation.screen.MainDestination.Qr
 import com.nexters.boolti.presentation.screen.MainDestination.Refund
-import com.nexters.boolti.presentation.screen.MainDestination.ReservationDetail
-import com.nexters.boolti.presentation.screen.MainDestination.Reservations
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.MainDestination.TicketDetail
 import com.nexters.boolti.presentation.screen.MainDestination.Ticketing
@@ -107,38 +105,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             navController = navController,
         )
 
-        SignoutScreen(
-            navController = navController,
-        )
-
-        composable(
-            route = Reservations.route,
-        ) {
-            ReservationsScreen(onBackPressed = {
-                navController.popBackStack()
-            }, navigateToDetail = { reservationId ->
-                navController.navigate("reservations/$reservationId")
-            })
-        }
-
-        composable(
-            route = "${ReservationDetail.route}/{$reservationId}",
-            arguments = ReservationDetail.arguments,
-        ) {
-            ReservationDetailScreen(
-                onBackPressed = { navController.popBackStack() },
-                navigateToRefund = { id -> navController.navigate("refund/$id") },
-            )
-        }
-
-        composable(
-            route = "${Refund.route}/{$reservationId}",
-            arguments = Refund.arguments,
-        ) {
-            RefundScreen(
-                onBackPressed = { navController.popBackStack() },
-            )
-        }
+        SignoutScreen(navController = navController)
+        ReservationsScreen(navController = navController)
+        ReservationDetailScreen(navController = navController)
+        RefundScreen(navController = navController)
 
         navigation(
             route = "${ShowDetail.route}/{$showId}",

@@ -5,7 +5,7 @@ import androidx.navigation.navArgument
 
 sealed class MainDestination(val route: String) {
     data object Home : MainDestination(route = "home")
-    data object ShowDetail : MainDestination(route = "shows") {
+    data object ShowDetail : MainDestination(route = "show") {
         val arguments = listOf(navArgument(showId) { type = NavType.StringType })
     }
 
@@ -47,7 +47,7 @@ sealed class MainDestination(val route: String) {
 
     data object HostedShows : MainDestination(route = "hostedShows")
 
-    data object SignOut : MainDestination(route = "signOut")
+    data object SignOut : MainDestination(route = "signout")
     data object Login : MainDestination(route = "login")
 }
 

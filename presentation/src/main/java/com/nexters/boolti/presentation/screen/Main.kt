@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.screen.MainDestination.*
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentScreen
@@ -86,15 +87,15 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
     // TODO: 하드코딩 된 route 를 각 화면에 정의
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = Home.route,
     ) {
         composable(
-            route = "home",
+            route = Home.route,
         ) {
             HomeScreen(
                 modifier = modifier,
                 onClickShowItem = {
-                    navController.navigate("show/$it")
+                    navController.navigate("${ShowDetail.route}/$it")
                 },
                 onClickTicket = {
                     navController.navigate("tickets/$it")
@@ -119,7 +120,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "login",
+            route = Login.route,
         ) {
             LoginScreen(
                 modifier = modifier,
@@ -128,7 +129,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             }
         }
         composable(
-            route = "signout",
+            route = SignOut.route,
         ) {
             SignoutScreen(
                 navigateToHome = { navController.navigateToHome() },
@@ -137,7 +138,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "reservations",
+            route = Reservations.route,
         ) {
             ReservationsScreen(onBackPressed = {
                 navController.popBackStack()
@@ -147,8 +148,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "reservations/{reservationId}",
-            arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
+            route = "${ReservationDetail.route}/{$reservationId}",
+            arguments = ReservationDetail.arguments,
         ) {
             ReservationDetailScreen(
                 onBackPressed = { navController.popBackStack() },
@@ -157,8 +158,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "refund/{reservationId}",
-            arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
+            route = "${Refund.route}/{$reservationId}",
+            arguments = Refund.arguments,
         ) {
             RefundScreen(
                 onBackPressed = { navController.popBackStack() },
@@ -166,9 +167,9 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         navigation(
-            route = "show/{showId}",
+            route = "${ShowDetail.route}/{$showId}",
             startDestination = "detail",
-            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
+            arguments = ShowDetail.arguments,
         ) {
             composable(
                 route = "detail",
@@ -233,8 +234,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "tickets/{ticketId}",
-            arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
+            route = "${TicketDetail.route}/{$ticketId}",
+            arguments = TicketDetail.arguments,
         ) {
             TicketDetailScreen(modifier = modifier,
                 onBackClicked = { navController.popBackStack() },
@@ -243,17 +244,12 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                         "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
                     )
                 },
-                navigateToShowDetail = { navController.navigate("show/$it") }
+                navigateToShowDetail = { navController.navigate("${ShowDetail.route}/$it") }
             )
         }
         composable(
-            route = "ticketing/{showId}?salesTicketId={salesTicketId}&ticketCount={ticketCount}&inviteTicket={isInviteTicket}",
-            arguments = listOf(
-                navArgument("showId") { type = NavType.StringType },
-                navArgument("salesTicketId") { type = NavType.StringType },
-                navArgument("ticketCount") { type = NavType.IntType },
-                navArgument("isInviteTicket") { type = NavType.BoolType },
-            ),
+            route = "${Ticketing.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}&inviteTicket={$isInviteTicket}",
+            arguments = Ticketing.arguments,
         ) {
             TicketingScreen(
                 modifier = modifier,
@@ -265,18 +261,15 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "qr/{data}?ticketName={ticketName}",
-            arguments = listOf(
-                navArgument("data") { type = NavType.StringType },
-                navArgument("ticketName") { type = NavType.StringType },
-            ),
+            route = "${Qr.route}/{$data}?ticketName={$ticketName}",
+            arguments = Qr.arguments,
         ) {
             QrFullScreen(modifier = modifier) {
                 navController.popBackStack()
             }
         }
         composable(
-            route = "hostedShows"
+            route = HostedShows.route
         ) {
             HostedShowScreen(
                 modifier = modifier,
@@ -288,18 +281,16 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         }
 
         composable(
-            route = "payment/{reservationId}?showId={showId}",
-            arguments = listOf(
-                navArgument("reservationId") { type = NavType.StringType },
-                navArgument("showId") { type = NavType.StringType }),
+            route = "${Payment.route}/{$reservationId}?showId={$showId}",
+            arguments = Payment.arguments,
         ) {
-            val showId = it.arguments?.getString("showId")
+            val showId = it.arguments?.getString(showId)
             PaymentScreen(
                 onClickHome = { navController.navigateToHome() },
                 onClickClose = {
                     showId?.let { showId ->
-                        navController.popBackStack("show/$showId", inclusive = true)
-                        navController.navigate("show/$showId")
+                        navController.popBackStack("${ShowDetail.route}/$showId", inclusive = true)
+                        navController.navigate("${ShowDetail.route}/$showId")
                     } ?: navController.popBackStack()
                 },
             )

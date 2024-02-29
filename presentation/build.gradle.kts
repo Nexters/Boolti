@@ -59,6 +59,8 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.andoridx.compose.compose.bom))
     implementation(libs.bundles.coroutines)
+    implementation(libs.bundles.firebase)
+    implementation(platform(libs.firebase.bom))
 
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)

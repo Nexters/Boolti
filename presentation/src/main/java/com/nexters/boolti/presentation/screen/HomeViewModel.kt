@@ -6,8 +6,10 @@ import com.nexters.boolti.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,11 +24,20 @@ class HomeViewModel @Inject constructor(
 
     init {
         initUserInfo()
+        sendFcmToken()
     }
 
     private fun initUserInfo() {
         authRepository.getUserAndCache()
             .catch { }
             .launchIn(viewModelScope)
+    }
+
+    private fun sendFcmToken() {
+        viewModelScope.launch {
+            loggedIn.collectLatest {
+                if (it == true) authRepository.sendFcmToken()
+            }
+        }
     }
 }

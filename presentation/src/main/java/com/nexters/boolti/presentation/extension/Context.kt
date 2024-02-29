@@ -21,6 +21,6 @@ fun Context.requireActivity(): Activity {
     )
 }
 
-fun Context.checkGranted(permission: String): Boolean {
+fun Context.checkGrantedPermission(permission: String): Boolean {
     return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 }

@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.core.app.ActivityCompat
 
 fun Activity.requestPermission(permission: String, requestCode: Int) {
-    if (!checkGranted(permission)) {
+    if (!checkGrantedPermission(permission)) {
         ActivityCompat.requestPermissions(
             this, arrayOf(permission),
             requestCode,

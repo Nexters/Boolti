@@ -26,14 +26,12 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.HostedShows
-import com.nexters.boolti.presentation.screen.MainDestination.Login
 import com.nexters.boolti.presentation.screen.MainDestination.Payment
 import com.nexters.boolti.presentation.screen.MainDestination.Qr
 import com.nexters.boolti.presentation.screen.MainDestination.Refund
 import com.nexters.boolti.presentation.screen.MainDestination.ReservationDetail
 import com.nexters.boolti.presentation.screen.MainDestination.Reservations
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
-import com.nexters.boolti.presentation.screen.MainDestination.SignOut
 import com.nexters.boolti.presentation.screen.MainDestination.TicketDetail
 import com.nexters.boolti.presentation.screen.MainDestination.Ticketing
 import com.nexters.boolti.presentation.screen.home.HomeScreen
@@ -95,7 +93,6 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
 fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
     val navController = rememberNavController()
 
-    // TODO: 하드코딩 된 route 를 각 화면에 정의
     NavHost(
         navController = navController,
         startDestination = Home.route,
@@ -105,23 +102,14 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             navController = navController,
         )
 
-        composable(
-            route = Login.route,
-        ) {
-            LoginScreen(
-                modifier = modifier,
-            ) {
-                navController.popBackStack()
-            }
-        }
-        composable(
-            route = SignOut.route,
-        ) {
-            SignoutScreen(
-                navigateToHome = { navController.navigateToHome() },
-                navigateBack = { navController.popBackStack() },
-            )
-        }
+        LoginScreen(
+            modifier = modifier,
+            navController = navController,
+        )
+
+        SignoutScreen(
+            navController = navController,
+        )
 
         composable(
             route = Reservations.route,

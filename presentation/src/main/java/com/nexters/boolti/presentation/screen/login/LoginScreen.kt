@@ -37,19 +37,37 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.subTextPadding
 
+fun NavGraphBuilder.LoginScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
+    composable(
+        route = MainDestination.Login.route,
+    ) {
+        LoginScreen(
+            modifier = modifier,
+            onBackPressed = { navController.popBackStack() }
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
+private fun LoginScreen(
+    onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
-    onBackPressed: () -> Unit,
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()

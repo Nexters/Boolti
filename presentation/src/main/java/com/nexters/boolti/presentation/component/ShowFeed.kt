@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -25,9 +26,14 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.constants.posterRatio
+import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.point1
 import java.time.format.DateTimeFormatter
 
@@ -50,7 +56,7 @@ fun ShowFeed(
                 contentDescription = stringResource(id = R.string.description_poster),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(210f / 297f)
+                    .aspectRatio(posterRatio)
                     .clip(RoundedCornerShape(borderRadius))
                     .border(
                         width = 1.dp,
@@ -60,47 +66,35 @@ fun ShowFeed(
                 contentScale = ContentScale.Crop,
             )
 
-            if (showState !is ShowState.TicketingInProgress) {
+            if (showState is ShowState.WaitingTicketing || showState is ShowState.FinishedShow) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(210f / 297f)
+                        .aspectRatio(posterRatio)
                         .background(
                             brush = SolidColor(Color.Black),
                             alpha = 0.5f,
                         )
                 )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(posterRatio)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(Color.Transparent, Grey95),
+                                startY = 48.dp.toPx(),
+                            ),
+                            alpha = 0.5f,
+                        )
+                )
             }
 
-            when (showState) {
-                is ShowState.WaitingTicketing -> {
-                    Badge(
-                        label = stringResource(
-                            id = R.string.ticketing_button_upcoming_ticket,
-                            showState.dDay
-                        ),
-                        modifier = Modifier.padding(all = 10.dp),
-                        color = Grey05,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                    )
-                }
-
-                is ShowState.FinishedShow -> {
-                    Badge(
-                        label = stringResource(id = R.string.finished_show),
-                        modifier = Modifier.padding(all = 10.dp)
-                    )
-                }
-
-                is ShowState.ClosedTicketing -> {
-                    Badge(
-                        label = stringResource(id = R.string.ticketing_button_closed_ticket),
-                        modifier = Modifier.padding(all = 10.dp)
-                    )
-                }
-
-                else -> {}
-            }
+            ShowBadge(
+                modifier = Modifier.padding(all = 10.dp),
+                showState = showState
+            )
         }
 
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
@@ -121,4 +115,42 @@ fun ShowFeed(
             style = point1,
         )
     }
+}
+
+@Composable
+private fun ShowBadge(
+    showState: ShowState,
+    modifier: Modifier = Modifier,
+) {
+    var dDay: Int? = null
+    val (color, containerColor, labelId) = when (showState) {
+        is ShowState.WaitingTicketing -> {
+            dDay = showState.dDay
+            Triple(
+                MaterialTheme.colorScheme.primary,
+                Grey80,
+                R.string.ticketing_button_upcoming_ticket,
+            )
+        }
+
+        ShowState.TicketingInProgress -> Triple(
+            Grey05,
+            MaterialTheme.colorScheme.primary,
+            R.string.ticketing_in_progress,
+        )
+
+        ShowState.ClosedTicketing -> Triple(Grey80, Grey20, R.string.ticketing_button_closed_ticket)
+        ShowState.FinishedShow -> Triple(Grey40, Grey80, R.string.finished_show)
+    }
+    val label = if (dDay == null) stringResource(labelId) else stringResource(labelId, dDay)
+
+
+    Text(
+        text = label,
+        modifier = modifier
+            .clip(RoundedCornerShape(100.dp))
+            .background(containerColor.copy(0.9f))
+            .padding(horizontal = 12.dp, vertical = 3.dp),
+        style = MaterialTheme.typography.labelMedium.copy(color = color),
+    )
 }

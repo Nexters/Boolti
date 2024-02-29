@@ -10,15 +10,9 @@ data class RefundUiState(
     val accountNumber: String = "",
     val reservation: ReservationDetail? = null,
 ) {
-    val isValidName: Boolean get() {
-        val regex = "^[가-힣]{2,10}$".toRegex()
-        return regex.matches(name)
-    }
+    val isValidName: Boolean get() = name.isNotBlank()
 
-    val isValidContact: Boolean get() {
-        val regex = "^0[0-9]{8,10}$".toRegex()
-        return regex.matches(contact)
-    }
+    val isValidContact: Boolean get() = contact.isNotBlank()
 
     val isValidAccountNumber: Boolean get() {
         val regex = "^[0-9]{11,14}$".toRegex()

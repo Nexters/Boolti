@@ -27,6 +27,7 @@
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
     <string name="has_pending_ticket">입금 확인 중인 티켓이 있어요!</string>
+    <string name="ticketing_in_progress">예매 중</string>
     <string-array name="days_of_week">
         <item>월</item>
         <item>화</item>
@@ -111,7 +112,7 @@
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
     <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>
     <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>
-    <string name="ticketing_button_closed_ticket">예매 마감</string>
+    <string name="ticketing_button_closed_ticket">예매 종료</string>
     <string name="ticketing_button_finished_show">공연 종료</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>

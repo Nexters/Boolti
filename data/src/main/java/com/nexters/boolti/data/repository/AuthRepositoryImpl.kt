@@ -4,6 +4,8 @@ import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
+import com.nexters.boolti.data.network.response.LoginResponse
+import com.nexters.boolti.domain.model.LoginUserState
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest
@@ -26,14 +28,12 @@ class AuthRepositoryImpl @Inject constructor(
     override val cachedUser: Flow<User?>
         get() = authDataSource.user.map { it?.toDomain() }
 
-    override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
+    override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
         return authDataSource.login(request)
             .onSuccess { response ->
                 tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             }
-            .mapCatching {
-                !it.signUpRequired
-            }
+            .mapCatching(LoginResponse::toDomain)
     }
 
     override suspend fun logout(): Result<Unit> = authDataSource.logout()

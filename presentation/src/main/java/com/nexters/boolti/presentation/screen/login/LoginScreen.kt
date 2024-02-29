@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,10 +35,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey30
@@ -53,19 +56,15 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
+    var showSignOutCancelledDialog by remember { mutableStateOf(false) }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.event.collect {
             when (it) {
-                LoginEvent.Success -> {
-                    onBackPressed()
-                }
-
-                LoginEvent.RequireSignUp -> {
-                    isSheetOpen = true
-                }
-
+                LoginEvent.Success -> onBackPressed()
+                LoginEvent.RequireSignUp -> isSheetOpen = true
+                LoginEvent.SignOutCancelled -> showSignOutCancelledDialog = true
                 LoginEvent.Invalid -> Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show()
             }
         }
@@ -86,6 +85,10 @@ fun LoginScreen(
                 signUp = viewModel::signUp,
             )
         }
+    }
+
+    if (showSignOutCancelledDialog) {
+        SignOutCancelledDialog { showSignOutCancelledDialog = false }
     }
 
     Scaffold(
@@ -162,7 +165,9 @@ private fun SignUpBottomSheet(
         modifier = modifier.padding(horizontal = 24.dp),
     ) {
         Text(
-            modifier = Modifier.padding(top = 24.dp, bottom = 12.dp).height(32.dp),
+            modifier = Modifier
+                .padding(top = 24.dp, bottom = 12.dp)
+                .height(32.dp),
             text = stringResource(id = R.string.signup_greeting),
             style = MaterialTheme.typography.headlineSmall
         )
@@ -193,6 +198,21 @@ private fun SignUpBottomSheet(
                 .padding(bottom = 34.dp),
             label = stringResource(id = R.string.signup_with_agreement),
             onClick = signUp,
+        )
+    }
+}
+
+@Composable
+fun SignOutCancelledDialog(onDismiss: () -> Unit) {
+    BTDialog(
+        onDismiss = onDismiss,
+        onClickPositiveButton = onDismiss,
+    ) {
+        Text(
+            text = stringResource(R.string.signout_cancelled_message),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

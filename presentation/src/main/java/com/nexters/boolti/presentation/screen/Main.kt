@@ -1,10 +1,17 @@
 package com.nexters.boolti.presentation.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -15,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
@@ -33,13 +41,40 @@ import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.util.SnackbarController
+
+val LocalSnackbarController = staticCompositionLocalOf {
+    SnackbarController(SnackbarHostState())
+}
 
 @Composable
 fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     BooltiTheme {
         Surface(modifier) {
-            MainNavigation(modifier, onClickQrScan)
+            Scaffold(
+                snackbarHost = {
+                    ToastSnackbarHost(
+                        modifier = Modifier.padding(bottom = 80.dp),
+                        hostState = snackbarHostState,
+                    )
+                },
+            ) { innerPadding ->
+                CompositionLocalProvider(
+                    LocalSnackbarController provides SnackbarController(
+                        snackbarHostState,
+                        scope
+                    )
+                ) {
+                    MainNavigation(
+                        modifier = modifier.padding(innerPadding),
+                        onClickQrScan = onClickQrScan,
+                    )
+                }
+            }
         }
     }
 }

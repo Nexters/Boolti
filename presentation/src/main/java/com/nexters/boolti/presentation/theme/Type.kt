@@ -5,9 +5,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.nexters.boolti.presentation.R
 
@@ -21,7 +21,8 @@ val pretendardFamily = FontFamily(
 )
 
 val aggroFamily = FontFamily(
-    Font(R.font.sb_aggro_m, FontWeight.Normal),
+    Font(R.font.sb_aggro_m, FontWeight.Medium),
+    Font(R.font.sb_aggro_b, FontWeight.Bold),
 )
 
 private val headline3 = createTextStyle(
@@ -96,23 +97,34 @@ private val caption = createTextStyle(
 
 val point1 = createTextStyle(
     fontFamily = aggroFamily,
-    fontWeight = FontWeight.Normal,
+    fontWeight = FontWeight.Bold,
     fontSize = 16.sp,
     lineHeight = 26.sp,
+    letterSpacing = (-0.03).em,
 )
 
 val point2 = createTextStyle(
     fontFamily = aggroFamily,
-    fontWeight = FontWeight.Normal,
+    fontWeight = FontWeight.Bold,
     fontSize = 20.sp,
     lineHeight = 30.sp,
+    letterSpacing = (-0.03).em,
+)
+
+val point3 = createTextStyle(
+    fontFamily = aggroFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 24.sp,
+    lineHeight = 34.sp,
+    letterSpacing = (-0.03).em,
 )
 
 val point4 = createTextStyle(
     fontFamily = aggroFamily,
-    fontWeight = FontWeight.Normal,
+    fontWeight = FontWeight.Medium,
     fontSize = 24.sp,
     lineHeight = 34.sp,
+    letterSpacing = (-0.03).em,
 )
 
 private fun createTextStyle(
@@ -120,6 +132,7 @@ private fun createTextStyle(
     lineHeight: TextUnit,
     fontFamily: FontFamily = pretendardFamily,
     fontWeight: FontWeight = FontWeight.Normal,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
 ): TextStyle {
     return TextStyle(
         fontFamily = fontFamily,
@@ -127,10 +140,10 @@ private fun createTextStyle(
         fontSize = fontSize,
         lineHeight = lineHeight,
         lineHeightStyle = LineHeightStyle(
-            alignment = LineHeightStyle.Alignment.Proportional,
+            alignment = LineHeightStyle.Alignment.Center,
             trim = LineHeightStyle.Trim.None
         ),
-        baselineShift = BaselineShift(0.12f),
+        letterSpacing = letterSpacing,
     )
 }
 

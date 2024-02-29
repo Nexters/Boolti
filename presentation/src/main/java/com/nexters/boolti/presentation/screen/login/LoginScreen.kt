@@ -88,7 +88,10 @@ fun LoginScreen(
     }
 
     if (showSignOutCancelledDialog) {
-        SignOutCancelledDialog { showSignOutCancelledDialog = false }
+        SignOutCancelledDialog {
+            showSignOutCancelledDialog = false
+            onBackPressed()
+        }
     }
 
     Scaffold(

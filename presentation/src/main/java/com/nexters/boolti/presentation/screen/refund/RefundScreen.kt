@@ -74,6 +74,7 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -98,17 +99,16 @@ fun RefundScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val events = viewModel.events
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val pagerState = rememberPagerState { 2 }
     var openDialog by remember { mutableStateOf(false) }
+    val snackbarController = LocalSnackbarController.current
 
     val refundMessage = stringResource(id = R.string.refund_completed)
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
                 RefundEvent.SuccessfullyRefunded -> {
-                    // TODO 스낵바로 변경
-                    Toast.makeText(context, refundMessage, Toast.LENGTH_LONG).show()
+                    snackbarController.showMessage(refundMessage)
                     onBackPressed()
                 }
             }

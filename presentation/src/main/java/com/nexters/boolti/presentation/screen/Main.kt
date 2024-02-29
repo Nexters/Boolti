@@ -24,7 +24,18 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
-import com.nexters.boolti.presentation.screen.MainDestination.*
+import com.nexters.boolti.presentation.screen.MainDestination.Home
+import com.nexters.boolti.presentation.screen.MainDestination.HostedShows
+import com.nexters.boolti.presentation.screen.MainDestination.Login
+import com.nexters.boolti.presentation.screen.MainDestination.Payment
+import com.nexters.boolti.presentation.screen.MainDestination.Qr
+import com.nexters.boolti.presentation.screen.MainDestination.Refund
+import com.nexters.boolti.presentation.screen.MainDestination.ReservationDetail
+import com.nexters.boolti.presentation.screen.MainDestination.Reservations
+import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
+import com.nexters.boolti.presentation.screen.MainDestination.SignOut
+import com.nexters.boolti.presentation.screen.MainDestination.TicketDetail
+import com.nexters.boolti.presentation.screen.MainDestination.Ticketing
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentScreen
@@ -89,35 +100,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         navController = navController,
         startDestination = Home.route,
     ) {
-        composable(
-            route = Home.route,
-        ) {
-            HomeScreen(
-                modifier = modifier,
-                onClickShowItem = {
-                    navController.navigate("${ShowDetail.route}/$it")
-                },
-                onClickTicket = {
-                    navController.navigate("tickets/$it")
-                },
-                onClickQr = { code, ticketName ->
-                    navController.navigate(
-                        "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
-                    )
-                },
-                onClickQrScan = {
-                    navController.navigate("hostedShows")
-                },
-                onClickSignout = {
-                    navController.navigate("signout")
-                },
-                navigateToReservations = {
-                    navController.navigate("reservations")
-                }
-            ) {
-                navController.navigate("login")
-            }
-        }
+        HomeScreen(
+            modifier = modifier,
+            navController = navController,
+        )
 
         composable(
             route = Login.route,

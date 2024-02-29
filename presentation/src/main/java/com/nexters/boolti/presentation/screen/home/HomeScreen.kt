@@ -22,13 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.screen.HomeViewModel
+import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
@@ -37,10 +40,32 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 
+fun NavGraphBuilder.HomeScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
+    composable(
+        route = MainDestination.Home.route,
+    ) {
+        HomeScreen(
+            modifier = modifier,
+            onClickShowItem = { navController.navigate("${MainDestination.ShowDetail.route}/$it") },
+            onClickTicket = { navController.navigate("${MainDestination.TicketDetail.route}/$it") },
+            onClickQr = { code, ticketName ->
+                navController.navigate(
+                    "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                )
+            },
+            onClickQrScan = { navController.navigate(MainDestination.HostedShows.route) },
+            onClickSignout = { navController.navigate(MainDestination.SignOut.route) },
+            navigateToReservations = { navController.navigate(MainDestination.Reservations.route) },
+            requireLogin = { navController.navigate(MainDestination.Login.route) }
+        )
+    }
+}
+
 @Composable
-fun HomeScreen(
-    modifier: Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
+private fun HomeScreen(
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
     onClickQr: (data: String, ticketName: String) -> Unit,
@@ -48,6 +73,8 @@ fun HomeScreen(
     onClickSignout: () -> Unit,
     navigateToReservations: () -> Unit,
     requireLogin: () -> Unit,
+    modifier: Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -93,7 +120,11 @@ fun HomeScreen(
                         modifier = modifier.padding(innerPadding),
                     )
 
-                    false -> TicketLoginScreen(modifier.padding(innerPadding), onLoginClick = requireLogin)
+                    false -> TicketLoginScreen(
+                        modifier.padding(innerPadding),
+                        onLoginClick = requireLogin
+                    )
+
                     else -> Unit // 로그인 여부를 불러오는 중
                 }
             }

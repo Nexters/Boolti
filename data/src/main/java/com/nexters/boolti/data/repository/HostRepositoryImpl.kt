@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class HostRepositoryImpl @Inject constructor(
+internal class HostRepositoryImpl @Inject constructor(
     private val dataSource: HostDataSource,
 ) : HostRepository {
     override fun requestEntrance(request: QrScanRequest): Flow<Boolean> = flow {

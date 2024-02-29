@@ -6,7 +6,7 @@ import com.nexters.boolti.domain.model.ShowDetail
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ShowDetailResponse(
+internal data class ShowDetailResponse(
     val id: String,
     val name: String,
     val placeName: String,

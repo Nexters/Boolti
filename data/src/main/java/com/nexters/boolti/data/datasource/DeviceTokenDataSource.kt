@@ -10,7 +10,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class DeviceTokenDataSource @Inject constructor(
+internal class DeviceTokenDataSource @Inject constructor(
     private val deviceTokenService: DeviceTokenService,
 ) {
     suspend fun sendFcmToken(): Result<Unit> = runCatching {

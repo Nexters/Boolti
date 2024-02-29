@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Serializable
-data class HostedShowDto(
+internal data class HostedShowDto(
     @SerialName("showId") val showId: String,
     @SerialName("showName") val showName: String,
 ) {

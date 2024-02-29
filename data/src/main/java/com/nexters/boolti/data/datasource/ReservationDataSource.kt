@@ -6,7 +6,7 @@ import com.nexters.boolti.data.network.response.ReservationResponse
 import com.nexters.boolti.domain.request.RefundRequest
 import javax.inject.Inject
 
-class ReservationDataSource @Inject constructor(
+internal class ReservationDataSource @Inject constructor(
     private val reservationService: ReservationService,
 ) {
     suspend fun getReservations(): List<ReservationResponse> = reservationService.getReservations()

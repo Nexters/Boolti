@@ -7,7 +7,7 @@ import com.nexters.boolti.domain.request.QrScanRequest
 import retrofit2.Response
 import javax.inject.Inject
 
-class HostDataSource @Inject constructor(
+internal class HostDataSource @Inject constructor(
     private val apiService: HostService,
 ) {
     suspend fun requestEntrance(request: QrScanRequest): Response<Boolean> = apiService.requestEntrance(request)

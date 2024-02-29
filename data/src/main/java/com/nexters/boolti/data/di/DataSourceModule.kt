@@ -16,7 +16,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object DataSourceModule {
+internal object DataSourceModule {
     @Singleton
     @Provides
     fun provideRemoteConfigDataSource(remoteConfig: FirebaseRemoteConfig): RemoteConfigDataSource =

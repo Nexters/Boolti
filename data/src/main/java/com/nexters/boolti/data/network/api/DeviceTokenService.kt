@@ -7,7 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface DeviceTokenService {
+internal interface DeviceTokenService {
     @POST("/app/papi/v1/device-token")
     suspend fun postFcmToken(@Body request: DeviceTokenRequest): Response<DeviceTokenResponse>
 }

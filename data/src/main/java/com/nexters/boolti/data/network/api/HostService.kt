@@ -10,7 +10,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-interface HostService {
+internal interface HostService {
     @GET("/app/api/v1/host/shows")
     suspend fun getHostedShows(): List<HostedShowDto>
 

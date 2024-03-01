@@ -64,6 +64,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.R
@@ -73,6 +76,11 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.format
+import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.isInviteTicket
+import com.nexters.boolti.presentation.screen.salesTicketId
+import com.nexters.boolti.presentation.screen.showId
+import com.nexters.boolti.presentation.screen.ticketCount
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -88,9 +96,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+fun NavGraphBuilder.TicketingScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
+    composable(
+        route = "${MainDestination.Ticketing.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}&inviteTicket={$isInviteTicket}",
+        arguments = MainDestination.Ticketing.arguments,
+    ) {
+        TicketingScreen(
+            modifier = modifier,
+            onBackClicked = { navController.popBackStack() },
+            onReserved = { reservationId, showId ->
+                navController.navigate("${MainDestination.Payment.route}/$reservationId?showId=$showId")
+            }
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketingScreen(
+private fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},

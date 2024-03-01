@@ -34,8 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey60
@@ -43,11 +47,29 @@ import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@Composable
-fun HostedShowScreen(
+fun NavGraphBuilder.HostedShowScreen(
+    onClickShow: (showId: String, showName: String) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
+) {
+    composable(
+        route = MainDestination.HostedShows.route
+    ) {
+        HostedShowScreen(
+            modifier = modifier,
+            onClickShow = onClickShow,
+            onClickBack = {
+                navController.popBackStack()
+            }
+        )
+    }
+}
+
+@Composable
+private fun HostedShowScreen(
     onClickBack: () -> Unit,
     onClickShow: (showId: String, showName: String) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HostedShowViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

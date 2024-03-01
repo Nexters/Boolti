@@ -17,18 +17,11 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
-import com.nexters.boolti.presentation.screen.MainDestination.HostedShows
-import com.nexters.boolti.presentation.screen.MainDestination.Payment
-import com.nexters.boolti.presentation.screen.MainDestination.Qr
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
-import com.nexters.boolti.presentation.screen.MainDestination.TicketDetail
-import com.nexters.boolti.presentation.screen.MainDestination.Ticketing
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentScreen
@@ -91,16 +84,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         navController = navController,
         startDestination = Home.route,
     ) {
-        HomeScreen(
-            modifier = modifier,
-            navController = navController,
-        )
-
-        LoginScreen(
-            modifier = modifier,
-            navController = navController,
-        )
-
+        HomeScreen(modifier = modifier, navController = navController)
+        LoginScreen(modifier = modifier, navController = navController)
         SignoutScreen(navController = navController)
         ReservationsScreen(navController = navController)
         ReservationDetailScreen(navController = navController)
@@ -111,85 +96,22 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             startDestination = "detail",
             arguments = ShowDetail.arguments,
         ) {
-            ShowDetailScreen(
-                modifier = modifier,
-                navController = navController,
-            )
-
+            ShowDetailScreen(modifier = modifier, navController = navController)
             ShowImagesScreen(navController = navController)
-            ShowDetailContentScreen(
-                modifier = modifier,
-                navController = navController,
-            )
-
-            ReportScreen(
-                modifier = modifier,
-                navController = navController,
-            )
+            ShowDetailContentScreen(modifier = modifier, navController = navController)
+            ReportScreen(modifier = modifier, navController = navController)
         }
 
-        composable(
-            route = "${TicketDetail.route}/{$ticketId}",
-            arguments = TicketDetail.arguments,
-        ) {
-            TicketDetailScreen(modifier = modifier,
-                onBackClicked = { navController.popBackStack() },
-                onClickQr = { code, ticketName ->
-                    navController.navigate(
-                        "qr/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
-                    )
-                },
-                navigateToShowDetail = { navController.navigate("${ShowDetail.route}/$it") }
-            )
-        }
-        composable(
-            route = "${Ticketing.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}&inviteTicket={$isInviteTicket}",
-            arguments = Ticketing.arguments,
-        ) {
-            TicketingScreen(
-                modifier = modifier,
-                onBackClicked = { navController.popBackStack() },
-                onReserved = { reservationId, showId ->
-                    navController.navigate("payment/$reservationId?showId=$showId")
-                }
-            )
-        }
+        TicketDetailScreen(modifier = modifier, navController = navController)
+        TicketingScreen(modifier = modifier, navController = navController)
+        QrFullScreen(modifier = modifier, navController = navController)
+        HostedShowScreen(
+            modifier = modifier,
+            onClickShow = onClickQrScan,
+            navController = navController,
+        )
 
-        composable(
-            route = "${Qr.route}/{$data}?ticketName={$ticketName}",
-            arguments = Qr.arguments,
-        ) {
-            QrFullScreen(modifier = modifier) {
-                navController.popBackStack()
-            }
-        }
-        composable(
-            route = HostedShows.route
-        ) {
-            HostedShowScreen(
-                modifier = modifier,
-                onClickShow = onClickQrScan,
-                onClickBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        composable(
-            route = "${Payment.route}/{$reservationId}?showId={$showId}",
-            arguments = Payment.arguments,
-        ) {
-            val showId = it.arguments?.getString(showId)
-            PaymentScreen(
-                onClickHome = { navController.navigateToHome() },
-                onClickClose = {
-                    showId?.let { showId ->
-                        navController.popBackStack("${ShowDetail.route}/$showId", inclusive = true)
-                        navController.navigate("${ShowDetail.route}/$showId")
-                    } ?: navController.popBackStack()
-                },
-            )
-        }
+        PaymentScreen(navController = navController)
     }
 }
 

@@ -22,14 +22,34 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.data
+import com.nexters.boolti.presentation.screen.ticketName
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
+fun NavGraphBuilder.QrFullScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
+    composable(
+        route = "${MainDestination.Qr.route}/{$data}?ticketName={$ticketName}",
+        arguments = MainDestination.Qr.arguments,
+    ) {
+        QrFullScreen(modifier = modifier) {
+            navController.popBackStack()
+        }
+    }
+}
+
 @Composable
-fun QrFullScreen(
+private fun QrFullScreen(
     modifier: Modifier = Modifier,
     viewModel: QrFullViewModel = hiltViewModel(),
     onClose: () -> Unit,

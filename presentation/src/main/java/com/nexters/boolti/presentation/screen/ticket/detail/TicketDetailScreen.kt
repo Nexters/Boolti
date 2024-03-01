@@ -77,6 +77,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
@@ -87,6 +90,8 @@ import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.ticketId
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -104,9 +109,30 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+fun NavGraphBuilder.TicketDetailScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+) {
+    composable(
+        route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+        arguments = MainDestination.TicketDetail.arguments,
+    ) {
+        TicketDetailScreen(
+            modifier = modifier,
+            onBackClicked = { navController.popBackStack() },
+            onClickQr = { code, ticketName ->
+                navController.navigate(
+                    "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                )
+            },
+            navigateToShowDetail = { navController.navigate("${MainDestination.ShowDetail.route}/$it") }
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketDetailScreen(
+private fun TicketDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketDetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
@@ -125,7 +151,8 @@ fun TicketDetailScreen(
     var contentWidth by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeight by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
-    val bottomAreaHeight = ticketSectionHeight - ticketSectionHeightUntilTicketInfo + ticketInfoHeight.toPx()
+    val bottomAreaHeight =
+        ticketSectionHeight - ticketSectionHeightUntilTicketInfo + ticketInfoHeight.toPx()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
@@ -137,7 +164,10 @@ fun TicketDetailScreen(
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
-                TicketDetailEvent.ManagerCodeValid -> snackbarHostState.showSnackbar(entranceSuccessMsg)
+                TicketDetailEvent.ManagerCodeValid -> snackbarHostState.showSnackbar(
+                    entranceSuccessMsg
+                )
+
                 TicketDetailEvent.OnRefresh -> showEnterCodeDialog = false
             }
         }
@@ -181,7 +211,12 @@ fun TicketDetailScreen(
                         .clip(ticketShape)
                         .border(
                             width = 1.dp,
-                            brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
+                            brush = Brush.verticalGradient(
+                                listOf(
+                                    White.copy(.5f),
+                                    White.copy(.2f)
+                                )
+                            ),
                             shape = ticketShape,
                         ),
                 ) {
@@ -207,16 +242,23 @@ fun TicketDetailScreen(
                                 )
                                 .background(
                                     brush = Brush.linearGradient(
-                                        colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
+                                        colors = listOf(
+                                            Color(0x33C5CACD),
+                                            Grey95.copy(alpha = .2f)
+                                        ),
                                         start = Offset.Zero,
-                                        end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
+                                        end = Offset(
+                                            x = contentWidth,
+                                            y = ticketSectionHeightUntilTicketInfo
+                                        ),
                                     ),
                                 )
                         )
                         Column(
                             modifier = Modifier
                                 .onGloballyPositioned { coordinates ->
-                                    ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
+                                    ticketSectionHeightUntilTicketInfo =
+                                        coordinates.size.height.toFloat()
                                 }
                         ) {
                             Title(ticketName = ticket.ticketName)
@@ -266,7 +308,8 @@ fun TicketDetailScreen(
 
                     Notice(notice = ticket.ticketNotice)
 
-                    val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                    val copiedMessage =
+                        stringResource(id = R.string.ticketing_address_copied_message)
                     Inquiry(
                         hostName = ticket.hostName,
                         hostPhoneNumber = ticket.hostPhoneNumber,

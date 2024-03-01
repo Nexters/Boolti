@@ -16,15 +16,45 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.reservationId
+import com.nexters.boolti.presentation.screen.showId
 import kotlinx.coroutines.launch
 
+fun NavGraphBuilder.PaymentScreen(
+    navController: NavController,
+) {
+    composable(
+        route = "${MainDestination.Payment.route}/{$reservationId}?showId={$showId}",
+        arguments = MainDestination.Payment.arguments,
+    ) {
+        val showId = it.arguments?.getString(showId)
+        PaymentScreen(
+            onClickHome = { navController.navigateToHome() },
+            onClickClose = {
+                showId?.let { showId ->
+                    navController.popBackStack(
+                        "${MainDestination.ShowDetail.route}/$showId",
+                        inclusive = true
+                    )
+                    navController.navigate("${MainDestination.ShowDetail.route}/$showId")
+                } ?: navController.popBackStack()
+            },
+        )
+    }
+}
+
 @Composable
-fun PaymentScreen(
+private fun PaymentScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
     viewModel: PaymentViewModel = hiltViewModel(),
@@ -41,7 +71,10 @@ fun PaymentScreen(
     Scaffold(
         topBar = { PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose) },
         snackbarHost = {
-            ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 40.dp))
+            ToastSnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 40.dp)
+            )
         },
     ) { innerPadding ->
         when (uiState) {

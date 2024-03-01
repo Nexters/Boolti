@@ -28,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,14 +52,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.sharedViewModel
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -73,8 +76,39 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
 
+fun NavGraphBuilder.ShowDetailScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+) {
+    composable(
+        route = "detail",
+    ) { entry ->
+        val showViewModel: ShowDetailViewModel =
+            entry.sharedViewModel(navController = navController)
+
+        ShowDetailScreen(
+            modifier = modifier,
+            onBack = { navController.popBackStack() },
+            onClickHome = { navController.navigateToHome() },
+            onClickContent = {
+                navController.navigate("content")
+            },
+            onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
+                navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
+            },
+            viewModel = showViewModel,
+            navigateToLogin = { navController.navigate("login") },
+            navigateToImages = { index -> navController.navigate("images/$index") },
+            navigateToReport = {
+                val showId = entry.arguments?.getString("showId")
+                navController.navigate("report/$showId")
+            }
+        )
+    }
+}
+
 @Composable
-fun ShowDetailScreen(
+private fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onClickContent: () -> Unit,

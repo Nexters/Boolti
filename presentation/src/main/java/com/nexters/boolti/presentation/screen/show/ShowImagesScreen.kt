@@ -24,15 +24,40 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.screen.sharedViewModel
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
+fun NavGraphBuilder.ShowImagesScreen(
+    navController: NavController,
+) {
+    composable(
+        route = "images/{index}",
+        arguments = listOf(navArgument("index") { type = NavType.IntType }),
+    ) { entry ->
+        val showViewModel: ShowDetailViewModel =
+            entry.sharedViewModel(navController = navController)
+        val index = entry.arguments!!.getInt("index")
+
+        ShowImagesScreen(
+            index = index,
+            viewModel = showViewModel,
+            onBackPressed = { navController.popBackStack() },
+        )
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ShowImagesScreen(
+private fun ShowImagesScreen(
     index: Int,
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,

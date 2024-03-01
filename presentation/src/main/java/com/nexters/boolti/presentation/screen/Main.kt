@@ -16,19 +16,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.HostedShows
 import com.nexters.boolti.presentation.screen.MainDestination.Payment
 import com.nexters.boolti.presentation.screen.MainDestination.Qr
-import com.nexters.boolti.presentation.screen.MainDestination.Refund
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.MainDestination.TicketDetail
 import com.nexters.boolti.presentation.screen.MainDestination.Ticketing
@@ -43,7 +40,6 @@ import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScre
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
-import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
 import com.nexters.boolti.presentation.screen.show.ShowImagesScreen
 import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
@@ -115,66 +111,21 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             startDestination = "detail",
             arguments = ShowDetail.arguments,
         ) {
-            composable(
-                route = "detail",
-            ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
+            ShowDetailScreen(
+                modifier = modifier,
+                navController = navController,
+            )
 
-                ShowDetailScreen(
-                    onBack = { navController.popBackStack() },
-                    onClickHome = { navController.navigateToHome() },
-                    onClickContent = {
-                        navController.navigate("content")
-                    },
-                    modifier = modifier,
-                    onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
-                        navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
-                    },
-                    viewModel = showViewModel,
-                    navigateToLogin = { navController.navigate("login") },
-                    navigateToImages = { index -> navController.navigate("images/$index") },
-                    navigateToReport = {
-                        val showId = entry.arguments?.getString("showId")
-                        navController.navigate("report/$showId")
-                    }
-                )
-            }
-            composable(
-                route = "images/{index}",
-                arguments = listOf(navArgument("index") { type = NavType.IntType }),
-            ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
-                val index = entry.arguments!!.getInt("index")
+            ShowImagesScreen(navController = navController)
+            ShowDetailContentScreen(
+                modifier = modifier,
+                navController = navController,
+            )
 
-                ShowImagesScreen(
-                    index = index,
-                    viewModel = showViewModel,
-                    onBackPressed = { navController.popBackStack() },
-                )
-            }
-            composable(
-                route = "content",
-            ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
-
-                ShowDetailContentScreen(
-                    modifier = modifier,
-                    viewModel = showViewModel,
-                    onBackPressed = { navController.popBackStack() }
-                )
-            }
-            composable(
-                route = "report/{showId}",
-            ) {
-                ReportScreen(
-                    onBackPressed = { navController.popBackStack() },
-                    popupToHome = { navController.navigateToHome() },
-                    modifier = modifier,
-                )
-            }
+            ReportScreen(
+                modifier = modifier,
+                navController = navController,
+            )
         }
 
         composable(

@@ -27,6 +27,7 @@
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
     <string name="has_pending_ticket">입금 확인 중인 티켓이 있어요!</string>
+    <string name="ticketing_in_progress">예매 중</string>
     <string-array name="days_of_week">
         <item>월</item>
         <item>화</item>
@@ -112,7 +113,7 @@
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
     <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>
     <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>
-    <string name="ticketing_button_closed_ticket">예매 마감</string>
+    <string name="ticketing_button_closed_ticket">예매 종료</string>
     <string name="ticketing_button_finished_show">공연 종료</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>
@@ -229,4 +230,9 @@
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>
     <string name="force_update_button">업데이트 하러가기</string>
+
+    <!-- 알림 -->
+    <string name="default_notification_channel_id">fcm</string>
+    <string name="fcm_default_channel_name">불티 알림</string>
+    <string name="fcm_default_channel_description">티켓 발권 알림을 받습니다.</string>
 </resources>

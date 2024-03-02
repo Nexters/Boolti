@@ -101,6 +101,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.require = "false" }
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.require = "false" }
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.require = "false" }
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxing" }
@@ -126,7 +127,7 @@ lifecycle = ["androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-ktx
 android-test = ["junit", "androidx-junit", "androidx-espresso-core", "kotlinx-coroutines-test"]
 network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
-firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
+firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx", "firebase-messaging-ktx"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
 coil = ["coil", "coil-compose"]
 compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-material3-android", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]

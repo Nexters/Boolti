@@ -58,6 +58,7 @@ import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -78,8 +79,6 @@ fun ReservationDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.fetchReservation()
@@ -87,12 +86,6 @@ fun ReservationDetailScreen(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = {
-            ToastSnackbarHost(
-                modifier = Modifier.padding(bottom = 80.dp),
-                hostState = snackbarHostState,
-            )
-        },
         topBar = { ReservationDetailAppBar(onBackPressed = onBackPressed) }) { innerPadding ->
 
         val state = uiState
@@ -108,16 +101,12 @@ fun ReservationDetailScreen(
                 modifier = Modifier
                     .padding(horizontal = marginHorizontal)
                     .padding(top = 12.dp),
-                text = "No. ${state.reservation.id}",
+                text = "No. ${state.reservation.csReservationId}",
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
             )
             Header(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) {
-                DepositInfo(
-                    reservation = state.reservation,
-                    showMessage = { message ->
-                        scope.launch { snackbarHostState.showSnackbar(message) }
-                    })
+                DepositInfo(reservation = state.reservation)
             }
             PaymentInfo(reservation = state.reservation)
             TicketInfo(reservation = state.reservation)
@@ -211,10 +200,11 @@ private fun Header(
 
 @Composable
 private fun DepositInfo(
-    reservation: ReservationDetail,
-    showMessage: (message: String) -> Unit,
     modifier: Modifier = Modifier,
+    reservation: ReservationDetail,
 ) {
+    val snackbarController = LocalSnackbarController.current
+
     Section(
         modifier = modifier,
         title = stringResource(id = R.string.reservation_account_info),
@@ -242,7 +232,7 @@ private fun DepositInfo(
                     onClick = {
                         clipboardManager.setText(AnnotatedString(reservation.accountNumber))
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                            showMessage(copiedMessage)
+                            snackbarController.showMessage(copiedMessage)
                         }
                     },
                 )

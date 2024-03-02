@@ -21,6 +21,7 @@ interface AuthRepository {
     suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit>
     suspend fun signout(request: SignoutRequest): Result<Unit>
     fun getUserAndCache(): Flow<User>
+    suspend fun sendFcmToken(): Result<Unit>
 
     val loggedIn: Flow<Boolean>
     val cachedUser: Flow<User?>

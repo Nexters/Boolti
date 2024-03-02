@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.DeviceTokenDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
@@ -21,6 +22,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenDataSource: TokenDataSource,
     private val signUpDataSource: SignUpDataSource,
     private val userDateSource: UserDataSource,
+    private val deviceTokenDataSource: DeviceTokenDataSource,
 ) : AuthRepository {
     override val loggedIn: Flow<Boolean>
         get() = authDataSource.loggedIn
@@ -28,22 +30,22 @@ class AuthRepositoryImpl @Inject constructor(
     override val cachedUser: Flow<User?>
         get() = authDataSource.user.map { it?.toDomain() }
 
-    override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
-        return authDataSource.login(request)
-            .onSuccess { response ->
-                tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
-            }
-            .mapCatching(LoginResponse::toDomain)
+    override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
+        return authDataSource.login(request).onSuccess { response ->
+            tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
+            deviceTokenDataSource.sendFcmToken()
+        }.mapCatching {
+            !it.signUpRequired
+        }
     }
 
     override suspend fun logout(): Result<Unit> = authDataSource.logout()
 
     override suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit> {
-        return signUpDataSource.signUp(signUpRequest)
-            .onSuccess { response ->
-                tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
-            }
-            .mapCatching { }
+        return signUpDataSource.signUp(signUpRequest).onSuccess { response ->
+            tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
+            deviceTokenDataSource.sendFcmToken()
+        }.mapCatching { }
     }
 
     override suspend fun signout(request: SignoutRequest): Result<Unit> = runCatching {
@@ -57,4 +59,6 @@ class AuthRepositoryImpl @Inject constructor(
         authDataSource.updateUser(response)
         emit(response.toDomain())
     }
+
+    override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()
 }

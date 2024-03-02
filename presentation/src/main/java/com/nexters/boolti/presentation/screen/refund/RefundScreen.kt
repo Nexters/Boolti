@@ -74,6 +74,7 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -98,17 +99,16 @@ fun RefundScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val events = viewModel.events
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val pagerState = rememberPagerState { 2 }
     var openDialog by remember { mutableStateOf(false) }
+    val snackbarController = LocalSnackbarController.current
 
     val refundMessage = stringResource(id = R.string.refund_completed)
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
                 RefundEvent.SuccessfullyRefunded -> {
-                    // TODO 스낵바로 변경
-                    Toast.makeText(context, refundMessage, Toast.LENGTH_LONG).show()
+                    snackbarController.showMessage(refundMessage)
                     onBackPressed()
                 }
             }
@@ -184,7 +184,7 @@ fun RefundScreen(
                         value = uiState.name
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         type = stringResource(id = R.string.contact_label),
                         value = StringBuilder(uiState.contact).apply {
                             if (uiState.contact.length > 7) {
@@ -194,12 +194,12 @@ fun RefundScreen(
                         }.toString()
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         type = stringResource(id = R.string.bank_name),
                         value = uiState.bankInfo?.bankName ?: ""
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         type = stringResource(id = R.string.account_number),
                         value = uiState.accountNumber
                     )
@@ -274,9 +274,7 @@ fun RefundInfoPage(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-    var showNameError by remember { mutableStateOf(false) }
     var showAccountError by remember { mutableStateOf(false) }
-    var showContactError by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -298,13 +296,7 @@ fun RefundInfoPage(
                     )
                     BTTextField(
                         modifier = Modifier
-                            .weight(1.0f)
-                            .onFocusChanged { focusState ->
-                                showNameError = uiState.name.isNotEmpty() &&
-                                        !uiState.isValidName &&
-                                        !focusState.isFocused
-                            },
-                        isError = showNameError,
+                            .weight(1.0f),
                         text = uiState.name,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
@@ -313,13 +305,6 @@ fun RefundInfoPage(
                         ),
                         placeholder = stringResource(id = R.string.refund_account_name_hint),
                         onValueChanged = onNameChanged
-                    )
-                }
-                if (showNameError) {
-                    Text(
-                        modifier = Modifier.padding(start = 56.dp, top = 12.dp),
-                        text = stringResource(id = R.string.validation_name),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
                     )
                 }
 
@@ -334,30 +319,16 @@ fun RefundInfoPage(
                     )
                     BTTextField(
                         modifier = Modifier
-                            .weight(1.0f)
-                            .onFocusChanged { focusState ->
-                                showContactError =
-                                    uiState.contact.isNotEmpty() &&
-                                            !uiState.isValidContact &&
-                                            !focusState.isFocused
-                            },
+                            .weight(1.0f),
                         text = uiState.contact.filterToPhoneNumber(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Phone,
                             imeAction = ImeAction.Next
                         ),
-                        isError = showContactError,
                         placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
                         onValueChanged = onContactNumberChanged,
                         visualTransformation = PhoneNumberVisualTransformation('-'),
-                    )
-                }
-                if (showContactError) {
-                    Text(
-                        modifier = Modifier.padding(start = 56.dp, top = 12.dp),
-                        text = stringResource(id = R.string.validation_contact),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
                     )
                 }
             }
@@ -671,17 +642,16 @@ fun InfoRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
+            modifier = Modifier.width(70.dp),
             text = type,
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
         )
         Text(
-            modifier = Modifier.weight(1.0f),
+            modifier = Modifier.padding(start = 12.dp),
             text = value,
             style = MaterialTheme.typography.bodySmall.copy(color = Grey15),
-            textAlign = TextAlign.End,
         )
     }
 }

@@ -26,6 +26,7 @@ data class ReservationDetailResponse(
     val reservationPhoneNumber: String,
     val depositorName: String = "",
     val depositorPhoneNumber: String = "",
+    val csReservationId: String,
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
@@ -47,6 +48,7 @@ data class ReservationDetailResponse(
             ticketHolderPhoneNumber = reservationPhoneNumber,
             depositorName = depositorName,
             depositorPhoneNumber = depositorPhoneNumber,
+            csReservationId = csReservationId,
         )
     }
 }

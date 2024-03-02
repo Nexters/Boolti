@@ -39,7 +39,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey60
-import com.nexters.boolti.presentation.theme.aggroFamily
+import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -128,9 +128,8 @@ private fun HostedShowItem(
         Text(
             modifier = Modifier.weight(1f),
             text = show.name,
-            style = MaterialTheme.typography.bodyLarge,
+            style = point1,
             color = tint,
-            fontFamily = aggroFamily,
         )
         Icon(
             painter = painterResource(id = R.drawable.ic_scan),

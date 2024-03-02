@@ -33,7 +33,11 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             authRepository.kakaoLogin(LoginRequest(accessToken)).onSuccess {
-                if (it) event(LoginEvent.Success) else event(LoginEvent.RequireSignUp)
+                when {
+                    it.signUpRequired -> event(LoginEvent.RequireSignUp)
+                    it.signOutCancelled -> event(LoginEvent.SignOutCancelled)
+                    else -> event(LoginEvent.Success)
+                }
             }.onFailure {
                 Timber.d("login failed: $it")
                 event(LoginEvent.Invalid)

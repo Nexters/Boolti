@@ -5,6 +5,8 @@ import com.nexters.boolti.data.datasource.DeviceTokenDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
+import com.nexters.boolti.data.network.response.LoginResponse
+import com.nexters.boolti.domain.model.LoginUserState
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest

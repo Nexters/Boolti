@@ -3,6 +3,6 @@ package com.nexters.boolti.data.network.request
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RefreshRequest(
+internal data class RefreshRequest(
     val refreshToken: String,
 )

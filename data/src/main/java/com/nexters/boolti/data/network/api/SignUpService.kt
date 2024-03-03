@@ -5,7 +5,7 @@ import com.nexters.boolti.domain.request.SignUpRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface SignUpService {
+internal interface SignUpService {
     @POST("/app/papi/v1/signup/sns")
     suspend fun signup(@Body request: SignUpRequest): SignUpResponse
 }

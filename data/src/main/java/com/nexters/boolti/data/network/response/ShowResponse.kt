@@ -6,7 +6,7 @@ import com.nexters.boolti.domain.model.Show
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ShowResponse(
+internal data class ShowResponse(
     val id: String,
     val name: String,
     val date: String,
@@ -26,4 +26,4 @@ data class ShowResponse(
     }
 }
 
-fun List<ShowResponse>.toDomains(): List<Show> = this.map { it.toDomain() }
+internal fun List<ShowResponse>.toDomains(): List<Show> = this.map { it.toDomain() }

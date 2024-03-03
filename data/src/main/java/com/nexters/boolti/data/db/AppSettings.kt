@@ -8,7 +8,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 @Serializable
-data class AppSettings(
+internal data class AppSettings(
     val userId: String? = null,
     val loginType: String? = null,
     val nickname: String? = null,
@@ -20,7 +20,7 @@ data class AppSettings(
     val refundPolicy: List<String> = emptyList(),
 )
 
-object AppSettingsSerializer : Serializer<AppSettings> {
+internal object AppSettingsSerializer : Serializer<AppSettings> {
 
     override val defaultValue: AppSettings = AppSettings()
 

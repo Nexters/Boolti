@@ -5,7 +5,7 @@ import com.nexters.boolti.data.network.response.ShowDetailResponse
 import com.nexters.boolti.data.network.response.ShowResponse
 import javax.inject.Inject
 
-class ShowDataSource @Inject constructor(
+internal class ShowDataSource @Inject constructor(
     private val showService: ShowService,
 ) {
     suspend fun search(keyword: String): Result<List<ShowResponse>> = runCatching {

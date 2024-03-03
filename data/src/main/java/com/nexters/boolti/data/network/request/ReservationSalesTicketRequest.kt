@@ -5,7 +5,7 @@ import com.nexters.boolti.domain.request.TicketingRequest
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReservationSalesTicketRequest(
+internal data class ReservationSalesTicketRequest(
     val userId: String,
     val showId: String,
     val salesTicketTypeId: String,
@@ -18,7 +18,7 @@ data class ReservationSalesTicketRequest(
     val means: String,
 )
 
-fun TicketingRequest.Normal.toData(): ReservationSalesTicketRequest = ReservationSalesTicketRequest(
+internal fun TicketingRequest.Normal.toData(): ReservationSalesTicketRequest = ReservationSalesTicketRequest(
     userId = userId,
     showId = showId,
     salesTicketTypeId = salesTicketTypeId,

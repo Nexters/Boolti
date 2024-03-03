@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class TokenDataSource @Inject constructor(
+internal class TokenDataSource @Inject constructor(
     private val context: Context,
 ) {
     private val dataStore: DataStore<AppSettings>

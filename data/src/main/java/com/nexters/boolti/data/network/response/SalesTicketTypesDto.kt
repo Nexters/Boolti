@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SalesTicketTypeDto(
+internal data class SalesTicketTypeDto(
     @SerialName("id") val id: String,
     @SerialName("showId") val showId: String,
     @SerialName("ticketType") val ticketType: String,

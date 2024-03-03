@@ -9,7 +9,7 @@ import okhttp3.Response
 import okhttp3.Route
 import javax.inject.Inject
 
-class AuthAuthenticator @Inject constructor(
+internal class AuthAuthenticator @Inject constructor(
     private val tokenDataSource: TokenDataSource,
     private val authDataSource: AuthDataSource,
 ) : Authenticator {

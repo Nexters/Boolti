@@ -7,7 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TicketingInfoDto(
+internal data class TicketingInfoDto(
     @SerialName("meansType")
     val meansType: String,
     @SerialName("salesTicketType")

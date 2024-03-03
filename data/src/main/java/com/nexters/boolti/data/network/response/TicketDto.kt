@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Serializable
-data class TicketDto(
+internal data class TicketDto(
     val userId: String,
     val ticketId: String,
     val showName: String,

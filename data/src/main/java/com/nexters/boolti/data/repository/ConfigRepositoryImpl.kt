@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
 
-class ConfigRepositoryImpl @Inject constructor(
+internal class ConfigRepositoryImpl @Inject constructor(
     private val remoteConfigDataSource: RemoteConfigDataSource,
     private val policyDataSource: PolicyDataSource,
 ) : ConfigRepository {

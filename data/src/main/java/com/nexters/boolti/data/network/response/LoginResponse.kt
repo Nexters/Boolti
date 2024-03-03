@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginResponse(
+internal data class LoginResponse(
     @SerialName("signUpRequired") val signUpRequired: Boolean = false,
     @SerialName("removeCancelled") val signOutCancelled: Boolean = false,
     @SerialName("accessToken") val accessToken: String?,

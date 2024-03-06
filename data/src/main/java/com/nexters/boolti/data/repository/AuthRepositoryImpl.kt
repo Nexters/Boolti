@@ -30,13 +30,11 @@ internal class AuthRepositoryImpl @Inject constructor(
     override val cachedUser: Flow<User?>
         get() = authDataSource.user.map { it?.toDomain() }
 
-    override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
+    override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
         return authDataSource.login(request).onSuccess { response ->
             tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             deviceTokenDataSource.sendFcmToken()
-        }.mapCatching {
-            !it.signUpRequired
-        }
+        }.mapCatching(LoginResponse::toDomain)
     }
 
     override suspend fun logout(): Result<Unit> = authDataSource.logout()

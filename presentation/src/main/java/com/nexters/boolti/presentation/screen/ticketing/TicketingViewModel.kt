@@ -78,12 +78,12 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun reservation() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.requestReservation(reservationRequest)
                 .onStart { _uiState.update { it.copy(loading = true) } }
                 .catch { e ->
-                    e.printStackTrace()
                     _uiState.update { it.copy(loading = false) }
+                    throw e
                 }
                 .singleOrNull()?.let { reservationId ->
                     Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
@@ -94,9 +94,8 @@ class TicketingViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
-                .catch { e -> e.printStackTrace() }
                 .onStart {
                     _uiState.update { it.copy(loading = true) }
                 }
@@ -132,7 +131,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun checkInviteCode() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.checkInviteCode(
                 CheckInviteCodeRequest(
                     showId = showId,
@@ -142,8 +141,8 @@ class TicketingViewModel @Inject constructor(
             ).onStart {
                 _uiState.update { it.copy(loading = true) }
             }.catch { e ->
-                e.printStackTrace()
                 _uiState.update { it.copy(loading = false) }
+                throw e
             }.singleOrNull()?.let { status ->
                 _uiState.update {
                     it.copy(loading = false, inviteCodeStatus = status)

@@ -47,10 +47,8 @@ class TicketDetailViewModel @Inject constructor(
     }
 
     private fun load(): Job {
-        return viewModelScope.launch {
-            repository.getTicket(ticketId).catch { e ->
-                e.printStackTrace()
-            }.singleOrNull()?.let { ticket ->
+        return viewModelScope.launch(recordExceptionHandler) {
+            repository.getTicket(ticketId).singleOrNull()?.let { ticket ->
                 _uiState.update { it.copy(ticket = ticket) }
             }
 
@@ -64,15 +62,15 @@ class TicketDetailViewModel @Inject constructor(
 
     fun requestEntrance(managerCode: String) {
         val ticket = uiState.value.ticket
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.requestEntrance(
                 ManagerCodeRequest(showId = ticket.showId, ticketId = ticket.ticketId, managerCode = managerCode)
             ).catch { e ->
-                e.printStackTrace()
                 when (e) {
                     is ManagerCodeException -> {
                         _managerCodeState.update { it.copy(error = e.errorType) }
                     }
+                    else -> throw e
                 }
             }.singleOrNull()?.let {
                 event(TicketDetailEvent.ManagerCodeValid)

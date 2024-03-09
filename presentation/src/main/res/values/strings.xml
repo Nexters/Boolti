@@ -175,6 +175,7 @@
     <string name="my_ticketing_history">예매 내역</string>
     <string name="my_scan_qr">QR 스캔</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
+    <string name="my_register_show">공연 등록</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

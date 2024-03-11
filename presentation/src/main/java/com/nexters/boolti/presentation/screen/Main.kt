@@ -84,7 +84,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         navController = navController,
         startDestination = Home.route,
     ) {
-        HomeScreen(modifier = modifier, navController = navController)
+        HomeScreen(modifier = modifier, navigateTo = navController::navigateTo)
         LoginScreen(modifier = modifier, navController = navController)
         SignoutScreen(navController = navController)
         ReservationsScreen(navController = navController)
@@ -125,3 +125,5 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
     }
     return hiltViewModel(parentEntry)
 }
+
+private fun NavController.navigateTo(route: String) = navigate(route)

@@ -40,32 +40,8 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 
-fun NavGraphBuilder.HomeScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier,
-) {
-    composable(
-        route = MainDestination.Home.route,
-    ) {
-        HomeScreen(
-            modifier = modifier,
-            onClickShowItem = { navController.navigate("${MainDestination.ShowDetail.route}/$it") },
-            onClickTicket = { navController.navigate("${MainDestination.TicketDetail.route}/$it") },
-            onClickQr = { code, ticketName ->
-                navController.navigate(
-                    "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
-                )
-            },
-            onClickQrScan = { navController.navigate(MainDestination.HostedShows.route) },
-            onClickSignout = { navController.navigate(MainDestination.SignOut.route) },
-            navigateToReservations = { navController.navigate(MainDestination.Reservations.route) },
-            requireLogin = { navController.navigate(MainDestination.Login.route) }
-        )
-    }
-}
-
 @Composable
-private fun HomeScreen(
+fun HomeScreen(
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
     onClickQr: (data: String, ticketName: String) -> Unit,

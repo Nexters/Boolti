@@ -110,7 +110,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 fun NavGraphBuilder.TicketDetailScreen(
-    navController: NavController,
+    navigateTo: (String) -> Unit,
+    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable(
@@ -119,13 +120,13 @@ fun NavGraphBuilder.TicketDetailScreen(
     ) {
         TicketDetailScreen(
             modifier = modifier,
-            onBackClicked = { navController.popBackStack() },
+            onBackClicked = popBackStack,
             onClickQr = { code, ticketName ->
-                navController.navigate(
+                navigateTo(
                     "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
                 )
             },
-            navigateToShowDetail = { navController.navigate("${MainDestination.ShowDetail.route}/$it") }
+            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") }
         )
     }
 }

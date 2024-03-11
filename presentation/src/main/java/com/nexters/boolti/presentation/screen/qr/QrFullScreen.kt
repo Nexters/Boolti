@@ -34,22 +34,8 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
-fun NavGraphBuilder.QrFullScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier,
-) {
-    composable(
-        route = "${MainDestination.Qr.route}/{$data}?ticketName={$ticketName}",
-        arguments = MainDestination.Qr.arguments,
-    ) {
-        QrFullScreen(modifier = modifier) {
-            navController.popBackStack()
-        }
-    }
-}
-
 @Composable
-private fun QrFullScreen(
+fun QrFullScreen(
     modifier: Modifier = Modifier,
     viewModel: QrFullViewModel = hiltViewModel(),
     onClose: () -> Unit,

@@ -52,22 +52,8 @@ import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.subTextPadding
 import java.time.format.DateTimeFormatter
 
-fun NavGraphBuilder.ReservationsScreen(
-    navController: NavController,
-) {
-    composable(
-        route = MainDestination.Reservations.route,
-    ) {
-        ReservationsScreen(
-            onBackPressed = { navController.popBackStack() },
-            navigateToDetail = { reservationId ->
-                navController.navigate("${MainDestination.Reservations.route}/$reservationId")
-            })
-    }
-}
-
 @Composable
-private fun ReservationsScreen(
+fun ReservationsScreen(
     onBackPressed: () -> Unit,
     navigateToDetail: (reservationId: String) -> Unit,
     viewModel: ReservationsViewModel = hiltViewModel(),

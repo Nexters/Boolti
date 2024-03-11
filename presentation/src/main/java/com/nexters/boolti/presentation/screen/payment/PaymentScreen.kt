@@ -30,31 +30,8 @@ import com.nexters.boolti.presentation.screen.reservationId
 import com.nexters.boolti.presentation.screen.showId
 import kotlinx.coroutines.launch
 
-fun NavGraphBuilder.PaymentScreen(
-    navController: NavController,
-) {
-    composable(
-        route = "${MainDestination.Payment.route}/{$reservationId}?showId={$showId}",
-        arguments = MainDestination.Payment.arguments,
-    ) {
-        val showId = it.arguments?.getString(showId)
-        PaymentScreen(
-            onClickHome = { navController.navigateToHome() },
-            onClickClose = {
-                showId?.let { showId ->
-                    navController.popBackStack(
-                        "${MainDestination.ShowDetail.route}/$showId",
-                        inclusive = true
-                    )
-                    navController.navigate("${MainDestination.ShowDetail.route}/$showId")
-                } ?: navController.popBackStack()
-            },
-        )
-    }
-}
-
 @Composable
-private fun PaymentScreen(
+fun PaymentScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
     viewModel: PaymentViewModel = hiltViewModel(),

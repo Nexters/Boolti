@@ -15,31 +15,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.extension.navigateToHome
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
-fun NavGraphBuilder.SignoutScreen(
-    navController: NavController,
-) {
-    composable(
-        route = MainDestination.SignOut.route,
-    ) {
-        SignoutScreen(
-            navigateToHome = { navController.navigateToHome() },
-            navigateBack = { navController.popBackStack() },
-        )
-    }
-}
-
 @Composable
-private fun SignoutScreen(
+fun SignoutScreen(
     navigateToHome: () -> Unit,
     navigateBack: () -> Unit,
     viewModel: SignoutViewModel = hiltViewModel(),

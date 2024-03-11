@@ -91,22 +91,9 @@ import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.launch
 
-fun NavGraphBuilder.RefundScreen(
-    navController: NavController,
-) {
-    composable(
-        route = "${MainDestination.Refund.route}/{$reservationId}",
-        arguments = MainDestination.Refund.arguments,
-    ) {
-        RefundScreen(
-            onBackPressed = { navController.popBackStack() },
-        )
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RefundScreen(
+fun RefundScreen(
     onBackPressed: () -> Unit,
     viewModel: RefundViewModel = hiltViewModel(),
 ) {

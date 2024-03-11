@@ -71,22 +71,8 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 
-fun NavGraphBuilder.ReservationDetailScreen(
-    navController: NavController,
-) {
-    composable(
-        route = "${MainDestination.ReservationDetail.route}/{$reservationId}",
-        arguments = MainDestination.ReservationDetail.arguments,
-    ) {
-        ReservationDetailScreen(
-            onBackPressed = { navController.popBackStack() },
-            navigateToRefund = { id -> navController.navigate("${MainDestination.Refund.route}/$id") },
-        )
-    }
-}
-
 @Composable
-private fun ReservationDetailScreen(
+fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
     navigateToRefund: (id: String) -> Unit,
     modifier: Modifier = Modifier,

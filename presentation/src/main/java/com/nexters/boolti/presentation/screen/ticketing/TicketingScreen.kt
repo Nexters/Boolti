@@ -96,27 +96,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-fun NavGraphBuilder.TicketingScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier,
-) {
-    composable(
-        route = "${MainDestination.Ticketing.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}&inviteTicket={$isInviteTicket}",
-        arguments = MainDestination.Ticketing.arguments,
-    ) {
-        TicketingScreen(
-            modifier = modifier,
-            onBackClicked = { navController.popBackStack() },
-            onReserved = { reservationId, showId ->
-                navController.navigate("${MainDestination.Payment.route}/$reservationId?showId=$showId")
-            }
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TicketingScreen(
+fun TicketingScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},

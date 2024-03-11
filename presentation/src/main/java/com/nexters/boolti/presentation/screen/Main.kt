@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.home.HomeScreen
@@ -85,33 +86,77 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         startDestination = Home.route,
     ) {
         HomeScreen(modifier = modifier, navigateTo = navController::navigateTo)
-        LoginScreen(modifier = modifier, navController = navController)
-        SignoutScreen(navController = navController)
-        ReservationsScreen(navController = navController)
-        ReservationDetailScreen(navController = navController)
-        RefundScreen(navController = navController)
+        LoginScreen(modifier = modifier, popBackStack = navController::popBackStack)
+        SignoutScreen(
+            navigateToHome = navController::navigateToHome,
+            popBackStack = navController::popBackStack
+        )
+        ReservationsScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        ReservationDetailScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        RefundScreen(popBackStack = navController::popBackStack)
 
         navigation(
             route = "${ShowDetail.route}/{$showId}",
             startDestination = "detail",
             arguments = ShowDetail.arguments,
         ) {
-            ShowDetailScreen(modifier = modifier, navController = navController)
-            ShowImagesScreen(navController = navController)
-            ShowDetailContentScreen(modifier = modifier, navController = navController)
-            ReportScreen(modifier = modifier, navController = navController)
+            ShowDetailScreen(
+                modifier = modifier,
+                navigateTo = navController::navigateTo,
+                popBackStack = navController::popBackStack,
+                navigateToHome = navController::navigateToHome,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            )
+            ShowImagesScreen(
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            )
+            ShowDetailContentScreen(
+                modifier = modifier,
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            )
+            ReportScreen(
+                modifier = modifier,
+                navigateToHome = navController::navigateToHome,
+                popBackStack = navController::popBackStack,
+            )
         }
 
-        TicketDetailScreen(modifier = modifier, navController = navController)
-        TicketingScreen(modifier = modifier, navController = navController)
-        QrFullScreen(modifier = modifier, navController = navController)
+        TicketDetailScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        TicketingScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)
         HostedShowScreen(
             modifier = modifier,
             onClickShow = onClickQrScan,
-            navController = navController,
+            popBackStack = navController::popBackStack,
         )
 
-        PaymentScreen(navController = navController)
+        PaymentScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+            popInclusiveBackStack = { route ->
+                navController.popBackStack(
+                    route = route,
+                    inclusive = true,
+                )
+            },
+            navigateToHome = navController::navigateToHome
+        )
     }
 }
 

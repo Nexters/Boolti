@@ -47,26 +47,8 @@ import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-fun NavGraphBuilder.HostedShowScreen(
-    onClickShow: (showId: String, showName: String) -> Unit,
-    navController: NavController,
-    modifier: Modifier = Modifier,
-) {
-    composable(
-        route = MainDestination.HostedShows.route
-    ) {
-        HostedShowScreen(
-            modifier = modifier,
-            onClickShow = onClickShow,
-            onClickBack = {
-                navController.popBackStack()
-            }
-        )
-    }
-}
-
 @Composable
-private fun HostedShowScreen(
+fun HostedShowScreen(
     onClickBack: () -> Unit,
     onClickShow: (showId: String, showName: String) -> Unit,
     modifier: Modifier = Modifier,

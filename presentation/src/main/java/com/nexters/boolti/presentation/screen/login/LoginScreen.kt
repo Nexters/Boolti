@@ -48,23 +48,9 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.subTextPadding
 
-fun NavGraphBuilder.LoginScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier,
-) {
-    composable(
-        route = MainDestination.Login.route,
-    ) {
-        LoginScreen(
-            modifier = modifier,
-            onBackPressed = { navController.popBackStack() }
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LoginScreen(
+fun LoginScreen(
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),

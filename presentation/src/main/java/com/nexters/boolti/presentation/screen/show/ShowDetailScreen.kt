@@ -51,7 +51,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -76,39 +78,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
 
-fun NavGraphBuilder.ShowDetailScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-) {
-    composable(
-        route = "detail",
-    ) { entry ->
-        val showViewModel: ShowDetailViewModel =
-            entry.sharedViewModel(navController = navController)
-
-        ShowDetailScreen(
-            modifier = modifier,
-            onBack = { navController.popBackStack() },
-            onClickHome = { navController.navigateToHome() },
-            onClickContent = {
-                navController.navigate("content")
-            },
-            onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
-                navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
-            },
-            viewModel = showViewModel,
-            navigateToLogin = { navController.navigate("login") },
-            navigateToImages = { index -> navController.navigate("images/$index") },
-            navigateToReport = {
-                val showId = entry.arguments?.getString("showId")
-                navController.navigate("report/$showId")
-            }
-        )
-    }
-}
-
 @Composable
-private fun ShowDetailScreen(
+fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onClickContent: () -> Unit,

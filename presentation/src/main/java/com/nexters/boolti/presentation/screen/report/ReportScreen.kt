@@ -33,23 +33,8 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point4
 
-fun NavGraphBuilder.ReportScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier,
-) {
-    composable(
-        route = "report/{showId}",
-    ) {
-        ReportScreen(
-            onBackPressed = { navController.popBackStack() },
-            popupToHome = { navController.navigateToHome() },
-            modifier = modifier,
-        )
-    }
-}
-
 @Composable
-private fun ReportScreen(
+fun ReportScreen(
     onBackPressed: () -> Unit,
     popupToHome: () -> Unit,
     modifier: Modifier = Modifier,

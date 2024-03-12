@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.show
 
 import android.content.Intent
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,9 +29,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +59,6 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
@@ -99,11 +99,30 @@ fun ShowDetailScreen(
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ShowDetailEvent.NavigateToImages -> {
+                    navigateToImages(event.index)
+                }
+
+                ShowDetailEvent.PopBackStack -> {
+                    onBack()
+                    viewModel.preventEvents()
+                }
+            }
+        }
+    }
+
+    BackHandler {
+        viewModel.sendEvent(ShowDetailEvent.PopBackStack)
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
             ShowDetailAppBar(
-                onBack = onBack,
+                onBack = { viewModel.sendEvent(ShowDetailEvent.PopBackStack) },
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
             )
@@ -121,7 +140,7 @@ fun ShowDetailScreen(
             ) {
                 Poster(
                     modifier = modifier.fillMaxWidth(),
-                    navigateToImages = navigateToImages,
+                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
                     title = uiState.showDetail.name,
                     images = uiState.showDetail.images.map { it.originImage }
                 )

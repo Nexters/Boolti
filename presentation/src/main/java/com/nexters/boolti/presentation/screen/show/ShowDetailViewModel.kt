@@ -42,11 +42,7 @@ class ShowDetailViewModel @Inject constructor(
         fetchShowDetail()
     }
 
-    fun sendEvent(event: ShowDetailEvent) {
-        viewModelScope.launch {
-            _events.send(event)
-        }
-    }
+    fun sendEvent(event: ShowDetailEvent) = viewModelScope.launch { _events.send(event) }
 
     private fun fetchShowDetail() {
         viewModelScope.launch {

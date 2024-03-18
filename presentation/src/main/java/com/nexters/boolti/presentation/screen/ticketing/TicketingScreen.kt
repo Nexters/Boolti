@@ -71,6 +71,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
@@ -186,6 +187,9 @@ fun TicketingScreen(
                 ) // 초청 코드
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
+                BusinessInformation(
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(120.dp))
             }
 

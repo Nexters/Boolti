@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,11 +49,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey15
@@ -129,6 +132,14 @@ fun ShowScreen(
                         show = uiState.shows[index],
                         modifier = Modifier
                             .clickable { onClickShowItem(uiState.shows[index].id) },
+                    )
+                }
+
+                item(
+                    span = { GridItemSpan(2) },
+                ) {
+                    BusinessInformation(
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }
             }

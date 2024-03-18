@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import com.nexters.boolti.presentation.theme.Grey70
 
 @Composable
 fun BusinessInformation(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -27,7 +29,9 @@ fun BusinessInformation(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
-            modifier = Modifier.padding(bottom = 2.dp),
+            modifier = Modifier
+                .padding(bottom = 2.dp)
+                .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

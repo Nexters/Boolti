@@ -104,6 +104,7 @@ fun TicketingScreen(
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
     onReserved: (reservationId: String, showId: String) -> Unit,
+    navigateToBusiness: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -188,7 +189,8 @@ fun TicketingScreen(
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
                 BusinessInformation(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = navigateToBusiness
                 )
                 Spacer(modifier = Modifier.height(120.dp))
             }
@@ -668,7 +670,10 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen { _, _ -> }
+            TicketingScreen(
+                onReserved = { _, _ -> },
+                navigateToBusiness = {}
+            )
         }
     }
 }

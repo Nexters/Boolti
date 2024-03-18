@@ -68,6 +68,7 @@ import com.nexters.boolti.presentation.theme.point4
 @Composable
 fun ShowScreen(
     navigateToReservations: () -> Unit,
+    navigateToBusiness: () -> Unit,
     onClickShowItem: (showId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowViewModel = hiltViewModel()
@@ -139,7 +140,8 @@ fun ShowScreen(
                     span = { GridItemSpan(2) },
                 ) {
                     BusinessInformation(
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        onClick = navigateToBusiness
                     )
                 }
             }

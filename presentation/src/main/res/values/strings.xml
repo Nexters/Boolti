@@ -236,4 +236,22 @@
     <string name="default_notification_channel_id">fcm</string>
     <string name="fcm_default_channel_name">불티 알림</string>
     <string name="fcm_default_channel_description">티켓 발권 알림을 받습니다.</string>
+
+    <!-- 사업자 정보 -->
+    <string name="business_title">사업자 정보</string>
+    <string name="business_information">스튜디오 불티 사업자 정보</string>
+    <string name="business_copyright">ⓒ Boolti. All Rights Reserved</string>
+    <string name="business_name">스튜디오 불티</string>
+    <string name="business_service_terms">서비스 이용약관</string>
+    <string name="business_privacy_policy">개인정보 처리방침</string>
+    <string name="business_refund_policy">환불 정책</string>
+    <string-array name="business_information">
+        <item>대표 : 김혜선</item>
+        <item>사업자 등록번호 : 202–43–63442</item>
+        <item>주소 : 경기도 남양주시 화도읍 묵현로 25번길 12–5</item>
+        <item>호스팅 서비스 : 스튜디오 불티</item>
+        <item>통신판매업 신고번호 : 2024-화도수동-0518</item>
+        <item>문의전화 : 0507–1363–5690</item>
+        <item>studio.boolti@gmail.com</item>
+    </string-array>
 </resources>

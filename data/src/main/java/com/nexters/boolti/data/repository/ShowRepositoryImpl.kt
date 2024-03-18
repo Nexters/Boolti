@@ -7,7 +7,7 @@ import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.repository.ShowRepository
 import javax.inject.Inject
 
-class ShowRepositoryImpl @Inject constructor(
+internal class ShowRepositoryImpl @Inject constructor(
     private val showDateSource: ShowDataSource,
 ) : ShowRepository {
     override suspend fun search(keyword: String): Result<List<Show>> {

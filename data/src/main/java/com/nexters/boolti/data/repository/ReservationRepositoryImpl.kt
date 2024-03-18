@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class ReservationRepositoryImpl @Inject constructor(
+internal class ReservationRepositoryImpl @Inject constructor(
     private val reservationDataSource: ReservationDataSource,
 ) : ReservationRepository {
     override fun getReservations(): Flow<List<Reservation>> = flow {

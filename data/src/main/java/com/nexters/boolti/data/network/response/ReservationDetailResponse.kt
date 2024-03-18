@@ -7,7 +7,7 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReservationDetailResponse(
+internal data class ReservationDetailResponse(
     val reservationId: String,
     val showImg: String,
     val showName: String,

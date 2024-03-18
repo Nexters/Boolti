@@ -12,7 +12,7 @@ import com.nexters.boolti.domain.request.TicketingInfoRequest
 import retrofit2.Response
 import javax.inject.Inject
 
-class TicketingDataSource @Inject constructor(
+internal class TicketingDataSource @Inject constructor(
     private val ticketingService: TicketingService,
 ) {
     suspend fun getSalesTickets(request: SalesTicketRequest): List<TicketWithQuantity> {

@@ -8,7 +8,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface LoginService {
+internal interface LoginService {
     @POST("/app/papi/v1/login/kakao")
     suspend fun kakaoLogin(@Body request: LoginRequest): LoginResponse
 

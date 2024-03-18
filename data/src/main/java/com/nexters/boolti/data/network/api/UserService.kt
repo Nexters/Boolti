@@ -6,7 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 
-interface UserService {
+internal interface UserService {
     @GET("/app/api/v1/user")
     suspend fun getUser(): UserResponse
 

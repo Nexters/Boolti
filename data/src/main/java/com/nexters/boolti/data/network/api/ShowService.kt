@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface ShowService {
+internal interface ShowService {
     @GET("/app/papi/v1/shows/search")
     suspend fun search(@Query("nameLike") keyword: String): List<ShowResponse>
 

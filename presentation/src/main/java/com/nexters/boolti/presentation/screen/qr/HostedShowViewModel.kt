@@ -1,8 +1,8 @@
 package com.nexters.boolti.presentation.screen.qr
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.HostRepository
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HostedShowViewModel @Inject constructor(
     private val repository: HostRepository,
-) : ViewModel() {
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(HostedShowState())
     val uiState = _uiState.asStateFlow()
 
@@ -25,13 +25,13 @@ class HostedShowViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.getHostedShows()
                 .onStart {
                     _uiState.update { it.copy(loading = true) }
                 }.catch { e ->
-                    e.printStackTrace()
                     _uiState.update { it.copy(loading = false) }
+                    throw e
                 }.singleOrNull()?.let { shows ->
                     _uiState.update { it.copy(loading = false, shows = shows) }
                 }

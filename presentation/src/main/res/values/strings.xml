@@ -65,6 +65,7 @@
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
     <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">불티 유저</string>
+    <string name="signout_cancelled_message">탈퇴 후 30일 이내에 로그인하여, 계정 삭제가 취소되었어요\n불티를 다시 찾아주셔서 감사해요!</string>
 
     <!-- 탈퇴 -->
     <string name="signout">회원 탈퇴</string>
@@ -174,6 +175,7 @@
     <string name="my_ticketing_history">예매 내역</string>
     <string name="my_scan_qr">QR 스캔</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
+    <string name="my_register_show">공연 등록</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

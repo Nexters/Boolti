@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.ticket
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.TicketRepository
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,12 +17,12 @@ import javax.inject.Inject
 @HiltViewModel
 class TicketViewModel @Inject constructor(
     private val ticketRepository: TicketRepository,
-) : ViewModel() {
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(TicketUiState(loading = true))
     val uiState = _uiState.asStateFlow()
 
     fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             _uiState.update { it.copy(loading = true) }
             ticketRepository.getTicket()
                 .onCompletion {

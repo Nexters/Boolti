@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AuthDataSource @Inject constructor(
+internal class AuthDataSource @Inject constructor(
     private val context: Context,
     private val loginService: LoginService,
 ) {

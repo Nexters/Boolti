@@ -5,6 +5,8 @@ import com.nexters.boolti.data.datasource.DeviceTokenDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
+import com.nexters.boolti.data.network.response.LoginResponse
+import com.nexters.boolti.domain.model.LoginUserState
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest
@@ -15,7 +17,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
+internal class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val tokenDataSource: TokenDataSource,
     private val signUpDataSource: SignUpDataSource,
@@ -28,13 +30,11 @@ class AuthRepositoryImpl @Inject constructor(
     override val cachedUser: Flow<User?>
         get() = authDataSource.user.map { it?.toDomain() }
 
-    override suspend fun kakaoLogin(request: LoginRequest): Result<Boolean> {
+    override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
         return authDataSource.login(request).onSuccess { response ->
             tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             deviceTokenDataSource.sendFcmToken()
-        }.mapCatching {
-            !it.signUpRequired
-        }
+        }.mapCatching(LoginResponse::toDomain)
     }
 
     override suspend fun logout(): Result<Unit> = authDataSource.logout()

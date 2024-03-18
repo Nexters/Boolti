@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.refund
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -55,17 +54,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
@@ -75,6 +75,8 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.reservationId
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -93,7 +95,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun RefundScreen(
     onBackPressed: () -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: RefundViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -121,7 +122,7 @@ fun RefundScreen(
                 title = stringResource(id = R.string.refund_button), onBackPressed = onBackPressed
             )
         },
-        modifier = modifier,
+        modifier = Modifier,
     ) { innerPadding ->
         val reservation = uiState.reservation ?: return@Scaffold
 

@@ -163,6 +163,7 @@ fun ShowAppBar(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = marginHorizontal)
     ) {
         Spacer(modifier = Modifier.height(20.dp))

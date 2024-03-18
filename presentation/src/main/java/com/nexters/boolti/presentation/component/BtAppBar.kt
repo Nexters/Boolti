@@ -39,11 +39,12 @@ fun BtAppBar(
             modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
         ) {
             Icon(
+                modifier = modifier
+                    .padding(start = marginHorizontal)
+                    .size(width = 24.dp, height = 24.dp),
+                tint = Grey10,
                 painter = painterResource(navIconRes),
                 contentDescription = stringResource(id = R.string.description_navigate_back),
-                modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
             )
         }
         Text(

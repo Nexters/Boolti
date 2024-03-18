@@ -23,7 +23,8 @@ fun NavGraphBuilder.TicketingScreen(
             onBackClicked = popBackStack,
             onReserved = { reservationId, showId ->
                 navigateTo("${MainDestination.Payment.route}/$reservationId?showId=$showId")
-            }
+            },
+            navigateToBusiness = { navigateTo(MainDestination.Business.route) },
         )
     }
 }

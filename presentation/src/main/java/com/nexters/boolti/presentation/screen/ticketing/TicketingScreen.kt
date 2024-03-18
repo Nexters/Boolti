@@ -71,6 +71,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
@@ -103,6 +104,7 @@ fun TicketingScreen(
     viewModel: TicketingViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
     onReserved: (reservationId: String, showId: String) -> Unit,
+    navigateToBusiness: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -186,6 +188,10 @@ fun TicketingScreen(
                 ) // 초청 코드
                 if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
+                BusinessInformation(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = navigateToBusiness
+                )
                 Spacer(modifier = Modifier.height(120.dp))
             }
 
@@ -664,7 +670,10 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
-            TicketingScreen { _, _ -> }
+            TicketingScreen(
+                onReserved = { _, _ -> },
+                navigateToBusiness = {}
+            )
         }
     }
 }

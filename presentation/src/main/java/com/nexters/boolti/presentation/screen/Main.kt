@@ -23,6 +23,7 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
+import com.nexters.boolti.presentation.screen.business.BusinessScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentScreen
@@ -157,6 +158,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             },
             navigateToHome = navController::navigateToHome
         )
+        BusinessScreen(popBackStack = navController::popBackStack)
     }
 }
 

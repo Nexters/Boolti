@@ -49,6 +49,7 @@ sealed class MainDestination(val route: String) {
 
     data object SignOut : MainDestination(route = "signout")
     data object Login : MainDestination(route = "login")
+    data object Business : MainDestination(route = "business")
 }
 
 /**

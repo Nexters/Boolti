@@ -236,7 +236,7 @@ fun RefundInfoPage(
                 }
                 Row(
                     modifier = Modifier
-                        .padding(vertical = 20.dp)
+                        .padding(top = 20.dp)
                         .height(48.dp)
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(4.dp))

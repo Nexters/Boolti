@@ -219,6 +219,7 @@
     <string name="refund_select_bank">선택 완료하기</string>
     <string name="refund_dialog_title">환불 정보를 확인해 주세요</string>
     <string name="refund_completed">환불 요청이 완료되었어요</string>
+    <string name="refund_information">환불 정보</string>
 
     <!-- 신고 -->
     <string name="report">신고하기</string>

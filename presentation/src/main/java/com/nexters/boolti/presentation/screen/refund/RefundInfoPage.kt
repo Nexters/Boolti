@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,8 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -55,6 +51,7 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.component.BtCheckBox
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.Error
@@ -73,12 +70,14 @@ import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 @Composable
 fun RefundInfoPage(
     uiState: RefundUiState,
+    refundPolicy: List<String>,
     reservation: ReservationDetail,
     onRequest: () -> Unit,
     onNameChanged: (String) -> Unit,
     onContactNumberChanged: (String) -> Unit,
     onBankInfoChanged: (BankInfo) -> Unit,
     onAccountNumberChanged: (String) -> Unit,
+    onRefundPolicyChecked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isSheetOpen by remember { mutableStateOf(false) }
@@ -226,12 +225,48 @@ fun RefundInfoPage(
             }
         }
 
+        Section(
+            modifier = Modifier.padding(vertical = 12.dp),
+            title = stringResource(id = R.string.refund_policy_label),
+            expandable = false,
+        ) {
+            Column {
+                refundPolicy.forEach {
+                    PolicyLine(modifier = Modifier.padding(bottom = 4.dp), text = it)
+                }
+                Row(
+                    modifier = Modifier
+                        .padding(vertical = 20.dp)
+                        .height(48.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { onRefundPolicyChecked(!uiState.refundPolicyChecked) }
+                        .background(Grey85)
+                        .border(width = 1.dp, color = Grey80, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    BtCheckBox(
+                        modifier = Modifier.size(24.dp),
+                        isSelected = uiState.refundPolicyChecked,
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = stringResource(id = R.string.refund_confirm_policy),
+                        color = Grey10,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.weight(1.0f))
         MainButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 8.dp),
+                .padding(top = 16.dp)
+                .padding(vertical = 8.dp),
             onClick = onRequest,
             enabled = uiState.isAbleToRequest,
             label = stringResource(id = R.string.refund_button)
@@ -384,6 +419,26 @@ private fun NormalRow(
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+        )
+    }
+}
+
+@Composable
+private fun PolicyLine(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 7.dp)
+                .size(4.dp)
+                .clip(shape = RoundedCornerShape(2.dp))
+                .background(color = Grey50),
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
         )
     }
 }

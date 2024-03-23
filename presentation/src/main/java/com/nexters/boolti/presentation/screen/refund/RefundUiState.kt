@@ -9,6 +9,7 @@ data class RefundUiState(
     val bankInfo: BankInfo? = null,
     val accountNumber: String = "",
     val reservation: ReservationDetail? = null,
+    val refundPolicyChecked: Boolean = false
 ) {
     val isValidName: Boolean get() = name.isNotBlank()
 
@@ -19,7 +20,12 @@ data class RefundUiState(
         return regex.matches(accountNumber)
     }
 
-    val isAbleToRequest: Boolean get() {
-        return reason.isNotBlank() && isValidName && isValidContact && (bankInfo != null) && isValidAccountNumber
-    }
+    val isAbleToRequest: Boolean get() =
+        reason.isNotBlank() &&
+                isValidName &&
+                isValidContact &&
+                (bankInfo != null) &&
+                isValidAccountNumber &&
+                refundPolicyChecked
+
 }

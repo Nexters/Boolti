@@ -44,6 +44,7 @@ fun RefundScreen(
     viewModel: RefundViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
     val events = viewModel.events
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState { 2 }
@@ -91,6 +92,7 @@ fun RefundScreen(
             } else {
                 RefundInfoPage(
                     uiState = uiState,
+                    refundPolicy = refundPolicy,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
@@ -100,6 +102,7 @@ fun RefundScreen(
                     onBankInfoChanged = viewModel::updateBankInfo,
                     onAccountNumberChanged = viewModel::updateAccountNumber,
                     onRequest = { openDialog = true },
+                    onRefundPolicyChecked = viewModel::toggleRefundPolicyCheck,
                 )
             }
         }

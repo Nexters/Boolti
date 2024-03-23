@@ -56,6 +56,9 @@
     <string name="ticket">티켓</string>
     <string name="invite_ticket">초청 티켓</string>
 
+    <string name="stepper_minus_description">감소</string>
+    <string name="stepper_plus_description">증가</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
     <string name="catch_phrase_sub">지금 티켓을 예매하고 공연을 즐겨보세요!</string>
@@ -98,7 +101,7 @@
     <string name="navigate_to_show_button">공연 정보 보기</string>
 
     <!-- 예매 -->
-    <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
+    <string name="choose_ticket_bottomsheet_title">옵션 선택</string>
     <string name="ticketing_share">공유하기</string>
     <string name="ticketing_period">티켓 예매 기간</string>
     <string name="ticketing_datetime">일시</string>

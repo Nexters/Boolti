@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.refund
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import kotlinx.coroutines.launch
 
@@ -134,7 +137,7 @@ fun RefundScreen(
                         value = uiState.name
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 12.dp),
                         type = stringResource(id = R.string.contact_label),
                         value = StringBuilder(uiState.contact).apply {
                             if (uiState.contact.length > 7) {
@@ -144,14 +147,27 @@ fun RefundScreen(
                         }.toString()
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 12.dp),
                         type = stringResource(id = R.string.bank_name),
                         value = uiState.bankInfo?.bankName ?: ""
                     )
                     InfoRow(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 12.dp),
                         type = stringResource(id = R.string.account_number),
                         value = uiState.accountNumber
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(top = 12.dp),
+                        thickness = 1.dp,
+                        color = Grey70,
+                    )
+                    InfoRow(
+                        modifier = Modifier.padding(top = 12.dp),
+                        type = stringResource(id = R.string.refund_price),
+                        value = stringResource(
+                            id = R.string.unit_won,
+                            uiState.reservation!!.totalAmountPrice,
+                        )
                     )
                 }
             }
@@ -167,9 +183,9 @@ fun InfoRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            modifier = Modifier.width(70.dp),
             text = type,
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
         )

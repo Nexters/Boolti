@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
@@ -201,6 +202,30 @@ fun RefundInfoPage(
             }
         }
 
+        Section(
+            modifier = Modifier.padding(top = 12.dp),
+            title = stringResource(id = R.string.refund_account_info),
+            expandable = false,
+        ) {
+            Column {
+                val paymentType = when (reservation.paymentType) {
+                    PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
+                    PaymentType.CARD -> stringResource(id = R.string.payment_card)
+                    else -> stringResource(id = R.string.reservations_unknown)
+                }
+
+                NormalRow(
+                    key = stringResource(id = R.string.refund_price),
+                    value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
+                )
+                NormalRow(
+                    modifier = Modifier.padding(top = 16.dp),
+                    key = stringResource(id = R.string.refund_method),
+                    value = paymentType
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.weight(1.0f))
         MainButton(
             modifier = Modifier
@@ -337,5 +362,28 @@ private fun Section(
         ) {
             content()
         }
+    }
+}
+
+@Composable
+private fun NormalRow(
+    key: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            modifier = Modifier,
+            text = key,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+        )
     }
 }

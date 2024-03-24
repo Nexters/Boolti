@@ -64,9 +64,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.R
@@ -77,11 +74,6 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.format
-import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.isInviteTicket
-import com.nexters.boolti.presentation.screen.salesTicketId
-import com.nexters.boolti.presentation.screen.showId
-import com.nexters.boolti.presentation.screen.ticketCount
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -462,10 +454,23 @@ private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: 
             label = stringResource(R.string.ticket_count_label),
             value = stringResource(R.string.ticket_count, ticketCount),
         )
-        SectionTicketInfo(
-            label = stringResource(R.string.total_payment_amount_label),
-            value = stringResource(R.string.unit_won, totalPrice),
-        )
+        Row(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(R.string.total_payment_amount_label),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30
+            )
+            Text(
+                text = stringResource(R.string.unit_won, totalPrice),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
     }
 }

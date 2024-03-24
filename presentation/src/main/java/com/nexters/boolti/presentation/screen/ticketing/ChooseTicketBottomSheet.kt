@@ -224,7 +224,7 @@ private fun ChooseTicketBottomSheetContent2(
             Spacer(modifier = Modifier.weight(1F))
             Text(
                 text = stringResource(R.string.format_total_price, ticket.ticket.price * ticketCount),
-                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
             )
         }
 

@@ -1,21 +1,28 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.extension.toContactFormat
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -39,158 +46,97 @@ fun TicketingConfirmDialog(
         onClickPositiveButton = onClick,
         onDismiss = onDismiss,
     ) {
-        Text(text = stringResource(R.string.ticketing_confirm_dialog_title))
-        ConstraintLayout(
+        Text(
+            text = stringResource(R.string.ticketing_confirm_dialog_title),
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Column(
             modifier = Modifier
                 .padding(top = 24.dp)
+                .clip(RoundedCornerShape(4.dp))
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-                .clip(RoundedCornerShape(4.dp))
-                .padding(horizontal = marginHorizontal, vertical = 16.dp)
+                .padding(horizontal = marginHorizontal, vertical = 16.dp),
         ) {
-            val (
-                reservationLabelRef,
-                depositorRef,
-                ticketRef,
-                paymentTypeRef,
-            ) = createRefs()
-
-            val barrier = createEndBarrier(
-                reservationLabelRef,
-                depositorRef,
-                ticketRef,
-                paymentTypeRef,
-                margin = 20.dp,
-            )
-
             // 예매자
-            Label(
-                modifier = Modifier.constrainAs(reservationLabelRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                },
-                label = stringResource(R.string.ticket_holder)
+            InfoRow(
+                label = stringResource(R.string.ticket_holder),
+                value1 = reservationName,
+                value2 = reservationContact.toContactFormat(),
             )
-            val (reservationNameRef, reservationContactRef) = createRefs()
-            InfoText(
-                modifier = Modifier.constrainAs(reservationNameRef) {
-                    start.linkTo(barrier)
-                    baseline.linkTo(reservationLabelRef.baseline)
-                },
-                value = reservationName,
-            )
-            InfoText(
-                modifier = Modifier.constrainAs(reservationContactRef) {
-                    start.linkTo(reservationNameRef.start)
-                    top.linkTo(reservationNameRef.bottom, 4.dp)
-                },
-                value = reservationContact.toContactFormat(),
-            )
-
             // 입금자
-            val (depositorNameRef, depositorContactRef) = createRefs()
             if (!isInviteTicket) {
-                Label(
-                    modifier = Modifier.constrainAs(depositorRef) {
-                        top.linkTo(reservationContactRef.bottom, 16.dp)
-                        start.linkTo(parent.start)
-                    },
+                InfoRow(
+                    modifier = Modifier.padding(top = 16.dp),
                     label = stringResource(R.string.depositor),
-                )
-                InfoText(
-                    modifier = Modifier.constrainAs(depositorNameRef) {
-                        start.linkTo(barrier)
-                        baseline.linkTo(depositorRef.baseline)
-                    },
-                    value = depositor
-                )
-                InfoText(
-                    modifier = Modifier.constrainAs(depositorContactRef) {
-                        start.linkTo(depositorNameRef.start)
-                        top.linkTo(depositorNameRef.bottom, 4.dp)
-                    },
-                    value = depositorContact.toContactFormat(),
+                    value1 = depositor,
+                    value2 = depositorContact.toContactFormat(),
                 )
             }
-
             // 티켓
-            Label(
-                modifier = Modifier.constrainAs(ticketRef) {
-                    if (isInviteTicket) {
-                        top.linkTo(reservationContactRef.bottom, 16.dp)
-                    } else {
-                        top.linkTo(depositorContactRef.bottom, 16.dp)
-                    }
-                    start.linkTo(parent.start)
-                },
+            InfoRow(
+                modifier = Modifier.padding(top = 16.dp),
                 label = stringResource(R.string.ticket),
+                value1 = ticketName,
+                value2 = stringResource(R.string.reservations_ticket_count_price_format_short, ticketCount, totalPrice),
             )
-            val (ticketNameRef, ticketInfoRef) = createRefs()
-            InfoText(
-                modifier = Modifier.constrainAs(ticketNameRef) {
-                    start.linkTo(barrier)
-                    baseline.linkTo(ticketRef.baseline)
-                },
-                value = ticketName,
-            )
-            InfoText(
-                modifier = Modifier.constrainAs(ticketInfoRef) {
-                    start.linkTo(ticketNameRef.start)
-                    top.linkTo(ticketNameRef.bottom, 4.dp)
-                },
-                value = stringResource(R.string.reservations_ticket_count_price_format_short, ticketCount, totalPrice),
-            )
-
             // 결제 수단
-            Label(
-                modifier = Modifier.constrainAs(paymentTypeRef) {
-                    top.linkTo(ticketInfoRef.bottom, 16.dp)
-                    start.linkTo(parent.start)
-                },
-                label = stringResource(R.string.ticket_type_label),
-            )
-            val paymentTypeDataRef = createRef()
-            InfoText(
-                modifier = Modifier.constrainAs(paymentTypeDataRef) {
-                    start.linkTo(barrier)
-                    baseline.linkTo(paymentTypeRef.baseline)
-                },
-                value = if (isInviteTicket) {
-                    stringResource(R.string.invite_ticket)
-                } else {
+            if (!isInviteTicket) {
+                InfoRow(
+                    modifier = Modifier.padding(top = 16.dp),
+                    label = stringResource(R.string.ticket_type_label),
+                    value1 =
                     when (paymentType) {
                         PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
                         PaymentType.CARD -> stringResource(R.string.payment_card)
                         PaymentType.UNDEFINED -> ""
-                    }
-                }
-            )
+                    },
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun Label(
+private fun InfoRow(
     modifier: Modifier = Modifier,
     label: String,
+    value1: String,
+    value2: String? = null,
 ) {
-    Text(
-        modifier = modifier,
-        text = label,
-        style = MaterialTheme.typography.bodySmall,
-        color = Grey30,
-    )
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(text = label, style = MaterialTheme.typography.bodySmall, color = Grey30)
+            Text(text = value1, style = MaterialTheme.typography.bodySmall, color = Grey15)
+        }
+        value2?.let {
+            Text(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .align(AbsoluteAlignment.Right),
+                text = value2,
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey15,
+            )
+        }
+    }
 }
 
+@Preview
 @Composable
-private fun InfoText(
-    modifier: Modifier = Modifier,
-    value: String,
-) {
-    Text(
-        modifier = modifier,
-        text = value,
-        style = MaterialTheme.typography.bodySmall,
-        color = Grey15,
-    )
+private fun InfoRowPreview() {
+    Surface {
+        BooltiTheme {
+            InfoRow(
+                modifier = Modifier.fillMaxWidth(),
+                label = "예매자",
+                value1 = "박명범",
+                value2 = "01020302030"
+            )
+        }
+    }
 }

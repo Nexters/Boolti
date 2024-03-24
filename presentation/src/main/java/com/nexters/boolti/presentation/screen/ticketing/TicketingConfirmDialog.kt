@@ -81,15 +81,18 @@ fun TicketingConfirmDialog(
                 value2 = stringResource(R.string.reservations_ticket_count_price_format_short, ticketCount, totalPrice),
             )
             // 결제 수단
-            if (!isInviteTicket) {
+            if (isInviteTicket || totalPrice > 0) {
                 InfoRow(
                     modifier = Modifier.padding(top = 16.dp),
                     label = stringResource(R.string.ticket_type_label),
-                    value1 =
-                    when (paymentType) {
-                        PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
-                        PaymentType.CARD -> stringResource(R.string.payment_card)
-                        PaymentType.UNDEFINED -> ""
+                    value1 = if (isInviteTicket) {
+                        stringResource(R.string.invite_ticket)
+                    } else {
+                        when (paymentType) {
+                            PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
+                            PaymentType.CARD -> stringResource(R.string.payment_card)
+                            PaymentType.UNDEFINED -> ""
+                        }
                     },
                 )
             }

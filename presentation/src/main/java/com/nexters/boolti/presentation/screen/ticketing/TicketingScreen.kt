@@ -152,34 +152,48 @@ fun TicketingScreen(
                     showName = uiState.showName,
                     showDate = uiState.showDate,
                 )
+                // 예매자 정보
                 TicketHolderSection(
                     name = uiState.reservationName,
                     phoneNumber = uiState.reservationContact,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onNameChanged = viewModel::setReservationName,
                     onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
-                ) // 예매자 정보
-                if (!uiState.isInviteTicket) DeposorSection(
-                    name = uiState.depositorName,
-                    phoneNumber = uiState.depositorContact,
-                    isSameContactInfo = uiState.isSameContactInfo,
-                    onClickSameContact = viewModel::toggleIsSameContactInfo,
-                    onNameChanged = viewModel::setDepositorName,
-                    onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
-                ) // 입금자 정보
+                )
+
+                // 입금자 정보
+                if (!uiState.isInviteTicket && uiState.totalPrice > 0) {
+                    DepositorSection(
+                        name = uiState.depositorName,
+                        phoneNumber = uiState.depositorContact,
+                        isSameContactInfo = uiState.isSameContactInfo,
+                        onClickSameContact = viewModel::toggleIsSameContactInfo,
+                        onNameChanged = viewModel::setDepositorName,
+                        onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
+                    )
+                }
+
+                // 티켓 정보
                 TicketInfoSection(
                     ticketName = uiState.ticketName,
                     ticketCount = uiState.ticketCount,
                     totalPrice = uiState.totalPrice,
-                ) // 티켓 정보
-                if (uiState.isInviteTicket) InviteCodeSection(
-                    uiState.inviteCode,
-                    uiState.inviteCodeStatus,
-                    onClickCheckInviteCode = viewModel::checkInviteCode,
-                    onInviteCodeChanged = viewModel::setInviteCode,
-                ) // 초청 코드
-                if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
+                )
+
+                // 초청 코드
+                if (uiState.isInviteTicket) {
+                    InviteCodeSection(
+                        uiState.inviteCode,
+                        uiState.inviteCodeStatus,
+                        onClickCheckInviteCode = viewModel::checkInviteCode,
+                        onInviteCodeChanged = viewModel::setInviteCode,
+                    )
+                }
+
+                if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
+
+                // 사업자 정보
                 BusinessInformation(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = navigateToBusiness
@@ -476,7 +490,7 @@ private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: 
 }
 
 @Composable
-private fun DeposorSection(
+private fun DepositorSection(
     name: String = "",
     phoneNumber: String = "",
     isSameContactInfo: Boolean,

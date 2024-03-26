@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.BuildConfig
@@ -46,12 +47,13 @@ class SplashActivity : ComponentActivity() {
                     shouldUpdate = shouldUpdate,
                     onSuccessVersionCheck = {
                         startActivity(Intent(this, MainActivity::class.java))
-                        intent.extras?.getString("합의된 key").let { // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
+                        intent.extras?.getString("합의된 key")?.let { // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
                             val deepLink = when (it) {
                                 else -> "https://app.boolti.in/home/tickets"
                             }
 
                             viewModel.sendDeepLinkEvent(deepLink)
+                            NotificationManagerCompat.from(this).cancel(0) // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
                         }
 
                         finish()

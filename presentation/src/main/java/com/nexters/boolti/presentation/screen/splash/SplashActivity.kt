@@ -46,10 +46,12 @@ class SplashActivity : ComponentActivity() {
                     shouldUpdate = shouldUpdate,
                     onSuccessVersionCheck = {
                         startActivity(Intent(this, MainActivity::class.java))
-                        intent.extras?.getString("합의된 key").let {
-                            // TODO : 받은 값에 따라 딥링크 생성하기
-                            val deeplink = "https://boolti.in/home/tickets"
-                            viewModel.sendDeepLinkEvent(deeplink)
+                        intent.extras?.getString("합의된 key").let { // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
+                            val deepLink = when (it) {
+                                else -> "https://boolti.in/home/tickets"
+                            }
+
+                            viewModel.sendDeepLinkEvent(deepLink)
                         }
 
                         finish()

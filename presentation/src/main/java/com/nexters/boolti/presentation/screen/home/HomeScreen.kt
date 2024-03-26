@@ -62,12 +62,8 @@ fun HomeScreen(
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.events.consumeEach { event ->
-            when (event) {
-                is HomeEvent.NavigateToDeepLink -> {
-                    navController.navigate(Uri.parse(event.deeplink))
-                }
-            }
+        viewModel.event.collect { deepLink ->
+            navController.navigate(Uri.parse(deepLink))
         }
     }
 

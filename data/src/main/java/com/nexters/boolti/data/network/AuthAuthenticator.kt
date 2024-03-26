@@ -28,6 +28,9 @@ internal class AuthAuthenticator @Inject constructor(
                 refreshToken = it.refreshToken,
             )
             it.accessToken
+        } ?: run {
+            authDataSource.logout()
+            null
         }
     }
 }

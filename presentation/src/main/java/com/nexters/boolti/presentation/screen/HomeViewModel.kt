@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
     )
 
     val event: SharedFlow<String> =
-        deepLinkEvent.events.filter { it.startsWith("https://boolti.in/home") }
+        deepLinkEvent.events.filter { it.startsWith("https://app.boolti.in/home") }
             .shareIn(
                 scope = viewModelScope,
                 started = SharingStarted.Lazily,

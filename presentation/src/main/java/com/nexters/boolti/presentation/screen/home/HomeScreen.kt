@@ -100,7 +100,7 @@ fun HomeScreen(
                 route = Destination.Ticket.route,
                 deepLinks = listOf(
                     navDeepLink {
-                        uriPattern = "https://boolti.in/home/tickets"
+                        uriPattern = "https://app.boolti.in/home/tickets"
                         action = Intent.ACTION_VIEW
                     }
                 )

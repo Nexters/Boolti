@@ -48,7 +48,7 @@ class SplashActivity : ComponentActivity() {
                         startActivity(Intent(this, MainActivity::class.java))
                         intent.extras?.getString("합의된 key").let { // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
                             val deepLink = when (it) {
-                                else -> "https://boolti.in/home/tickets"
+                                else -> "https://app.boolti.in/home/tickets"
                             }
 
                             viewModel.sendDeepLinkEvent(deepLink)

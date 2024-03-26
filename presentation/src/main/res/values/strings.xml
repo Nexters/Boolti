@@ -187,10 +187,10 @@
     <string name="reservations_empty">예매 내역이 없어요</string>
     <string name="reservations_empty_sub">티켓을 예매하고 공연을 즐겨보세요!</string>
     <string name="reservations_depositing">입금 확인 중</string>
-    <string name="reservations_refunding">환불 진행 중</string>
+    <string name="reservations_refunding">취소 진행 중</string>
     <string name="reservations_canceled">예매 취소</string>
     <string name="reservations_reserved">티켓 발권 완료</string>
-    <string name="reservations_refunded">환불 완료</string>
+    <string name="reservations_refunded">취소 완료</string>
     <string name="reservations_detail_view">상세 보기</string>
     <string name="reservations_unknown">알 수 없음</string>
     <string name="reservations_ticket_count_price_format">"%s / %d매 / %,d원"</string>
@@ -208,8 +208,8 @@
     <string name="reservation_ticket_info_format">"%s / %d매"</string>
 
     <!-- 환불 -->
-    <string name="refund_button">환불 요청하기</string>
-    <string name="refund_reason_label">환불 이유를 입력해 주세요</string>
+    <string name="refund_button">취소 요청하기</string>
+    <string name="refund_reason_label">취소 사유를 입력해 주세요</string>
     <string name="refund_reason_hint">예) 티켓 종류 재 선택 후 다시 예매할게요</string>
     <string name="refund_account_holder_info">예금주 정보</string>
     <string name="refund_account_name_hint">실명을 입력해 주세요</string>
@@ -218,7 +218,11 @@
     <string name="refund_account_number_hint">계좌번호를 입력해 주세요</string>
     <string name="refund_select_bank">선택 완료하기</string>
     <string name="refund_dialog_title">환불 정보를 확인해 주세요</string>
-    <string name="refund_completed">환불 요청이 완료되었어요</string>
+    <string name="refund_completed">취소 요청이 완료되었어요</string>
+    <string name="refund_information">환불 정보</string>
+    <string name="refund_price">환불 예정 금액</string>
+    <string name="refund_method">환불 수단</string>
+    <string name="refund_confirm_policy">취소/환불 규정을 확인했습니다</string>
 
     <!-- 신고 -->
     <string name="report">신고하기</string>

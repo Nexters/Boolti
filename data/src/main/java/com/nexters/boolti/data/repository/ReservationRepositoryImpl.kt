@@ -26,7 +26,7 @@ internal class ReservationRepositoryImpl @Inject constructor(
         if (isSuccessful) {
             emit(Unit)
         } else {
-            throw RuntimeException("환불 실패")
+            throw RuntimeException("취소 실패")
         }
     }
 }

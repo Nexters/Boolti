@@ -54,9 +54,7 @@ fun AccountTransferContent(
             Modifier.padding(top = 24.dp),
             poster = reservation.showImage,
             showName = reservation.showName,
-            ticketName = reservation.ticketName,
-            ticketCount = reservation.ticketCount,
-            price = reservation.totalAmountPrice,
+            showDate = LocalDateTime.now(), // TODO 서버에서 내려주는 값으로 대체해야 하지면 이 화면은 곧 사라질 예정.
         )
 
         Box(

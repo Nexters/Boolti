@@ -71,9 +71,8 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
-import com.nexters.boolti.presentation.extension.format
+import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -280,7 +279,7 @@ private fun Header(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = showDate.format("yyyy.MM.dd (${showDate.dayOfWeekString}) HH:mm"),
+                text = showDate.showDateTimeString,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey30,
             )

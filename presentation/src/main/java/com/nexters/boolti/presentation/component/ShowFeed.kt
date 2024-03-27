@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,6 +26,7 @@ import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.constants.posterRatio
+import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
@@ -35,7 +35,6 @@ import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.point1
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ShowFeed(
@@ -97,12 +96,8 @@ fun ShowFeed(
             )
         }
 
-        val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
-        val indexOfDay = show.date.dayOfWeek.value - 1
-        val formatter =
-            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) HH:mm")
         Text(
-            text = show.date.format(formatter),
+            text = show.date.showDateTimeString,
             modifier = Modifier.padding(top = 12.dp),
             style = MaterialTheme.typography.bodySmall.copy(color = Grey30)
         )

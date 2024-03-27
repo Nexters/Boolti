@@ -52,6 +52,10 @@ fun PaymentScreen(
             is PaymentState.Success -> {
                 val reservation = (uiState as PaymentState.Success).reservationDetail
                 when {
+                    true -> PaymentCompleteScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        reservation = reservation
+                    )
                     reservation.totalAmountPrice == 0 || reservation.reservationState == ReservationState.RESERVED || reservation.isInviteTicket ->
                         PaymentCompleteScreen(
                             modifier = Modifier.padding(innerPadding),

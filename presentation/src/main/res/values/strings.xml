@@ -52,7 +52,7 @@
     <string name="next">다음</string>
 
     <string name="ticket_holder">예매자</string>
-    <string name="depositor">입금자</string>
+    <string name="depositor">결제자</string>
     <string name="ticket">티켓</string>
     <string name="invite_ticket">초청 티켓</string>
 
@@ -121,7 +121,7 @@
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>
     <string name="ticketing_ticket_holder_label">예매자 정보</string>
-    <string name="depositor_info_label">입금자 정보</string>
+    <string name="depositor_info_label">결제자 정보</string>
     <string name="ticket_info_label">티켓 정보</string>
     <string name="invite_code_label">초청 코드</string>
     <string name="payment_type_label">결제 수단</string>
@@ -138,10 +138,11 @@
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
     <string name="ticketing_invite_code_invalid">초청 코드가 올바르지 않아요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
-    <string name="ticketing_same_contact_info">예매자와 입금자가 같아요</string>
+    <string name="ticketing_same_contact_info">예매자와 결제자가 같아요</string>
     <string name="ticket_type_label">티켓 종류</string>
     <string name="ticket_count_label">티켓 매수</string>
     <string name="total_payment_amount_label">총 결제 금액</string>
+    <string name="payment_amount_label">결제 금액</string>
     <string name="ticketing_payment_information">다음 페이지에서 계좌 번호를 안내해 드릴게요</string>
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
@@ -168,7 +169,7 @@
     <string name="account_number">계좌번호</string>
     <string name="account_holder">예금주</string>
     <string name="account_transfer_due_date">입금 마감일</string>
-    <string name="invite_ticket_complete_title">결제가 완료되었어요</string>
+    <string name="invite_ticket_complete_title">결제를 완료했어요</string>
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 
     <!-- 마이 -->
@@ -209,6 +210,10 @@
     <string name="reservation_before_completion">발권 전</string>
     <string name="reservation_ticket_count_format">%d매</string>
     <string name="reservation_ticket_info_format">"%s / %d매"</string>
+    <string name="reservation_number">주문 번호</string>
+    <string name="reservation_ticket_type">주문 티켓</string>
+    <string name="show_ticket">티켓 보기</string>
+    <string name="show_reservation">예매 내역보기</string>
 
     <!-- 환불 -->
     <string name="refund_button">환불 요청하기</string>

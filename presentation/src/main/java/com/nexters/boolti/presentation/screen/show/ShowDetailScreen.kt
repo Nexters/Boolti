@@ -266,7 +266,7 @@ private fun ShowDetailAppBar(
                 .size(44.dp),
             onClick = {
                 Firebase.dynamicLinks.shortLinkAsync {
-                    link = Uri.parse("https://boolti.in/show?showId=$showId")
+                    link = Uri.parse("https://app.boolti.in/show?showId=$showId")
                     domainUriPrefix = "https://boolti.page.link"
 
                     androidParameters { }

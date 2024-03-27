@@ -416,7 +416,7 @@ private fun Title(
         )
         Image(
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey80),
+            colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
             contentDescription = null,
         )
     }

@@ -21,21 +21,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.repository.ConfigRepository
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.screen.MainActivity
+import com.nexters.boolti.presentation.service.BtNotification
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashActivity : ComponentActivity() {
@@ -52,10 +48,21 @@ class SplashActivity : ComponentActivity() {
                     shouldUpdate = shouldUpdate,
                     onSuccessVersionCheck = {
                         startActivity(Intent(this, MainActivity::class.java))
+                        intent.extras?.getString("type")?.let { type ->
+                            val notification = BtNotification(type)
+
+                            notification.deepLink?.let {
+                                viewModel.sendDeepLinkEvent(it)
+                            }
+
+                            NotificationManagerCompat.from(this).cancel(notification.id)
+                        }
+
                         finish()
                     },
                     onClickUpdate = {
-                        val playStoreUrl = "http://play.google.com/store/apps/details?id=${BuildConfig.PACKAGE_NAME}"
+                        val playStoreUrl =
+                            "http://play.google.com/store/apps/details?id=${BuildConfig.PACKAGE_NAME}"
                         startActivity(
                             Intent(Intent.ACTION_VIEW).apply {
                                 data = Uri.parse(playStoreUrl)
@@ -120,17 +127,4 @@ fun UpdateDialogPreview() {
             UpdateDialog {}
         }
     }
-}
-
-@HiltViewModel
-class SplashViewModel @Inject constructor(
-    configRepository: ConfigRepository,
-) : ViewModel() {
-    init {
-        viewModelScope.launch {
-            configRepository.cacheRefundPolicy()
-        }
-    }
-
-    val shouldUpdate = configRepository.shouldUpdate()
 }

@@ -48,8 +48,8 @@ internal class AuthDataSource @Inject constructor(
     }
 
     suspend fun logout(): Result<Unit> = runCatching {
-        loginService.logout()
         localLogout()
+        loginService.logout()
     }
 
     suspend fun localLogout() {

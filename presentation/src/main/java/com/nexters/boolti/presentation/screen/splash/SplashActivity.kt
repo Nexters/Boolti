@@ -28,6 +28,7 @@ import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.screen.MainActivity
+import com.nexters.boolti.presentation.service.BtNotification
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,13 +48,14 @@ class SplashActivity : ComponentActivity() {
                     shouldUpdate = shouldUpdate,
                     onSuccessVersionCheck = {
                         startActivity(Intent(this, MainActivity::class.java))
-                        intent.extras?.getString("합의된 key")?.let { // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
-                            val deepLink = when (it) {
-                                else -> "https://app.boolti.in/home/tickets"
+                        intent.extras?.getString("type")?.let { type ->
+                            val notification = BtNotification(type)
+
+                            notification.deepLink?.let {
+                                viewModel.sendDeepLinkEvent(it)
                             }
 
-                            viewModel.sendDeepLinkEvent(deepLink)
-                            NotificationManagerCompat.from(this).cancel(0) // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
+                            NotificationManagerCompat.from(this).cancel(notification.id)
                         }
 
                         finish()

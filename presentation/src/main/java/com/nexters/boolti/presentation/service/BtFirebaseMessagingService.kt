@@ -40,24 +40,27 @@ class BtFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (!checkGrantedPermission(Manifest.permission.POST_NOTIFICATIONS)) return
 
-        remoteMessage.notification?.let { notification ->
-            val defaultChannelId = getString(R.string.default_notification_channel_id)
-            val pendingIntent = PendingIntent.getActivity(
-                applicationContext,
-                UUID.randomUUID().hashCode(),
-                Intent(this, SplashActivity::class.java).putExtra("합의된 key", ""),
-                PendingIntent.FLAG_IMMUTABLE
-            )
-            val builder =
-                NotificationCompat.Builder(this, notification.channelId ?: defaultChannelId)
-                    .setContentTitle(notification.title)
-                    .setContentText(notification.body)
-                    .setSmallIcon(R.drawable.ic_logo)
-                    .setContentIntent(pendingIntent)
+        val notification = remoteMessage.notification ?: return
+        val btNotification = BtNotification(remoteMessage.data["type"])
 
-            // TODO : 서버에서 푸시 알림 타입을 확정하면 변경하기
-            NotificationManagerCompat.from(this).notify(0, builder.build())
-        }
+        val defaultChannelId = getString(R.string.default_notification_channel_id)
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            UUID.randomUUID().hashCode(),
+            Intent(this, SplashActivity::class.java).putExtra(
+                "type",
+                btNotification.type
+            ),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder =
+            NotificationCompat.Builder(this, notification.channelId ?: defaultChannelId)
+                .setContentTitle(notification.title)
+                .setContentText(notification.body)
+                .setSmallIcon(R.drawable.ic_logo)
+                .setContentIntent(pendingIntent)
+
+        NotificationManagerCompat.from(this).notify(btNotification.id, builder.build())
     }
 
     override fun onDestroy() {

@@ -59,6 +59,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.dynamiclinks.androidParameters
 import com.google.firebase.dynamiclinks.dynamicLink
 import com.google.firebase.dynamiclinks.dynamicLinks
+import com.google.firebase.dynamiclinks.iosParameters
 import com.google.firebase.dynamiclinks.shortLinkAsync
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
@@ -270,7 +271,7 @@ private fun ShowDetailAppBar(
                     domainUriPrefix = "https://boolti.page.link"
 
                     androidParameters { }
-                    // iosParameters("com.example.ios") { } TODO : iOS 패키지 네임 넣기
+                    iosParameters("com.nexters.boolti") { }
                 }.addOnSuccessListener {
                     it.shortLink?.let { link ->
                         println(link)

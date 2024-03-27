@@ -53,6 +53,7 @@ import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -193,7 +194,7 @@ private fun Title(
         )
         Image(
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey80),
+            colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
             contentDescription = null,
         )
     }

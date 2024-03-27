@@ -57,6 +57,7 @@ class BtFirebaseMessagingService : FirebaseMessagingService() {
             NotificationCompat.Builder(this, notification.channelId ?: defaultChannelId)
                 .setContentTitle(notification.title)
                 .setContentText(notification.body)
+                .setColor(0xFF6827)
                 .setSmallIcon(R.drawable.ic_logo)
                 .setContentIntent(pendingIntent)
 

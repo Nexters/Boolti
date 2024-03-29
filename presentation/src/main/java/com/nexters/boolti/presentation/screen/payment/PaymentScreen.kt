@@ -27,6 +27,8 @@ import kotlinx.coroutines.launch
 fun PaymentScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
+    navigateToReservation: (reservation: ReservationDetail) -> Unit,
+    navigateToTicketDetail: (reservation: ReservationDetail) -> Unit,
     viewModel: PaymentViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -51,15 +53,20 @@ fun PaymentScreen(
             is PaymentState.Loading -> Unit
             is PaymentState.Success -> {
                 val reservation = (uiState as PaymentState.Success).reservationDetail
-                when {
+                when { // TODO 조건 정리
                     true -> PaymentCompleteScreen(
                         modifier = Modifier.padding(innerPadding),
-                        reservation = reservation
+                        reservation = reservation,
+                        navigateToReservation = navigateToReservation,
+                        navigateToTicketDetail = navigateToTicketDetail,
                     )
+
                     reservation.totalAmountPrice == 0 || reservation.reservationState == ReservationState.RESERVED || reservation.isInviteTicket ->
                         PaymentCompleteScreen(
                             modifier = Modifier.padding(innerPadding),
-                            reservation = reservation
+                            reservation = reservation,
+                            navigateToReservation = navigateToReservation,
+                            navigateToTicketDetail = navigateToTicketDetail,
                         )
 
                     else -> ProgressPayment(

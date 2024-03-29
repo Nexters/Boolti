@@ -156,7 +156,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                     inclusive = true,
                 )
             },
-            navigateToHome = navController::navigateToHome
+            navigateToHome = navController::navigateToHome,
         )
         BusinessScreen(popBackStack = navController::popBackStack)
     }

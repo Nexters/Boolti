@@ -68,7 +68,10 @@ fun PaymentCompleteScreen(
             InfoRow(
                 modifier = Modifier.padding(top = 24.dp),
                 label = stringResource(R.string.payment_amount_label),
-                value = "${stringResource(R.string.unit_won, reservation.totalAmountPrice)} (카카오뱅크카드 / 일시불)",
+                value = stringResource(
+                    R.string.unit_won,
+                    reservation.totalAmountPrice
+                ), // TODO (카카오뱅크카드 / 일시불) 형태의 정보 추가
             )
             InfoRow(
                 label = stringResource(R.string.reservation_ticket_type),
@@ -84,7 +87,7 @@ fun PaymentCompleteScreen(
                     .padding(top = 24.dp),
                 poster = reservation.showImage,
                 showName = reservation.showName,
-                showDate = LocalDateTime.now(), // TODO 서버에서 내려주는 공연 일시로 대체 필요!!
+                showDate = reservation.showDate,
             )
         }
 
@@ -159,6 +162,7 @@ private fun PaymentCompleteScreenPreview() {
                 id = "eius",
                 showImage = "noster",
                 showName = "Mara King",
+                showDate = LocalDateTime.now(),
                 ticketName = "Juliet Greer",
                 isInviteTicket = false,
                 ticketCount = 6931,

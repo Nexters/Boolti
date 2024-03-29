@@ -50,6 +50,7 @@
     <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
     <string name="copy">복사</string>
     <string name="next">다음</string>
+    <string name="show">보기</string>
 
     <string name="ticket_holder">예매자</string>
     <string name="depositor">결제자</string>
@@ -150,6 +151,10 @@
     <string name="ticketing_confirm_dialog_title">결제 정보를 확인해주세요</string>
     <string name="ticketing_address_copied_message">공연장 주소가 복사되었어요</string>
     <string name="ticketing_host_format">%s (%s)</string>
+    <string name="order_agreement_label">주문내용 확인 및 결제 동의</string>
+    <string name="order_agreement_privacy_collection">[필수] 개인정보 수집・이용 동의</string>
+    <string name="order_agreement_privacy_offer">[필수] 개인정보 제 3자 정보 제공 동의</string>
+    <string name="order_agreement_payment_agency">[필수] 결제대행 서비스 이용약관 동의</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>

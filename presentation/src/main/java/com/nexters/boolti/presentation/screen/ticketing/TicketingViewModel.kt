@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
@@ -169,6 +168,14 @@ class TicketingViewModel @Inject constructor(
 
     fun setInviteCode(code: String) {
         _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
+    }
+
+    fun toggleAgreement(index: Int) {
+        _uiState.update { it.toggleAgreement(index) }
+    }
+
+    fun toggleAgreement() {
+        _uiState.update { it.toggleAgreement() }
     }
 
     private fun event(event: TicketingEvent) {

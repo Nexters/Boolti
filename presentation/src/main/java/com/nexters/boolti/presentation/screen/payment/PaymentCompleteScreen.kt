@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -40,9 +41,11 @@ fun PaymentCompleteScreen(
     navigateToTicketDetail: (reservation: ReservationDetail) -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
-    Box {
+    Box(
+        modifier = modifier.fillMaxSize(),
+    ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(horizontal = marginHorizontal)
                 .verticalScroll(scrollState),
         ) {
@@ -54,11 +57,13 @@ fun PaymentCompleteScreen(
                 label = stringResource(R.string.reservation_number), value = reservation.csReservationId
             )
             InfoRow(
+                modifier = Modifier.padding(top = 16.dp),
                 label = stringResource(R.string.ticketing_ticket_holder_label),
                 value = slashFormat(reservation.ticketHolderName, reservation.ticketHolderPhoneNumber),
             )
             if (reservation.isInviteTicket || reservation.totalAmountPrice > 0) {
                 InfoRow(
+                    modifier = Modifier.padding(top = 16.dp),
                     label = stringResource(R.string.depositor_info_label),
                     value = slashFormat(reservation.depositorName, reservation.depositorPhoneNumber),
                 )
@@ -74,6 +79,7 @@ fun PaymentCompleteScreen(
                 ), // TODO (카카오뱅크카드 / 일시불) 형태의 정보 추가
             )
             InfoRow(
+                modifier = Modifier.padding(top = 16.dp),
                 label = stringResource(R.string.reservation_ticket_type),
                 value = slashFormat(
                     reservation.ticketName,
@@ -93,15 +99,22 @@ fun PaymentCompleteScreen(
 
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = marginHorizontal)
                 .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            SecondaryButton(label = stringResource(R.string.show_reservation)) {
+            SecondaryButton(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.show_reservation),
+            ) {
                 navigateToReservation(reservation)
             }
-            MainButton(label = stringResource(R.string.show_ticket)) {
+            MainButton(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.show_ticket),
+            ) {
                 navigateToTicketDetail(reservation)
             }
         }

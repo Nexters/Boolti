@@ -43,6 +43,8 @@ data class Ticket(
     val usedAt: LocalDateTime? = null,
     val hostName: String = "",
     val hostPhoneNumber: String = "",
+    val csReservationId: String = "",
+    val csTicketId: String = "",
 ) {
     val ticketState: TicketState
         get() = run {

@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -39,6 +38,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -130,7 +130,7 @@ fun TicketContent(
                 ),
         )
         Column {
-            Title(ticket.ticketName, 1) // TODO 개수 정보 생기면 업데이트
+            Title(ticket.ticketName, ticket.csTicketId)
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,24 +177,31 @@ fun TicketContent(
 @Composable
 private fun Title(
     ticketName: String = "",
-    count: Int = 0,
+    csTicketId: String = "",
 ) {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
+            .alpha(0.65f)
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = if (count > 1) stringResource(R.string.ticket_title, ticketName, count) else ticketName,
-            style = MaterialTheme.typography.bodySmall,
-            color = Grey80,
-        )
         Image(
+            modifier = Modifier.padding(end = 4.dp),
             painter = painterResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(Grey80),
             contentDescription = null,
+        )
+        Text(
+            modifier = Modifier.weight(1f),
+            text = ticketName,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
+        )
+        Text(
+            text = csTicketId,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
         )
     }
 }
@@ -291,7 +298,7 @@ private fun TicketQr(
                     .clip(RoundedCornerShape(4.dp))
                     .size(70.dp)
                     .background(
-                        brush = SolidColor(Color.Black),
+                        brush = SolidColor(Black),
                         alpha = 0.8f,
                     )
             )

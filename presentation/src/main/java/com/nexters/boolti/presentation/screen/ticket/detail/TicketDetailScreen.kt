@@ -69,6 +69,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,7 +78,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
@@ -262,7 +262,7 @@ private fun TicketDetailScreen(
                                         coordinates.size.height.toFloat()
                                 }
                         ) {
-                            Title(ticketName = ticket.ticketName)
+                            Title(ticketName = ticket.ticketName, csTicketId = ticket.csTicketId)
 
                             AsyncImage(
                                 modifier = Modifier
@@ -401,23 +401,31 @@ private fun TicketDetailToolbar(
 @Composable
 private fun Title(
     ticketName: String = "",
+    csTicketId: String = "",
 ) {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
+            .alpha(0.65f)
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = ticketName,
-            style = MaterialTheme.typography.bodySmall,
-            color = Grey80,
-        )
         Image(
+            modifier = Modifier.padding(end = 4.dp),
             painter = painterResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(Grey80),
             contentDescription = null,
+        )
+        Text(
+            modifier = Modifier.weight(1f),
+            text = ticketName,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
+        )
+        Text(
+            text = csTicketId,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
         )
     }
 }
@@ -502,7 +510,7 @@ private fun TicketQr(
             modifier = Modifier
                 .padding(vertical = 8.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(Color.White)
+                .background(White)
                 .padding(2.dp)
                 .clickable {
                     if (ticketState == TicketState.Ready) onClickQr(entryCode)

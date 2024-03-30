@@ -82,9 +82,11 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
+import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.CoroutineScope
@@ -105,6 +107,7 @@ fun TicketingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    val specOut = false // TODO 다음 버전(페이 들어오는 버전)에서 추가될 기능 마킹
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -195,15 +198,26 @@ fun TicketingScreen(
                 if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
-                // 주문내용 확인 및 결제 동의
-                OrderAgreementSection(
-                    totalAgreed = uiState.orderAgreed,
-                    agreement = uiState.orderAgreement,
-                    agreementLabels = uiState.orderAgreementInfos,
-                    onClickTotalAgree = viewModel::toggleAgreement,
-                    onClickAgree = viewModel::toggleAgreement,
-                    onClickShow = {}, // TODO 기획 확정되면 구현
+                Text(
+                    modifier = Modifier
+                        .padding(top = 24.dp, bottom = 20.dp)
+                        .padding(horizontal = marginHorizontal),
+                    text = stringResource(R.string.business_responsibility),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Grey70,
                 )
+
+                if (specOut) {
+                    // 주문내용 확인 및 결제 동의
+                    OrderAgreementSection(
+                        totalAgreed = uiState.orderAgreed,
+                        agreement = uiState.orderAgreement,
+                        agreementLabels = uiState.orderAgreementInfos,
+                        onClickTotalAgree = viewModel::toggleAgreement,
+                        onClickAgree = viewModel::toggleAgreement,
+                        onClickShow = {}, // TODO 기획 확정되면 구현
+                    )
+                }
 
                 // 사업자 정보
                 BusinessInformation(

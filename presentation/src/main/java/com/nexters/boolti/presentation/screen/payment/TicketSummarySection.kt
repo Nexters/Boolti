@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -77,6 +78,63 @@ fun TicketSummarySection(
     }
 }
 
+@Composable
+fun LegacyTicketSummarySection(
+    modifier: Modifier = Modifier,
+    poster: String,
+    showName: String,
+    paymentType: PaymentType,
+    ticketCount: Int,
+    totalPrice: Int,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AsyncImage(
+            model = poster,
+            contentDescription = stringResource(R.string.description_poster),
+            modifier = Modifier
+                .size(width = 70.dp, height = 98.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(4.dp),
+                ),
+            contentScale = ContentScale.Crop,
+        )
+        Column(
+            modifier = Modifier.padding(start = 16.dp)
+        ) {
+            Text(
+                text = showName,
+                style = point1,
+                color = Grey05,
+            )
+            val payment = when (paymentType) {
+                PaymentType.ACCOUNT_TRANSFER -> R.string.payment_account_transfer
+                PaymentType.CARD -> R.string.payment_card
+                PaymentType.UNDEFINED -> R.string.blank
+            }.let { stringResource(id = it) }
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = String.format("%s / %s", payment, ticketCount),
+                color = Grey30,
+                style = MaterialTheme.typography.bodySmall,
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(id = R.string.unit_won, totalPrice),
+                color = Grey30,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun TicketSummaryPreview() {
@@ -87,6 +145,23 @@ private fun TicketSummaryPreview() {
                 poster = "",
                 showName = "2024 TOGETHER LUCKY CLUB",
                 showDate = LocalDateTime.now(),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LegacyTicketSummaryPreview() {
+    BooltiTheme {
+        Surface {
+            LegacyTicketSummarySection(
+                modifier = Modifier.padding(24.dp),
+                poster = "",
+                showName = "2024 TOGETHER LUCKY CLUB",
+                paymentType = PaymentType.ACCOUNT_TRANSFER,
+                ticketCount = 10,
+                totalPrice = 30000,
             )
         }
     }

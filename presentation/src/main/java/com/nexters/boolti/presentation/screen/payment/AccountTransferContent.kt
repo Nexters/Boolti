@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.format
@@ -34,6 +35,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.theme.subTextPadding
 import java.time.LocalDateTime
+import com.nexters.boolti.presentation.screen.payment.LegacyTicketSummarySection as LegacyTicketSummarySection1
 
 @Composable
 fun AccountTransferContent(
@@ -45,16 +47,20 @@ fun AccountTransferContent(
         modifier = modifier.padding(horizontal = marginHorizontal),
     ) {
         HeaderSection(reservation.totalAmountPrice, reservation.salesEndDateTime)
-        Divider(
+
+        HorizontalDivider(
             modifier = Modifier.padding(top = 20.dp),
             thickness = 1.dp,
-            color = Grey85,
+            color = Grey85
         )
-        TicketSummarySection(
-            Modifier.padding(top = 24.dp),
+
+        LegacyTicketSummarySection1(
+            modifier = Modifier.padding(top = 24.dp),
             poster = reservation.showImage,
             showName = reservation.showName,
-            showDate = LocalDateTime.now(), // TODO 서버에서 내려주는 값으로 대체해야 하지면 이 화면은 곧 사라질 예정.
+            paymentType = PaymentType.ACCOUNT_TRANSFER,
+            ticketCount = reservation.ticketCount,
+            totalPrice = reservation.totalAmountPrice,
         )
 
         Box(

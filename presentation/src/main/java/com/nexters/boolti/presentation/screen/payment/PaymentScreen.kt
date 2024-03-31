@@ -53,15 +53,10 @@ fun PaymentScreen(
             is PaymentState.Loading -> Unit
             is PaymentState.Success -> {
                 val reservation = (uiState as PaymentState.Success).reservationDetail
-                when { // TODO 조건 정리
-                    true -> PaymentCompleteScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        reservation = reservation,
-                        navigateToReservation = navigateToReservation,
-                        navigateToTicketDetail = navigateToTicketDetail,
-                    )
-
-                    reservation.totalAmountPrice == 0 || reservation.reservationState == ReservationState.RESERVED || reservation.isInviteTicket ->
+                when {
+                    reservation.totalAmountPrice == 0 ||
+                            reservation.reservationState == ReservationState.RESERVED ||
+                            reservation.isInviteTicket ->
                         PaymentCompleteScreen(
                             modifier = Modifier.padding(innerPadding),
                             reservation = reservation,

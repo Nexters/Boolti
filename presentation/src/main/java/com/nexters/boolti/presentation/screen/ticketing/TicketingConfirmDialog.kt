@@ -65,7 +65,7 @@ fun TicketingConfirmDialog(
                 value2 = reservationContact.toContactFormat(),
             )
             // 입금자
-            if (!isInviteTicket) {
+            if (!isInviteTicket && totalPrice > 0) {
                 InfoRow(
                     modifier = Modifier.padding(top = 16.dp),
                     label = stringResource(R.string.depositor),

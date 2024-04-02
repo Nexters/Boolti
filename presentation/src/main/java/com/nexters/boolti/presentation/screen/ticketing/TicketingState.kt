@@ -35,17 +35,21 @@ data class TicketingState(
         get() = orderAgreement.none { !it }
 
     val reservationButtonEnabled: Boolean
-        get() = if (isInviteTicket) {
-//            orderAgreed &&
-                    reservationName.isNotBlank() &&
-                    reservationContact.isNotBlank() &&
-                    inviteCodeStatus is InviteCodeStatus.Valid
-        } else {
-//            orderAgreed &&
-                    reservationName.isNotBlank() &&
-                    reservationContact.isNotBlank() &&
-                    (isSameContactInfo || depositorName.isNotBlank()) &&
-                    (isSameContactInfo || depositorContact.isNotBlank())
+        get() = when {
+            isInviteTicket -> //            orderAgreed &&
+                reservationName.isNotBlank() &&
+                        reservationContact.isNotBlank() &&
+                        inviteCodeStatus is InviteCodeStatus.Valid
+
+            totalPrice == 0 -> // orderAgreed &7
+                reservationName.isNotBlank() &&
+                        reservationContact.isNotBlank()
+
+            else -> //            orderAgreed &&
+                reservationName.isNotBlank() &&
+                        reservationContact.isNotBlank() &&
+                        (isSameContactInfo || depositorName.isNotBlank()) &&
+                        (isSameContactInfo || depositorContact.isNotBlank())
         }
 
     fun toggleAgreement(index: Int): TicketingState {

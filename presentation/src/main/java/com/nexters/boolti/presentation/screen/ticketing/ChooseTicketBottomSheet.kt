@@ -14,16 +14,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -31,6 +31,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,8 +49,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.domain.model.SalesTicket
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.Badge
+import com.nexters.boolti.presentation.component.HorizontalCountStepper
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.sliceAtMost
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
@@ -65,7 +69,6 @@ fun ChooseTicketBottomSheet(
     onDismissRequest: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val listState = rememberLazyListState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -89,12 +92,16 @@ fun ChooseTicketBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .padding(bottom = 20.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+                .padding(
+                    bottom = 20.dp + WindowInsets.navigationBars
+                        .asPaddingValues()
+                        .calculateBottomPadding()
+                )
                 .heightIn(max = 564.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
-                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
                 modifier = Modifier
                     .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
             )
@@ -102,14 +109,13 @@ fun ChooseTicketBottomSheet(
                 ChooseTicketBottomSheetContent2(
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
-                    onTicketingClicked = {
-                        onTicketingClicked(it.ticket, 1) // TODO 추후 개수 선택 기획 들어오면 변경
+                    onTicketingClicked = { ticket, count ->
+                        onTicketingClicked(ticket.ticket, count)
                         viewModel.unSelectTicket()
                     },
                 )
             } ?: run {
                 ChooseTicketBottomSheetContent1(
-                    listState = listState,
                     tickets = uiState.tickets,
                     onSelectItem = viewModel::selectTicket,
                 )
@@ -121,10 +127,10 @@ fun ChooseTicketBottomSheet(
 @Composable
 private fun ChooseTicketBottomSheetContent1(
     modifier: Modifier = Modifier,
-    listState: LazyListState,
     tickets: List<TicketWithQuantity>,
     onSelectItem: (TicketWithQuantity) -> Unit,
 ) {
+    val listState = rememberLazyListState()
     LazyColumn(
         modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         state = listState
@@ -143,8 +149,10 @@ private fun ChooseTicketBottomSheetContent2(
     modifier: Modifier = Modifier,
     ticket: TicketWithQuantity,
     onCloseClicked: () -> Unit,
-    onTicketingClicked: (TicketWithQuantity) -> Unit,
+    onTicketingClicked: (ticket: TicketWithQuantity, count: Int) -> Unit,
 ) {
+    var ticketCount by remember { mutableIntStateOf(1) }
+
     Column(modifier) {
         Row(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
@@ -161,42 +169,62 @@ private fun ChooseTicketBottomSheetContent2(
                     if (!ticket.ticket.isInviteTicket) {
                         Badge(
                             stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            containerColor = MaterialTheme.colorScheme.surface,
                             modifier = Modifier.padding(start = 8.dp),
                         )
                     }
+                    Spacer(modifier = Modifier.weight(1F))
+                    IconButton(onClick = onCloseClicked) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_close),
+                            contentDescription = stringResource(id = R.string.description_close_button),
+                            tint = Grey50,
+                        )
+                    }
                 }
-                Text(
-                    text = stringResource(R.string.format_price, ticket.ticket.price),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = Grey15,
-                    ),
-                    modifier = Modifier.padding(top = 12.dp),
-                )
-            }
-            Spacer(modifier = Modifier.weight(1F))
-            IconButton(onClick = onCloseClicked) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = stringResource(id = R.string.description_close_button),
-                    tint = Grey50,
-                )
+                Row(
+                    modifier = Modifier.padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (ticket.ticket.isInviteTicket) {
+                        Text(
+                            text = stringResource(R.string.ticketing_limit_per_person, 1),
+                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+                        )
+                    } else {
+                        HorizontalCountStepper(
+                            modifier = Modifier.width(100.dp),
+                            currentCount = ticketCount,
+                            minCount = 1,
+                            maxCount = ticket.quantity,
+                            onClickMinus = { ticketCount-- },
+                            onClickPlus = { ticketCount++ },
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = stringResource(R.string.format_price, ticket.ticket.price),
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+                    )
+                }
             }
         }
 
-        Divider(color = Grey80, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+        HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Grey80)
 
         Row(
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.ticketing_limit_per_person, 1),
+                text = stringResource(R.string.total_payment_amount_label),
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
             Spacer(modifier = Modifier.weight(1F))
             Text(
-                text = stringResource(R.string.format_total_price, ticket.ticket.price),
-                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+                text = stringResource(R.string.format_total_price, ticket.ticket.price * ticketCount),
+                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
             )
         }
 
@@ -206,7 +234,7 @@ private fun ChooseTicketBottomSheetContent2(
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
                 .height(48.dp),
-            onClick = { onTicketingClicked(ticket) },
+            onClick = { onTicketingClicked(ticket, ticketCount) },
         )
     }
 }
@@ -217,6 +245,7 @@ private fun TicketingTicketItem(
     onClick: (TicketWithQuantity) -> Unit,
 ) {
     val enabled = ticket.ticket.isInviteTicket || ticket.quantity > 0
+    val textColor = if (enabled) MaterialTheme.colorScheme.onPrimary else Grey70
 
     Row(
         modifier = Modifier
@@ -227,13 +256,15 @@ private fun TicketingTicketItem(
     ) {
         Text(
             text = ticket.ticket.ticketName.sliceAtMost(12),
-            style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey30 else Grey70),
+            style = MaterialTheme.typography.bodyLarge.copy(color = textColor),
             overflow = TextOverflow.Ellipsis,
         )
         if (!ticket.ticket.isInviteTicket && ticket.quantity > 0) {
             Badge(
                 stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
-                Modifier.padding(start = 8.dp),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                containerColor = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.padding(start = 8.dp),
             )
         }
         Text(
@@ -245,7 +276,7 @@ private fun TicketingTicketItem(
             } else {
                 stringResource(R.string.sold_out_label)
             },
-            style = MaterialTheme.typography.bodyLarge.copy(color = if (enabled) Grey15 else Grey70),
+            style = MaterialTheme.typography.bodyLarge.copy(color = textColor),
             textAlign = TextAlign.End,
             maxLines = 1,
         )
@@ -254,7 +285,67 @@ private fun TicketingTicketItem(
 
 @Preview
 @Composable
-fun TicketingTicketItemPreview() {
+private fun TicketingTicket1Preview() {
+    BooltiTheme {
+        ChooseTicketBottomSheetContent1(
+            tickets = listOf(
+                TicketWithQuantity(
+                    ticket = SalesTicket(
+                        id = "legimus",
+                        showId = "repudiandae",
+                        ticketName = "Nadine Faulkner",
+                        price = 4358,
+                        isInviteTicket = false,
+                    ),
+                    quantity = 100,
+                ),
+                TicketWithQuantity(
+                    ticket = SalesTicket(
+                        id = "putent",
+                        showId = "qui",
+                        ticketName = "Beth Small",
+                        price = 6979,
+                        isInviteTicket = false,
+                    ),
+                    quantity = 7168,
+                ),
+                TicketWithQuantity(
+                    ticket = SalesTicket(
+                        id = "verear",
+                        showId = "non",
+                        ticketName = "Dante Keith",
+                        price = 9397,
+                        isInviteTicket = true,
+                    ), quantity = 4817
+                )
+            )
+        ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun TicketingTicket2Preview() {
+    BooltiTheme {
+        ChooseTicketBottomSheetContent2(
+            ticket = TicketWithQuantity(
+                ticket = SalesTicket(
+                    id = "legimus",
+                    showId = "repudiandae",
+                    ticketName = "Nadine Faulkner",
+                    price = 4358,
+                    isInviteTicket = false,
+                ),
+                quantity = 100,
+            ),
+            onCloseClicked = {},
+        ) { _, _ -> }
+    }
+}
+
+@Preview
+@Composable
+private fun TicketingTicketItemPreview() {
     val ticket = SalesTicket("", "", "상운이쇼상운이쇼상운이쇼상운이쇼", 1000, false)
 
     BooltiTheme {
@@ -264,13 +355,5 @@ fun TicketingTicketItemPreview() {
                 quantity = 100,
             ),
         ) {}
-    }
-}
-
-@Preview
-@Composable
-fun BadgePreview() {
-    BooltiTheme {
-        Badge("3개 남음")
     }
 }

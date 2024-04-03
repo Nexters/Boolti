@@ -16,24 +16,19 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.navigateToHome
-import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.reservationId
-import com.nexters.boolti.presentation.screen.showId
 import kotlinx.coroutines.launch
 
 @Composable
 fun PaymentScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
+    navigateToReservation: (reservation: ReservationDetail) -> Unit,
+    navigateToTicketDetail: (reservation: ReservationDetail) -> Unit,
     viewModel: PaymentViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -59,10 +54,14 @@ fun PaymentScreen(
             is PaymentState.Success -> {
                 val reservation = (uiState as PaymentState.Success).reservationDetail
                 when {
-                    reservation.reservationState == ReservationState.RESERVED || reservation.isInviteTicket ->
+                    reservation.totalAmountPrice == 0 ||
+                            reservation.reservationState == ReservationState.RESERVED ||
+                            reservation.isInviteTicket ->
                         PaymentCompleteScreen(
                             modifier = Modifier.padding(innerPadding),
-                            reservation = reservation
+                            reservation = reservation,
+                            navigateToReservation = navigateToReservation,
+                            navigateToTicketDetail = navigateToTicketDetail,
                         )
 
                     else -> ProgressPayment(

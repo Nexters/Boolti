@@ -55,18 +55,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.R
@@ -74,23 +73,20 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
-import com.nexters.boolti.presentation.extension.format
-import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.isInviteTicket
-import com.nexters.boolti.presentation.screen.salesTicketId
-import com.nexters.boolti.presentation.screen.showId
-import com.nexters.boolti.presentation.screen.ticketCount
+import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
+import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.CoroutineScope
@@ -111,6 +107,7 @@ fun TicketingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    val specOut = false // TODO 다음 버전(페이 들어오는 버전)에서 추가될 기능 마킹
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -160,34 +157,69 @@ fun TicketingScreen(
                     showName = uiState.showName,
                     showDate = uiState.showDate,
                 )
+                // 예매자 정보
                 TicketHolderSection(
                     name = uiState.reservationName,
                     phoneNumber = uiState.reservationContact,
                     isSameContactInfo = uiState.isSameContactInfo,
                     onNameChanged = viewModel::setReservationName,
                     onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
-                ) // 예매자 정보
-                if (!uiState.isInviteTicket) DeposorSection(
-                    name = uiState.depositorName,
-                    phoneNumber = uiState.depositorContact,
-                    isSameContactInfo = uiState.isSameContactInfo,
-                    onClickSameContact = viewModel::toggleIsSameContactInfo,
-                    onNameChanged = viewModel::setDepositorName,
-                    onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
-                ) // 입금자 정보
+                )
+
+                // 입금자 정보
+                if (!uiState.isInviteTicket && uiState.totalPrice > 0) {
+                    DepositorSection(
+                        name = uiState.depositorName,
+                        phoneNumber = uiState.depositorContact,
+                        isSameContactInfo = uiState.isSameContactInfo,
+                        onClickSameContact = viewModel::toggleIsSameContactInfo,
+                        onNameChanged = viewModel::setDepositorName,
+                        onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
+                    )
+                }
+
+                // 티켓 정보
                 TicketInfoSection(
                     ticketName = uiState.ticketName,
                     ticketCount = uiState.ticketCount,
                     totalPrice = uiState.totalPrice,
-                ) // 티켓 정보
-                if (uiState.isInviteTicket) InviteCodeSection(
-                    uiState.inviteCode,
-                    uiState.inviteCodeStatus,
-                    onClickCheckInviteCode = viewModel::checkInviteCode,
-                    onInviteCodeChanged = viewModel::setInviteCode,
-                ) // 초청 코드
-                if (!uiState.isInviteTicket) PaymentSection(scope, snackbarHostState) // 결제 수단
+                )
+
+                // 초청 코드
+                if (uiState.isInviteTicket) {
+                    InviteCodeSection(
+                        uiState.inviteCode,
+                        uiState.inviteCodeStatus,
+                        onClickCheckInviteCode = viewModel::checkInviteCode,
+                        onInviteCodeChanged = viewModel::setInviteCode,
+                    )
+                }
+
+                if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(scope, snackbarHostState) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
+
+                Text(
+                    modifier = Modifier
+                        .padding(top = 24.dp, bottom = 20.dp)
+                        .padding(horizontal = marginHorizontal),
+                    text = stringResource(R.string.business_responsibility),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Grey70,
+                )
+
+                if (specOut) {
+                    // 주문내용 확인 및 결제 동의
+                    OrderAgreementSection(
+                        totalAgreed = uiState.orderAgreed,
+                        agreement = uiState.orderAgreement,
+                        agreementLabels = uiState.orderAgreementInfos,
+                        onClickTotalAgree = viewModel::toggleAgreement,
+                        onClickAgree = viewModel::toggleAgreement,
+                        onClickShow = {}, // TODO 기획 확정되면 구현
+                    )
+                }
+
+                // 사업자 정보
                 BusinessInformation(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = navigateToBusiness
@@ -274,7 +306,7 @@ private fun Header(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = showDate.format("yyyy.MM.dd (${showDate.dayOfWeekString}) HH:mm"),
+                text = showDate.showDateTimeString,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey30,
             )
@@ -462,16 +494,29 @@ private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: 
             label = stringResource(R.string.ticket_count_label),
             value = stringResource(R.string.ticket_count, ticketCount),
         )
-        SectionTicketInfo(
-            label = stringResource(R.string.total_payment_amount_label),
-            value = stringResource(R.string.unit_won, totalPrice),
-        )
+        Row(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(R.string.total_payment_amount_label),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30
+            )
+            Text(
+                text = stringResource(R.string.unit_won, totalPrice),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
         Spacer(modifier = Modifier.padding(bottom = 8.dp))
     }
 }
 
 @Composable
-private fun DeposorSection(
+private fun DepositorSection(
     name: String = "",
     phoneNumber: String = "",
     isSameContactInfo: Boolean,
@@ -577,6 +622,110 @@ private fun TicketHolderSection(
 }
 
 @Composable
+private fun OrderAgreementSection(
+    totalAgreed: Boolean,
+    agreementLabels: List<Int>,
+    agreement: List<Boolean>,
+    onClickTotalAgree: () -> Unit,
+    onClickAgree: (index: Int) -> Unit,
+    onClickShow: (index: Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(20.dp),
+    ) {
+        Row(
+            modifier = Modifier.clickable(onClick = onClickTotalAgree),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (totalAgreed) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_checkbox_selected),
+                    tint = Grey05,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(3.dp)
+                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_checkbox_18),
+                    tint = Grey50,
+                    contentDescription = null,
+                )
+            }
+            Text(
+                text = stringResource(R.string.order_agreement_label),
+                color = Grey10,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.size(16.dp))
+        agreementLabels.forEachIndexed { index, labelRes ->
+            OrderAgreementItem(
+                modifier = Modifier.padding(top = 4.dp),
+                index = index,
+                agreed = agreement[index],
+                label = stringResource(labelRes),
+                onClickAgree = onClickAgree,
+                onClickShow = onClickShow,
+            )
+        }
+    }
+}
+
+@Composable
+private fun OrderAgreementItem(
+    modifier: Modifier = Modifier,
+    index: Int,
+    agreed: Boolean,
+    label: String,
+    onClickAgree: (index: Int) -> Unit,
+    onClickShow: (index: Int) -> Unit,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.clickable { onClickAgree(index) },
+        ) {
+            Icon(
+                modifier = Modifier.padding(end = 4.dp),
+                painter = painterResource(R.drawable.ic_check), contentDescription = label,
+                tint = if (agreed) MaterialTheme.colorScheme.primary else Grey50,
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey50,
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        ShowButton { onClickShow(index) }
+    }
+}
+
+@Composable
+private fun ShowButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Text(
+        modifier = modifier.clickable(onClick = onClick),
+        text = stringResource(R.string.show),
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontWeight = FontWeight.SemiBold,
+            textDecoration = TextDecoration.Underline,
+        ),
+        color = Grey50,
+    )
+}
+
+@Composable
 private fun Section(
     modifier: Modifier = Modifier,
     title: String,
@@ -673,6 +822,23 @@ private fun TicketingDetailScreenPreview() {
             TicketingScreen(
                 onReserved = { _, _ -> },
                 navigateToBusiness = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OrderAgreementItemPreview() {
+    BooltiTheme {
+        Surface {
+            var agreed by remember { mutableStateOf(false) }
+            OrderAgreementItem(
+                index = 0,
+                agreed = agreed,
+                label = "test",
+                onClickAgree = { agreed = !agreed },
+                onClickShow = {},
             )
         }
     }

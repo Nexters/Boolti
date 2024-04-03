@@ -177,7 +177,6 @@ fun ShowDetailScreen(
                 )
                 ShowDetailCtaButton(
                     showState = uiState.showDetail.state,
-                    purchased = uiState.showDetail.isReserved,
                     onClick = {
                         scope.launch {
                             if (isLoggedIn == true) {
@@ -497,24 +496,16 @@ private fun SectionContent(
 @Composable
 fun ShowDetailCtaButton(
     onClick: () -> Unit,
-    purchased: Boolean,
     showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
-    val enabled = showState is ShowState.TicketingInProgress && !purchased
+    val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
         is ShowState.WaitingTicketing -> stringResource(
             id = R.string.ticketing_button_upcoming_ticket, showState.dDay
         )
 
-        ShowState.TicketingInProgress -> {
-            if (purchased) {
-                stringResource(id = R.string.ticketing_button_purchased_ticket)
-            } else {
-                stringResource(id = R.string.ticketing_button_label)
-            }
-        }
-
+        ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }

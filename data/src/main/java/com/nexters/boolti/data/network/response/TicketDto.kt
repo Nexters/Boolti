@@ -18,6 +18,8 @@ internal data class TicketDto(
     val ticketName: String,
     val entryCode: String,
     val usedAt: String? = null, // 사용되지 않았을 때 null
+    val ticketCreatedAt: String,
+    val csTicketId: String,
 ) {
     fun toDomain(): Ticket = Ticket(
         userId = userId,
@@ -30,6 +32,8 @@ internal data class TicketDto(
         placeName = placeName,
         entryCode = entryCode,
         usedAt = usedAt?.toLocalDateTime(),
+        csReservationId = "", // TODO 이거 빈 값으로 둬도 되는지 확인 필요
+        csTicketId = csTicketId,
     )
 }
 
@@ -54,6 +58,8 @@ data class TicketDetailDto(
     val usedAt: String? = null,
     val hostName: String = "",
     val hostPhoneNumber: String = "",
+    val csReservationId: String = "",
+    val csTicketId: String = "",
 ) {
     fun toDomain(): Ticket = Ticket(
         userId = userId,
@@ -75,5 +81,7 @@ data class TicketDetailDto(
         usedAt = usedAt?.toLocalDateTime(),
         hostName = hostName,
         hostPhoneNumber = hostPhoneNumber,
+        csReservationId = csReservationId,
+        csTicketId = csTicketId,
     )
 }

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.ticketing
 
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.PaymentType
+import com.nexters.boolti.presentation.R
 import java.time.LocalDateTime
 
 data class TicketingState(
@@ -22,16 +23,47 @@ data class TicketingState(
     val depositorContact: String = "",
     val inviteCode: String = "",
     val refundPolicy: List<String> = emptyList(),
+    val orderAgreement: List<Boolean> = listOf(false, false, false),
 ) {
+    val orderAgreementInfos = listOf(
+        R.string.order_agreement_privacy_collection,
+        R.string.order_agreement_privacy_offer,
+        R.string.order_agreement_payment_agency,
+    )
+
+    val orderAgreed: Boolean
+        get() = orderAgreement.none { !it }
+
     val reservationButtonEnabled: Boolean
-        get() = if (isInviteTicket) {
-            reservationName.isNotBlank() &&
-                    reservationContact.isNotBlank() &&
-                    inviteCodeStatus is InviteCodeStatus.Valid
-        } else {
-            reservationName.isNotBlank() &&
-                    reservationContact.isNotBlank() &&
-                    (isSameContactInfo || depositorName.isNotBlank()) &&
-                    (isSameContactInfo || depositorContact.isNotBlank())
+        get() = when {
+            isInviteTicket -> //            orderAgreed &&
+                reservationName.isNotBlank() &&
+                        reservationContact.isNotBlank() &&
+                        inviteCodeStatus is InviteCodeStatus.Valid
+
+            totalPrice == 0 -> // orderAgreed &7
+                reservationName.isNotBlank() &&
+                        reservationContact.isNotBlank()
+
+            else -> //            orderAgreed &&
+                reservationName.isNotBlank() &&
+                        reservationContact.isNotBlank() &&
+                        (isSameContactInfo || depositorName.isNotBlank()) &&
+                        (isSameContactInfo || depositorContact.isNotBlank())
         }
+
+    fun toggleAgreement(index: Int): TicketingState {
+        val updated = orderAgreement.toMutableList().apply {
+            set(index, !orderAgreement[index])
+        }
+        return copy(orderAgreement = updated)
+    }
+
+    fun toggleAgreement(): TicketingState {
+        return if (orderAgreed) {
+            copy(orderAgreement = orderAgreement.map { false })
+        } else {
+            copy(orderAgreement = orderAgreement.map { true })
+        }
+    }
 }

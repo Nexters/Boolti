@@ -84,9 +84,9 @@ fun TicketingConfirmDialog(
             if (isInviteTicket || totalPrice > 0) {
                 InfoRow(
                     modifier = Modifier.padding(top = 16.dp),
-                    label = stringResource(R.string.ticket_type_label),
+                    label = stringResource(R.string.payment_type_label),
                     value1 = if (isInviteTicket) {
-                        stringResource(R.string.invite_ticket)
+                        stringResource(R.string.invite_code_label)
                     } else {
                         when (paymentType) {
                             PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)

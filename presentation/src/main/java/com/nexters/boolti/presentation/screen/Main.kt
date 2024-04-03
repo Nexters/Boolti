@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -19,6 +20,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
@@ -106,6 +108,16 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             route = "${ShowDetail.route}/{$showId}",
             startDestination = "detail",
             arguments = ShowDetail.arguments,
+            deepLinks = listOf(
+//                navDeepLink {
+//                    uriPattern = "https://app.boolti.in/show?showId={$showId}"
+//                    action = Intent.ACTION_VIEW
+//                },
+                navDeepLink {
+                    uriPattern = "https://preview.boolti.in/show/{$showId}"
+                    action = Intent.ACTION_VIEW
+                },
+            ),
         ) {
             ShowDetailScreen(
                 modifier = modifier,

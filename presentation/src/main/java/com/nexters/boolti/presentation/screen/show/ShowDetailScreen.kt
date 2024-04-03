@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.show
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -54,6 +55,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.dynamiclinks.androidParameters
+import com.google.firebase.dynamiclinks.dynamicLink
+import com.google.firebase.dynamiclinks.dynamicLinks
+import com.google.firebase.dynamiclinks.iosParameters
+import com.google.firebase.dynamiclinks.shortLinkAsync
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
@@ -122,6 +129,7 @@ fun ShowDetailScreen(
         modifier = modifier,
         topBar = {
             ShowDetailAppBar(
+                showId = uiState.showDetail.id,
                 onBack = { viewModel.sendEvent(ShowDetailEvent.PopBackStack) },
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
@@ -211,6 +219,7 @@ fun ShowDetailScreen(
 
 @Composable
 private fun ShowDetailAppBar(
+    showId: String,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
@@ -256,17 +265,29 @@ private fun ShowDetailAppBar(
                 .padding(end = 10.dp)
                 .size(44.dp),
             onClick = {
-                val sendIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(
-                        Intent.EXTRA_TEXT,
-                        "https://play.google.com/store/apps/details?id=${context.applicationContext.packageName}"
-                    )
-                    type = "text/plain"
-                }
+                Firebase.dynamicLinks.shortLinkAsync {
+                    link = Uri.parse("https://preview.boolti.in/show/$showId")
+                    domainUriPrefix = "https://boolti.page.link"
 
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
+                    androidParameters { }
+                    iosParameters("com.nexters.boolti") { }
+                }.addOnSuccessListener {
+                    it.shortLink?.let { link ->
+                        println(link)
+
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                link.toString()
+                            )
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        context.startActivity(shareIntent)
+                    }
+                }
             },
         ) {
             Icon(

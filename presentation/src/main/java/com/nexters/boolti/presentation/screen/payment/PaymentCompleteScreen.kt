@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.payment
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,8 +22,6 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -97,7 +94,8 @@ fun PaymentCompleteScreen(
             )
         }
 
-        Row(
+        // TODO 백엔드에 TicketId 요청 필요 <-- 1.5.0 에 주석 제거
+        /*Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -117,7 +115,7 @@ fun PaymentCompleteScreen(
             ) {
                 navigateToTicketDetail(reservation)
             }
-        }
+        }*/
     }
 }
 

@@ -36,6 +36,7 @@
 
                 <data android:scheme="https" />
                 <data android:host="app.boolti.in" />
+                <data android:host="preview.boolti.in" />
             </intent-filter>
         </activity>
 

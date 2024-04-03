@@ -109,10 +109,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             startDestination = "detail",
             arguments = ShowDetail.arguments,
             deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "https://app.boolti.in/show?showId={$showId}"
-                    action = Intent.ACTION_VIEW
-                },
+//                navDeepLink {
+//                    uriPattern = "https://app.boolti.in/show?showId={$showId}"
+//                    action = Intent.ACTION_VIEW
+//                },
                 navDeepLink {
                     uriPattern = "https://preview.boolti.in/show/{$showId}"
                     action = Intent.ACTION_VIEW

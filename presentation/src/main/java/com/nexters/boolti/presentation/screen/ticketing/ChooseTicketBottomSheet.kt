@@ -99,12 +99,6 @@ fun ChooseTicketBottomSheet(
                 )
                 .heightIn(max = 564.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
-                style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
-            )
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
                     ticket = it,
@@ -131,15 +125,23 @@ private fun ChooseTicketBottomSheetContent1(
     onSelectItem: (TicketWithQuantity) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    LazyColumn(
-        modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-        state = listState
-    ) {
-        items(tickets, key = { it.ticket.id }) {
-            TicketingTicketItem(
-                ticket = it,
-                onClick = onSelectItem,
-            )
+    Column {
+        Text(
+            text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
+            style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
+            modifier = Modifier
+                .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
+        )
+        LazyColumn(
+            modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+            state = listState
+        ) {
+            items(tickets, key = { it.ticket.id }) {
+                TicketingTicketItem(
+                    ticket = it,
+                    onClick = onSelectItem,
+                )
+            }
         }
     }
 }

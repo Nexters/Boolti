@@ -200,7 +200,7 @@
     <string name="reservations_depositing">입금 확인 중</string>
     <string name="reservations_refunding">취소 진행 중</string>
     <string name="reservations_canceled">예매 취소</string>
-    <string name="reservations_reserved">티켓 발권 완료</string>
+    <string name="reservations_reserved">발권 완료</string>
     <string name="reservations_refunded">취소 완료</string>
     <string name="reservations_detail_view">상세 보기</string>
     <string name="reservations_unknown">알 수 없음</string>

@@ -143,7 +143,10 @@ fun TicketingScreen(
             )
         },
         snackbarHost = {
-            ToastSnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(bottom = 100.dp))
+            ToastSnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 100.dp)
+            )
         }
     ) { innerPadding ->
         Box(modifier = modifier.padding(innerPadding)) {
@@ -195,7 +198,10 @@ fun TicketingScreen(
                     )
                 }
 
-                if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(scope, snackbarHostState) // 결제 수단
+                if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(
+                    scope,
+                    snackbarHostState
+                ) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
                 Text(
@@ -250,7 +256,10 @@ fun TicketingScreen(
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
                     enabled = uiState.reservationButtonEnabled,
-                    label = stringResource(R.string.ticketing_payment_button_label, uiState.totalPrice),
+                    label = stringResource(
+                        R.string.ticketing_payment_button_label,
+                        uiState.totalPrice
+                    ),
                     onClick = {
                         showConfirmDialog = true
                     },
@@ -299,7 +308,10 @@ private fun Header(
             contentScale = ContentScale.Crop,
         )
 
-        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(start = 16.dp)) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(start = 16.dp)
+        ) {
             Text(
                 text = showName,
                 style = point2,
@@ -433,7 +445,10 @@ private fun InviteCodeSection(
                 text = inviteCode.uppercase(),
                 singleLine = true,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
-                isError = inviteCodeStatus is InviteCodeStatus.Invalid,
+                isError = inviteCodeStatus in listOf(
+                    InviteCodeStatus.Invalid,
+                    InviteCodeStatus.Duplicated,
+                ),
                 placeholder = stringResource(R.string.ticketing_invite_code_placeholder),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Password,

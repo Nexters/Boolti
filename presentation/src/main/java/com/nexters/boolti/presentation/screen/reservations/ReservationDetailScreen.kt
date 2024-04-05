@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -211,41 +212,49 @@ private fun DepositInfo(
         title = stringResource(id = R.string.reservation_account_info),
     ) {
         Column {
-            DepositInfoRow(
+            NormalRow(
                 modifier = Modifier
                     .height(32.dp)
                     .padding(bottom = 8.dp),
                 key = stringResource(id = R.string.bank_name),
                 value = reservation.bankName,
             )
-            DepositInfoRow(
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .height(40.dp)
                     .padding(bottom = 2.dp),
-                key = stringResource(id = R.string.account_number),
-                value = reservation.accountNumber,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 val clipboardManager = LocalClipboardManager.current
                 val copiedMessage = stringResource(id = R.string.account_number_copied_message)
 
-                CopyButton(
-                    label = stringResource(id = R.string.copy),
-                    onClick = {
+                Text(
+                    modifier = Modifier,
+                    text = stringResource(id = R.string.account_number),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                )
+                Text(
+                    modifier = Modifier.clickable {
                         clipboardManager.setText(AnnotatedString(reservation.accountNumber))
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                             snackbarController.showMessage(copiedMessage)
                         }
                     },
+                    text = reservation.accountNumber,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+                    textDecoration = TextDecoration.Underline,
                 )
             }
-            DepositInfoRow(
+            NormalRow(
                 modifier = Modifier
                     .height(40.dp)
                     .padding(bottom = 2.dp),
                 key = stringResource(id = R.string.account_holder),
                 value = reservation.accountHolder,
             )
-            DepositInfoRow(
+            NormalRow(
                 modifier = Modifier
                     .height(40.dp)
                     .padding(bottom = 2.dp),
@@ -253,33 +262,6 @@ private fun DepositInfo(
                 value = reservation.salesEndDateTime.format(datetimeFormat),
             )
         }
-    }
-}
-
-@Composable
-private fun DepositInfoRow(
-    key: String,
-    value: String,
-    modifier: Modifier = Modifier,
-    content: (@Composable () -> Unit)? = null,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(end = 20.dp)
-                .width(80.dp),
-            text = key,
-            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-        )
-        Spacer(modifier = Modifier.weight(1.0f))
-        content?.invoke()
     }
 }
 

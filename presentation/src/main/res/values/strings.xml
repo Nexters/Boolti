@@ -211,7 +211,7 @@
     <string name="reservation_detail">예매 내역 상세</string>
     <string name="reservation_account_info">입금 계좌 정보</string>
     <string name="payment_info_label">결제 정보</string>
-    <string name="payment_state_label">결제 상태</string>
+    <string name="payment_state_label">결제 수단</string>
     <string name="reservation_ticket_info">티켓 정보</string>
     <string name="reservation_datetime">발권 일시</string>
     <string name="reservation_before_completion">발권 전</string>

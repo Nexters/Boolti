@@ -118,13 +118,13 @@ fun ReservationDetailScreen(
             if (!state.reservation.isInviteTicket) {
                 DepositInfo(reservation = state.reservation)
             }
+            TicketHolderInfo(reservation = state.reservation)
+            if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
             if (state.reservation.reservationState == ReservationState.REFUNDED) {
                 RefundInfo(reservation = state.reservation)
             }
             TicketInfo(reservation = state.reservation)
-            TicketHolderInfo(reservation = state.reservation)
-            if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             Spacer(modifier = Modifier.height(40.dp))
             if (state.reservation.reservationState == ReservationState.RESERVED &&

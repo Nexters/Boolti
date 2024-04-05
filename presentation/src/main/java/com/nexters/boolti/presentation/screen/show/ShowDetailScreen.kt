@@ -266,11 +266,16 @@ private fun ShowDetailAppBar(
                 .size(44.dp),
             onClick = {
                 Firebase.dynamicLinks.shortLinkAsync {
-                    link = Uri.parse("https://preview.boolti.in/show/$showId")
+                    val uri = Uri.parse("https://preview.boolti.in/show/$showId")
+                    link = uri
                     domainUriPrefix = "https://boolti.page.link"
 
-                    androidParameters { }
-                    iosParameters("com.nexters.boolti") { }
+                    androidParameters {
+                        fallbackUrl = uri
+                    }
+                    iosParameters("com.nexters.boolti") {
+                        setFallbackUrl(uri)
+                    }
                 }.addOnSuccessListener {
                     it.shortLink?.let { link ->
                         println(link)

@@ -298,8 +298,6 @@ private fun PaymentInfo(
             else -> stringResource(id = R.string.reservations_unknown)
         }
 
-        val (stateStringId, _) = reservation.reservationState.toDescriptionAndColorPair()
-
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -310,11 +308,6 @@ private fun PaymentInfo(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.total_payment_amount_label),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
-            )
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.payment_state_label),
-                value = stringResource(id = stateStringId)
             )
         }
     }
@@ -342,12 +335,6 @@ private fun TicketInfo(
                     id = R.string.reservation_ticket_count_format,
                     reservation.ticketCount
                 ),
-            )
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.reservation_datetime),
-                value = reservation.completedDateTime?.format(datetimeFormat)
-                    ?: stringResource(id = R.string.reservation_before_completion),
             )
         }
     }

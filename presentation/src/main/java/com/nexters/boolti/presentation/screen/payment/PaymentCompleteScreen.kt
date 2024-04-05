@@ -97,6 +97,7 @@ fun PaymentCompleteScreen(
             )
         }
 
+        /*
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -118,6 +119,7 @@ fun PaymentCompleteScreen(
                 navigateToTicketDetail(reservation)
             }
         }
+         */
     }
 }
 

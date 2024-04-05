@@ -83,7 +83,7 @@ fun LegacyTicketSummarySection(
     modifier: Modifier = Modifier,
     poster: String,
     showName: String,
-    paymentType: PaymentType,
+    ticketName: String,
     ticketCount: Int,
     totalPrice: Int,
 ) {
@@ -112,15 +112,14 @@ fun LegacyTicketSummarySection(
                 style = point1,
                 color = Grey05,
             )
-            val payment = when (paymentType) {
-                PaymentType.ACCOUNT_TRANSFER -> R.string.payment_account_transfer
-                PaymentType.CARD -> R.string.payment_card
-                PaymentType.UNDEFINED -> R.string.blank
-            }.let { stringResource(id = it) }
 
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = String.format("%s / %s", payment, ticketCount),
+                text = stringResource(
+                    id = R.string.reservation_ticket_info_format,
+                    ticketName,
+                    ticketCount
+                ),
                 color = Grey30,
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -159,7 +158,7 @@ private fun LegacyTicketSummaryPreview() {
                 modifier = Modifier.padding(24.dp),
                 poster = "",
                 showName = "2024 TOGETHER LUCKY CLUB",
-                paymentType = PaymentType.ACCOUNT_TRANSFER,
+                ticketName = "일반 티켓 B",
                 ticketCount = 10,
                 totalPrice = 30000,
             )

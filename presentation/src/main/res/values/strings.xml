@@ -176,7 +176,7 @@
     <string name="account_number">계좌번호</string>
     <string name="account_holder">예금주</string>
     <string name="account_transfer_due_date">입금 마감일</string>
-    <string name="invite_ticket_complete_title">결제가 완료되었어요</string>
+    <string name="invite_ticket_complete_title">결제를 완료했어요</string>
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 
     <!-- 마이 -->

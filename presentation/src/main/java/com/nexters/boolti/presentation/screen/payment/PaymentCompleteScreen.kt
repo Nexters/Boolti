@@ -61,7 +61,7 @@ fun PaymentCompleteScreen(
                 label = stringResource(R.string.ticketing_ticket_holder_label),
                 value = slashFormat(reservation.ticketHolderName, reservation.ticketHolderPhoneNumber),
             )
-            if (reservation.isInviteTicket || reservation.totalAmountPrice > 0) {
+            if (!reservation.isInviteTicket && reservation.totalAmountPrice > 0) {
                 InfoRow(
                     modifier = Modifier.padding(top = 16.dp),
                     label = stringResource(R.string.depositor_info_label),

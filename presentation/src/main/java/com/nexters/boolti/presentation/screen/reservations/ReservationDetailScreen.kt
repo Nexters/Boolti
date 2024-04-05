@@ -48,20 +48,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.reservationId
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -99,13 +93,27 @@ fun ReservationDetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
         ) {
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = marginHorizontal)
-                    .padding(top = 12.dp),
-                text = "No. ${state.reservation.csReservationId}",
-                style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                val (textId, textColor) = state.reservation.reservationState.toDescriptionAndColorPair()
+
+                Text(
+                    modifier = Modifier
+                        .padding(start = marginHorizontal)
+                        .padding(top = 12.dp),
+                    text = "No. ${state.reservation.csReservationId}",
+                    style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(end = marginHorizontal)
+                        .padding(top = 12.dp),
+                    text = stringResource(id = textId),
+                    style = MaterialTheme.typography.bodySmall.copy(color = textColor)
+                )
+            }
             Header(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) {
                 DepositInfo(reservation = state.reservation)

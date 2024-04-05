@@ -119,6 +119,9 @@ fun ReservationDetailScreen(
                 DepositInfo(reservation = state.reservation)
             }
             PaymentInfo(reservation = state.reservation)
+            if (state.reservation.reservationState == ReservationState.REFUNDED) {
+                RefundInfo(reservation = state.reservation)
+            }
             TicketInfo(reservation = state.reservation)
             TicketHolderInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
@@ -298,6 +301,36 @@ private fun PaymentInfo(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.total_payment_amount_label),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
+            )
+        }
+    }
+}
+
+@Composable
+private fun RefundInfo(
+    reservation: ReservationDetail,
+) {
+    Section(
+        modifier = Modifier.padding(top = 12.dp),
+        title = stringResource(id = R.string.reservation_breakdown_of_refund),
+    ) {
+        Column {
+            val paymentType = when (reservation.paymentType) {
+                PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
+                PaymentType.CARD -> stringResource(id = R.string.payment_card)
+                else -> stringResource(id = R.string.reservations_unknown)
+            }
+
+            NormalRow(
+                modifier = Modifier.padding(bottom = 8.dp),
+                key = stringResource(id = R.string.reservation_price_of_refund),
+                value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice),
+            )
+
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                key = stringResource(id = R.string.refund_method),
+                value = paymentType,
             )
         }
     }

@@ -219,6 +219,8 @@
     <string name="reservation_ticket_info_format">"%s / %d매"</string>
     <string name="reservation_number">주문 번호</string>
     <string name="reservation_ticket_type">주문 티켓</string>
+    <string name="reservation_breakdown_of_refund">환불 내역</string>
+    <string name="reservation_price_of_refund">총 환불 금액</string>
     <string name="show_ticket">티켓 보기</string>
     <string name="show_reservation">예매 내역보기</string>
 

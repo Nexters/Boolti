@@ -99,12 +99,6 @@ fun ChooseTicketBottomSheet(
                 )
                 .heightIn(max = 564.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
-                style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
-            )
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
                     ticket = it,
@@ -131,15 +125,23 @@ private fun ChooseTicketBottomSheetContent1(
     onSelectItem: (TicketWithQuantity) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    LazyColumn(
-        modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-        state = listState
-    ) {
-        items(tickets, key = { it.ticket.id }) {
-            TicketingTicketItem(
-                ticket = it,
-                onClick = onSelectItem,
-            )
+    Column {
+        Text(
+            text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
+            style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
+            modifier = Modifier
+                .padding(top = 20.dp, start = 24.dp, end = 24.dp, bottom = 12.dp)
+        )
+        LazyColumn(
+            modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+            state = listState
+        ) {
+            items(tickets, key = { it.ticket.id }) {
+                TicketingTicketItem(
+                    ticket = it,
+                    onClick = onSelectItem,
+                )
+            }
         }
     }
 }
@@ -155,60 +157,57 @@ private fun ChooseTicketBottomSheetContent2(
 
     Column(modifier) {
         Row(
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(top = 16.dp, end = 8.dp, start = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = ticket.ticket.ticketName.sliceAtMost(12),
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                    )
-                    if (!ticket.ticket.isInviteTicket) {
-                        Badge(
-                            stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            modifier = Modifier.padding(start = 8.dp),
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1F))
-                    IconButton(onClick = onCloseClicked) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_close),
-                            contentDescription = stringResource(id = R.string.description_close_button),
-                            tint = Grey50,
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.padding(top = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if (ticket.ticket.isInviteTicket) {
-                        Text(
-                            text = stringResource(R.string.ticketing_limit_per_person, 1),
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-                        )
-                    } else {
-                        HorizontalCountStepper(
-                            modifier = Modifier.width(100.dp),
-                            currentCount = ticketCount,
-                            minCount = 1,
-                            maxCount = ticket.quantity,
-                            onClickMinus = { ticketCount-- },
-                            onClickPlus = { ticketCount++ },
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = stringResource(R.string.format_price, ticket.ticket.price),
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-                    )
-                }
+            Text(
+                text = ticket.ticket.ticketName.sliceAtMost(12),
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                ),
+            )
+            if (!ticket.ticket.isInviteTicket) {
+                Badge(
+                    stringResource(R.string.badge_left_ticket_amount, ticket.quantity),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
             }
+            Spacer(modifier = Modifier.weight(1F))
+            IconButton(onClick = onCloseClicked) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = stringResource(id = R.string.description_close_button),
+                    tint = Grey50,
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.padding(top = 8.dp, bottom = 20.dp, start = 24.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (ticket.ticket.isInviteTicket) {
+                Text(
+                    text = stringResource(R.string.ticketing_limit_per_person, 1),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+                )
+            } else {
+                HorizontalCountStepper(
+                    modifier = Modifier.width(100.dp),
+                    currentCount = ticketCount,
+                    minCount = 1,
+                    maxCount = ticket.quantity,
+                    onClickMinus = { ticketCount-- },
+                    onClickPlus = { ticketCount++ },
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = stringResource(R.string.format_price, ticket.ticket.price),
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+            )
         }
 
         HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Grey80)

@@ -315,7 +315,7 @@ private fun TicketDetailScreen(
                         hostName = ticket.hostName,
                         hostPhoneNumber = ticket.hostPhoneNumber,
                         onClickCopyPlace = {
-                            clipboardManager.setText(AnnotatedString(ticket.streetAddress + ticket.detailAddress))
+                            clipboardManager.setText(AnnotatedString(ticket.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(copiedMessage)

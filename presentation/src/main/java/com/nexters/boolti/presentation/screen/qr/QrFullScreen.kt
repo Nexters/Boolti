@@ -46,7 +46,7 @@ fun QrFullScreen(
             modifier = Modifier
                 .constrainAs(closeButton) {
                     top.linkTo(parent.top, margin = 10.dp)
-                    start.linkTo(parent.start, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
                 }
         ) {
             Icon(

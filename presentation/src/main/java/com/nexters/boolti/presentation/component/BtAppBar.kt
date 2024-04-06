@@ -105,7 +105,7 @@ fun BtCloseableAppBar(
     BtAppBar(
         modifier = modifier,
         title = title,
-        navigateButtons = {
+        actionButtons = {
             BtAppBarDefaults.AppBarIconButton(
                 onClick = onClickClose,
                 iconRes = R.drawable.ic_close,

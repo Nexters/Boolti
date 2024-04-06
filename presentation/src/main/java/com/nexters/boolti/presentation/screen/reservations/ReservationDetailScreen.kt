@@ -65,6 +65,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
+import java.time.LocalDateTime
 
 @Composable
 fun ReservationDetailScreen(
@@ -127,8 +128,11 @@ fun ReservationDetailScreen(
             TicketInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             Spacer(modifier = Modifier.height(40.dp))
-            if (state.reservation.reservationState == ReservationState.RESERVED &&
-                !state.reservation.isInviteTicket
+            if (
+                state.reservation.reservationState == ReservationState.RESERVED &&
+                !state.reservation.isInviteTicket &&
+                state.reservation.totalAmountPrice > 0 &&
+                state.reservation.salesEndDateTime < LocalDateTime.now()
             ) {
                 RefundButton(
                     modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),

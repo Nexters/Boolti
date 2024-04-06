@@ -58,7 +58,7 @@ fun AccountTransferContent(
             modifier = Modifier.padding(top = 24.dp),
             poster = reservation.showImage,
             showName = reservation.showName,
-            paymentType = PaymentType.ACCOUNT_TRANSFER,
+            ticketName = reservation.ticketName,
             ticketCount = reservation.ticketCount,
             totalPrice = reservation.totalAmountPrice,
         )

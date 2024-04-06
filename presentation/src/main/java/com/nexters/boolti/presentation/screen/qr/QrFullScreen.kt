@@ -22,13 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.data
-import com.nexters.boolti.presentation.screen.ticketName
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
@@ -52,7 +46,7 @@ fun QrFullScreen(
             modifier = Modifier
                 .constrainAs(closeButton) {
                     top.linkTo(parent.top, margin = 10.dp)
-                    end.linkTo(parent.end, margin = 20.dp)
+                    start.linkTo(parent.start, margin = 20.dp)
                 }
         ) {
             Icon(

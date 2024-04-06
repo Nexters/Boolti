@@ -24,16 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtAppBar
-import com.nexters.boolti.presentation.screen.sharedViewModel
+import com.nexters.boolti.presentation.component.BtCloseableAppBar
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -52,13 +44,7 @@ fun ShowImagesScreen(
     ) { uiState.showDetail.images.size }
 
     Scaffold(
-        topBar = {
-            BtAppBar(
-                title = "",
-                onBackPressed = onBackPressed,
-                navIconRes = R.drawable.ic_close,
-            )
-        },
+        topBar = { BtCloseableAppBar(onClickClose = onBackPressed) },
         modifier = modifier,
     ) { innerPadding ->
         Column(

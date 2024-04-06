@@ -31,17 +31,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -62,10 +58,7 @@ fun ReservationsScreen(
 
     Scaffold(
         topBar = {
-            BtAppBar(
-                title = stringResource(id = R.string.my_ticketing_history),
-                onBackPressed = onBackPressed,
-            )
+            BtBackAppBar(title = stringResource(id = R.string.my_ticketing_history), onClickBack = onBackPressed)
         }
     ) { innerPadding ->
         Box(

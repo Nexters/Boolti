@@ -29,15 +29,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -84,6 +81,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
@@ -175,7 +173,7 @@ private fun TicketDetailScreen(
     }
 
     Scaffold(
-        topBar = { TicketDetailToolbar(onBackClicked = onBackClicked) },
+        topBar = { BtBackAppBar(onClickBack = onBackClicked) },
         snackbarHost = {
             ToastSnackbarHost(
                 modifier = Modifier.padding(bottom = 54.dp),
@@ -375,27 +373,6 @@ private fun TicketDetailScreen(
             )
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TicketDetailToolbar(
-    onBackClicked: () -> Unit,
-) {
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            IconButton(onClick = onBackClicked) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = stringResource(R.string.description_navigate_back),
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        ),
-    )
 }
 
 @Composable

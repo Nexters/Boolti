@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -30,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,6 +38,7 @@ import com.nexters.boolti.presentation.QrScanEvent
 import com.nexters.boolti.presentation.QrScanViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.BtCloseableAppBar
 import com.nexters.boolti.presentation.component.CircleBgIcon
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.Error
@@ -93,7 +91,10 @@ fun QrScanScreen(
 
     Scaffold(
         topBar = {
-            QrScanToolbar(showName = uiState.showName, onClickClose = onClickClose)
+            BtCloseableAppBar(
+                title = uiState.showName,
+                onClickClose = onClickClose,
+            )
         },
         bottomBar = {
             QrScanBottombar { showEntryCodeDialog = true }
@@ -128,37 +129,6 @@ fun QrScanScreen(
             EntryCodeDialog(
                 managerCode = uiState.managerCode,
                 onDismiss = { showEntryCodeDialog = false },
-            )
-        }
-    }
-}
-
-@Composable
-private fun QrScanToolbar(
-    showName: String,
-    onClickClose: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .height(44.dp)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(end = 20.dp)
-                .weight(1f),
-            text = showName,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        IconButton(onClick = onClickClose) {
-            Icon(
-                painter = painterResource(R.drawable.ic_close),
-                tint = MaterialTheme.colorScheme.onBackground,
-                contentDescription = stringResource(R.string.description_close_button),
             )
         }
     }

@@ -24,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,6 +52,7 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -83,7 +83,13 @@ fun ReservationDetailScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { ReservationDetailAppBar(onBackPressed = onBackPressed) }) { innerPadding ->
+        topBar = {
+            BtBackAppBar(
+                title = stringResource(id = R.string.reservation_detail),
+                onClickBack = onBackPressed,
+            )
+        },
+    ) { innerPadding ->
 
         val state = uiState
         if (state !is ReservationDetailUiState.Success) return@Scaffold
@@ -140,36 +146,6 @@ fun ReservationDetailScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ReservationDetailAppBar(
-    onBackPressed: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(44.dp)
-            .background(color = MaterialTheme.colorScheme.background),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(id = R.string.description_navigate_back),
-                modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
-            )
-        }
-        Text(
-            text = stringResource(id = R.string.reservation_detail),
-            style = MaterialTheme.typography.titleMedium.copy(color = Grey10),
-        )
     }
 }
 

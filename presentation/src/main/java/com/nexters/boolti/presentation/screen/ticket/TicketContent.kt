@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -187,10 +188,10 @@ private fun Title(
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            modifier = Modifier.padding(end = 4.dp),
+        Icon(
+            modifier = Modifier.padding(end = 4.dp).size(20.dp),
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
+            tint = Grey80,
             contentDescription = null,
         )
         Text(

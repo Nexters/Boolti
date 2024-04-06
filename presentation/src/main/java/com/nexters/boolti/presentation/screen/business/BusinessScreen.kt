@@ -53,7 +53,7 @@ fun BusinessScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                modifier = Modifier.padding(bottom = 20.dp),
+                modifier = Modifier.padding(top = 20.dp, bottom = 16.dp),
                 text = stringResource(id = R.string.business_name),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,

@@ -139,7 +139,7 @@
     <string name="ticketing_invite_code_use_button">사용하기</string>
     <string name="ticketing_invite_code_success">사용되었습니다</string>
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
-    <string name="ticketing_invite_code_invalid">초청 코드가 올바르지 않아요</string>
+    <string name="ticketing_invite_code_invalid">올바른 초청 코드를 입력해 주세요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
     <string name="ticketing_same_contact_info">예매자와 결제자가 같아요</string>
     <string name="ticket_type_label">티켓 종류</string>
@@ -176,7 +176,7 @@
     <string name="account_number">계좌번호</string>
     <string name="account_holder">예금주</string>
     <string name="account_transfer_due_date">입금 마감일</string>
-    <string name="invite_ticket_complete_title">결제가 완료되었어요</string>
+    <string name="invite_ticket_complete_title">결제를 완료했어요</string>
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 
     <!-- 마이 -->
@@ -200,7 +200,7 @@
     <string name="reservations_depositing">입금 확인 중</string>
     <string name="reservations_refunding">취소 진행 중</string>
     <string name="reservations_canceled">예매 취소</string>
-    <string name="reservations_reserved">티켓 발권 완료</string>
+    <string name="reservations_reserved">발권 완료</string>
     <string name="reservations_refunded">취소 완료</string>
     <string name="reservations_detail_view">상세 보기</string>
     <string name="reservations_unknown">알 수 없음</string>
@@ -211,7 +211,7 @@
     <string name="reservation_detail">예매 내역 상세</string>
     <string name="reservation_account_info">입금 계좌 정보</string>
     <string name="payment_info_label">결제 정보</string>
-    <string name="payment_state_label">결제 상태</string>
+    <string name="payment_state_label">결제 수단</string>
     <string name="reservation_ticket_info">티켓 정보</string>
     <string name="reservation_datetime">발권 일시</string>
     <string name="reservation_before_completion">발권 전</string>
@@ -219,6 +219,8 @@
     <string name="reservation_ticket_info_format">"%s / %d매"</string>
     <string name="reservation_number">주문 번호</string>
     <string name="reservation_ticket_type">주문 티켓</string>
+    <string name="reservation_breakdown_of_refund">환불 내역</string>
+    <string name="reservation_price_of_refund">총 환불 금액</string>
     <string name="show_ticket">티켓 보기</string>
     <string name="show_reservation">예매 내역보기</string>
 
@@ -272,6 +274,6 @@
         <item>호스팅 서비스 : 스튜디오 불티</item>
         <item>통신판매업 신고번호 : 2024-화도수동-0518</item>
         <item>문의전화 : 0507–1363–5690</item>
-        <item>studio.boolti@gmail.com</item>
+        <item>이메일 : studio.boolti@gmail.com</item>
     </string-array>
 </resources>

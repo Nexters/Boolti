@@ -50,7 +50,6 @@ internal class TicketingRepositoryImpl @Inject constructor(
             val errMsg = response.errorBody()?.string()
             val status = InviteCodeStatus.fromString(errMsg?.errorType)
             emit(status)
-            throw InviteCodeException(status)
         }
     }
 

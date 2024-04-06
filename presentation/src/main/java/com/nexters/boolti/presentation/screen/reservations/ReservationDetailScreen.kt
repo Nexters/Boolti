@@ -121,11 +121,11 @@ fun ReservationDetailScreen(
             }
             TicketHolderInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
+            TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
             if (state.reservation.reservationState == ReservationState.REFUNDED) {
                 RefundInfo(reservation = state.reservation)
             }
-            TicketInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             Spacer(modifier = Modifier.height(40.dp))
             if (
@@ -287,7 +287,7 @@ private fun PaymentInfo(
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.payment_info_label),
+        title = stringResource(id = R.string.payment_state_label),
     ) {
         val paymentType = when (reservation.paymentType) {
             PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)

@@ -247,23 +247,28 @@ private fun ShowDetailAppBar(
                 description = stringResource(id = R.string.ticketing_share),
                 onClick = {
                     Firebase.dynamicLinks.shortLinkAsync {
-                        link = Uri.parse("https://preview.boolti.in/show/$showId")
+                        val uri = Uri.parse("https://preview.boolti.in/show/$showId")
+                        link = uri
                         domainUriPrefix = "https://boolti.page.link"
 
-                        androidParameters { }
-                        iosParameters("com.nexters.boolti") { }
-                    }.addOnSuccessListener {
-                        it.shortLink?.let { link ->
-                            println(link)
+                    androidParameters {
+                        fallbackUrl = uri
+                    }
+                    iosParameters("com.nexters.boolti") {
+                        setFallbackUrl(uri)
+                    }
+                }.addOnSuccessListener {
+                    it.shortLink?.let { link ->
+                        println(link)
 
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    link.toString()
-                                )
-                                type = "text/plain"
-                            }
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                link.toString()
+                            )
+                            type = "text/plain"
+                        }
 
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             context.startActivity(shareIntent)
@@ -276,7 +281,7 @@ private fun ShowDetailAppBar(
                 description = stringResource(id = R.string.description_more_menu),
                 onClick = { isContextMenuVisible = true },
             )
-        }
+        },
     )
 
     Box(

@@ -138,7 +138,7 @@ fun ReservationDetailScreen(
                 state.reservation.reservationState == ReservationState.RESERVED &&
                 !state.reservation.isInviteTicket &&
                 state.reservation.totalAmountPrice > 0 &&
-                state.reservation.salesEndDateTime < LocalDateTime.now()
+                state.reservation.salesEndDateTime >= LocalDateTime.now()
             ) {
                 RefundButton(
                     modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),

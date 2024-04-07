@@ -24,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,6 +52,7 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -65,6 +65,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
+import java.time.LocalDateTime
 
 @Composable
 fun ReservationDetailScreen(
@@ -82,7 +83,13 @@ fun ReservationDetailScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { ReservationDetailAppBar(onBackPressed = onBackPressed) }) { innerPadding ->
+        topBar = {
+            BtBackAppBar(
+                title = stringResource(id = R.string.reservation_detail),
+                onClickBack = onBackPressed,
+            )
+        },
+    ) { innerPadding ->
 
         val state = uiState
         if (state !is ReservationDetailUiState.Success) return@Scaffold
@@ -120,15 +127,18 @@ fun ReservationDetailScreen(
             }
             TicketHolderInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
+            TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
             if (state.reservation.reservationState == ReservationState.REFUNDED) {
                 RefundInfo(reservation = state.reservation)
             }
-            TicketInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             Spacer(modifier = Modifier.height(40.dp))
-            if (state.reservation.reservationState == ReservationState.RESERVED &&
-                !state.reservation.isInviteTicket
+            if (
+                state.reservation.reservationState == ReservationState.RESERVED &&
+                !state.reservation.isInviteTicket &&
+                state.reservation.totalAmountPrice > 0 &&
+                state.reservation.salesEndDateTime < LocalDateTime.now()
             ) {
                 RefundButton(
                     modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
@@ -136,36 +146,6 @@ fun ReservationDetailScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ReservationDetailAppBar(
-    onBackPressed: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(44.dp)
-            .background(color = MaterialTheme.colorScheme.background),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(id = R.string.description_navigate_back),
-                modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
-            )
-        }
-        Text(
-            text = stringResource(id = R.string.reservation_detail),
-            style = MaterialTheme.typography.titleMedium.copy(color = Grey10),
-        )
     }
 }
 
@@ -283,7 +263,7 @@ private fun PaymentInfo(
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.payment_info_label),
+        title = stringResource(id = R.string.payment_state_label),
     ) {
         val paymentType = when (reservation.paymentType) {
             PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)

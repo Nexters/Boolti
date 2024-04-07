@@ -27,7 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
@@ -40,9 +40,9 @@ fun BusinessScreen(
     Scaffold(
         contentColor = MaterialTheme.colorScheme.background,
         topBar = {
-            BtAppBar(
+            BtBackAppBar(
                 title = stringResource(id = R.string.business_title),
-                onBackPressed = onBackPressed,
+                onClickBack = onBackPressed,
             )
         }
     ) { innerPadding ->

@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,8 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -47,7 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -57,13 +53,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.dynamiclinks.androidParameters
-import com.google.firebase.dynamiclinks.dynamicLink
 import com.google.firebase.dynamiclinks.dynamicLinks
 import com.google.firebase.dynamiclinks.iosParameters
 import com.google.firebase.dynamiclinks.shortLinkAsync
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.requireActivity
@@ -223,52 +220,36 @@ private fun ShowDetailAppBar(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
-
-    Row(
-        modifier = modifier
-            .height(44.dp)
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.surface),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp),
-            onClick = onBack,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(id = R.string.description_navigate_back),
-                Modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
+    BtAppBar(
+        colors = BtAppBarDefaults.appBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        navigateButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_arrow_back,
+                description = stringResource(id = R.string.description_navigate_back),
+                onClick = onBack,
             )
-        }
-        IconButton(
-            modifier = Modifier.size(width = 64.dp, height = 44.dp),
-            onClick = onClickHome,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_home),
-                contentDescription = stringResource(id = R.string.description_toolbar_home),
-                Modifier.size(width = 24.dp, height = 24.dp)
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_home,
+                description = stringResource(id = R.string.description_toolbar_home),
+                onClick = onClickHome,
             )
-        }
-        Spacer(modifier = Modifier.weight(1.0f))
-        IconButton(
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .size(44.dp),
-            onClick = {
-                Firebase.dynamicLinks.shortLinkAsync {
-                    val uri = Uri.parse("https://preview.boolti.in/show/$showId")
-                    link = uri
-                    domainUriPrefix = "https://boolti.page.link"
+        },
+        actionButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_share,
+                description = stringResource(id = R.string.ticketing_share),
+                onClick = {
+                    Firebase.dynamicLinks.shortLinkAsync {
+                        val uri = Uri.parse("https://preview.boolti.in/show/$showId")
+                        link = uri
+                        domainUriPrefix = "https://boolti.page.link"
 
                     androidParameters {
                         fallbackUrl = uri
@@ -289,33 +270,19 @@ private fun ShowDetailAppBar(
                             type = "text/plain"
                         }
 
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-                        context.startActivity(shareIntent)
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }
                     }
-                }
-            },
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(R.drawable.ic_share),
-                contentDescription = stringResource(id = R.string.ticketing_share),
+                },
             )
-        }
-        IconButton(
-            modifier = Modifier
-                .padding(end = marginHorizontal)
-                .size(24.dp),
-            onClick = {
-                isContextMenuVisible = true
-            },
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(R.drawable.ic_verticle_more),
-                contentDescription = stringResource(id = R.string.description_more_menu),
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_verticle_more,
+                description = stringResource(id = R.string.description_more_menu),
+                onClick = { isContextMenuVisible = true },
             )
-        }
-    }
+        },
+    )
 
     Box(
         modifier = Modifier

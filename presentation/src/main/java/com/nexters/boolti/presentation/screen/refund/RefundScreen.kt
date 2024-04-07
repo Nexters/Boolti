@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -68,8 +67,9 @@ fun RefundScreen(
 
     Scaffold(
         topBar = {
-            BtAppBar(
-                title = stringResource(id = R.string.refund_button), onBackPressed = onBackPressed
+            BtBackAppBar(
+                title = stringResource(R.string.refund_button),
+                onClickBack = onBackPressed,
             )
         },
         modifier = Modifier,

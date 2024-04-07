@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
@@ -42,7 +42,7 @@ fun SignoutScreen(
     }
 
     Scaffold(
-        topBar = { BtAppBar(title = stringResource(R.string.signout), onBackPressed = navigateBack) },
+        topBar = { BtBackAppBar(title = stringResource(R.string.signout), onClickBack = navigateBack) },
         bottomBar = {
             MainButton(
                 modifier = Modifier

@@ -138,7 +138,7 @@ fun ReservationDetailScreen(
                 state.reservation.reservationState == ReservationState.RESERVED &&
                 !state.reservation.isInviteTicket &&
                 state.reservation.totalAmountPrice > 0 &&
-                state.reservation.salesEndDateTime < LocalDateTime.now()
+                state.reservation.salesEndDateTime >= LocalDateTime.now()
             ) {
                 RefundButton(
                     modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
@@ -273,14 +273,14 @@ private fun PaymentInfo(
 
         Column {
             NormalRow(
-                modifier = Modifier.padding(bottom = 8.dp),
-                key = stringResource(id = R.string.payment_type_label),
-                value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
-            )
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                modifier = Modifier.padding(bottom = 10.dp),
                 key = stringResource(id = R.string.total_payment_amount_label),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
+            )
+            NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                key = stringResource(id = R.string.payment_type_label),
+                value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
             )
         }
     }

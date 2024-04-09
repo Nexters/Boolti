@@ -19,8 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -71,7 +72,7 @@ fun BTDialog(
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .clickable { onDismiss() },
-                            painter = painterResource(id = R.drawable.ic_close),
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_close),
                             tint = Grey50,
                             contentDescription = stringResource(R.string.description_close_button),
                         )

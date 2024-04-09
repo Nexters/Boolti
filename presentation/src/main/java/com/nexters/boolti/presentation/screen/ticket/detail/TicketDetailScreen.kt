@@ -57,13 +57,14 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -389,7 +390,7 @@ private fun Title(
     ) {
         Image(
             modifier = Modifier.padding(end = 4.dp),
-            painter = painterResource(R.drawable.ic_logo),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
             contentDescription = null,
         )
@@ -647,7 +648,7 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                     .clip(CircleShape)
                     .rotate(rotation)
                     .clickable(role = Role.Image) { expanded = !expanded },
-                painter = painterResource(R.drawable.ic_expand_24),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_expand_24),
                 tint = Grey50,
                 contentDescription = null,
             )

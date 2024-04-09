@@ -24,9 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -157,7 +159,7 @@ fun MyHeader(modifier: Modifier = Modifier, user: User?, requireLogin: () -> Uni
         if (user == null) {
             Icon(
                 modifier = Modifier.padding(start = 12.dp),
-                painter = painterResource(id = R.drawable.ic_arrow_right),
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_right),
                 contentDescription = null,
                 tint = Grey50,
             )
@@ -183,7 +185,7 @@ private fun MyButton(
             style = MaterialTheme.typography.titleLarge.copy(color = Grey10),
         )
         Icon(
-            painter = painterResource(id = R.drawable.ic_arrow_right),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
             contentDescription = null,
             tint = Grey50,
         )

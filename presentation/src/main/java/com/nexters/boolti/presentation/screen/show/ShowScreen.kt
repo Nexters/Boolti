@@ -42,14 +42,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -243,7 +243,7 @@ fun SearchBar(
                 trailingIcon = {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(id = R.drawable.ic_search),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_search),
                         contentDescription = null,
                         tint = Grey60,
                     )
@@ -281,6 +281,6 @@ private fun Banner(
             text = stringResource(R.string.has_pending_ticket),
             style = MaterialTheme.typography.bodyLarge,
         )
-        Icon(painter = painterResource(id = R.drawable.ic_arrow_right), contentDescription = null)
+        Icon(imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right), contentDescription = null)
     }
 }

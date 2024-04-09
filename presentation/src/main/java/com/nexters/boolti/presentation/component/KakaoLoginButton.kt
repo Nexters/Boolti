@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.component
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kakao.sdk.auth.model.OAuthToken
@@ -65,7 +65,8 @@ fun KakaoLoginButton(
             contentAlignment = Alignment.CenterStart,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_kakaotalk), contentDescription = "카카오톡 아이콘",
+                imageVector = ImageVector.vectorResource(R.drawable.ic_kakaotalk),
+                contentDescription = "카카오톡 아이콘",
                 modifier = Modifier.size(width = 20.dp, height = 20.dp),
                 tint = Color.Black,
             )

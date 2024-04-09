@@ -20,8 +20,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,7 +41,6 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
-import kotlinx.coroutines.channels.consumeEach
 
 @Composable
 fun HomeScreen(
@@ -170,7 +170,7 @@ private fun HomeNavigationBar(
                     onClick = { onDestinationChanged(dest) },
                     icon = {
                         Icon(
-                            painter = painterResource(dest.icon),
+                            imageVector = ImageVector.vectorResource(dest.icon),
                             contentDescription = label,
                         )
                     },

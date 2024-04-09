@@ -16,9 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +51,7 @@ fun QrFullScreen(
                 }
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_close),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_close),
                 tint = Grey90,
                 contentDescription = stringResource(R.string.description_close_button),
             )
@@ -91,7 +92,7 @@ fun QrFullScreen(
                 modifier = Modifier
                     .width(84.dp)
                     .padding(bottom = 12.dp),
-                painter = painterResource(R.drawable.ic_logo_boolti),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_logo_boolti),
                 contentScale = ContentScale.FillWidth,
                 contentDescription = null,
             )

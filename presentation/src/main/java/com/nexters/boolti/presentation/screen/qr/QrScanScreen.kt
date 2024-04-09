@@ -25,8 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -106,7 +107,7 @@ fun QrScanScreen(
                 leadingIcon = {
                     snackbarIconId?.let {
                         CircleBgIcon(
-                            painter = painterResource(it),
+                            iconId = it,
                             bgColor = when (it) {
                                 R.drawable.ic_check -> Success
                                 R.drawable.ic_error -> Error
@@ -153,7 +154,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
                 modifier = Modifier
                     .size(20.dp)
                     .padding(end = 4.dp),
-                painter = painterResource(id = R.drawable.ic_book),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_book),
                 tint = Grey50,
                 contentDescription = stringResource(R.string.show_entry_code),
             )

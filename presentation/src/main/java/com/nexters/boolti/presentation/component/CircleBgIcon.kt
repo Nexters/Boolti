@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CircleShape
@@ -8,12 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 
 @Composable
 fun CircleBgIcon(
     modifier: Modifier = Modifier,
-    painter: Painter,
+    @DrawableRes iconId: Int,
     bgColor: Color,
 ) {
     Box(
@@ -21,6 +23,6 @@ fun CircleBgIcon(
             .clip(CircleShape)
             .background(bgColor)
     ) {
-        Icon(painter = painter, contentDescription = null)
+        Icon(imageVector = ImageVector.vectorResource(iconId), contentDescription = null)
     }
 }

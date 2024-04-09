@@ -20,8 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,7 +58,7 @@ fun <T> HorizontalStepper(
                     onClickLabel = stringResource(R.string.stepper_minus_description),
                     onClick = { onClickMinus(currentItem) },
                 ),
-                painter = painterResource(id = R.drawable.ic_stepper_minus),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_stepper_minus),
                 colorFilter = ColorFilter.tint(if (minusEnabled) Grey15 else Grey70),
                 contentDescription = stringResource(R.string.stepper_minus_description),
             )
@@ -82,7 +83,7 @@ fun <T> HorizontalStepper(
                     onClickLabel = stringResource(R.string.stepper_plus_description),
                     onClick = { onClickPlus(currentItem) },
                 ),
-                painter = painterResource(id = R.drawable.ic_stepper_plus),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_stepper_plus),
                 colorFilter = ColorFilter.tint(if (plusEnabled) Grey15 else Grey70),
                 contentDescription = stringResource(R.string.stepper_plus_description),
             )

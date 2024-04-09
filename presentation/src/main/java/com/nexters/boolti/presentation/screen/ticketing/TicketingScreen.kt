@@ -47,10 +47,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -324,7 +325,7 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                     .clip(CircleShape)
                     .rotate(rotation)
                     .clickable(role = Role.Image) { expanded = !expanded },
-                painter = painterResource(R.drawable.ic_expand_24),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_expand_24),
                 tint = Grey50,
                 contentDescription = null,
             )
@@ -397,7 +398,7 @@ private fun PaymentSection(
         }
         Row(Modifier.padding(top = 12.dp)) {
             Icon(
-                painter = painterResource(R.drawable.ic_info_20),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_info_20),
                 tint = Grey50,
                 contentDescription = null,
             )
@@ -532,7 +533,7 @@ private fun DepositorSection(
             ) {
                 if (isSameContactInfo) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_checkbox_selected),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_checkbox_selected),
                         tint = Grey05,
                         contentDescription = null,
                         modifier = Modifier
@@ -542,7 +543,7 @@ private fun DepositorSection(
                     )
                 } else {
                     Icon(
-                        painter = painterResource(R.drawable.ic_checkbox_18),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_checkbox_18),
                         tint = Grey50,
                         contentDescription = null,
                     )
@@ -638,7 +639,7 @@ private fun OrderAgreementSection(
         ) {
             if (totalAgreed) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_checkbox_selected),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_checkbox_selected),
                     tint = Grey05,
                     contentDescription = null,
                     modifier = Modifier
@@ -648,7 +649,7 @@ private fun OrderAgreementSection(
                 )
             } else {
                 Icon(
-                    painter = painterResource(R.drawable.ic_checkbox_18),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_checkbox_18),
                     tint = Grey50,
                     contentDescription = null,
                 )
@@ -692,7 +693,8 @@ private fun OrderAgreementItem(
         ) {
             Icon(
                 modifier = Modifier.padding(end = 4.dp),
-                painter = painterResource(R.drawable.ic_check), contentDescription = label,
+                imageVector = ImageVector.vectorResource(R.drawable.ic_check),
+                contentDescription = label,
                 tint = if (agreed) MaterialTheme.colorScheme.primary else Grey50,
             )
             Text(

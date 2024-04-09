@@ -39,9 +39,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
@@ -167,7 +168,7 @@ fun RefundInfoPage(
                     )
                     Spacer(modifier = Modifier.weight(1.0f))
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_down),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_down),
                         contentDescription = stringResource(id = R.string.refund_bank_selection),
                         tint = Grey50,
                     )
@@ -383,7 +384,7 @@ private fun Section(
                     modifier = Modifier.graphicsLayer {
                         rotationX = rotation
                     },
-                    painter = painterResource(id = R.drawable.ic_expand_24),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_expand_24),
                     contentDescription = stringResource(R.string.description_expand),
                     tint = Grey50,
                 )

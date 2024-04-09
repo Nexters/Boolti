@@ -24,9 +24,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -175,7 +176,7 @@ private fun ReservationItem(
             )
             Icon(
                 modifier = Modifier.padding(start = 4.dp),
-                painter = painterResource(R.drawable.ic_arrow_right),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
                 contentDescription = null,
                 tint = Grey50
             )

@@ -7,6 +7,7 @@ import com.nexters.boolti.domain.exception.QrErrorType
 import com.nexters.boolti.domain.exception.QrScanException
 import com.nexters.boolti.domain.repository.HostRepository
 import com.nexters.boolti.domain.request.QrScanRequest
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,7 @@ import javax.inject.Inject
 class QrScanViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val hostRepository: HostRepository,
-) : ViewModel() {
+) : BaseViewModel() {
     private var lastCode: String? = null // 테스트 코드: wkjai-qoxzaz
 
     private val showId: String = requireNotNull(savedStateHandle["showId"])
@@ -48,18 +49,15 @@ class QrScanViewModel @Inject constructor(
      * @param entryCode 스캔한 QR 의 데이터
      */
     fun scan(entryCode: String) {
-        if (entryCode != lastCode) {
-            lastCode = entryCode
-            Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
-            requestEntrance(entryCode)
-        }
+        Timber.tag("mangbaam_QrScanActivity").d("스캔 결과: $entryCode")
+        requestEntrance(entryCode)
     }
 
     /**
      * 입장 확인
      */
     private fun requestEntrance(entryCode: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             hostRepository.requestEntrance(
                 QrScanRequest(showId = showId, entryCode = entryCode)
             ).catch { e ->
@@ -69,6 +67,7 @@ class QrScanViewModel @Inject constructor(
                             event(QrScanEvent.ScanError(type))
                         }
                     }
+                    else -> throw e
                 }
             }.singleOrNull()?.let {
                 event(QrScanEvent.ScanSuccess)
@@ -77,10 +76,8 @@ class QrScanViewModel @Inject constructor(
     }
 
     private fun getManagerCode() {
-        viewModelScope.launch {
-            hostRepository.getManagerCode(showId).catch { e ->
-                e.printStackTrace()
-            }.singleOrNull()?.let { code ->
+        viewModelScope.launch(recordExceptionHandler) {
+            hostRepository.getManagerCode(showId).singleOrNull()?.let { code ->
                 _uiState.update { it.copy(managerCode = code) }
             }
         }

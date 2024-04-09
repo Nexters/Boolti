@@ -24,17 +24,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +42,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,10 +52,10 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.CopyButton
-import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -67,7 +65,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
-import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @Composable
 fun ReservationDetailScreen(
@@ -78,8 +76,6 @@ fun ReservationDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.fetchReservation()
@@ -87,13 +83,13 @@ fun ReservationDetailScreen(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = {
-            ToastSnackbarHost(
-                modifier = Modifier.padding(bottom = 80.dp),
-                hostState = snackbarHostState,
+        topBar = {
+            BtBackAppBar(
+                title = stringResource(id = R.string.reservation_detail),
+                onClickBack = onBackPressed,
             )
         },
-        topBar = { ReservationDetailAppBar(onBackPressed = onBackPressed) }) { innerPadding ->
+    ) { innerPadding ->
 
         val state = uiState
         if (state !is ReservationDetailUiState.Success) return@Scaffold
@@ -104,29 +100,45 @@ fun ReservationDetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
         ) {
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = marginHorizontal)
-                    .padding(top = 12.dp),
-                text = "No. ${state.reservation.id}",
-                style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                val (textId, textColor) = state.reservation.reservationState.toDescriptionAndColorPair()
+
+                Text(
+                    modifier = Modifier
+                        .padding(start = marginHorizontal)
+                        .padding(top = 12.dp),
+                    text = "No. ${state.reservation.csReservationId}",
+                    style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(end = marginHorizontal)
+                        .padding(top = 12.dp),
+                    text = stringResource(id = textId),
+                    style = MaterialTheme.typography.bodySmall.copy(color = textColor)
+                )
+            }
             Header(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) {
-                DepositInfo(
-                    reservation = state.reservation,
-                    showMessage = { message ->
-                        scope.launch { snackbarHostState.showSnackbar(message) }
-                    })
+                DepositInfo(reservation = state.reservation)
             }
-            PaymentInfo(reservation = state.reservation)
-            TicketInfo(reservation = state.reservation)
             TicketHolderInfo(reservation = state.reservation)
             if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
+            TicketInfo(reservation = state.reservation)
+            PaymentInfo(reservation = state.reservation)
+            if (state.reservation.reservationState == ReservationState.REFUNDED) {
+                RefundInfo(reservation = state.reservation)
+            }
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             Spacer(modifier = Modifier.height(40.dp))
-            if (state.reservation.reservationState == ReservationState.RESERVED &&
-                !state.reservation.isInviteTicket
+            if (
+                state.reservation.reservationState == ReservationState.RESERVED &&
+                !state.reservation.isInviteTicket &&
+                state.reservation.totalAmountPrice > 0 &&
+                state.reservation.salesEndDateTime >= LocalDateTime.now()
             ) {
                 RefundButton(
                     modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
@@ -134,36 +146,6 @@ fun ReservationDetailScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ReservationDetailAppBar(
-    onBackPressed: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(44.dp)
-            .background(color = MaterialTheme.colorScheme.background),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp), onClick = onBackPressed
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(id = R.string.description_navigate_back),
-                modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
-            )
-        }
-        Text(
-            text = stringResource(id = R.string.reservation_detail),
-            style = MaterialTheme.typography.titleMedium.copy(color = Grey10),
-        )
     }
 }
 
@@ -211,50 +193,59 @@ private fun Header(
 
 @Composable
 private fun DepositInfo(
-    reservation: ReservationDetail,
-    showMessage: (message: String) -> Unit,
     modifier: Modifier = Modifier,
+    reservation: ReservationDetail,
 ) {
+    val snackbarController = LocalSnackbarController.current
+
     Section(
         modifier = modifier,
         title = stringResource(id = R.string.reservation_account_info),
     ) {
         Column {
-            DepositInfoRow(
+            NormalRow(
                 modifier = Modifier
                     .height(32.dp)
                     .padding(bottom = 8.dp),
                 key = stringResource(id = R.string.bank_name),
                 value = reservation.bankName,
             )
-            DepositInfoRow(
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .height(40.dp)
                     .padding(bottom = 2.dp),
-                key = stringResource(id = R.string.account_number),
-                value = reservation.accountNumber,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 val clipboardManager = LocalClipboardManager.current
                 val copiedMessage = stringResource(id = R.string.account_number_copied_message)
 
-                CopyButton(
-                    label = stringResource(id = R.string.copy),
-                    onClick = {
+                Text(
+                    modifier = Modifier,
+                    text = stringResource(id = R.string.account_number),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                )
+                Text(
+                    modifier = Modifier.clickable {
                         clipboardManager.setText(AnnotatedString(reservation.accountNumber))
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                            showMessage(copiedMessage)
+                            snackbarController.showMessage(copiedMessage)
                         }
                     },
+                    text = reservation.accountNumber,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
+                    textDecoration = TextDecoration.Underline,
                 )
             }
-            DepositInfoRow(
+            NormalRow(
                 modifier = Modifier
                     .height(40.dp)
                     .padding(bottom = 2.dp),
                 key = stringResource(id = R.string.account_holder),
                 value = reservation.accountHolder,
             )
-            DepositInfoRow(
+            NormalRow(
                 modifier = Modifier
                     .height(40.dp)
                     .padding(bottom = 2.dp),
@@ -266,40 +257,13 @@ private fun DepositInfo(
 }
 
 @Composable
-private fun DepositInfoRow(
-    key: String,
-    value: String,
-    modifier: Modifier = Modifier,
-    content: (@Composable () -> Unit)? = null,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(end = 20.dp)
-                .width(80.dp),
-            text = key,
-            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-        )
-        Spacer(modifier = Modifier.weight(1.0f))
-        content?.invoke()
-    }
-}
-
-@Composable
 private fun PaymentInfo(
     reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
     Section(
         modifier = modifier.padding(top = 12.dp),
-        title = stringResource(id = R.string.payment_info_label),
+        title = stringResource(id = R.string.payment_state_label),
     ) {
         val paymentType = when (reservation.paymentType) {
             PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
@@ -307,23 +271,46 @@ private fun PaymentInfo(
             else -> stringResource(id = R.string.reservations_unknown)
         }
 
-        val (stateStringId, _) = reservation.reservationState.toDescriptionAndColorPair()
-
         Column {
             NormalRow(
-                modifier = Modifier.padding(bottom = 8.dp),
-                key = stringResource(id = R.string.payment_type_label),
-                value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
-            )
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                modifier = Modifier.padding(bottom = 10.dp),
                 key = stringResource(id = R.string.total_payment_amount_label),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
             )
             NormalRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                key = stringResource(id = R.string.payment_type_label),
+                value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
+            )
+        }
+    }
+}
+
+@Composable
+private fun RefundInfo(
+    reservation: ReservationDetail,
+) {
+    Section(
+        modifier = Modifier.padding(top = 12.dp),
+        title = stringResource(id = R.string.reservation_breakdown_of_refund),
+    ) {
+        Column {
+            val paymentType = when (reservation.paymentType) {
+                PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
+                PaymentType.CARD -> stringResource(id = R.string.payment_card)
+                else -> stringResource(id = R.string.reservations_unknown)
+            }
+
+            NormalRow(
+                modifier = Modifier.padding(bottom = 8.dp),
+                key = stringResource(id = R.string.reservation_price_of_refund),
+                value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice),
+            )
+
+            NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.payment_state_label),
-                value = stringResource(id = stateStringId)
+                key = stringResource(id = R.string.refund_method),
+                value = paymentType,
             )
         }
     }
@@ -351,12 +338,6 @@ private fun TicketInfo(
                     id = R.string.reservation_ticket_count_format,
                     reservation.ticketCount
                 ),
-            )
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.reservation_datetime),
-                value = reservation.completedDateTime?.format(datetimeFormat)
-                    ?: stringResource(id = R.string.reservation_before_completion),
             )
         }
     }

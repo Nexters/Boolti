@@ -7,7 +7,7 @@ import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class RemoteConfigDataSource(
+internal class RemoteConfigDataSource(
     private val remoteConfig: FirebaseRemoteConfig,
 ) {
 

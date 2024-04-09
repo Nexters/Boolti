@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.ticket
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import kotlin.math.absoluteValue
 
 @Composable
 fun TicketScreen(
     onClickTicket: (String) -> Unit,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TicketViewModel = hiltViewModel(),
 ) {
@@ -43,10 +45,19 @@ fun TicketScreen(
         viewModel.load()
     }
 
-    if (uiState.tickets.isNotEmpty()) {
-        TicketNotEmptyScreen(modifier, uiState, onClickQr, onClickTicket = onClickTicket)
-    } else {
-        TicketEmptyScreen(modifier)
+    when {
+        uiState.loading -> Box(modifier = Modifier.fillMaxSize()) {
+            BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+
+        uiState.tickets.isNotEmpty() -> TicketNotEmptyScreen(
+            modifier,
+            uiState,
+            onClickQr,
+            onClickTicket = onClickTicket
+        )
+
+        else -> TicketEmptyScreen(modifier)
     }
 }
 
@@ -55,7 +66,7 @@ fun TicketScreen(
 private fun TicketNotEmptyScreen(
     modifier: Modifier,
     uiState: TicketUiState,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
 ) {
     Column(

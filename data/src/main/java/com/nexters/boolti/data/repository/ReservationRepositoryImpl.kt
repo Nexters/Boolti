@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class ReservationRepositoryImpl @Inject constructor(
+internal class ReservationRepositoryImpl @Inject constructor(
     private val reservationDataSource: ReservationDataSource,
 ) : ReservationRepository {
     override fun getReservations(): Flow<List<Reservation>> = flow {
@@ -26,7 +26,7 @@ class ReservationRepositoryImpl @Inject constructor(
         if (isSuccessful) {
             emit(Unit)
         } else {
-            throw RuntimeException("환불 실패")
+            throw RuntimeException("취소 실패")
         }
     }
 }

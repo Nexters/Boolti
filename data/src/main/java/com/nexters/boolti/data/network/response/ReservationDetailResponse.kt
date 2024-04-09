@@ -7,10 +7,11 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReservationDetailResponse(
+internal data class ReservationDetailResponse(
     val reservationId: String,
     val showImg: String,
     val showName: String,
+    val showDate: String,
     val salesTicketName: String,
     val salesTicketType: String,
     val ticketCount: Int,
@@ -26,12 +27,14 @@ data class ReservationDetailResponse(
     val reservationPhoneNumber: String,
     val depositorName: String = "",
     val depositorPhoneNumber: String = "",
+    val csReservationId: String,
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
             id = reservationId,
             showImage = showImg,
             showName = showName,
+            showDate = showDate.toLocalDateTime(),
             ticketName = salesTicketName,
             isInviteTicket = salesTicketType == "INVITE",
             ticketCount = ticketCount,
@@ -47,6 +50,7 @@ data class ReservationDetailResponse(
             ticketHolderPhoneNumber = reservationPhoneNumber,
             depositorName = depositorName,
             depositorPhoneNumber = depositorPhoneNumber,
+            csReservationId = csReservationId,
         )
     }
 }

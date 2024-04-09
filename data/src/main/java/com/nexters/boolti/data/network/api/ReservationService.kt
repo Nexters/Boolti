@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.Path
 
-interface ReservationService {
+internal interface ReservationService {
     @GET("/app/api/v1/reservations")
     suspend fun getReservations(): List<ReservationResponse>
 

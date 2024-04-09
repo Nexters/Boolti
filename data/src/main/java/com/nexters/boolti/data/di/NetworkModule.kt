@@ -7,6 +7,7 @@ import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.network.AuthInterceptor
+import com.nexters.boolti.data.network.api.DeviceTokenService
 import com.nexters.boolti.data.network.api.HostService
 import com.nexters.boolti.data.network.api.ReservationService
 import com.nexters.boolti.data.network.api.ShowService
@@ -30,7 +31,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object NetworkModule {
+internal object NetworkModule {
     @Singleton
     @Provides
     @Named("auth")
@@ -76,6 +77,11 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideUserService(@Named("auth") retrofit: Retrofit): UserService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideDeviceTokenService(@Named("auth") retrofit: Retrofit): DeviceTokenService =
+        retrofit.create()
 
     @Singleton
     @Provides

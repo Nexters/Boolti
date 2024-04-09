@@ -1,8 +1,8 @@
 [versions]
 minSdk = "26"
 targetSdk = "34"
-versionCode = "5"
-versionName = "1.1.1"
+versionCode = "8"
+versionName = "1.4.0"
 packageName = "com.nexters.boolti"
 compileSdk = "34"
 targetJvm = "17"
@@ -41,6 +41,7 @@ google-services = "4.4.0"
 firebase-crashlytics = "2.9.9"
 firebase-config = "21.6.0"
 kotest = "5.8.0"
+zoomable = "1.6.0"
 zxing = "4.3.0"
 kakao = "2.19.0"
 timber = "5.0.1"
@@ -100,12 +101,15 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.require = "false" }
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.require = "false" }
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.require = "false" }
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config" }
+firebase-dynamic-links = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.require = "false" }
+zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxing" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk"}
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android" }
@@ -124,7 +128,7 @@ lifecycle = ["androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-ktx
 android-test = ["junit", "androidx-junit", "androidx-espresso-core", "kotlinx-coroutines-test"]
 network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
-firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
+firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-dynamic-links"]
 kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
 coil = ["coil", "coil-compose"]
 compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-material3-android", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]

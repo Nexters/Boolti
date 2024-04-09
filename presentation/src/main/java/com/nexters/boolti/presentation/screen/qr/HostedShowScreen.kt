@@ -12,15 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,24 +32,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey60
-import com.nexters.boolti.presentation.theme.aggroFamily
+import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Composable
 fun HostedShowScreen(
-    modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
     onClickShow: (showId: String, showName: String) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HostedShowViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = { HostedShowToolbar(onClickBack) }
+        topBar = {
+            BtBackAppBar(
+                title = stringResource(R.string.hostedShowsTitle),
+                onClickBack = onClickBack,
+            )
+        }
     ) { innerPadding ->
         if (uiState.shows.isEmpty()) {
             EmptyHostedShow(modifier = modifier.padding(innerPadding))
@@ -67,30 +69,6 @@ fun HostedShowScreen(
             )
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HostedShowToolbar(
-    onClickBack: () -> Unit,
-) {
-    TopAppBar(
-        title = {
-            Text(stringResource(R.string.hostedShowsTitle))
-        }, navigationIcon = {
-            IconButton(onClick = onClickBack) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = stringResource(R.string.description_navigate_back),
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-        )
-    )
 }
 
 @Composable
@@ -128,9 +106,8 @@ private fun HostedShowItem(
         Text(
             modifier = Modifier.weight(1f),
             text = show.name,
-            style = MaterialTheme.typography.bodyLarge,
+            style = point1,
             color = tint,
-            fontFamily = aggroFamily,
         )
         Icon(
             painter = painterResource(id = R.drawable.ic_scan),

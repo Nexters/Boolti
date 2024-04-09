@@ -1,7 +1,9 @@
 package com.nexters.boolti.presentation.screen.show
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,13 +25,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,31 +44,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.Firebase
+import com.google.firebase.dynamiclinks.androidParameters
+import com.google.firebase.dynamiclinks.dynamicLinks
+import com.google.firebase.dynamiclinks.iosParameters
+import com.google.firebase.dynamiclinks.shortLinkAsync
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
-import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
-import com.nexters.boolti.presentation.theme.aggroFamily
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
@@ -95,23 +98,36 @@ fun ShowDetailScreen(
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ShowDetailEvent.NavigateToImages -> {
+                    navigateToImages(event.index)
+                }
+
+                ShowDetailEvent.PopBackStack -> {
+                    onBack()
+                    viewModel.preventEvents()
+                }
+            }
+        }
+    }
+
+    BackHandler {
+        viewModel.sendEvent(ShowDetailEvent.PopBackStack)
+    }
+
     Scaffold(
         modifier = modifier,
-        snackbarHost = {
-            ToastSnackbarHost(
-                modifier = Modifier.padding(bottom = 80.dp),
-                hostState = snackbarHostState,
-            )
-        },
         topBar = {
             ShowDetailAppBar(
-                onBack = onBack,
+                showId = uiState.showDetail.id,
+                onBack = { viewModel.sendEvent(ShowDetailEvent.PopBackStack) },
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
             )
@@ -129,7 +145,7 @@ fun ShowDetailScreen(
             ) {
                 Poster(
                     modifier = modifier.fillMaxWidth(),
-                    navigateToImages = navigateToImages,
+                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
                     title = uiState.showDetail.name,
                     images = uiState.showDetail.images.map { it.originImage }
                 )
@@ -137,7 +153,6 @@ fun ShowDetailScreen(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
                         .padding(bottom = 114.dp),
-                    snackbarHost = snackbarHostState,
                     showDetail = uiState.showDetail,
                     host = stringResource(
                         id = R.string.ticketing_host_format,
@@ -167,12 +182,6 @@ fun ShowDetailScreen(
                 )
                 ShowDetailCtaButton(
                     showState = uiState.showDetail.state,
-                    purchased = uiState.showDetail.isReserved,
-                    showMessage = { message ->
-                        scope.launch {
-                            snackbarHostState.showSnackbar(message = message)
-                        }
-                    },
                     onClick = {
                         scope.launch {
                             if (isLoggedIn == true) {
@@ -207,85 +216,73 @@ fun ShowDetailScreen(
 
 @Composable
 private fun ShowDetailAppBar(
+    showId: String,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
+    BtAppBar(
+        colors = BtAppBarDefaults.appBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        navigateButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_arrow_back,
+                description = stringResource(id = R.string.description_navigate_back),
+                onClick = onBack,
+            )
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_home,
+                description = stringResource(id = R.string.description_toolbar_home),
+                onClick = onClickHome,
+            )
+        },
+        actionButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_share,
+                description = stringResource(id = R.string.ticketing_share),
+                onClick = {
+                    Firebase.dynamicLinks.shortLinkAsync {
+                        val uri = Uri.parse("https://preview.boolti.in/show/$showId")
+                        link = uri
+                        domainUriPrefix = "https://boolti.page.link"
 
-    Row(
-        modifier = modifier
-            .height(44.dp)
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.surface),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            modifier = Modifier.size(width = 48.dp, height = 44.dp),
-            onClick = onBack,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(id = R.string.description_navigate_back),
-                Modifier
-                    .padding(start = marginHorizontal)
-                    .size(width = 24.dp, height = 24.dp)
-            )
-        }
-        IconButton(
-            modifier = Modifier.size(width = 64.dp, height = 44.dp),
-            onClick = onClickHome,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_home),
-                contentDescription = stringResource(id = R.string.description_toolbar_home),
-                Modifier.size(width = 24.dp, height = 24.dp)
-            )
-        }
-        Spacer(modifier = Modifier.weight(1.0f))
-        IconButton(
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .size(44.dp),
-            onClick = {
-                val sendIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(
-                        Intent.EXTRA_TEXT,
-                        "https://play.google.com/store/apps/details?id=${context.applicationContext.packageName}"
-                    )
-                    type = "text/plain"
-                }
+                    androidParameters {
+                        fallbackUrl = uri
+                    }
+                    iosParameters("com.nexters.boolti") {
+                        setFallbackUrl(uri)
+                    }
+                }.addOnSuccessListener {
+                    it.shortLink?.let { link ->
+                        println(link)
 
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
-            },
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(R.drawable.ic_share),
-                contentDescription = stringResource(id = R.string.ticketing_share),
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                link.toString()
+                            )
+                            type = "text/plain"
+                        }
+
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        }
+                    }
+                },
             )
-        }
-        IconButton(
-            modifier = Modifier
-                .padding(end = marginHorizontal)
-                .size(24.dp),
-            onClick = {
-                isContextMenuVisible = true
-            },
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(R.drawable.ic_verticle_more),
-                contentDescription = stringResource(id = R.string.description_more_menu),
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_verticle_more,
+                description = stringResource(id = R.string.description_more_menu),
+                onClick = { isContextMenuVisible = true },
             )
-        }
-    }
+        },
+    )
 
     Box(
         modifier = Modifier
@@ -315,13 +312,12 @@ private fun ShowDetailAppBar(
 
 @Composable
 private fun ContentScaffold(
-    snackbarHost: SnackbarHostState,
     showDetail: ShowDetail,
     host: String,
     onClickContent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
+    val snackbarController = LocalSnackbarController.current
 
     Column(
         modifier = modifier,
@@ -361,9 +357,7 @@ private fun ContentScaffold(
                         onClick = {
                             clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                scope.launch {
-                                    snackbarHost.showSnackbar(copiedMessage)
-                                }
+                                snackbarController.showMessage(copiedMessage)
                             }
                         }
                     )
@@ -448,10 +442,7 @@ private fun Poster(
         Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),
             text = title,
-            fontFamily = aggroFamily,
-            color = Grey05,
-            fontSize = 24.sp,
-            lineHeight = 34.sp,
+            style = point3,
         )
     }
 }
@@ -498,25 +489,16 @@ private fun SectionContent(
 @Composable
 fun ShowDetailCtaButton(
     onClick: () -> Unit,
-    showMessage: (message: String) -> Unit,
-    purchased: Boolean,
     showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
-    val enabled = showState is ShowState.TicketingInProgress && !purchased
+    val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
         is ShowState.WaitingTicketing -> stringResource(
             id = R.string.ticketing_button_upcoming_ticket, showState.dDay
         )
 
-        ShowState.TicketingInProgress -> {
-            if (purchased) {
-                stringResource(id = R.string.ticketing_button_purchased_ticket)
-            } else {
-                stringResource(id = R.string.ticketing_button_label)
-            }
-        }
-
+        ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
     }

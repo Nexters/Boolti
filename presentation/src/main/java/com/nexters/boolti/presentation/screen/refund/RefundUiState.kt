@@ -9,23 +9,23 @@ data class RefundUiState(
     val bankInfo: BankInfo? = null,
     val accountNumber: String = "",
     val reservation: ReservationDetail? = null,
+    val refundPolicyChecked: Boolean = false
 ) {
-    val isValidName: Boolean get() {
-        val regex = "^[가-힣]{2,10}$".toRegex()
-        return regex.matches(name)
-    }
+    val isValidName: Boolean get() = name.isNotBlank()
 
-    val isValidContact: Boolean get() {
-        val regex = "^0[0-9]{8,10}$".toRegex()
-        return regex.matches(contact)
-    }
+    val isValidContact: Boolean get() = contact.isNotBlank()
 
     val isValidAccountNumber: Boolean get() {
         val regex = "^[0-9]{11,14}$".toRegex()
         return regex.matches(accountNumber)
     }
 
-    val isAbleToRequest: Boolean get() {
-        return reason.isNotBlank() && isValidName && isValidContact && (bankInfo != null) && isValidAccountNumber
-    }
+    val isAbleToRequest: Boolean get() =
+        reason.isNotBlank() &&
+                isValidName &&
+                isValidContact &&
+                (bankInfo != null) &&
+                isValidAccountNumber &&
+                refundPolicyChecked
+
 }

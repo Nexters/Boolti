@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.home
 
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.screen.HomeViewModel
 import com.nexters.boolti.presentation.screen.my.MyScreen
@@ -36,23 +40,32 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
+import kotlinx.coroutines.channels.consumeEach
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
-    onClickQr: (data: String) -> Unit,
+    onClickQr: (data: String, ticketName: String) -> Unit,
     onClickQrScan: () -> Unit,
+    onClickSignout: () -> Unit,
     navigateToReservations: () -> Unit,
+    navigateToBusiness: () -> Unit,
     requireLogin: () -> Unit,
+    modifier: Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { deepLink ->
+            navController.navigate(Uri.parse(deepLink))
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -80,10 +93,17 @@ fun HomeScreen(
                     modifier = modifier.padding(innerPadding),
                     onClickShowItem = onClickShowItem,
                     navigateToReservations = navigateToReservations,
+                    navigateToBusiness = navigateToBusiness,
                 )
             }
             composable(
                 route = Destination.Ticket.route,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "https://app.boolti.in/home/tickets"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
             ) {
                 when (loggedIn) {
                     true -> TicketScreen(
@@ -92,7 +112,11 @@ fun HomeScreen(
                         modifier = modifier.padding(innerPadding),
                     )
 
-                    false -> TicketLoginScreen(modifier.padding(innerPadding), onLoginClick = requireLogin)
+                    false -> TicketLoginScreen(
+                        modifier.padding(innerPadding),
+                        onLoginClick = requireLogin
+                    )
+
                     else -> Unit // 로그인 여부를 불러오는 중
                 }
             }
@@ -104,6 +128,7 @@ fun HomeScreen(
                     requireLogin = requireLogin,
                     navigateToReservations = navigateToReservations,
                     onClickQrScan = onClickQrScan,
+                    onClickSignout = onClickSignout,
                 )
             }
         }

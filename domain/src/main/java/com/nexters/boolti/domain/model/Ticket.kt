@@ -43,14 +43,15 @@ data class Ticket(
     val usedAt: LocalDateTime? = null,
     val hostName: String = "",
     val hostPhoneNumber: String = "",
+    val csReservationId: String = "",
+    val csTicketId: String = "",
 ) {
     val ticketState: TicketState
         get() = run {
             val now = LocalDateTime.now()
             when {
+                usedAt != null && now > usedAt -> TicketState.Used
                 now.toLocalDate() > showDate.toLocalDate() -> TicketState.Finished
-                usedAt == null -> TicketState.Ready
-                now > usedAt -> TicketState.Used
                 else -> TicketState.Ready
             }
         }

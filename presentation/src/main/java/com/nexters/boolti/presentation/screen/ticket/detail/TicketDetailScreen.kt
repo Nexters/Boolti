@@ -29,15 +29,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -69,6 +66,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,16 +75,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.ticketId
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -104,13 +107,35 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+fun NavGraphBuilder.TicketDetailScreen(
+    navigateTo: (String) -> Unit,
+    popBackStack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    composable(
+        route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+        arguments = MainDestination.TicketDetail.arguments,
+    ) {
+        TicketDetailScreen(
+            modifier = modifier,
+            onBackClicked = popBackStack,
+            onClickQr = { code, ticketName ->
+                navigateTo(
+                    "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
+                )
+            },
+            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") }
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketDetailScreen(
+private fun TicketDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketDetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     navigateToShowDetail: (showId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -125,7 +150,8 @@ fun TicketDetailScreen(
     var contentWidth by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeight by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
-    val bottomAreaHeight = ticketSectionHeight - ticketSectionHeightUntilTicketInfo + ticketInfoHeight.toPx()
+    val bottomAreaHeight =
+        ticketSectionHeight - ticketSectionHeightUntilTicketInfo + ticketInfoHeight.toPx()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
@@ -137,14 +163,17 @@ fun TicketDetailScreen(
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
-                TicketDetailEvent.ManagerCodeValid -> snackbarHostState.showSnackbar(entranceSuccessMsg)
+                TicketDetailEvent.ManagerCodeValid -> snackbarHostState.showSnackbar(
+                    entranceSuccessMsg
+                )
+
                 TicketDetailEvent.OnRefresh -> showEnterCodeDialog = false
             }
         }
     }
 
     Scaffold(
-        topBar = { TicketDetailToolbar(onBackClicked = onBackClicked) },
+        topBar = { BtBackAppBar(onClickBack = onBackClicked) },
         snackbarHost = {
             ToastSnackbarHost(
                 modifier = Modifier.padding(bottom = 54.dp),
@@ -181,7 +210,12 @@ fun TicketDetailScreen(
                         .clip(ticketShape)
                         .border(
                             width = 1.dp,
-                            brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
+                            brush = Brush.verticalGradient(
+                                listOf(
+                                    White.copy(.5f),
+                                    White.copy(.2f)
+                                )
+                            ),
                             shape = ticketShape,
                         ),
                 ) {
@@ -207,19 +241,26 @@ fun TicketDetailScreen(
                                 )
                                 .background(
                                     brush = Brush.linearGradient(
-                                        colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
+                                        colors = listOf(
+                                            Color(0x33C5CACD),
+                                            Grey95.copy(alpha = .2f)
+                                        ),
                                         start = Offset.Zero,
-                                        end = Offset(x = contentWidth, y = ticketSectionHeightUntilTicketInfo),
+                                        end = Offset(
+                                            x = contentWidth,
+                                            y = ticketSectionHeightUntilTicketInfo
+                                        ),
                                     ),
                                 )
                         )
                         Column(
                             modifier = Modifier
                                 .onGloballyPositioned { coordinates ->
-                                    ticketSectionHeightUntilTicketInfo = coordinates.size.height.toFloat()
+                                    ticketSectionHeightUntilTicketInfo =
+                                        coordinates.size.height.toFloat()
                                 }
                         ) {
-                            Title(ticketName = ticket.ticketName)
+                            Title(ticketName = ticket.ticketName, csTicketId = ticket.csTicketId)
 
                             AsyncImage(
                                 modifier = Modifier
@@ -246,7 +287,7 @@ fun TicketDetailScreen(
                                 placeName = ticket.placeName,
                                 entryCode = ticket.entryCode,
                                 ticketState = ticket.ticketState,
-                                onClickQr = onClickQr,
+                                onClickQr = { onClickQr(it, ticket.ticketName) },
                             )
                         }
                         // 티켓 좌상단 꼭지점 그라데이션
@@ -266,12 +307,13 @@ fun TicketDetailScreen(
 
                     Notice(notice = ticket.ticketNotice)
 
-                    val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                    val copiedMessage =
+                        stringResource(id = R.string.ticketing_address_copied_message)
                     Inquiry(
                         hostName = ticket.hostName,
                         hostPhoneNumber = ticket.hostPhoneNumber,
                         onClickCopyPlace = {
-                            clipboardManager.setText(AnnotatedString(ticket.streetAddress + ticket.detailAddress))
+                            clipboardManager.setText(AnnotatedString(ticket.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(copiedMessage)
@@ -333,47 +375,34 @@ fun TicketDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TicketDetailToolbar(
-    onBackClicked: () -> Unit,
-) {
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            IconButton(onClick = onBackClicked) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = stringResource(R.string.description_navigate_back),
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        ),
-    )
-}
-
 @Composable
 private fun Title(
     ticketName: String = "",
+    csTicketId: String = "",
 ) {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
+            .alpha(0.65f)
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Image(
+            modifier = Modifier.padding(end = 4.dp),
+            painter = painterResource(R.drawable.ic_logo),
+            colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
+            contentDescription = null,
+        )
         Text(
             modifier = Modifier.weight(1f),
             text = ticketName,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
             color = Grey80,
         )
-        Image(
-            painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey80),
-            contentDescription = null,
+        Text(
+            text = csTicketId,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
         )
     }
 }
@@ -458,7 +487,7 @@ private fun TicketQr(
             modifier = Modifier
                 .padding(vertical = 8.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(Color.White)
+                .background(White)
                 .padding(2.dp)
                 .clickable {
                     if (ticketState == TicketState.Ready) onClickQr(entryCode)
@@ -695,7 +724,11 @@ private fun SectionTitle(title: String) {
 fun TicketDetailPreview() {
     BooltiTheme {
         Surface {
-            TicketDetailScreen(modifier = Modifier, onBackClicked = {}, onClickQr = {}, navigateToShowDetail = {})
+            TicketDetailScreen(
+                modifier = Modifier,
+                onBackClicked = {},
+                onClickQr = { _, _ -> },
+                navigateToShowDetail = {})
         }
     }
 }

@@ -6,11 +6,9 @@ import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-class TokenDataSource @Inject constructor(
+internal class TokenDataSource @Inject constructor(
     private val context: Context,
 ) {
     private val dataStore: DataStore<AppSettings>

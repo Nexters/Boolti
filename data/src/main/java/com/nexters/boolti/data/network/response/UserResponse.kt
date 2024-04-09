@@ -4,7 +4,7 @@ import com.nexters.boolti.domain.model.User
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserResponse(
+internal data class UserResponse(
     val id: String,
     val nickname: String? = null,
     val email: String? = null,

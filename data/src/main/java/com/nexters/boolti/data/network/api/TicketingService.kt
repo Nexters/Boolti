@@ -13,7 +13,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface TicketingService {
+internal interface TicketingService {
     @GET("app/api/v1/sales-ticket-type/{showId}")
     suspend fun getSalesTickets(
         @Path("showId") showId: String,

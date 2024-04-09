@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
@@ -10,6 +9,7 @@ import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,7 +32,7 @@ class TicketingViewModel @Inject constructor(
     private val repository: TicketingRepository,
     getUserUsecase: GetUserUsecase,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
-) : ViewModel() {
+) : BaseViewModel() {
     private val showId: String = requireNotNull(savedStateHandle["showId"])
     private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
@@ -54,20 +55,20 @@ class TicketingViewModel @Inject constructor(
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
                 reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationPhoneNumber,
+                reservationPhoneNumber = state.reservationContact,
             )
 
             false -> TicketingRequest.Normal(
                 ticketCount = uiState.value.ticketCount,
                 depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
-                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationPhoneNumber else state.depositorPhoneNumber,
+                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationContact else state.depositorContact,
                 paymentAmount = uiState.value.totalPrice,
                 paymentType = uiState.value.paymentType,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
                 reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationPhoneNumber,
+                reservationPhoneNumber = state.reservationContact,
             )
         }
 
@@ -76,12 +77,12 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun reservation() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.requestReservation(reservationRequest)
                 .onStart { _uiState.update { it.copy(loading = true) } }
                 .catch { e ->
-                    e.printStackTrace()
                     _uiState.update { it.copy(loading = false) }
+                    throw e
                 }
                 .singleOrNull()?.let { reservationId ->
                     Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
@@ -92,9 +93,8 @@ class TicketingViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
-                .catch { e -> e.printStackTrace() }
                 .onStart {
                     _uiState.update { it.copy(loading = true) }
                 }
@@ -114,13 +114,12 @@ class TicketingViewModel @Inject constructor(
                     }
                 }
             getRefundPolicyUsecase()
-                .catch { e -> e.printStackTrace() }
                 .onEach { refundPolicy ->
                     _uiState.update {
                         it.copy(refundPolicy = refundPolicy)
                     }
                 }
-                .launchIn(viewModelScope)
+                .launchIn(viewModelScope + recordExceptionHandler)
         }
     }
 
@@ -131,7 +130,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun checkInviteCode() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.checkInviteCode(
                 CheckInviteCodeRequest(
                     showId = showId,
@@ -141,8 +140,8 @@ class TicketingViewModel @Inject constructor(
             ).onStart {
                 _uiState.update { it.copy(loading = true) }
             }.catch { e ->
-                e.printStackTrace()
                 _uiState.update { it.copy(loading = false) }
+                throw e
             }.singleOrNull()?.let { status ->
                 _uiState.update {
                     it.copy(loading = false, inviteCodeStatus = status)
@@ -156,7 +155,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun setReservationPhoneNumber(number: String) {
-        _uiState.update { it.copy(reservationPhoneNumber = number) }
+        _uiState.update { it.copy(reservationContact = number) }
     }
 
     fun setDepositorName(name: String) {
@@ -164,11 +163,19 @@ class TicketingViewModel @Inject constructor(
     }
 
     fun setDepositorPhoneNumber(number: String) {
-        _uiState.update { it.copy(depositorPhoneNumber = number) }
+        _uiState.update { it.copy(depositorContact = number) }
     }
 
     fun setInviteCode(code: String) {
         _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
+    }
+
+    fun toggleAgreement(index: Int) {
+        _uiState.update { it.toggleAgreement(index) }
+    }
+
+    fun toggleAgreement() {
+        _uiState.update { it.toggleAgreement() }
     }
 
     private fun event(event: TicketingEvent) {

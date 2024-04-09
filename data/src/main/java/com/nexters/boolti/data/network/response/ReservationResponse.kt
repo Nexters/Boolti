@@ -6,7 +6,7 @@ import com.nexters.boolti.domain.model.Reservation
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReservationResponse(
+internal data class ReservationResponse(
     val reservationId: String,
     val reservationStatus: String,
     val reservationDate: String,
@@ -30,4 +30,4 @@ data class ReservationResponse(
     }
 }
 
-fun List<ReservationResponse>.toDomains(): List<Reservation> = this.map { it.toDomain() }
+internal fun List<ReservationResponse>.toDomains(): List<Reservation> = this.map { it.toDomain() }

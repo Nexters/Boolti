@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,7 @@ import javax.inject.Inject
 class PaymentViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
-) : ViewModel() {
+) : BaseViewModel() {
     private val reservationId: String = requireNotNull(savedStateHandle["reservationId"]) {
         "TicketingCompleteViewModel 에 reservationId 가 전달되지 않았습니다."
     }
@@ -29,11 +30,8 @@ class PaymentViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.getPaymentInfo(reservationId)
-                .catch { e ->
-                    e.printStackTrace()
-                }
                 .singleOrNull()?.let {
                     _uiState.value = PaymentState.Success(reservationDetail = it)
                 }

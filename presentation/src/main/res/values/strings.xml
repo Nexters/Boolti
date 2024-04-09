@@ -3,6 +3,8 @@
     <string name="menu_tickets">티켓</string>
     <string name="menu_my">마이</string>
 
+    <string name="blank" />
+
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
     <string name="description_close_button">닫기</string>
@@ -27,6 +29,7 @@
     <string name="finished_show">공연 종료</string>
     <string name="search_bar_hint">공연명으로 검색해 주세요</string>
     <string name="has_pending_ticket">입금 확인 중인 티켓이 있어요!</string>
+    <string name="ticketing_in_progress">예매 중</string>
     <string-array name="days_of_week">
         <item>월</item>
         <item>화</item>
@@ -49,6 +52,15 @@
     <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
     <string name="copy">복사</string>
     <string name="next">다음</string>
+    <string name="show">보기</string>
+
+    <string name="ticket_holder">예매자</string>
+    <string name="depositor">결제자</string>
+    <string name="ticket">티켓</string>
+    <string name="invite_ticket">초청 티켓</string>
+
+    <string name="stepper_minus_description">감소</string>
+    <string name="stepper_plus_description">증가</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
@@ -59,12 +71,21 @@
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
     <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">불티 유저</string>
+    <string name="signout_cancelled_message">탈퇴 후 30일 이내에 로그인하여, 계정 삭제가 취소되었어요\n불티를 다시 찾아주셔서 감사해요!</string>
 
     <!-- 탈퇴 -->
-    <string name="signout_button">회원 탈퇴</string>
-    <string name="signout">탈퇴</string>
+    <string name="signout">회원 탈퇴</string>
+    <string name="signout_button">탈퇴하기</string>
     <string name="signout_dialog_title">탈퇴하시겠어요?</string>
     <string name="signout_dialog_message">탈퇴일로부터 30일 이내로 로그인 시 계정 삭제를 취소할 수 있습니다. 30일이 지나면 계정 및 정보가 영구 삭제됩니다.</string>
+    <string name="signout_notice_title">탈퇴 전, 꼭 읽어보세요!</string>
+    <string-array name="signout_notice">
+        <item>주최한 공연 정보는 사라지지 않아요</item>
+        <item>예매한 티켓은 전부 사라지며 복구할 수 없어요</item>
+        <item>탈퇴 일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
+    </string-array>
+    <string name="signout_reason_title">탈퇴 이유를 입력해주세요</string>
+    <string name="signout_reason_placeholder">예) 계정 탈퇴 후 재가입할게요</string>
 
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>
@@ -83,7 +104,7 @@
     <string name="navigate_to_show_button">공연 정보 보기</string>
 
     <!-- 예매 -->
-    <string name="choose_ticket_bottomsheet_title">티켓 선택</string>
+    <string name="choose_ticket_bottomsheet_title">옵션 선택</string>
     <string name="ticketing_share">공유하기</string>
     <string name="ticketing_period">티켓 예매 기간</string>
     <string name="ticketing_datetime">일시</string>
@@ -98,12 +119,12 @@
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
     <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>
     <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>
-    <string name="ticketing_button_closed_ticket">예매 마감</string>
+    <string name="ticketing_button_closed_ticket">예매 종료</string>
     <string name="ticketing_button_finished_show">공연 종료</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>
     <string name="ticketing_ticket_holder_label">예매자 정보</string>
-    <string name="depositor_info_label">입금자 정보</string>
+    <string name="depositor_info_label">결제자 정보</string>
     <string name="ticket_info_label">티켓 정보</string>
     <string name="invite_code_label">초청 코드</string>
     <string name="payment_type_label">결제 수단</string>
@@ -118,17 +139,24 @@
     <string name="ticketing_invite_code_use_button">사용하기</string>
     <string name="ticketing_invite_code_success">사용되었습니다</string>
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
-    <string name="ticketing_invite_code_invalid">초청 코드가 올바르지 않아요</string>
+    <string name="ticketing_invite_code_invalid">올바른 초청 코드를 입력해 주세요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
-    <string name="ticketing_same_contact_info">예매자와 입금자가 같아요</string>
+    <string name="ticketing_same_contact_info">예매자와 결제자가 같아요</string>
     <string name="ticket_type_label">티켓 종류</string>
     <string name="ticket_count_label">티켓 매수</string>
     <string name="total_payment_amount_label">총 결제 금액</string>
+    <string name="payment_amount_label">결제 금액</string>
     <string name="ticketing_payment_information">다음 페이지에서 계좌 번호를 안내해 드릴게요</string>
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
+    <string name="ticketing_payment_button_label_short">결제하기</string>
+    <string name="ticketing_confirm_dialog_title">결제 정보를 확인해주세요</string>
     <string name="ticketing_address_copied_message">공연장 주소가 복사되었어요</string>
     <string name="ticketing_host_format">%s (%s)</string>
+    <string name="order_agreement_label">주문내용 확인 및 결제 동의</string>
+    <string name="order_agreement_privacy_collection">[필수] 개인정보 수집・이용 동의</string>
+    <string name="order_agreement_privacy_offer">[필수] 개인정보 제 3자 정보 제공 동의</string>
+    <string name="order_agreement_payment_agency">[필수] 결제대행 서비스 이용약관 동의</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
@@ -148,7 +176,7 @@
     <string name="account_number">계좌번호</string>
     <string name="account_holder">예금주</string>
     <string name="account_transfer_due_date">입금 마감일</string>
-    <string name="invite_ticket_complete_title">결제가 완료되었어요</string>
+    <string name="invite_ticket_complete_title">결제를 완료했어요</string>
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
 
     <!-- 마이 -->
@@ -158,6 +186,7 @@
     <string name="my_ticketing_history">예매 내역</string>
     <string name="my_scan_qr">QR 스캔</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
+    <string name="my_register_show">공연 등록</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>
@@ -169,28 +198,35 @@
     <string name="reservations_empty">예매 내역이 없어요</string>
     <string name="reservations_empty_sub">티켓을 예매하고 공연을 즐겨보세요!</string>
     <string name="reservations_depositing">입금 확인 중</string>
-    <string name="reservations_refunding">환불 진행 중</string>
+    <string name="reservations_refunding">취소 진행 중</string>
     <string name="reservations_canceled">예매 취소</string>
-    <string name="reservations_reserved">티켓 발권 완료</string>
-    <string name="reservations_refunded">환불 완료</string>
+    <string name="reservations_reserved">발권 완료</string>
+    <string name="reservations_refunded">취소 완료</string>
     <string name="reservations_detail_view">상세 보기</string>
     <string name="reservations_unknown">알 수 없음</string>
     <string name="reservations_ticket_count_price_format">"%s / %d매 / %,d원"</string>
+    <string name="reservations_ticket_count_price_format_short">%d매 / %,d원"</string>
 
     <!-- 예매 내역 상세 -->
     <string name="reservation_detail">예매 내역 상세</string>
     <string name="reservation_account_info">입금 계좌 정보</string>
     <string name="payment_info_label">결제 정보</string>
-    <string name="payment_state_label">결제 상태</string>
+    <string name="payment_state_label">결제 수단</string>
     <string name="reservation_ticket_info">티켓 정보</string>
     <string name="reservation_datetime">발권 일시</string>
     <string name="reservation_before_completion">발권 전</string>
     <string name="reservation_ticket_count_format">%d매</string>
     <string name="reservation_ticket_info_format">"%s / %d매"</string>
+    <string name="reservation_number">주문 번호</string>
+    <string name="reservation_ticket_type">주문 티켓</string>
+    <string name="reservation_breakdown_of_refund">환불 내역</string>
+    <string name="reservation_price_of_refund">총 환불 금액</string>
+    <string name="show_ticket">티켓 보기</string>
+    <string name="show_reservation">예매 내역보기</string>
 
     <!-- 환불 -->
-    <string name="refund_button">환불 요청하기</string>
-    <string name="refund_reason_label">환불 이유를 입력해 주세요</string>
+    <string name="refund_button">취소 요청하기</string>
+    <string name="refund_reason_label">취소 사유를 입력해 주세요</string>
     <string name="refund_reason_hint">예) 티켓 종류 재 선택 후 다시 예매할게요</string>
     <string name="refund_account_holder_info">예금주 정보</string>
     <string name="refund_account_name_hint">실명을 입력해 주세요</string>
@@ -199,7 +235,11 @@
     <string name="refund_account_number_hint">계좌번호를 입력해 주세요</string>
     <string name="refund_select_bank">선택 완료하기</string>
     <string name="refund_dialog_title">환불 정보를 확인해 주세요</string>
-    <string name="refund_completed">환불 요청이 완료되었어요</string>
+    <string name="refund_completed">취소 요청이 완료되었어요</string>
+    <string name="refund_information">환불 정보</string>
+    <string name="refund_price">환불 예정 금액</string>
+    <string name="refund_method">환불 수단</string>
+    <string name="refund_confirm_policy">취소/환불 규정을 확인했습니다</string>
 
     <!-- 신고 -->
     <string name="report">신고하기</string>
@@ -212,4 +252,28 @@
     <string name="force_update_title">업데이트 알림</string>
     <string name="force_update_description">지금 업데이트하고\n더 편리해진 불티를 만나보세요</string>
     <string name="force_update_button">업데이트 하러가기</string>
+
+    <!-- 알림 -->
+    <string name="default_notification_channel_id">fcm</string>
+    <string name="fcm_default_channel_name">불티 알림</string>
+    <string name="fcm_default_channel_description">티켓 발권 알림을 받습니다.</string>
+
+    <!-- 사업자 정보 -->
+    <string name="business_title">사업자 정보</string>
+    <string name="business_responsibility">스튜디오 불티는 통신판매중개자로 통신판매의 당사자가 아닙니다. 불티에서 판매되는 상품에 대한 광고, 상품주문, 배송, 환불의 의무와 책임은 각 판매자에게 있습니다.</string>
+    <string name="business_information">스튜디오 불티 사업자 정보</string>
+    <string name="business_copyright">ⓒ Boolti. All Rights Reserved</string>
+    <string name="business_name">스튜디오 불티</string>
+    <string name="business_service_terms">서비스 이용약관</string>
+    <string name="business_privacy_policy">개인정보 처리방침</string>
+    <string name="business_refund_policy">환불 정책</string>
+    <string-array name="business_information">
+        <item>대표 : 김혜선</item>
+        <item>사업자 등록번호 : 202–43–63442</item>
+        <item>주소 : 경기도 남양주시 화도읍 묵현로 25번길 12–5</item>
+        <item>호스팅 서비스 : 스튜디오 불티</item>
+        <item>통신판매업 신고번호 : 2024-화도수동-0518</item>
+        <item>문의전화 : 0507–1363–5690</item>
+        <item>이메일 : studio.boolti@gmail.com</item>
+    </string-array>
 </resources>

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class TicketRepositoryImpl @Inject constructor(
+internal class TicketRepositoryImpl @Inject constructor(
     private val dataSource: TicketDataSource,
     private val hostDataSource: HostDataSource,
 ) : TicketRepository {

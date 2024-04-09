@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AuthDataSource @Inject constructor(
+internal class AuthDataSource @Inject constructor(
     private val context: Context,
     private val loginService: LoginService,
 ) {
@@ -48,7 +48,11 @@ class AuthDataSource @Inject constructor(
     }
 
     suspend fun logout(): Result<Unit> = runCatching {
+        localLogout()
         loginService.logout()
+    }
+
+    suspend fun localLogout() {
         dataStore.updateData {
             it.copy(
                 userId = null,
@@ -58,7 +62,7 @@ class AuthDataSource @Inject constructor(
                 phoneNumber = null,
                 photo = null,
                 accessToken = "",
-                refreshToken = ""
+                refreshToken = "",
             )
         }
     }

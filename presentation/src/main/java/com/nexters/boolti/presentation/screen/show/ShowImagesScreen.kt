@@ -25,8 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtCloseableAppBar
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -43,13 +44,7 @@ fun ShowImagesScreen(
     ) { uiState.showDetail.images.size }
 
     Scaffold(
-        topBar = {
-            BtAppBar(
-                title = "",
-                onBackPressed = onBackPressed,
-                navIconRes = R.drawable.ic_close,
-            )
-        },
+        topBar = { BtCloseableAppBar(onClickClose = onBackPressed) },
         modifier = modifier,
     ) { innerPadding ->
         Column(
@@ -67,7 +62,8 @@ fun ShowImagesScreen(
             ) {
                 AsyncImage(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .zoomable(rememberZoomState()),
                     model = uiState.showDetail.images[it].originImage,
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,

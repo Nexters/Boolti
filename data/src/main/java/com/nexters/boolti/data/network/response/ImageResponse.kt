@@ -4,7 +4,7 @@ import com.nexters.boolti.domain.model.ImagePair
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ImageResponse(
+internal data class ImageResponse(
     val id: String,
     val path: String,
     val thumbnailPath: String,
@@ -19,7 +19,7 @@ data class ImageResponse(
     }
 }
 
-fun List<ImageResponse>.toDomains(): List<ImagePair> {
+internal fun List<ImageResponse>.toDomains(): List<ImagePair> {
     return this.asSequence()
         .sortedBy { it.sequence }
         .map { it.toDomain() }

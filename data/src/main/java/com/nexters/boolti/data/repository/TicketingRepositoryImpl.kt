@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class TicketingRepositoryImpl @Inject constructor(
+internal class TicketingRepositoryImpl @Inject constructor(
     private val dataSource: TicketingDataSource,
     private val reservationDataSource: ReservationDataSource,
 ) : TicketingRepository {
@@ -50,7 +50,6 @@ class TicketingRepositoryImpl @Inject constructor(
             val errMsg = response.errorBody()?.string()
             val status = InviteCodeStatus.fromString(errMsg?.errorType)
             emit(status)
-            throw InviteCodeException(status)
         }
     }
 

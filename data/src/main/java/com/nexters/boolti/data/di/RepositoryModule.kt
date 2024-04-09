@@ -21,7 +21,7 @@ import dagger.hilt.components.SingletonComponent
 
 @InstallIn(SingletonComponent::class)
 @Module
-abstract class RepositoryModule {
+internal abstract class RepositoryModule {
     @Binds
     abstract fun bindConfigRepository(repository: ConfigRepositoryImpl): ConfigRepository
 

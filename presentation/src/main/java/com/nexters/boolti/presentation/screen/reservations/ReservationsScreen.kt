@@ -35,7 +35,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Reservation
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey05
@@ -52,21 +52,17 @@ import java.time.format.DateTimeFormatter
 fun ReservationsScreen(
     onBackPressed: () -> Unit,
     navigateToDetail: (reservationId: String) -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: ReservationsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
-            BtAppBar(
-                title = stringResource(id = R.string.my_ticketing_history),
-                onBackPressed = onBackPressed,
-            )
+            BtBackAppBar(title = stringResource(id = R.string.my_ticketing_history), onClickBack = onBackPressed)
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
         ) {

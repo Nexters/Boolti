@@ -1,21 +1,31 @@
 package com.nexters.boolti.presentation.screen
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.screen.MainDestination.Home
+import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
+import com.nexters.boolti.presentation.screen.business.BusinessScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentScreen
@@ -27,18 +37,45 @@ import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScre
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
-import com.nexters.boolti.presentation.screen.show.ShowDetailViewModel
 import com.nexters.boolti.presentation.screen.show.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.util.SnackbarController
+
+val LocalSnackbarController = staticCompositionLocalOf {
+    SnackbarController(SnackbarHostState())
+}
 
 @Composable
 fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     BooltiTheme {
         Surface(modifier) {
-            MainNavigation(modifier, onClickQrScan)
+            Scaffold(
+                snackbarHost = {
+                    ToastSnackbarHost(
+                        modifier = Modifier.padding(bottom = 80.dp),
+                        hostState = snackbarHostState,
+                    )
+                },
+            ) { innerPadding ->
+                CompositionLocalProvider(
+                    LocalSnackbarController provides SnackbarController(
+                        snackbarHostState,
+                        scope
+                    )
+                ) {
+                    MainNavigation(
+                        modifier = modifier.padding(innerPadding),
+                        onClickQrScan = onClickQrScan,
+                    )
+                }
+            }
         }
     }
 }
@@ -47,207 +84,93 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
 fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
     val navController = rememberNavController()
 
-    // TODO: 하드코딩 된 route 를 각 화면에 정의
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = Home.route,
     ) {
-        composable(
-            route = "home",
-        ) {
-            HomeScreen(
-                modifier = modifier,
-                onClickShowItem = {
-                    navController.navigate("show/$it")
-                },
-                onClickTicket = {
-                    navController.navigate("tickets/$it")
-                },
-                onClickQr = {
-                    navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}")
-                },
-                onClickQrScan = {
-                    navController.navigate("hostedShows")
-                },
-                navigateToReservations = {
-                    navController.navigate("reservations")
-                }
-            ) {
-                navController.navigate("login")
-            }
-        }
-
-        composable(
-            route = "login",
-        ) {
-            LoginScreen(
-                modifier = modifier,
-            ) {
-                navController.popBackStack()
-            }
-        }
-
-        composable(
-            route = "reservations",
-        ) {
-            ReservationsScreen(onBackPressed = {
-                navController.popBackStack()
-            }, navigateToDetail = { reservationId ->
-                navController.navigate("reservations/$reservationId")
-            })
-        }
-
-        composable(
-            route = "reservations/{reservationId}",
-            arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
-        ) {
-            ReservationDetailScreen(
-                onBackPressed = { navController.popBackStack() },
-                navigateToRefund = { id -> navController.navigate("refund/$id") },
-            )
-        }
-
-        composable(
-            route = "refund/{reservationId}",
-            arguments = listOf(navArgument("reservationId") { type = NavType.StringType }),
-        ) {
-            RefundScreen(
-                onBackPressed = { navController.popBackStack() },
-            )
-        }
+        HomeScreen(modifier = modifier, navigateTo = navController::navigateTo)
+        LoginScreen(modifier = modifier, popBackStack = navController::popBackStack)
+        SignoutScreen(
+            navigateToHome = navController::navigateToHome,
+            popBackStack = navController::popBackStack
+        )
+        ReservationsScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        ReservationDetailScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        RefundScreen(popBackStack = navController::popBackStack)
 
         navigation(
-            route = "show/{showId}",
+            route = "${ShowDetail.route}/{$showId}",
             startDestination = "detail",
-            arguments = listOf(navArgument("showId") { type = NavType.StringType }),
-        ) {
-            composable(
-                route = "detail",
-            ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
-
-                ShowDetailScreen(
-                    onBack = { navController.popBackStack() },
-                    onClickHome = { navController.navigateToHome() },
-                    onClickContent = {
-                        navController.navigate("content")
-                    },
-                    modifier = modifier,
-                    onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
-                        navController.navigate("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
-                    },
-                    viewModel = showViewModel,
-                    navigateToLogin = { navController.navigate("login") },
-                    navigateToImages = { index -> navController.navigate("images/$index") },
-                    navigateToReport = {
-                        val showId = entry.arguments?.getString("showId")
-                        navController.navigate("report/$showId")
-                    }
-                )
-            }
-            composable(
-                route = "images/{index}",
-                arguments = listOf(navArgument("index") { type = NavType.IntType }),
-            ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
-                val index = entry.arguments!!.getInt("index")
-
-                ShowImagesScreen(
-                    index = index,
-                    viewModel = showViewModel,
-                    onBackPressed = { navController.popBackStack() },
-                )
-            }
-            composable(
-                route = "content",
-            ) { entry ->
-                val showViewModel: ShowDetailViewModel =
-                    entry.sharedViewModel(navController = navController)
-
-                ShowDetailContentScreen(
-                    modifier = modifier,
-                    viewModel = showViewModel,
-                    onBackPressed = { navController.popBackStack() }
-                )
-            }
-            composable(
-                route = "report/{showId}",
-            ) {
-                ReportScreen(
-                    onBackPressed = { navController.popBackStack() },
-                    popupToHome = { navController.navigateToHome() },
-                    modifier = modifier,
-                )
-            }
-        }
-
-        composable(
-            route = "tickets/{ticketId}",
-            arguments = listOf(navArgument("ticketId") { type = NavType.StringType }),
-        ) {
-            TicketDetailScreen(modifier = modifier,
-                onBackClicked = { navController.popBackStack() },
-                onClickQr = { navController.navigate("qr/${it.filter { c -> c.isLetterOrDigit() }}") },
-                navigateToShowDetail = { navController.navigate("show/$it") }
-            )
-        }
-        composable(
-            route = "ticketing/{showId}?salesTicketId={salesTicketId}&ticketCount={ticketCount}&inviteTicket={isInviteTicket}",
-            arguments = listOf(
-                navArgument("showId") { type = NavType.StringType },
-                navArgument("salesTicketId") { type = NavType.StringType },
-                navArgument("ticketCount") { type = NavType.IntType },
-                navArgument("isInviteTicket") { type = NavType.BoolType },
+            arguments = ShowDetail.arguments,
+            deepLinks = listOf(
+//                navDeepLink {
+//                    uriPattern = "https://app.boolti.in/show?showId={$showId}"
+//                    action = Intent.ACTION_VIEW
+//                },
+                navDeepLink {
+                    uriPattern = "https://preview.boolti.in/show/{$showId}"
+                    action = Intent.ACTION_VIEW
+                },
             ),
         ) {
-            TicketingScreen(
+            ShowDetailScreen(
                 modifier = modifier,
-                onBackClicked = { navController.popBackStack() },
-                onReserved = { reservationId, showId ->
-                    navController.navigate("payment/$reservationId?showId=$showId")
-                }
+                navigateTo = navController::navigateTo,
+                popBackStack = navController::popBackStack,
+                navigateToHome = navController::navigateToHome,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            )
+            ShowImagesScreen(
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            )
+            ShowDetailContentScreen(
+                modifier = modifier,
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            )
+            ReportScreen(
+                modifier = modifier,
+                navigateToHome = navController::navigateToHome,
+                popBackStack = navController::popBackStack,
             )
         }
 
-        composable(
-            route = "qr/{data}",
-            arguments = listOf(navArgument("data") { type = NavType.StringType }),
-        ) {
-            QrFullScreen(modifier = modifier) {
-                navController.popBackStack()
-            }
-        }
-        composable(
-            route = "hostedShows"
-        ) {
-            HostedShowScreen(
-                modifier = modifier,
-                onClickShow = onClickQrScan,
-                onClickBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
+        TicketDetailScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        TicketingScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack
+        )
+        QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)
+        HostedShowScreen(
+            modifier = modifier,
+            onClickShow = onClickQrScan,
+            popBackStack = navController::popBackStack,
+        )
 
-        composable(
-            route = "payment/{reservationId}?showId={showId}",
-            arguments = listOf(
-                navArgument("reservationId") { type = NavType.StringType },
-                navArgument("showId") { type = NavType.StringType }),
-        ) {
-            val showId = it.arguments?.getString("showId")
-            PaymentScreen(
-                onClickHome = { navController.navigateToHome() },
-                onClickClose = {
-                    showId?.let { showId ->
-                        navController.popBackStack("show/$showId", inclusive = true)
-                        navController.navigate("show/$showId")
-                    } ?: navController.popBackStack()
-                },
-            )
-        }
+        PaymentScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+            popInclusiveBackStack = { route ->
+                navController.popBackStack(
+                    route = route,
+                    inclusive = true,
+                )
+            },
+            navigateToHome = navController::navigateToHome,
+        )
+        BusinessScreen(popBackStack = navController::popBackStack)
     }
 }
 
@@ -261,3 +184,5 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
     }
     return hiltViewModel(parentEntry)
 }
+
+private fun NavController.navigateTo(route: String) = navigate(route)

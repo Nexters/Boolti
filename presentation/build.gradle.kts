@@ -47,6 +47,7 @@ android {
 
 dependencies {
     implementation(projects.domain)
+    implementation(projects.tosspayments)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

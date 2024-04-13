@@ -81,6 +81,7 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.data)
     implementation(projects.presentation)
+    implementation(projects.tosspayments)
 
     implementation(libs.bundles.coroutines)
 

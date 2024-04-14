@@ -5,9 +5,13 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +34,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,16 +42,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -65,6 +68,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.InviteCodeStatus
+import com.nexters.boolti.domain.model.PaymentType
+import com.nexters.boolti.domain.model.PaymentType.ACCOUNT_TRANSFER
+import com.nexters.boolti.domain.model.PaymentType.CARD
+import com.nexters.boolti.domain.model.PaymentType.UNDEFINED
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtBackAppBar
@@ -87,8 +94,6 @@ import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 @Composable
@@ -102,9 +107,7 @@ fun TicketingScreen(
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
     var showConfirmDialog by remember { mutableStateOf(false) }
-    val specOut = false // TODO 다음 버전(페이 들어오는 버전)에서 추가될 기능 마킹
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -180,10 +183,14 @@ fun TicketingScreen(
                     )
                 }
 
-                if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(
-                    scope,
-                    snackbarHostState
-                ) // 결제 수단
+                // 결제 수단
+                if (!uiState.isInviteTicket && uiState.totalPrice > 0) {
+                    PaymentSection(
+                        selected = uiState.paymentType,
+                        onClick = { viewModel.setPaymentType(it) },
+                    )
+                }
+
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
                 Text(
@@ -195,17 +202,15 @@ fun TicketingScreen(
                     color = Grey70,
                 )
 
-                if (specOut) {
-                    // 주문내용 확인 및 결제 동의
-                    OrderAgreementSection(
-                        totalAgreed = uiState.orderAgreed,
-                        agreement = uiState.orderAgreement,
-                        agreementLabels = uiState.orderAgreementInfos,
-                        onClickTotalAgree = viewModel::toggleAgreement,
-                        onClickAgree = viewModel::toggleAgreement,
-                        onClickShow = {}, // TODO 기획 확정되면 구현
-                    )
-                }
+                // 주문내용 확인 및 결제 동의
+                OrderAgreementSection(
+                    totalAgreed = uiState.orderAgreed,
+                    agreement = uiState.orderAgreement,
+                    agreementLabels = uiState.orderAgreementInfos,
+                    onClickTotalAgree = viewModel::toggleAgreement,
+                    onClickAgree = viewModel::toggleAgreement,
+                    onClickShow = {}, // TODO 기획 확정되면 구현
+                )
 
                 // 사업자 정보
                 BusinessInformation(
@@ -248,7 +253,7 @@ fun TicketingScreen(
                 )
             }
         }
-        if (showConfirmDialog) {
+        if (showConfirmDialog && uiState.paymentType != null) {
             TicketingConfirmDialog(
                 isInviteTicket = uiState.isInviteTicket,
                 reservationName = uiState.reservationName,
@@ -258,7 +263,7 @@ fun TicketingScreen(
                 ticketName = uiState.ticketName,
                 ticketCount = uiState.ticketCount,
                 totalPrice = uiState.totalPrice,
-                paymentType = uiState.paymentType,
+                paymentType = uiState.paymentType ?: UNDEFINED,
                 onClick = viewModel::reservation,
                 onDismiss = { showConfirmDialog = false },
             )
@@ -363,49 +368,25 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
 
 @Composable
 private fun PaymentSection(
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
+    selected: PaymentType? = null,
+    onClick: (PaymentType) -> Unit,
 ) {
-    val context = LocalContext.current
     Section(title = stringResource(R.string.payment_type_label)) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(4.dp),
-                )
-                .background(MaterialTheme.colorScheme.surfaceTint)
-                .clickable(role = Role.DropdownList) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = context.getString(R.string.ticketing_payment_message),
-                            duration = SnackbarDuration.Short,
-                        )
-                    }
-                }
-                .padding(horizontal = 12.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(
-                modifier = Modifier.align(Alignment.CenterStart),
-                text = stringResource(R.string.payment_account_transfer),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge,
+            PaymentType(
+                modifier = Modifier.weight(1f),
+                paymentType = CARD,
+                selected = selected == CARD,
+                onClick = { onClick(CARD) },
             )
-        }
-        Row(Modifier.padding(top = 12.dp)) {
-            Icon(
-                painter = painterResource(R.drawable.ic_info_20),
-                tint = Grey50,
-                contentDescription = null,
-            )
-            Text(
-                text = stringResource(R.string.ticketing_payment_information),
-                modifier = Modifier.padding(start = 4.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
+            PaymentType(
+                modifier = Modifier.weight(1f),
+                paymentType = ACCOUNT_TRANSFER,
+                selected = selected == ACCOUNT_TRANSFER,
+                onClick = { onClick(ACCOUNT_TRANSFER) },
             )
         }
     }
@@ -811,6 +792,51 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun PaymentType(
+    paymentType: PaymentType,
+    modifier: Modifier = Modifier,
+    selected: Boolean = false,
+    onClick: () -> Unit,
+) {
+    val focusRequester = remember { FocusRequester() }
+    val label = when (paymentType) {
+        ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
+        CARD -> stringResource(R.string.payment_credit_check_card)
+        UNDEFINED -> ""
+    }
+
+    LaunchedEffect(selected) {
+        if (selected) focusRequester.requestFocus()
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.surfaceTint)
+            .border(
+                width = 1.dp,
+                color = if (selected) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(4.dp),
+            )
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(vertical = 12.dp)
+                .basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused)
+                .focusRequester(focusRequester)
+                .focusable(),
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun TicketingDetailScreenPreview() {
@@ -837,6 +863,19 @@ private fun OrderAgreementItemPreview() {
                 onClickAgree = { agreed = !agreed },
                 onClickShow = {},
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PaymentTypePreview() {
+    BooltiTheme {
+        Surface {
+            PaymentType(
+                paymentType = CARD,
+                selected = true,
+            ) {}
         }
     }
 }

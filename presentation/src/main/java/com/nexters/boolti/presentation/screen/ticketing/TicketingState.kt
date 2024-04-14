@@ -16,7 +16,7 @@ data class TicketingState(
     val isSameContactInfo: Boolean = false,
     val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val paymentType: PaymentType = PaymentType.ACCOUNT_TRANSFER,
+    val paymentType: PaymentType? = null,
     val reservationName: String = "",
     val reservationContact: String = "",
     val depositorName: String = "",
@@ -36,20 +36,17 @@ data class TicketingState(
 
     val reservationButtonEnabled: Boolean
         get() = when {
-            isInviteTicket -> //            orderAgreed &&
-                reservationName.isNotBlank() &&
-                        reservationContact.isNotBlank() &&
-                        inviteCodeStatus is InviteCodeStatus.Valid
+            !orderAgreed ||
+                    reservationName.isBlank() ||
+                    reservationContact.isBlank() -> false
 
-            totalPrice == 0 -> // orderAgreed &7
-                reservationName.isNotBlank() &&
-                        reservationContact.isNotBlank()
+            isInviteTicket -> inviteCodeStatus is InviteCodeStatus.Valid
 
-            else -> //            orderAgreed &&
-                reservationName.isNotBlank() &&
-                        reservationContact.isNotBlank() &&
-                        (isSameContactInfo || depositorName.isNotBlank()) &&
-                        (isSameContactInfo || depositorContact.isNotBlank())
+            totalPrice == 0 -> true
+
+            else -> paymentType != null &&
+                    (isSameContactInfo || depositorName.isNotBlank()) &&
+                    (isSameContactInfo || depositorContact.isNotBlank())
         }
 
     fun toggleAgreement(index: Int): TicketingState {

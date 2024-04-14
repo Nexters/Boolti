@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
+import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
@@ -63,7 +64,7 @@ class TicketingViewModel @Inject constructor(
                 depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
                 depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationContact else state.depositorContact,
                 paymentAmount = uiState.value.totalPrice,
-                paymentType = uiState.value.paymentType,
+                paymentType = uiState.value.paymentType ?: PaymentType.UNDEFINED,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
@@ -109,7 +110,7 @@ class TicketingViewModel @Inject constructor(
                             ticketCount = info.ticketCount,
                             totalPrice = info.totalPrice,
                             isInviteTicket = info.isInviteTicket,
-                            paymentType = info.paymentType,
+//                            paymentType = info.paymentType,
                         )
                     }
                 }
@@ -168,6 +169,10 @@ class TicketingViewModel @Inject constructor(
 
     fun setInviteCode(code: String) {
         _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
+    }
+
+    fun setPaymentType(type: PaymentType) {
+        _uiState.update { it.copy(paymentType = type) }
     }
 
     fun toggleAgreement(index: Int) {

@@ -52,6 +52,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -72,6 +73,7 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.PaymentType.ACCOUNT_TRANSFER
 import com.nexters.boolti.domain.model.PaymentType.CARD
 import com.nexters.boolti.domain.model.PaymentType.UNDEFINED
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtBackAppBar
@@ -80,6 +82,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
+import com.nexters.boolti.presentation.screen.payment.toss.TossPaymentWidgetActivity
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -94,6 +97,7 @@ import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
+import com.tosspayments.paymentsdk.view.PaymentMethod
 import java.time.LocalDateTime
 
 @Composable
@@ -108,6 +112,7 @@ fun TicketingScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -115,6 +120,23 @@ fun TicketingScreen(
                 is TicketingEvent.TicketingSuccess -> {
                     showConfirmDialog = false
                     onReserved(it.reservationId, it.showId)
+                }
+
+                is TicketingEvent.ProgressPayment -> {
+                    context.startActivity(
+                        TossPaymentWidgetActivity.getIntent(
+                            context = context,
+                            amount = uiState.totalPrice,
+                            clientKey = BuildConfig.TOSS_CLIENT_KEY,
+                            customerKey = "",
+                            orderId = "",
+                            orderName = "",
+                            currency = PaymentMethod.Rendering.Currency.KRW,
+                            countryCode = "KR",
+                            variantKey = null,
+                            redirectUrl = null,
+                        )
+                    )
                 }
             }
         }

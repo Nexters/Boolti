@@ -79,18 +79,26 @@ class TicketingViewModel @Inject constructor(
 
     fun reservation() {
         viewModelScope.launch(recordExceptionHandler) {
-            repository.requestReservation(reservationRequest)
-                .onStart { _uiState.update { it.copy(loading = true) } }
-                .catch { e ->
-                    _uiState.update { it.copy(loading = false) }
-                    throw e
-                }
-                .singleOrNull()?.let { reservationId ->
-                    Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
-                    _uiState.update { it.copy(loading = false) }
-                    event(TicketingEvent.TicketingSuccess(reservationId, showId))
-                }
+            when (uiState.value.paymentType) {
+                PaymentType.ACCOUNT_TRANSFER -> accountTransfer()
+                PaymentType.CARD -> event(TicketingEvent.ProgressPayment)
+                else -> Unit
+            }
         }
+    }
+
+    private suspend fun accountTransfer() {
+        repository.requestReservation(reservationRequest)
+            .onStart { _uiState.update { it.copy(loading = true) } }
+            .catch { e ->
+                _uiState.update { it.copy(loading = false) }
+                throw e
+            }
+            .singleOrNull()?.let { reservationId ->
+                Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
+                _uiState.update { it.copy(loading = false) }
+                event(TicketingEvent.TicketingSuccess(reservationId, showId))
+            }
     }
 
     private fun load() {

@@ -82,7 +82,6 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
-import com.nexters.boolti.presentation.screen.payment.toss.TossPaymentWidgetActivity
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -97,6 +96,7 @@ import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.tosspayments.paymentsdk.view.PaymentMethod
 import java.time.LocalDateTime
 
@@ -128,9 +128,9 @@ fun TicketingScreen(
                             context = context,
                             amount = uiState.totalPrice,
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
-                            customerKey = "",
-                            orderId = "",
-                            orderName = "",
+                            customerKey = "test",
+                            orderId = "test01",
+                            orderName = "TEST",
                             currency = PaymentMethod.Rendering.Currency.KRW,
                             countryCode = "KR",
                             variantKey = null,

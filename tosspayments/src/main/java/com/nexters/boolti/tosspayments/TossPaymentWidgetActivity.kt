@@ -1,40 +1,27 @@
-package com.nexters.boolti.presentation.screen.payment.toss
+package com.nexters.boolti.tosspayments
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
-import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
-import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.AgreementStatus
 import com.tosspayments.paymentsdk.model.AgreementStatusListener
+import com.tosspayments.paymentsdk.model.PaymentCallback
 import com.tosspayments.paymentsdk.model.PaymentMethodEventListener
 import com.tosspayments.paymentsdk.model.PaymentWidgetOptions
 import com.tosspayments.paymentsdk.model.PaymentWidgetStatusListener
 import com.tosspayments.paymentsdk.model.TossPaymentResult
-import com.tosspayments.paymentsdk.view.Agreement
 import com.tosspayments.paymentsdk.view.PaymentMethod
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TossPaymentWidgetActivity : AppCompatActivity() {
-    private lateinit var paymentMethod: PaymentMethod
-    private lateinit var agreement: Agreement
+    private lateinit var binding: ActivityTossPaymentWidgetBinding
 
     private val paymentEventListener
         get() = object : PaymentMethodEventListener() {
@@ -66,7 +53,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 Log.d(TAG, "onAgreementStatusChanged : ${agreementStatus.agreedRequiredTerms}")
 
                 runOnUiThread {
-//                    binding.requestPaymentCta.isEnabled = agreementStatus.agreedRequiredTerms
+                    binding.btnPay.isEnabled = agreementStatus.agreedRequiredTerms
                 }
             }
         }
@@ -77,10 +64,12 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
 
             Log.d(TAG, message)
 //            binding.paymentMethodWidgetStatus.text = message
+            binding.pbLoading.visibility = View.GONE
         }
 
         override fun onFail(fail: TossPaymentResult.Fail) {
             Log.d(TAG, fail.errorMessage)
+            binding.pbLoading.visibility = View.GONE
             /*startActivity(
                 PaymentResultActivity.getIntent(
                     this@PaymentWidgetActivity,
@@ -105,81 +94,45 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
 
         override fun onFail(fail: TossPaymentResult.Fail) {
             Log.d(TAG, fail.errorMessage)
-/*
-            startActivity(
-                PaymentResultActivity.getIntent(
-                    this@PaymentWidgetActivity,
-                    false,
-                    arrayListOf(
-                        "ErrorCode|${fail.errorCode}",
-                        "ErrorMessage|${fail.errorMessage}",
-                        "OrderId|${fail.orderId}"
-                    )
-                )
-            )
-*/
+            /*
+                        startActivity(
+                            PaymentResultActivity.getIntent(
+                                this@PaymentWidgetActivity,
+                                false,
+                                arrayListOf(
+                                    "ErrorCode|${fail.errorCode}",
+                                    "ErrorMessage|${fail.errorMessage}",
+                                    "OrderId|${fail.orderId}"
+                                )
+                            )
+                        )
+            */
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            BooltiTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
+        binding = ActivityTossPaymentWidgetBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-                    var paymentMethodCreated by remember { mutableStateOf(false) }
-                    var agreementCreated by remember { mutableStateOf(false) }
-                    val readyToRender by remember {
-                        derivedStateOf {
-                            paymentMethodCreated && agreementCreated
-                        }
-                    }
-                    LaunchedEffect(readyToRender) {
-                        if (readyToRender) {
-                            intent?.run {
-                                initPaymentWidget(
-                                    amount = getDoubleExtra(EXTRA_KEY_AMOUNT, 0.0),
-                                    clientKey = getStringExtra(EXTRA_KEY_CLIENT_KEY).orEmpty(),
-                                    customerKey = getStringExtra(EXTRA_KEY_CUSTOMER_KEY).orEmpty(),
-                                    orderId = getStringExtra(EXTRA_KEY_ORDER_ID).orEmpty(),
-                                    orderName = getStringExtra(EXTRA_KEY_ORDER_NAME).orEmpty(),
-                                    currency = getSerializableExtra(EXTRA_KEY_CURRENCY) as? PaymentMethod.Rendering.Currency
-                                        ?: PaymentMethod.Rendering.Currency.KRW,
-                                    countryCode = getStringExtra(EXTRA_KEY_COUNTRY_CODE)?.takeIf { it.length == 2 }
-                                        ?: "KR",
-                                    variantKey = getStringExtra(EXTRA_KEY_VARIANT_KEY),
-                                    redirectUrl = getStringExtra(EXTRA_KEY_REDIRECT_URL)
-                                )
-                            }
-                        }
-                    }
+        initViews()
+    }
 
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        AndroidView(
-                            modifier = Modifier.weight(1f),
-                            factory = { context ->
-                                PaymentMethod(context).apply {
-                                    paymentMethod = this
-                                }
-                            },
-                            update = { paymentMethodCreated = true }
-                        )
-                        AndroidView(
-                            factory = { context ->
-                                Agreement(context).apply {
-                                    agreement = this
-                                }
-                            },
-                            update = { agreementCreated = true }
-                        )
-                    }
-                }
-            }
+    private fun initViews() {
+        intent?.run {
+            initPaymentWidget(
+                amount = getIntExtra(EXTRA_KEY_AMOUNT, 0),
+                clientKey = getStringExtra(EXTRA_KEY_CLIENT_KEY).orEmpty(),
+                customerKey = getStringExtra(EXTRA_KEY_CUSTOMER_KEY).orEmpty(),
+                orderId = getStringExtra(EXTRA_KEY_ORDER_ID).orEmpty(),
+                orderName = getStringExtra(EXTRA_KEY_ORDER_NAME).orEmpty(),
+                currency = getSerializableExtra(EXTRA_KEY_CURRENCY) as? PaymentMethod.Rendering.Currency
+                    ?: PaymentMethod.Rendering.Currency.KRW,
+                countryCode = getStringExtra(EXTRA_KEY_COUNTRY_CODE)?.takeIf { it.length == 2 }
+                    ?: "KR",
+                variantKey = getStringExtra(EXTRA_KEY_VARIANT_KEY),
+                redirectUrl = getStringExtra(EXTRA_KEY_REDIRECT_URL)
+            )
         }
     }
 
@@ -212,17 +165,72 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         }
         paymentWidget.run {
             renderPaymentMethods(
-                method = paymentMethod,
+                method = binding.paymentMethodWidget,
                 amount = renderingAmount,
                 options = renderingOptions,
                 paymentWidgetStatusListener = paymentMethodWidgetStatusListener,
             )
-
-            renderAgreement(agreement, agreementWidgetStatusListener)
+            renderAgreement(binding.agreementWidget, agreementWidgetStatusListener)
 
             addPaymentMethodEventListener(paymentEventListener)
             addAgreementStatusListener(agreementStatusListener)
         }
+
+        binding.btnPay.setOnClickListener {
+            paymentWidget.requestPayment(
+                paymentInfo = PaymentMethod.PaymentInfo(orderId = orderId, orderName = orderName),
+                paymentCallback = object : PaymentCallback {
+                    override fun onPaymentSuccess(success: TossPaymentResult.Success) {
+                        handlePaymentSuccessResult(success)
+                    }
+
+                    override fun onPaymentFailed(fail: TossPaymentResult.Fail) {
+                        handlePaymentFailResult(fail)
+                    }
+                }
+            )
+            Log.d("selectedPaymentMethod", paymentWidget.getSelectedPaymentMethod().toString())
+        }
+    }
+
+    private fun handlePaymentSuccessResult(success: TossPaymentResult.Success) {
+        val paymentType: String? = success.additionalParameters["paymentType"]
+        if ("BRANDPAY".equals(paymentType, true)) {
+            // TODO: 브랜드페이 승인
+        } else {
+            // TODO: 일반결제 승인 -> 추후 일반결제/브랜드페이 승인으로 Migration 예정되어있음
+        }
+
+        /*
+                startActivity(
+                    PaymentResultActivity.getIntent(
+                        this@PaymentWidgetActivity,
+                        true,
+                        arrayListOf(
+                            "PaymentKey|${success.paymentKey}",
+                            "OrderId|${success.orderId}",
+                            "Amount|${success.amount}",
+                            "AdditionalParams|${success.additionalParameters}"
+                        )
+                    )
+                )
+        */
+    }
+
+    private fun handlePaymentFailResult(fail: TossPaymentResult.Fail) {
+        /*
+                startActivity(
+                    PaymentResultActivity.getIntent(
+                        this@PaymentWidgetActivity,
+                        false,
+                        arrayListOf(
+                            "ErrorCode|${fail.errorCode}",
+                            "ErrorMessage|${fail.errorMessage}",
+                            "OrderId|${fail.orderId}"
+                        )
+                    )
+                )
+        */
     }
 
     private fun toast(message: String) {

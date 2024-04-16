@@ -61,7 +61,7 @@
         </activity>
         <activity android:name=".presentation.QrScanActivity" />
 
-        <!--suppress AndroidDomInspection -->
+        <!--        suppress AndroidDomInspection -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
@@ -69,8 +69,14 @@
 
         <activity
             android:name=".tosspayments.TossPaymentWidgetActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <!--suppress AndroidDomInspection -->
+        <activity
+            android:name="com.tosspayments.paymentsdk.activity.TossPaymentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
 import com.nexters.boolti.tosspayments.extension.toCurrency
@@ -23,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TossPaymentWidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTossPaymentWidgetBinding
+    private val viewModel: TossPaymentsWidgetViewModel by viewModels()
 
     private val paymentEventListener
         get() = object : PaymentMethodEventListener() {
@@ -195,27 +197,11 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     private fun handlePaymentSuccessResult(success: TossPaymentResult.Success) {
-        val paymentType: String? = success.additionalParameters["paymentType"]
-        if ("BRANDPAY".equals(paymentType, true)) {
-            // TODO: 브랜드페이 승인
+        if (viewModel.validateOrderId(success.orderId)) {
+            toast("승인 절차 진행")
         } else {
-            // TODO: 일반결제 승인 -> 추후 일반결제/브랜드페이 승인으로 Migration 예정되어있음
+            toast("orderId 가 일치하지 않음")
         }
-
-        /*
-                startActivity(
-                    PaymentResultActivity.getIntent(
-                        this@PaymentWidgetActivity,
-                        true,
-                        arrayListOf(
-                            "PaymentKey|${success.paymentKey}",
-                            "OrderId|${success.orderId}",
-                            "Amount|${success.amount}",
-                            "AdditionalParams|${success.additionalParameters}"
-                        )
-                    )
-                )
-        */
     }
 
     private fun handlePaymentFailResult(fail: TossPaymentResult.Fail) {

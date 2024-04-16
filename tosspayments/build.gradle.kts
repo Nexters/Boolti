@@ -45,10 +45,13 @@ android {
 }
 
 dependencies {
+    implementation(projects.domain)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.bundles.lifecycle)
     implementation(libs.payments.toss)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

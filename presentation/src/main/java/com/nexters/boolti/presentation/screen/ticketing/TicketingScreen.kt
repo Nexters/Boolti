@@ -128,13 +128,13 @@ fun TicketingScreen(
                             context = context,
                             amount = uiState.totalPrice,
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
-                            customerKey = "test",
-                            orderId = "test01",
+                            customerKey = it.userId,
+                            orderId = it.orderId,
                             orderName = "${uiState.showName} ${uiState.ticketName}",
                             currency = Currency.KRW.name,
                             countryCode = "KR",
-                            variantKey = null,
-                            redirectUrl = null,
+                            variantKey = null, // 멀티 결제 UI 사용 시 필요
+                            redirectUrl = null, // 브랜드 페이 사용 시 필요
                         )
                     )
                 }

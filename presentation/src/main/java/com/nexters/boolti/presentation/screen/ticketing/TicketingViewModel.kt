@@ -1,11 +1,13 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
+import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -13,10 +15,13 @@ import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -81,7 +86,17 @@ class TicketingViewModel @Inject constructor(
         viewModelScope.launch(recordExceptionHandler) {
             when (uiState.value.paymentType) {
                 PaymentType.ACCOUNT_TRANSFER -> accountTransfer()
-                PaymentType.CARD -> event(TicketingEvent.ProgressPayment)
+                PaymentType.CARD -> {
+                    getOrderId()
+                        .onStart { _uiState.update { it.copy(loading = true) } }
+                        .onEach { orderId ->
+                            Log.d("[MANGBAAM]TicketingViewModel", "reservation orderId: $orderId")
+                            event(TicketingEvent.ProgressPayment(userId, orderId))
+                        }
+                        .onCompletion { _uiState.update { it.copy(loading = false) } }
+                        .firstOrNull()
+                }
+
                 else -> Unit
             }
         }
@@ -189,6 +204,10 @@ class TicketingViewModel @Inject constructor(
 
     fun toggleAgreement() {
         _uiState.update { it.toggleAgreement() }
+    }
+
+    private fun getOrderId(): Flow<String> {
+        return repository.getOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
     }
 
     private fun event(event: TicketingEvent) {

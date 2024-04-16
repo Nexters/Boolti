@@ -85,8 +85,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
 
-    implementation(libs.payments.toss)
-
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.ui.test.junit4)

@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
+import com.nexters.boolti.tosspayments.extension.toCurrency
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.AgreementStatus
 import com.tosspayments.paymentsdk.model.AgreementStatusListener
@@ -256,7 +257,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             customerKey: String,
             orderId: String,
             orderName: String,
-            currency: PaymentMethod.Rendering.Currency,
+            currency: String,
             countryCode: String,
             variantKey: String? = null,
             redirectUrl: String? = null
@@ -267,7 +268,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
                 .putExtra(EXTRA_KEY_ORDER_ID, orderId)
                 .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
-                .putExtra(EXTRA_KEY_CURRENCY, currency)
+                .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
                 .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
                 .putExtra(EXTRA_KEY_VARIANT_KEY, variantKey)
                 .putExtra(EXTRA_KEY_REDIRECT_URL, redirectUrl)

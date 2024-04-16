@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.Currency
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.PaymentType.ACCOUNT_TRANSFER
@@ -97,7 +98,6 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
-import com.tosspayments.paymentsdk.view.PaymentMethod
 import java.time.LocalDateTime
 
 @Composable
@@ -130,8 +130,8 @@ fun TicketingScreen(
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
                             customerKey = "test",
                             orderId = "test01",
-                            orderName = "TEST",
-                            currency = PaymentMethod.Rendering.Currency.KRW,
+                            orderName = "${uiState.showName} ${uiState.ticketName}",
+                            currency = Currency.KRW.name,
                             countryCode = "KR",
                             variantKey = null,
                             redirectUrl = null,

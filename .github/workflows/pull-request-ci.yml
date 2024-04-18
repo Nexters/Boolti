@@ -26,9 +26,15 @@ jobs:
 
       - name: Run unit tests
         env:
+          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
         run: |
+          echo "$KEYSTORE" | base64 -d > ./app/boolti-keystore.keystore
+          echo "$KEYSTORE_PROPERTIES" > keystore.properties
           echo "$LOCAL_PROPERTIES" > local.properties
+          echo "$GOOGLE_SERVICES" > ./app/google-services.json
           ./gradlew test --stacktrace
 
       - name: Publish Test Results

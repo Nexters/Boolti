@@ -2,7 +2,7 @@ name: Android Pull Request CI
 
 on:
   pull_request:
-    branches: [ develop, ci ]
+    branches: [ develop ]
 
 jobs:
   unit_test:
@@ -34,7 +34,7 @@ jobs:
           echo "$KEYSTORE" | base64 -d > ./app/boolti-keystore.keystore
           echo "$KEYSTORE_PROPERTIES" > keystore.properties
           echo "$LOCAL_PROPERTIES" > local.properties
-          echo "$GOOGLE_SERVICES" > ./app/google-services.json
+          echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
           ./gradlew test --stacktrace
 
       - name: Publish Test Results
@@ -42,4 +42,3 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: "**/test-results/**/*.xml"
-

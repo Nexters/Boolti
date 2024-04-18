@@ -133,6 +133,13 @@ fun TicketingScreen(
                             orderName = "${uiState.showName} ${uiState.ticketName}",
                             currency = Currency.KRW.name,
                             countryCode = "KR",
+                            showId = viewModel.showId,
+                            salesTicketTypeId = viewModel.salesTicketTypeId,
+                            ticketCount = uiState.ticketCount,
+                            reservationName = uiState.reservationName,
+                            reservationPhoneNumber = uiState.reservationContact,
+                            depositorName = uiState.depositorName,
+                            depositorPhoneNumber = uiState.depositorContact,
                             variantKey = null, // 멀티 결제 UI 사용 시 필요
                             redirectUrl = null, // 브랜드 페이 사용 시 필요
                         )

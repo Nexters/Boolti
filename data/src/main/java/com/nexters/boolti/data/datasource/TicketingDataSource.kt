@@ -8,6 +8,7 @@ import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
+import com.nexters.boolti.domain.request.PaymentApproveRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import retrofit2.Response
@@ -48,5 +49,9 @@ internal class TicketingDataSource @Inject constructor(
 
     suspend fun requestOrderId(request: OrderIdRequest): String {
         return ticketingService.requestOrderId(request).orderId
+    }
+
+    suspend fun approvePayment(request: PaymentApproveRequest): String {
+        return ticketingService.approvePayment(request).orderId
     }
 }

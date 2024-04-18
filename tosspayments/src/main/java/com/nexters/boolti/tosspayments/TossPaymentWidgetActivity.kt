@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
 import com.nexters.boolti.tosspayments.extension.toCurrency
 import com.tosspayments.paymentsdk.PaymentWidget
@@ -20,6 +23,8 @@ import com.tosspayments.paymentsdk.model.PaymentWidgetStatusListener
 import com.tosspayments.paymentsdk.model.TossPaymentResult
 import com.tosspayments.paymentsdk.view.PaymentMethod
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TossPaymentWidgetActivity : AppCompatActivity() {
@@ -63,16 +68,15 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
 
     private val paymentMethodWidgetStatusListener = object : PaymentWidgetStatusListener {
         override fun onLoad() {
-            val message = "PaymentMethods loaded"
-
-            Log.d(TAG, message)
-//            binding.paymentMethodWidgetStatus.text = message
-            binding.pbLoading.visibility = View.GONE
+            binding.btnPay.isVisible = true
+            binding.btnPay.isEnabled = true
+            binding.pbLoading.isVisible = false
         }
 
         override fun onFail(fail: TossPaymentResult.Fail) {
             Log.d(TAG, fail.errorMessage)
-            binding.pbLoading.visibility = View.GONE
+            binding.btnPay.isEnabled = false
+            binding.pbLoading.isVisible = false
             /*startActivity(
                 PaymentResultActivity.getIntent(
                     this@PaymentWidgetActivity,
@@ -119,6 +123,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initViews()
+        observe()
     }
 
     private fun initViews() {
@@ -136,6 +141,23 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 variantKey = getStringExtra(EXTRA_KEY_VARIANT_KEY),
                 redirectUrl = getStringExtra(EXTRA_KEY_REDIRECT_URL)
             )
+        }
+    }
+
+    private fun observe() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collectLatest(::handleEvent)
+            }
+        }
+    }
+
+    private fun handleEvent(event: PaymentEvent) {
+        when (event) {
+            is PaymentEvent.Approved -> {
+                toast("승인 성공!!!!!!")
+                Log.d("[MANGBAAM]", "observe: 승인 성공, orderId: ${event.orderId}")
+            }
         }
     }
 
@@ -197,11 +219,11 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     private fun handlePaymentSuccessResult(success: TossPaymentResult.Success) {
-        if (viewModel.validateOrderId(success.orderId)) {
-            toast("승인 절차 진행")
-        } else {
-            toast("orderId 가 일치하지 않음")
-        }
+        viewModel.approvePayment(
+            orderId = success.orderId,
+            paymentKey = success.paymentKey,
+            totalPrice = success.amount.toInt(),
+        )
     }
 
     private fun handlePaymentFailResult(fail: TossPaymentResult.Fail) {
@@ -235,6 +257,13 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         private const val EXTRA_KEY_COUNTRY_CODE = "extraKeyCountryCode"
         private const val EXTRA_KEY_VARIANT_KEY = "extraKeyVariantKey"
         private const val EXTRA_KEY_REDIRECT_URL = "extraKeyRedirectUrl"
+        private const val EXTRA_KEY_SHOW_ID = "extraKeyShowId"
+        private const val EXTRA_KEY_SALES_TICKET_ID = "extraKeySalesTicketId"
+        private const val EXTRA_KEY_TICKET_COUNT = "extraKeyTicketCount"
+        private const val EXTRA_KEY_RESERVATION_NAME = "extraKeyReservationName"
+        private const val EXTRA_KEY_RESERVATION_PHONE_NUMBER = "extraKeyReservationPhoneNumber"
+        private const val EXTRA_KEY_DEPOSITOR_NAME = "extraKeyDepositorName"
+        private const val EXTRA_KEY_DEPOSITOR_PHONE_NUMBER = "extraKeyDepositorPhoneNumber"
 
         fun getIntent(
             context: Context,
@@ -245,8 +274,15 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             orderName: String,
             currency: String,
             countryCode: String,
+            showId: String,
+            salesTicketTypeId: String,
+            ticketCount: Int,
+            reservationName: String,
+            reservationPhoneNumber: String,
+            depositorName: String,
+            depositorPhoneNumber: String,
             variantKey: String? = null,
-            redirectUrl: String? = null
+            redirectUrl: String? = null,
         ): Intent {
             return Intent(context, TossPaymentWidgetActivity::class.java)
                 .putExtra(EXTRA_KEY_AMOUNT, amount)
@@ -258,6 +294,13 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
                 .putExtra(EXTRA_KEY_VARIANT_KEY, variantKey)
                 .putExtra(EXTRA_KEY_REDIRECT_URL, redirectUrl)
+                .putExtra(EXTRA_KEY_SHOW_ID, showId)
+                .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
+                .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
+                .putExtra(EXTRA_KEY_RESERVATION_NAME, reservationName)
+                .putExtra(EXTRA_KEY_RESERVATION_PHONE_NUMBER, reservationPhoneNumber)
+                .putExtra(EXTRA_KEY_DEPOSITOR_NAME, depositorName)
+                .putExtra(EXTRA_KEY_DEPOSITOR_PHONE_NUMBER, depositorPhoneNumber)
         }
     }
 }

@@ -61,7 +61,7 @@
         </activity>
         <activity android:name=".presentation.QrScanActivity" />
 
-        <!--        suppress AndroidDomInspection -->
+        <!--suppress AndroidDomInspection -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"

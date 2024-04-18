@@ -2,12 +2,14 @@ package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
+import com.nexters.boolti.data.network.response.ApprovePaymentResponse
 import com.nexters.boolti.data.network.response.CheckInviteCodeResponse
 import com.nexters.boolti.data.network.response.OrderIdDto
 import com.nexters.boolti.data.network.response.ReservationDto
 import com.nexters.boolti.data.network.response.SalesTicketTypeDto
 import com.nexters.boolti.data.network.response.TicketingInfoDto
 import com.nexters.boolti.domain.request.OrderIdRequest
+import com.nexters.boolti.domain.request.PaymentApproveRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -49,4 +51,9 @@ internal interface TicketingService {
     suspend fun requestOrderId(
         @Body request: OrderIdRequest,
     ): OrderIdDto
+
+    @POST("/app/api/v1/order/approve-payment")
+    suspend fun approvePayment(
+        @Body request: PaymentApproveRequest,
+    ): ApprovePaymentResponse
 }

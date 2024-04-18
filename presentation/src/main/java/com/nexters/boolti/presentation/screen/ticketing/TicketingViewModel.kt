@@ -39,8 +39,8 @@ class TicketingViewModel @Inject constructor(
     getUserUsecase: GetUserUsecase,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val showId: String = requireNotNull(savedStateHandle["showId"])
-    private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
+    val showId: String = requireNotNull(savedStateHandle["showId"])
+    val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
     private val userId = getUserUsecase().id
 

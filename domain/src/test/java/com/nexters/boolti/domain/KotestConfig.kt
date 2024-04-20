@@ -4,7 +4,7 @@ import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.extensions.Extension
 import io.kotest.extensions.junitxml.JunitXmlReporter
 
-class KoTestConfig : AbstractProjectConfig() {
+class KotestConfig : AbstractProjectConfig() {
 
     override fun extensions(): List<Extension> = listOf(
         JunitXmlReporter(

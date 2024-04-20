@@ -20,3 +20,7 @@ plugins {
 task("clean", Delete::class) {
     delete = setOf(rootProject.buildDir)
 }
+
+task("btTest") {
+    dependsOn(":domain:test", ":data:testDebugUnitTest", ":presentation:testDebugUnitTest")
+}

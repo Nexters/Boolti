@@ -84,10 +84,10 @@ hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-p
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax-inject" }
 junit = { module = "junit:junit", version.ref = "junit" }
-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+kotest-extentions-junitxml = { group = "io.kotest", name = "kotest-extensions-junitxml", version.ref = "kotest"}
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "coroutines" }
@@ -129,6 +129,6 @@ android-test = ["junit", "androidx-junit", "androidx-espresso-core", "kotlinx-co
 network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
 firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-dynamic-links"]
-kotest = ["kotest-assertions-core", "kotest-property", "kotest-runner-junit5"]
+kotest = ["kotest-property", "kotest-runner-junit5", "kotest-extentions-junitxml"]
 coil = ["coil", "coil-compose"]
 compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-material3-android", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]

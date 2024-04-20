@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 class ShowTest : BehaviorSpec() {
     private val now = LocalDate.now()
     private val standardShow = Show(
-        id = 1,
+        id = "1",
         name = "",
         date = LocalDateTime.MAX,
         salesStartDate = LocalDate.MIN,

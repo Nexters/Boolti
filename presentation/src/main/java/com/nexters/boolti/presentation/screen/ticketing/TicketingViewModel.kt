@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
@@ -69,7 +68,7 @@ class TicketingViewModel @Inject constructor(
                 depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
                 depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationContact else state.depositorContact,
                 paymentAmount = uiState.value.totalPrice,
-                paymentType = uiState.value.paymentType ?: PaymentType.UNDEFINED,
+                paymentType = PaymentType.CARD,
                 userId = userId,
                 showId = showId,
                 salesTicketTypeId = salesTicketTypeId,
@@ -84,36 +83,15 @@ class TicketingViewModel @Inject constructor(
 
     fun reservation() {
         viewModelScope.launch(recordExceptionHandler) {
-            when (uiState.value.paymentType) {
-                PaymentType.ACCOUNT_TRANSFER -> accountTransfer()
-                PaymentType.CARD -> {
-                    getOrderId()
-                        .onStart { _uiState.update { it.copy(loading = true) } }
-                        .onEach { orderId ->
-                            Log.d("[MANGBAAM]TicketingViewModel", "reservation orderId: $orderId")
-                            event(TicketingEvent.ProgressPayment(userId, orderId))
-                        }
-                        .onCompletion { _uiState.update { it.copy(loading = false) } }
-                        .firstOrNull()
+            getOrderId()
+                .onStart { _uiState.update { it.copy(loading = true) } }
+                .onEach { orderId ->
+                    Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
+                    event(TicketingEvent.ProgressPayment(userId, orderId))
                 }
-
-                else -> Unit
-            }
+                .onCompletion { _uiState.update { it.copy(loading = false) } }
+                .firstOrNull()
         }
-    }
-
-    private suspend fun accountTransfer() {
-        repository.requestReservation(reservationRequest)
-            .onStart { _uiState.update { it.copy(loading = true) } }
-            .catch { e ->
-                _uiState.update { it.copy(loading = false) }
-                throw e
-            }
-            .singleOrNull()?.let { reservationId ->
-                Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
-                _uiState.update { it.copy(loading = false) }
-                event(TicketingEvent.TicketingSuccess(reservationId, showId))
-            }
     }
 
     private fun load() {
@@ -133,7 +111,6 @@ class TicketingViewModel @Inject constructor(
                             ticketCount = info.ticketCount,
                             totalPrice = info.totalPrice,
                             isInviteTicket = info.isInviteTicket,
-//                            paymentType = info.paymentType,
                         )
                     }
                 }
@@ -192,10 +169,6 @@ class TicketingViewModel @Inject constructor(
 
     fun setInviteCode(code: String) {
         _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
-    }
-
-    fun setPaymentType(type: PaymentType) {
-        _uiState.update { it.copy(paymentType = type) }
     }
 
     fun toggleAgreement(index: Int) {

@@ -212,24 +212,7 @@ fun TicketingScreen(
                     )
                 }
 
-                // 결제 수단
-                if (!uiState.isInviteTicket && uiState.totalPrice > 0) {
-                    PaymentSection(
-                        selected = uiState.paymentType,
-                        onClick = { viewModel.setPaymentType(it) },
-                    )
-                }
-
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
-
-                Text(
-                    modifier = Modifier
-                        .padding(top = 24.dp, bottom = 20.dp)
-                        .padding(horizontal = marginHorizontal),
-                    text = stringResource(R.string.business_responsibility),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Grey70,
-                )
 
                 // 주문내용 확인 및 결제 동의
                 OrderAgreementSection(
@@ -239,6 +222,15 @@ fun TicketingScreen(
                     onClickTotalAgree = viewModel::toggleAgreement,
                     onClickAgree = viewModel::toggleAgreement,
                     onClickShow = {}, // TODO 기획 확정되면 구현
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(top = 24.dp, bottom = 20.dp)
+                        .padding(horizontal = marginHorizontal),
+                    text = stringResource(R.string.business_responsibility),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Grey70,
                 )
 
                 // 사업자 정보
@@ -282,7 +274,7 @@ fun TicketingScreen(
                 )
             }
         }
-        if (showConfirmDialog && uiState.paymentType != null) {
+        if (showConfirmDialog) {
             TicketingConfirmDialog(
                 isInviteTicket = uiState.isInviteTicket,
                 reservationName = uiState.reservationName,
@@ -292,7 +284,6 @@ fun TicketingScreen(
                 ticketName = uiState.ticketName,
                 ticketCount = uiState.ticketCount,
                 totalPrice = uiState.totalPrice,
-                paymentType = uiState.paymentType ?: UNDEFINED,
                 onClick = viewModel::reservation,
                 onDismiss = { showConfirmDialog = false },
             )

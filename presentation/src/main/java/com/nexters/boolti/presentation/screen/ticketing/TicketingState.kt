@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import com.nexters.boolti.domain.model.InviteCodeStatus
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import java.time.LocalDateTime
 
@@ -16,7 +15,6 @@ data class TicketingState(
     val isSameContactInfo: Boolean = false,
     val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val paymentType: PaymentType? = null,
     val reservationName: String = "",
     val reservationContact: String = "",
     val depositorName: String = "",
@@ -44,8 +42,7 @@ data class TicketingState(
 
             totalPrice == 0 -> true
 
-            else -> paymentType != null &&
-                    (isSameContactInfo || depositorName.isNotBlank()) &&
+            else -> (isSameContactInfo || depositorName.isNotBlank()) &&
                     (isSameContactInfo || depositorContact.isNotBlank())
         }
 

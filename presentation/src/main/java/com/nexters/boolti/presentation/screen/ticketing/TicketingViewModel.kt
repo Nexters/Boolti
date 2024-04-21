@@ -3,10 +3,10 @@ package com.nexters.boolti.presentation.screen.ticketing
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
+import com.nexters.boolti.domain.request.PaymentApproveRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -52,46 +52,72 @@ class TicketingViewModel @Inject constructor(
     private val state: TicketingState
         get() = uiState.value
 
-    private val reservationRequest: TicketingRequest
-        get() = when (uiState.value.isInviteTicket) {
-            true -> TicketingRequest.Invite(
-                inviteCode = state.inviteCode,
-                userId = userId,
-                showId = showId,
-                salesTicketTypeId = salesTicketTypeId,
-                reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationContact,
-            )
-
-            false -> TicketingRequest.Normal(
-                ticketCount = uiState.value.ticketCount,
-                depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
-                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationContact else state.depositorContact,
-                paymentAmount = uiState.value.totalPrice,
-                paymentType = PaymentType.CARD,
-                userId = userId,
-                showId = showId,
-                salesTicketTypeId = salesTicketTypeId,
-                reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationContact,
-            )
-        }
-
     init {
         load()
     }
 
     fun reservation() {
         viewModelScope.launch(recordExceptionHandler) {
-            getOrderId()
-                .onStart { _uiState.update { it.copy(loading = true) } }
-                .onEach { orderId ->
-                    Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
-                    event(TicketingEvent.ProgressPayment(userId, orderId))
-                }
-                .onCompletion { _uiState.update { it.copy(loading = false) } }
-                .firstOrNull()
+            when {
+                state.isInviteTicket -> reservationInviteTicket()
+                !state.isInviteTicket && state.totalPrice > 0 -> reservationSalesTicket()
+                else -> reservationFreeTicket()
+            }
         }
+    }
+
+    private suspend fun reservationSalesTicket() {
+        getOrderId()
+            .onStart { _uiState.update { it.copy(loading = true) } }
+            .onEach { orderId ->
+                Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
+                event(TicketingEvent.ProgressPayment(userId, orderId))
+            }
+            .onCompletion { _uiState.update { it.copy(loading = false) } }
+            .firstOrNull()
+    }
+
+    private suspend fun reservationInviteTicket() {
+        val request = TicketingRequest.Invite(
+            inviteCode = state.inviteCode,
+            userId = userId,
+            showId = showId,
+            salesTicketTypeId = salesTicketTypeId,
+            reservationName = state.reservationName,
+            reservationPhoneNumber = state.reservationContact,
+        )
+        repository.requestReservation(request)
+            .onStart { _uiState.update { it.copy(loading = true) } }
+            .catch { e ->
+                _uiState.update { it.copy(loading = false) }
+                throw e
+            }
+            .onCompletion { _uiState.update { it.copy(loading = false) } }
+            .singleOrNull()?.let { reservationId ->
+                Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
+                event(TicketingEvent.TicketingSuccess(reservationId, showId))
+            }
+    }
+
+    private suspend fun reservationFreeTicket() {
+        val request = PaymentApproveRequest(
+            orderId = getOrderId().firstOrNull() ?: return,
+            amount = uiState.value.totalPrice,
+            paymentKey = "",
+            showId = showId,
+            salesTicketTypeId = salesTicketTypeId,
+            ticketCount = ticketCount,
+            reservationName = uiState.value.reservationName,
+            reservationPhoneNumber = uiState.value.reservationContact,
+            depositorName = uiState.value.depositorName,
+            depositorPhoneNumber = uiState.value.depositorContact,
+            paymentAmount = uiState.value.totalPrice,
+            means = com.nexters.boolti.domain.model.PaymentType.CARD,
+        )
+        repository.approvePayment(request)
+            .singleOrNull()?.let {
+                event(TicketingEvent.TicketingSuccess(it, showId))
+            }
     }
 
     private fun load() {

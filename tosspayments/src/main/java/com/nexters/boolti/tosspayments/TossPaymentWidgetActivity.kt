@@ -227,6 +227,11 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     private fun handlePaymentFailResult(fail: TossPaymentResult.Fail) {
+        Log.e(
+            TAG,
+            "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
+        )
+        toast(fail.errorMessage)
         /*
                 startActivity(
                     PaymentResultActivity.getIntent(

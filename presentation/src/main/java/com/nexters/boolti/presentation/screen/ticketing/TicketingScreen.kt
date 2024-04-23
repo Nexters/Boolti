@@ -144,6 +144,7 @@ fun TicketingScreen(
                             redirectUrl = null, // 브랜드 페이 사용 시 필요
                         )
                     )
+                    showConfirmDialog = false
                 }
             }
         }
@@ -382,32 +383,6 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun PaymentSection(
-    selected: PaymentType? = null,
-    onClick: (PaymentType) -> Unit,
-) {
-    Section(title = stringResource(R.string.payment_type_label)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            PaymentType(
-                modifier = Modifier.weight(1f),
-                paymentType = CARD,
-                selected = selected == CARD,
-                onClick = { onClick(CARD) },
-            )
-            PaymentType(
-                modifier = Modifier.weight(1f),
-                paymentType = ACCOUNT_TRANSFER,
-                selected = selected == ACCOUNT_TRANSFER,
-                onClick = { onClick(ACCOUNT_TRANSFER) },
-            )
         }
     }
 }

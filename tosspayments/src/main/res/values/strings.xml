@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="payment_failure_cta">다시 예매하기</string>
+    <string name="payment_failed_title">결제에 실패했어요</string>
+</resources>

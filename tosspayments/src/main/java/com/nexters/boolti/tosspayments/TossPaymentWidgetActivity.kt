@@ -59,7 +59,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         get() = object : AgreementStatusListener {
             override fun onAgreementStatusChanged(agreementStatus: AgreementStatus) {
                 Log.d(TAG, "onAgreementStatusChanged : ${agreementStatus.agreedRequiredTerms}")
-
                 runOnUiThread {
                     binding.btnPay.isEnabled = agreementStatus.agreedRequiredTerms
                 }
@@ -77,17 +76,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             Log.d(TAG, fail.errorMessage)
             binding.btnPay.isEnabled = false
             binding.pbLoading.isVisible = false
-            /*startActivity(
-                PaymentResultActivity.getIntent(
-                    this@PaymentWidgetActivity,
-                    false,
-                    arrayListOf(
-                        "ErrorCode|${fail.errorCode}",
-                        "ErrorMessage|${fail.errorMessage}",
-                        "OrderId|${fail.orderId}"
-                    )
-                )
-            )*/
         }
     }
 
@@ -96,25 +84,20 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             val message = "Agreements loaded"
 
             Log.d(TAG, message)
-//            binding.agreementWidgetStatus.text = message
         }
 
         override fun onFail(fail: TossPaymentResult.Fail) {
             Log.d(TAG, fail.errorMessage)
-            /*
-                        startActivity(
-                            PaymentResultActivity.getIntent(
-                                this@PaymentWidgetActivity,
-                                false,
-                                arrayListOf(
-                                    "ErrorCode|${fail.errorCode}",
-                                    "ErrorMessage|${fail.errorMessage}",
-                                    "OrderId|${fail.orderId}"
-                                )
-                            )
-                        )
-            */
         }
+    }
+
+    private val paymentFailureDialog by lazy {
+        BTDialog(
+            title = getString(R.string.payment_failed_title),
+            buttonLabel = getString(R.string.payment_failure_cta),
+            cancelable = false,
+            listener = { finish() },
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -231,20 +214,10 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             TAG,
             "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
         )
-        toast(fail.errorMessage)
-        /*
-                startActivity(
-                    PaymentResultActivity.getIntent(
-                        this@PaymentWidgetActivity,
-                        false,
-                        arrayListOf(
-                            "ErrorCode|${fail.errorCode}",
-                            "ErrorMessage|${fail.errorMessage}",
-                            "OrderId|${fail.orderId}"
-                        )
-                    )
-                )
-        */
+        paymentFailureDialog.apply {
+            setMessage(fail.errorMessage)
+            show(supportFragmentManager, fail.errorCode)
+        }
     }
 
     private fun toast(message: String) {

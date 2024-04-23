@@ -26,6 +26,11 @@ class TossPaymentsWidgetViewModel @Inject constructor(
     private val depositorName: String = savedStateHandle["extraKeyDepositorName"] ?: ""
     private val depositorPhoneNumber: String = savedStateHandle["extraKeyDepositorPhoneNumber"] ?: ""
 
+    private var widgetLoadSuccess: Boolean = false
+    private var agreementLoadSuccess: Boolean = false
+    val loadSuccess: Boolean
+        get() = widgetLoadSuccess && agreementLoadSuccess
+
     private val _event = Channel<PaymentEvent>()
     val event = _event.receiveAsFlow()
 
@@ -54,6 +59,14 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                 event(PaymentEvent.Approved(orderId))
             }
         }
+    }
+
+    fun onLoadPaymentWidget(success: Boolean) {
+        widgetLoadSuccess = success
+    }
+
+    fun onLoadAgreement(success: Boolean) {
+        agreementLoadSuccess = success
     }
 
     private fun event(event: PaymentEvent) {

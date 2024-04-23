@@ -36,21 +36,18 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             override fun onCustomRequested(paymentMethodKey: String) {
                 val message = "onCustomRequested : $paymentMethodKey"
                 Log.d(TAG, message)
-
                 toast(message)
             }
 
             override fun onCustomPaymentMethodSelected(paymentMethodKey: String) {
                 val message = "onCustomPaymentMethodSelected : $paymentMethodKey"
                 Log.d(TAG, message)
-
                 toast(message)
             }
 
             override fun onCustomPaymentMethodUnselected(paymentMethodKey: String) {
                 val message = "onCustomPaymentMethodUnselected : $paymentMethodKey"
                 Log.d(TAG, message)
-
                 toast(message)
             }
         }
@@ -60,7 +57,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             override fun onAgreementStatusChanged(agreementStatus: AgreementStatus) {
                 Log.d(TAG, "onAgreementStatusChanged : ${agreementStatus.agreedRequiredTerms}")
                 runOnUiThread {
-                    binding.btnPay.isEnabled = agreementStatus.agreedRequiredTerms
+                    binding.btnPay.isEnabled = agreementStatus.agreedRequiredTerms && viewModel.loadSuccess
                 }
             }
         }
@@ -70,23 +67,26 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             binding.btnPay.isVisible = true
             binding.btnPay.isEnabled = true
             binding.pbLoading.isVisible = false
+            viewModel.onLoadPaymentWidget(true)
         }
 
         override fun onFail(fail: TossPaymentResult.Fail) {
             Log.d(TAG, fail.errorMessage)
             binding.btnPay.isEnabled = false
             binding.pbLoading.isVisible = false
+            viewModel.onLoadPaymentWidget(false)
         }
     }
 
     private val agreementWidgetStatusListener = object : PaymentWidgetStatusListener {
         override fun onLoad() {
             val message = "Agreements loaded"
-
+            viewModel.onLoadAgreement(true)
             Log.d(TAG, message)
         }
 
         override fun onFail(fail: TossPaymentResult.Fail) {
+            viewModel.onLoadAgreement(false)
             Log.d(TAG, fail.errorMessage)
         }
     }

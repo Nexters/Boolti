@@ -43,12 +43,14 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             override fun onCustomPaymentMethodSelected(paymentMethodKey: String) {
                 val message = "onCustomPaymentMethodSelected : $paymentMethodKey"
                 Log.d(TAG, message)
+                binding.btnPay.isEnabled = true
                 toast(message)
             }
 
             override fun onCustomPaymentMethodUnselected(paymentMethodKey: String) {
                 val message = "onCustomPaymentMethodUnselected : $paymentMethodKey"
                 Log.d(TAG, message)
+                binding.btnPay.isEnabled = false
                 toast(message)
             }
         }
@@ -73,9 +75,8 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
 
         override fun onFail(fail: TossPaymentResult.Fail) {
             Log.d(TAG, fail.errorMessage)
-            binding.btnPay.isEnabled = false
             binding.pbLoading.isVisible = false
-            viewModel.onLoadPaymentWidget(false)
+            toast(fail.errorMessage)
         }
     }
 

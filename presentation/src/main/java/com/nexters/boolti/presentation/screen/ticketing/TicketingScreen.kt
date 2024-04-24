@@ -117,13 +117,14 @@ fun TicketingScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val paymentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val intent = result.data ?: return@rememberLauncherForActivityResult
-            val reservationId = intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
-            onReserved(reservationId, viewModel.showId)
+    val paymentLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data ?: return@rememberLauncherForActivityResult
+                val reservationId = intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                onReserved(reservationId, viewModel.showId)
+            }
         }
-    }
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -149,8 +150,8 @@ fun TicketingScreen(
                             ticketCount = uiState.ticketCount,
                             reservationName = uiState.reservationName,
                             reservationPhoneNumber = uiState.reservationContact,
-                            depositorName = uiState.depositorName,
-                            depositorPhoneNumber = uiState.depositorContact,
+                            depositorName = if (uiState.isSameContactInfo) uiState.reservationName else uiState.depositorName,
+                            depositorPhoneNumber = if (uiState.isSameContactInfo) uiState.reservationContact else uiState.depositorContact,
                             variantKey = null, // 멀티 결제 UI 사용 시 필요
                             redirectUrl = null, // 브랜드 페이 사용 시 필요
                         )

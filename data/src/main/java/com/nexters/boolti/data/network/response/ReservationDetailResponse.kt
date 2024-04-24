@@ -28,6 +28,7 @@ internal data class ReservationDetailResponse(
     val depositorName: String = "",
     val depositorPhoneNumber: String = "",
     val csReservationId: String,
+    val cardDetail: CardDetailResponse? = null,
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
@@ -51,6 +52,18 @@ internal data class ReservationDetailResponse(
             depositorName = depositorName,
             depositorPhoneNumber = depositorPhoneNumber,
             csReservationId = csReservationId,
+            cardDetail = cardDetail?.toDomain(),
+        )
+    }
+
+    @Serializable
+    internal data class CardDetailResponse(
+        val installmentPlanMonths: Int,
+        val issuerCode: String,
+    ) {
+        fun toDomain(): ReservationDetail.CardDetail = ReservationDetail.CardDetail(
+            installmentPlanMonths = installmentPlanMonths,
+            issuerCode = issuerCode,
         )
     }
 }

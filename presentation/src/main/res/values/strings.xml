@@ -132,6 +132,8 @@
     <string name="payment_credit_check_card">신용・체크 카드</string>
     <string name="payment_account_transfer">계좌 이체</string>
     <string name="payment_card">카드</string>
+    <string name="payment_installment_plan_months">%d개월</string>
+    <string name="payment_pay_in_full">일시불</string>
     <string name="name_label">이름</string>
     <string name="contact_label">연락처</string>
     <string name="ticketing_name_placeholder">실명을 입력해 주세요</string>

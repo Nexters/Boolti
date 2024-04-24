@@ -18,7 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nexters.boolti.domain.model.PaymentType
+import com.nexters.boolti.domain.model.PaymentType.ACCOUNT_TRANSFER
+import com.nexters.boolti.domain.model.PaymentType.CARD
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
@@ -67,13 +68,33 @@ fun PaymentCompleteScreen(
             }
             SectionDivider(modifier = Modifier.padding(top = 24.dp))
 
+            val payment = when (reservation.paymentType) {
+                ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
+                CARD -> {
+                    val installment = reservation.cardDetail?.installmentPlanMonths?.let { months ->
+                        if (months == 0) {
+                            stringResource(R.string.payment_pay_in_full)
+                        } else {
+                            stringResource(R.string.payment_installment_plan_months, months)
+                        }
+                    }
+                    StringBuilder(reservation.bankName)
+                        .apply {
+                            installment?.let { append(" / $it") }
+                        }
+                        .toString()
+                }
+
+                else -> null
+            }
             InfoRow(
                 modifier = Modifier.padding(top = 24.dp),
                 label = stringResource(R.string.payment_amount_label),
                 value = stringResource(
                     R.string.unit_won,
                     reservation.totalAmountPrice
-                ), // TODO (카카오뱅크카드 / 일시불) 형태의 정보 추가
+                ),
+                value2 = payment?.let { "($it)" },
             )
             InfoRow(
                 modifier = Modifier.padding(top = 16.dp),
@@ -135,23 +156,34 @@ private fun InfoRow(
     modifier: Modifier = Modifier,
     label: String,
     value: String,
+    value2: String? = null,
 ) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier.width(100.dp),
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Grey30,
-        )
-        Text(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Grey15,
-        )
+    Column {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier.width(100.dp),
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30,
+            )
+            Text(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey15,
+            )
+        }
+        value2?.let {
+            Text(
+                modifier = Modifier.padding(horizontal = 112.dp),
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey15,
+            )
+        }
     }
 }
 
@@ -177,11 +209,11 @@ private fun PaymentCompleteScreenPreview() {
                 ticketName = "Juliet Greer",
                 isInviteTicket = false,
                 ticketCount = 6931,
-                bankName = "Corinne Leon",
+                bankName = "카카오뱅크카드",
                 accountNumber = "graece",
                 accountHolder = "reprimique",
                 salesEndDateTime = LocalDateTime.now(),
-                paymentType = PaymentType.UNDEFINED,
+                paymentType = CARD,
                 totalAmountPrice = 3473,
                 reservationState = ReservationState.REFUNDING,
                 completedDateTime = null,
@@ -189,7 +221,8 @@ private fun PaymentCompleteScreenPreview() {
                 ticketHolderPhoneNumber = "(453) 355-6682",
                 depositorName = "Dick Haley",
                 depositorPhoneNumber = "(869) 823-0418",
-                csReservationId = "mutat"
+                csReservationId = "mutat",
+                cardDetail = ReservationDetail.CardDetail(3, ""),
             ),
             navigateToReservation = {},
             navigateToTicketDetail = {},

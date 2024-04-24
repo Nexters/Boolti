@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.payment
 
-import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -14,12 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
@@ -27,7 +24,6 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.BooltiTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun PaymentScreen(
@@ -70,41 +66,10 @@ fun PaymentScreen(
                             navigateToTicketDetail = navigateToTicketDetail,
                         )
 
-                    else -> ProgressPayment(
-                        modifier = Modifier.padding(innerPadding),
-                        reservation = reservation,
-                        onClickCopyAccountNumber = {
-                            clipboardManager.setText(AnnotatedString(it))
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.account_number_copied_message),
-                                    )
-                                }
-                            }
-                        }
-                    )
+                    else -> Unit
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ProgressPayment(
-    modifier: Modifier = Modifier,
-    reservation: ReservationDetail,
-    onClickCopyAccountNumber: (accountNumber: String) -> Unit,
-) {
-    when (reservation.paymentType) {
-        PaymentType.ACCOUNT_TRANSFER -> AccountTransferContent(
-            modifier = modifier,
-            reservation = reservation,
-            onClickCopyAccountNumber = onClickCopyAccountNumber
-        )
-
-        PaymentType.CARD -> Unit
-        PaymentType.UNDEFINED -> Unit
     }
 }
 

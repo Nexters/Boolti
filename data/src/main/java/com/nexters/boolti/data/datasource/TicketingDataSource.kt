@@ -4,6 +4,7 @@ import com.nexters.boolti.data.network.api.TicketingService
 import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
 import com.nexters.boolti.data.network.response.CheckInviteCodeResponse
+import com.nexters.boolti.domain.model.ApprovePaymentResponse
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
@@ -51,7 +52,7 @@ internal class TicketingDataSource @Inject constructor(
         return ticketingService.requestOrderId(request).orderId
     }
 
-    suspend fun approvePayment(request: PaymentApproveRequest): String {
-        return ticketingService.approvePayment(request).orderId
+    suspend fun approvePayment(request: PaymentApproveRequest): ApprovePaymentResponse {
+        return ticketingService.approvePayment(request).toDomain()
     }
 }

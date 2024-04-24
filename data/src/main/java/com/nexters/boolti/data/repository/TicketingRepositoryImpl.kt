@@ -4,6 +4,7 @@ import com.nexters.boolti.data.datasource.ReservationDataSource
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
 import com.nexters.boolti.domain.extension.errorType
+import com.nexters.boolti.domain.model.ApprovePaymentResponse
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.TicketWithQuantity
@@ -62,7 +63,7 @@ internal class TicketingRepositoryImpl @Inject constructor(
         emit(dataSource.requestOrderId(request))
     }
 
-    override fun approvePayment(request: PaymentApproveRequest): Flow<String> = flow {
+    override fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse> = flow {
         emit(dataSource.approvePayment(request))
     }
 }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.domain.repository
 
+import com.nexters.boolti.domain.model.ApprovePaymentResponse
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.TicketWithQuantity
@@ -19,5 +20,5 @@ interface TicketingRepository {
     fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus>
     fun getPaymentInfo(reservationId: String): Flow<ReservationDetail>
     fun getOrderId(request: OrderIdRequest): Flow<String>
-    fun approvePayment(request: PaymentApproveRequest): Flow<String>
+    fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse>
 }

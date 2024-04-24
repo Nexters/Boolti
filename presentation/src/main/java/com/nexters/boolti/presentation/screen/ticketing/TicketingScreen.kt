@@ -1,5 +1,8 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -114,6 +117,14 @@ fun TicketingScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    val paymentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val intent = result.data ?: return@rememberLauncherForActivityResult
+            val reservationId = intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+            onReserved(reservationId, viewModel.showId)
+        }
+    }
+
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
@@ -123,7 +134,7 @@ fun TicketingScreen(
                 }
 
                 is TicketingEvent.ProgressPayment -> {
-                    context.startActivity(
+                    paymentLauncher.launch(
                         TossPaymentWidgetActivity.getIntent(
                             context = context,
                             amount = uiState.totalPrice,

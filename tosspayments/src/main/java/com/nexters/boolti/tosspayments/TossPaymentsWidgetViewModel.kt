@@ -55,8 +55,8 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                     paymentAmount = totalPrice,
                     means = PaymentType.CARD,
                 )
-            ).singleOrNull()?.let { orderId ->
-                event(PaymentEvent.Approved(orderId))
+            ).singleOrNull()?.let { (orderId, reservationId) ->
+                event(PaymentEvent.Approved(orderId, reservationId))
             }
         }
     }

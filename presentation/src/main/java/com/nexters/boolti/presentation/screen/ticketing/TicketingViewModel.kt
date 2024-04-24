@@ -114,9 +114,9 @@ class TicketingViewModel @Inject constructor(
             paymentAmount = uiState.value.totalPrice,
             means = com.nexters.boolti.domain.model.PaymentType.CARD,
         )
-        repository.approvePayment(request)
+        repository.approvePayment(request) // TODO 무료 티켓 API 확인
             .singleOrNull()?.let {
-                event(TicketingEvent.TicketingSuccess(it, showId))
+                event(TicketingEvent.TicketingSuccess(it.reservationId, showId))
             }
     }
 

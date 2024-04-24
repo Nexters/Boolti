@@ -1,5 +1,6 @@
 package com.nexters.boolti.tosspayments
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -138,8 +139,13 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     private fun handleEvent(event: PaymentEvent) {
         when (event) {
             is PaymentEvent.Approved -> {
-                toast("승인 성공!!!!!!")
                 Log.d("[MANGBAAM]", "observe: 승인 성공, orderId: ${event.orderId}")
+                val intent = Intent().apply {
+                    putExtra("orderId", event.orderId)
+                    putExtra("reservationId", event.reservationId)
+                }
+                setResult(Activity.RESULT_OK, intent)
+                finish()
             }
         }
     }
@@ -242,6 +248,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         private const val EXTRA_KEY_RESERVATION_PHONE_NUMBER = "extraKeyReservationPhoneNumber"
         private const val EXTRA_KEY_DEPOSITOR_NAME = "extraKeyDepositorName"
         private const val EXTRA_KEY_DEPOSITOR_PHONE_NUMBER = "extraKeyDepositorPhoneNumber"
+        private const val RESULT_KEY_PAYMENT_RESULT = 1000
 
         fun getIntent(
             context: Context,

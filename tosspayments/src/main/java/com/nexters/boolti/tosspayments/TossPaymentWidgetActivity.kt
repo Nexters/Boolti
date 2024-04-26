@@ -94,12 +94,12 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     private val paymentFailureDialog by lazy {
-        BTDialog(
-            title = getString(R.string.payment_failed_title),
-            buttonLabel = getString(R.string.payment_failure_cta),
-            cancelable = false,
-            listener = { finish() },
-        )
+        buildBTDialog(this) {
+            title = getString(R.string.payment_failed_title)
+            buttonLabel = getString(R.string.payment_failure_cta)
+            cancelable = false
+            setListener { finish() }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

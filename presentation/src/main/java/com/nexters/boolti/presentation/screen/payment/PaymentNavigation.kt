@@ -6,18 +6,18 @@ import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.reservationId
 import com.nexters.boolti.presentation.screen.showId
 
-fun NavGraphBuilder.PaymentScreen(
+fun NavGraphBuilder.PaymentCompleteScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     popInclusiveBackStack: (String) -> Unit,
     navigateToHome: () -> Unit,
 ) {
     composable(
-        route = "${MainDestination.Payment.route}/{$reservationId}?showId={$showId}",
-        arguments = MainDestination.Payment.arguments,
+        route = "${MainDestination.PaymentComplete.route}/{$reservationId}?showId={$showId}",
+        arguments = MainDestination.PaymentComplete.arguments,
     ) {
         val showId = it.arguments?.getString(showId)
-        PaymentScreen(
+        PaymentCompleteScreen(
             onClickHome = navigateToHome,
             onClickClose = {
                 showId?.let { showId ->

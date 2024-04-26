@@ -28,7 +28,7 @@ import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.business.BusinessScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
-import com.nexters.boolti.presentation.screen.payment.PaymentScreen
+import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
@@ -159,7 +159,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             popBackStack = navController::popBackStack,
         )
 
-        PaymentScreen(
+        PaymentCompleteScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
             popInclusiveBackStack = { route ->

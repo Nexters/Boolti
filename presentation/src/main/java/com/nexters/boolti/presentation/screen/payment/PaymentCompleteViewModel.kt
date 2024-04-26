@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.payment
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -9,12 +8,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PaymentViewModel @Inject constructor(
+class PaymentCompleteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
 ) : BaseViewModel() {
@@ -22,7 +24,7 @@ class PaymentViewModel @Inject constructor(
         "TicketingCompleteViewModel 에 reservationId 가 전달되지 않았습니다."
     }
 
-    private val _uiState = MutableStateFlow<PaymentState>(PaymentState.Loading)
+    private val _uiState = MutableStateFlow(PaymentCompleteState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -32,8 +34,11 @@ class PaymentViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch(recordExceptionHandler) {
             repository.getPaymentInfo(reservationId)
-                .singleOrNull()?.let {
-                    _uiState.value = PaymentState.Success(reservationDetail = it)
+                .onStart { _uiState.update { it.copy(loading = false) } }
+                .catch { e -> throw e }
+                .onCompletion { _uiState.update { it.copy(loading = false) } }
+                .singleOrNull()?.let { reservationDetail ->
+                    _uiState.update { it.copy(reservationDetail = reservationDetail) }
                 }
         }
     }

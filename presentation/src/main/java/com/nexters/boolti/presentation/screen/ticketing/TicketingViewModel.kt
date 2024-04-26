@@ -88,10 +88,7 @@ class TicketingViewModel @Inject constructor(
         )
         repository.requestReservation(request)
             .onStart { _uiState.update { it.copy(loading = true) } }
-            .catch { e ->
-                _uiState.update { it.copy(loading = false) }
-                throw e
-            }
+            .catch { e -> throw e }
             .onCompletion { _uiState.update { it.copy(loading = false) } }
             .singleOrNull()?.let { reservationId ->
                 Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")

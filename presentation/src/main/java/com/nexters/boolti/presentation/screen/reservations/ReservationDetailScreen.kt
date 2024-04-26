@@ -126,7 +126,7 @@ fun ReservationDetailScreen(
                 DepositInfo(reservation = state.reservation)
             }
             TicketHolderInfo(reservation = state.reservation)
-            if (!state.reservation.isInviteTicket) DepositorInfo(reservation = state.reservation)
+            if (state.reservation.totalAmountPrice > 0) DepositorInfo(reservation = state.reservation)
             TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
             if (state.reservation.reservationState == ReservationState.REFUNDED) {
@@ -267,7 +267,7 @@ private fun PaymentInfo(
     ) {
         val paymentType = when (reservation.paymentType) {
             PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-            PaymentType.CARD -> stringResource(id = R.string.payment_card)
+            PaymentType.CARD -> "${reservation.bankName} / ${stringResource(id = R.string.payment_pay_in_full)}"
             else -> stringResource(id = R.string.reservations_unknown)
         }
 
@@ -277,11 +277,13 @@ private fun PaymentInfo(
                 key = stringResource(id = R.string.total_payment_amount_label),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
             )
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                key = stringResource(id = R.string.payment_type_label),
-                value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
-            )
+            if (reservation.totalAmountPrice > 0 || reservation.isInviteTicket) { // 0원 티켓 제외
+                NormalRow(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                    key = stringResource(id = R.string.payment_type_label),
+                    value = if (reservation.isInviteTicket) stringResource(id = R.string.invite_code_label) else paymentType
+                )
+            }
         }
     }
 }
@@ -297,7 +299,7 @@ private fun RefundInfo(
         Column {
             val paymentType = when (reservation.paymentType) {
                 PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-                PaymentType.CARD -> stringResource(id = R.string.payment_card)
+                PaymentType.CARD -> reservation.bankName
                 else -> stringResource(id = R.string.reservations_unknown)
             }
 
@@ -306,12 +308,13 @@ private fun RefundInfo(
                 key = stringResource(id = R.string.reservation_price_of_refund),
                 value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice),
             )
-
-            NormalRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-                key = stringResource(id = R.string.refund_method),
-                value = paymentType,
-            )
+            if (reservation.totalAmountPrice > 0) {
+                NormalRow(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                    key = stringResource(id = R.string.refund_method),
+                    value = paymentType,
+                )
+            }
         }
     }
 }

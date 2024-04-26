@@ -132,12 +132,12 @@ fun RefundScreen(
                 ) {
                     if (uiState.reservation!!.totalAmountPrice > 0) {
                         InfoRow(
+                            modifier = Modifier.padding(bottom = 12.dp),
                             type = stringResource(id = R.string.refund_method),
                             value = uiState.reservation!!.bankName
                         )
                     }
                     InfoRow(
-                        modifier = Modifier.padding(top = 12.dp),
                         type = stringResource(id = R.string.refund_price),
                         value = stringResource(
                             id = R.string.unit_won,

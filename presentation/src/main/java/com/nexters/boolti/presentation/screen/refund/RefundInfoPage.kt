@@ -91,11 +91,13 @@ fun RefundInfoPage(
                     key = stringResource(id = R.string.refund_price),
                     value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
                 )
-                NormalRow(
-                    modifier = Modifier.padding(top = 16.dp),
-                    key = stringResource(id = R.string.refund_method),
-                    value = reservation.bankName
-                )
+                if (reservation.totalAmountPrice > 0) {
+                    NormalRow(
+                        modifier = Modifier.padding(top = 16.dp),
+                        key = stringResource(id = R.string.refund_method),
+                        value = reservation.bankName
+                    )
+                }
             }
         }
 

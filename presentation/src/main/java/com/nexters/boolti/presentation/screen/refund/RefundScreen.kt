@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,7 +34,6 @@ import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import kotlinx.coroutines.launch
 
@@ -60,6 +58,10 @@ fun RefundScreen(
                 RefundEvent.SuccessfullyRefunded -> {
                     snackbarController.showMessage(refundMessage)
                     onBackPressed()
+                }
+
+                is RefundEvent.ShowMessage -> {
+                    snackbarController.showMessage(event.message)
                 }
             }
         }
@@ -100,10 +102,6 @@ fun RefundScreen(
                         .fillMaxSize()
                         .padding(innerPadding),
                     reservation = reservation,
-                    onNameChanged = viewModel::updateName,
-                    onContactNumberChanged = viewModel::updateContact,
-                    onBankInfoChanged = viewModel::updateBankInfo,
-                    onAccountNumberChanged = viewModel::updateAccountNumber,
                     onRequest = { openDialog = true },
                     onRefundPolicyChecked = viewModel::toggleRefundPolicyCheck,
                 )
@@ -132,35 +130,12 @@ fun RefundScreen(
                         .background(Grey80)
                         .padding(horizontal = 20.dp, vertical = 16.dp)
                 ) {
-                    InfoRow(
-                        type = stringResource(id = R.string.account_holder),
-                        value = uiState.name
-                    )
-                    InfoRow(
-                        modifier = Modifier.padding(top = 12.dp),
-                        type = stringResource(id = R.string.contact_label),
-                        value = StringBuilder(uiState.contact).apply {
-                            if (uiState.contact.length > 7) {
-                                insert(7, '-')
-                                insert(3, '-')
-                            }
-                        }.toString()
-                    )
-                    InfoRow(
-                        modifier = Modifier.padding(top = 12.dp),
-                        type = stringResource(id = R.string.bank_name),
-                        value = uiState.bankInfo?.bankName ?: ""
-                    )
-                    InfoRow(
-                        modifier = Modifier.padding(top = 12.dp),
-                        type = stringResource(id = R.string.account_number),
-                        value = uiState.accountNumber
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(top = 12.dp),
-                        thickness = 1.dp,
-                        color = Grey70,
-                    )
+                    if (uiState.reservation!!.totalAmountPrice > 0) {
+                        InfoRow(
+                            type = stringResource(id = R.string.refund_method),
+                            value = uiState.reservation!!.bankName
+                        )
+                    }
                     InfoRow(
                         modifier = Modifier.padding(top = 12.dp),
                         type = stringResource(id = R.string.refund_price),

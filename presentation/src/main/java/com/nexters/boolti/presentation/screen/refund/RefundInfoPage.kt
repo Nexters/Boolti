@@ -66,26 +66,15 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefundInfoPage(
     uiState: RefundUiState,
     refundPolicy: List<String>,
     reservation: ReservationDetail,
     onRequest: () -> Unit,
-    onNameChanged: (String) -> Unit,
-    onContactNumberChanged: (String) -> Unit,
-    onBankInfoChanged: (BankInfo) -> Unit,
-    onAccountNumberChanged: (String) -> Unit,
     onRefundPolicyChecked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isSheetOpen by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
-    var showAccountError by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
@@ -93,126 +82,11 @@ fun RefundInfoPage(
             reservation = reservation
         )
         Section(
-            title = stringResource(id = R.string.refund_account_holder_info)
-        ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.width(56.dp),
-                        text = stringResource(id = R.string.name_label),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
-                    )
-                    BTTextField(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        text = uiState.name,
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next
-                        ),
-                        placeholder = stringResource(id = R.string.refund_account_name_hint),
-                        onValueChanged = onNameChanged
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.padding(top = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.width(56.dp),
-                        text = stringResource(id = R.string.contact_label),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
-                    )
-                    BTTextField(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        text = uiState.contact.filterToPhoneNumber(),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Phone,
-                            imeAction = ImeAction.Next
-                        ),
-                        placeholder = stringResource(id = R.string.ticketing_contact_placeholder),
-                        onValueChanged = onContactNumberChanged,
-                        visualTransformation = PhoneNumberVisualTransformation('-'),
-                    )
-                }
-            }
-        }
-        Section(
             modifier = Modifier.padding(top = 12.dp),
-            title = stringResource(id = R.string.refund_account_info),
+            title = stringResource(id = R.string.refund_information),
             expandable = false,
         ) {
             Column {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    onClick = { isSheetOpen = true },
-                    shape = RoundedCornerShape(4.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceTint,
-                    ),
-                    contentPadding = PaddingValues(horizontal = 12.dp),
-                ) {
-                    val bankSelection = stringResource(id = R.string.refund_bank_selection)
-                    Text(
-                        text = if (uiState.bankInfo == null) bankSelection else uiState.bankInfo.bankName,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-                    )
-                    Spacer(modifier = Modifier.weight(1.0f))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_down),
-                        contentDescription = stringResource(id = R.string.refund_bank_selection),
-                        tint = Grey50,
-                    )
-                }
-                BTTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                        .onFocusChanged { focusState ->
-                            showAccountError = uiState.accountNumber.isNotEmpty() &&
-                                    !uiState.isValidAccountNumber &&
-                                    !focusState.isFocused
-                        },
-                    text = uiState.accountNumber,
-                    isError = showAccountError,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done
-                    ),
-                    placeholder = stringResource(id = R.string.refund_account_number_hint),
-                    onValueChanged = onAccountNumberChanged,
-                )
-                if (showAccountError) {
-                    Text(
-                        modifier = Modifier.padding(top = 12.dp),
-                        text = stringResource(id = R.string.validation_account),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Error),
-                    )
-                }
-            }
-        }
-
-        Section(
-            modifier = Modifier.padding(top = 12.dp),
-            title = stringResource(id = R.string.refund_account_info),
-            expandable = false,
-        ) {
-            Column {
-                val paymentType = when (reservation.paymentType) {
-                    PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-                    PaymentType.CARD -> stringResource(id = R.string.payment_card)
-                    else -> stringResource(id = R.string.reservations_unknown)
-                }
-
                 NormalRow(
                     key = stringResource(id = R.string.refund_price),
                     value = stringResource(id = R.string.unit_won, reservation.totalAmountPrice)
@@ -220,7 +94,7 @@ fun RefundInfoPage(
                 NormalRow(
                     modifier = Modifier.padding(top = 16.dp),
                     key = stringResource(id = R.string.refund_method),
-                    value = paymentType
+                    value = reservation.bankName
                 )
             }
         }
@@ -271,31 +145,6 @@ fun RefundInfoPage(
             enabled = uiState.isAbleToRequest,
             label = stringResource(id = R.string.refund_button)
         )
-    }
-
-    if (isSheetOpen) {
-        ModalBottomSheet(
-            modifier = Modifier.heightIn(max = 646.dp),
-            sheetState = sheetState,
-            onDismissRequest = {
-                isSheetOpen = false
-            },
-            dragHandle = {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 12.dp, bottom = 20.dp)
-                        .size(45.dp, 4.dp)
-                        .background(Grey70)
-                        .clip(RoundedCornerShape(100.dp)),
-                )
-            },
-            containerColor = Grey85,
-        ) {
-            BankSelection(
-                selectedBank = uiState.bankInfo,
-                onClick = onBankInfoChanged,
-                onDismiss = { isSheetOpen = false })
-        }
     }
 }
 

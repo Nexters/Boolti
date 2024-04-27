@@ -3,7 +3,6 @@ package com.nexters.boolti.tosspayments
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.PaymentApproveRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,8 +51,6 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                     reservationPhoneNumber = reservationPhoneNumber,
                     depositorName = depositorName,
                     depositorPhoneNumber = depositorPhoneNumber,
-                    paymentAmount = totalPrice,
-                    means = PaymentType.CARD,
                 )
             ).singleOrNull()?.let { (orderId, reservationId) ->
                 event(PaymentEvent.Approved(orderId, reservationId))

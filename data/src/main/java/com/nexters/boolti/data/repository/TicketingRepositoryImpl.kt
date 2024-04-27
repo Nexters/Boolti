@@ -35,7 +35,7 @@ internal class TicketingRepositoryImpl @Inject constructor(
     override fun requestReservation(request: TicketingRequest): Flow<String> = flow {
         val response = when (request) {
             is TicketingRequest.Invite -> dataSource.requestReservationInviteTicket(request.toData())
-            is TicketingRequest.Normal -> dataSource.requestReservationSalesTicket(request.toData())
+            is TicketingRequest.Free -> dataSource.requestReservationSalesTicket(request.toData())
         }
         emit(response)
     }

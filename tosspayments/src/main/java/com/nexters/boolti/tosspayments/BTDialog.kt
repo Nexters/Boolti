@@ -9,18 +9,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.nexters.boolti.tosspayments.databinding.DialogCommonBinding
 
-class BTDialog(
-    private var title: String = "",
-    private var message: String = "",
-    private var buttonLabel: String = "",
-    private val cancelable: Boolean = true,
-    listener: BTDialogListener? = null,
-) : DialogFragment(R.layout.dialog_common) {
+class BTDialog : DialogFragment(R.layout.dialog_common) {
     private var _binding: DialogCommonBinding? = null
     private val binding: DialogCommonBinding
         get() = _binding ?: error("BTDialog binding is null")
 
-    private var _listener: BTDialogListener? = listener
+    var title: String = ""
+    var message: String = ""
+    var buttonLabel: String = ""
+    var listener: BTDialogListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = DialogCommonBinding.inflate(inflater, container, false)
@@ -40,8 +37,6 @@ class BTDialog(
 
     private fun initDialog() {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        isCancelable = cancelable
     }
 
     private fun initViews() = with(binding) {
@@ -50,24 +45,8 @@ class BTDialog(
         btnCta.text = buttonLabel
 
         btnCta.setOnClickListener {
-            _listener?.onClick()
+            listener?.onClick()
         }
-    }
-
-    fun setListener(listener: BTDialogListener) {
-        _listener = listener
-    }
-
-    fun setTitle(title: String) {
-        this.title = title
-    }
-
-    fun setMessage(message: String) {
-        this.message = message
-    }
-
-    fun setButtonLabel(buttonLabel: String) {
-        this.buttonLabel = buttonLabel
     }
 }
 

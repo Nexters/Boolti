@@ -32,6 +32,15 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTossPaymentWidgetBinding
     private val viewModel: TossPaymentsWidgetViewModel by viewModels()
 
+    private val paymentFailureDialog by lazy {
+        BTDialog().apply {
+            title = this@TossPaymentWidgetActivity.getString(R.string.payment_failed_title)
+            buttonLabel = this@TossPaymentWidgetActivity.getString(R.string.payment_failure_cta)
+            isCancelable = false
+            listener = BTDialogListener { finish() }
+        }
+    }
+
     private val paymentEventListener
         get() = object : PaymentMethodEventListener() {
             override fun onCustomRequested(paymentMethodKey: String) {
@@ -91,15 +100,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             viewModel.onLoadAgreement(false)
             Log.d(TAG, fail.errorMessage)
         }
-    }
-
-    private val paymentFailureDialog by lazy {
-        BTDialog(
-            title = getString(R.string.payment_failed_title),
-            buttonLabel = getString(R.string.payment_failure_cta),
-            cancelable = false,
-            listener = { finish() },
-        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -222,7 +222,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
         )
         paymentFailureDialog.apply {
-            setMessage(fail.errorMessage)
+            message = fail.errorMessage
             show(supportFragmentManager, fail.errorCode)
         }
     }
@@ -249,7 +249,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         private const val EXTRA_KEY_RESERVATION_PHONE_NUMBER = "extraKeyReservationPhoneNumber"
         private const val EXTRA_KEY_DEPOSITOR_NAME = "extraKeyDepositorName"
         private const val EXTRA_KEY_DEPOSITOR_PHONE_NUMBER = "extraKeyDepositorPhoneNumber"
-        private const val RESULT_KEY_PAYMENT_RESULT = 1000
 
         fun getIntent(
             context: Context,

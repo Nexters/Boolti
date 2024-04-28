@@ -261,6 +261,38 @@
     <string name="fcm_default_channel_name">불티 알림</string>
     <string name="fcm_default_channel_description">티켓 발권 알림을 받습니다.</string>
 
+    <!-- 카드사 -->
+    <string name="card_ibk_bc">기업 BC</string>
+    <string name="card_gwangjubank">광주은행</string>
+    <string name="card_lotte">롯데카드</string>
+    <string name="card_kdbbank">KDB산업은행</string>
+    <string name="card_bc">BC카드</string>
+    <string name="card_samsung">삼성카드</string>
+    <string name="card_saemaul">새마을금고</string>
+    <string name="card_shinhan">신한카드</string>
+    <string name="card_shinhyeop">신협</string>
+    <string name="card_citi">씨티카드</string>
+    <string name="card_woori_bc">우리BC카드</string>
+    <string name="card_woori">우리카드</string>
+    <string name="card_post">우체국예금보험</string>
+    <string name="card_savingbank">저축은행중앙회</string>
+    <string name="card_jeonbukbank">전북은행</string>
+    <string name="card_jejubank">제주은행</string>
+    <string name="card_kakaobank">카카오뱅크</string>
+    <string name="card_kbank">케이뱅크</string>
+    <string name="card_tossbank">토스뱅크</string>
+    <string name="card_hana">하나카드</string>
+    <string name="card_hyundai">현대카드</string>
+    <string name="card_kookmin">KB국민카드</string>
+    <string name="card_nonghyeop">NH농협카드</string>
+    <string name="card_suhyeop">Sh수협은행</string>
+    <string name="card_diners">다이너스 클럽</string>
+    <string name="card_master">마스터카드</string>
+    <string name="card_unionpay">유니온페이</string>
+    <string name="card_amex">아메리칸 익스프레스</string>
+    <string name="card_jcb">JCB</string>
+    <string name="card_visa">VISA</string>
+
     <!-- 사업자 정보 -->
     <string name="business_title">사업자 정보</string>
     <string name="business_responsibility">스튜디오 불티는 통신판매중개자로 통신판매의 당사자가 아닙니다. 불티에서 판매되는 상품에 대한 광고, 상품주문, 배송, 환불의 의무와 책임은 각 판매자에게 있습니다.</string>

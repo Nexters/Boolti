@@ -1,6 +1,5 @@
 package com.nexters.boolti.domain.request
 
-import com.nexters.boolti.domain.model.PaymentType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,6 +14,4 @@ data class PaymentApproveRequest(
     val reservationPhoneNumber: String,
     val depositorName: String,
     val depositorPhoneNumber: String,
-    val paymentAmount: Int,
-    val means: PaymentType,
 )

@@ -6,7 +6,6 @@ import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
-import com.nexters.boolti.domain.request.PaymentApproveRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -60,13 +59,13 @@ class TicketingViewModel @Inject constructor(
         viewModelScope.launch(recordExceptionHandler) {
             when {
                 state.isInviteTicket -> reservationInviteTicket()
-                !state.isInviteTicket && state.totalPrice > 0 -> reservationSalesTicket()
+                !state.isInviteTicket && state.totalPrice > 0 -> progressPayment()
                 else -> reservationFreeTicket()
             }
         }
     }
 
-    private suspend fun reservationSalesTicket() {
+    private suspend fun progressPayment() {
         getOrderId()
             .onStart { _uiState.update { it.copy(loading = true) } }
             .onEach { orderId ->
@@ -88,10 +87,6 @@ class TicketingViewModel @Inject constructor(
         )
         repository.requestReservation(request)
             .onStart { _uiState.update { it.copy(loading = true) } }
-            .catch { e ->
-                _uiState.update { it.copy(loading = false) }
-                throw e
-            }
             .onCompletion { _uiState.update { it.copy(loading = false) } }
             .singleOrNull()?.let { reservationId ->
                 Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
@@ -100,24 +95,17 @@ class TicketingViewModel @Inject constructor(
     }
 
     private suspend fun reservationFreeTicket() {
-        val request = PaymentApproveRequest(
-            orderId = getOrderId().firstOrNull() ?: return,
-            amount = uiState.value.totalPrice,
-            paymentKey = "",
+        val request = TicketingRequest.Free(
+            ticketCount = ticketCount,
+            userId = userId,
             showId = showId,
             salesTicketTypeId = salesTicketTypeId,
-            ticketCount = ticketCount,
             reservationName = uiState.value.reservationName,
             reservationPhoneNumber = uiState.value.reservationContact,
-            depositorName = uiState.value.depositorName,
-            depositorPhoneNumber = uiState.value.depositorContact,
-            paymentAmount = uiState.value.totalPrice,
-            means = com.nexters.boolti.domain.model.PaymentType.CARD,
         )
-        repository.approvePayment(request) // TODO 무료 티켓 API 확인
-            .singleOrNull()?.let {
-                event(TicketingEvent.TicketingSuccess(it.reservationId, showId))
-            }
+        repository.requestReservation(request).singleOrNull()?.let { reservationId ->
+            event(TicketingEvent.TicketingSuccess(reservationId, showId))
+        }
     }
 
     private fun load() {

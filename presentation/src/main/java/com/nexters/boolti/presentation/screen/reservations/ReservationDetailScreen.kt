@@ -45,12 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
-import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
+import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -192,19 +191,11 @@ private fun PaymentInfo(
     reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-
     Section(
         modifier = modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.payment_state_label),
     ) {
-        val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
-        val paymentType = when (reservation.paymentType) {
-            PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-            PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
-            PaymentType.SIMPLE_PAYMENT -> reservation.provider
-            else -> stringResource(id = R.string.reservations_unknown)
-        }
+        val paymentType = reservation.getPaymentString(context = LocalContext.current)
 
         Column {
             NormalRow(
@@ -227,20 +218,12 @@ private fun PaymentInfo(
 private fun RefundInfo(
     reservation: ReservationDetail,
 ) {
-    val context = LocalContext.current
-
     Section(
         modifier = Modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.reservation_breakdown_of_refund),
     ) {
         Column {
-            val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
-            val paymentType = when (reservation.paymentType) {
-                PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-                PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
-                PaymentType.SIMPLE_PAYMENT -> reservation.provider
-                else -> stringResource(id = R.string.reservations_unknown)
-            }
+            val paymentType = reservation.getPaymentString(context = LocalContext.current)
 
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),

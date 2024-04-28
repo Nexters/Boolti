@@ -43,6 +43,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCheckBox
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
+import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -61,14 +62,7 @@ fun RefundInfoPage(
     onRefundPolicyChecked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
-    val paymentType = when (reservation.paymentType) {
-        PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-        PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
-        PaymentType.SIMPLE_PAYMENT -> reservation.provider
-        else -> stringResource(id = R.string.reservations_unknown)
-    }
+    val paymentType = reservation.getPaymentString(context = LocalContext.current)
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),

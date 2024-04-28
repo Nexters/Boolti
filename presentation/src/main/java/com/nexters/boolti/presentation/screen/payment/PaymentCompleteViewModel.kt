@@ -7,7 +7,6 @@ import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.singleOrNull
@@ -35,7 +34,6 @@ class PaymentCompleteViewModel @Inject constructor(
         viewModelScope.launch(recordExceptionHandler) {
             repository.getPaymentInfo(reservationId)
                 .onStart { _uiState.update { it.copy(loading = false) } }
-                .catch { e -> throw e }
                 .onCompletion { _uiState.update { it.copy(loading = false) } }
                 .singleOrNull()?.let { reservationDetail ->
                     _uiState.update { it.copy(reservationDetail = reservationDetail) }

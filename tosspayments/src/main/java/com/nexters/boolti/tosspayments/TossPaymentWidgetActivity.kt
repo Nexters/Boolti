@@ -94,11 +94,11 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     private val paymentFailureDialog by lazy {
-        buildBTDialog(this) {
+        BTDialog().apply {
             title = getString(R.string.payment_failed_title)
             buttonLabel = getString(R.string.payment_failure_cta)
-            cancelable = false
-            setListener { finish() }
+            isCancelable = false
+            listener = BTDialogListener { finish() }
         }
     }
 
@@ -222,7 +222,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
         )
         paymentFailureDialog.apply {
-            setMessage(fail.errorMessage)
+            message = fail.errorMessage
             show(supportFragmentManager, fail.errorCode)
         }
     }
@@ -249,7 +249,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         private const val EXTRA_KEY_RESERVATION_PHONE_NUMBER = "extraKeyReservationPhoneNumber"
         private const val EXTRA_KEY_DEPOSITOR_NAME = "extraKeyDepositorName"
         private const val EXTRA_KEY_DEPOSITOR_PHONE_NUMBER = "extraKeyDepositorPhoneNumber"
-        private const val RESULT_KEY_PAYMENT_RESULT = 1000
 
         fun getIntent(
             context: Context,

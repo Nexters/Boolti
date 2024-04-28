@@ -128,7 +128,6 @@ fun ReservationDetailScreen(
             if (
                 state.reservation.reservationState == ReservationState.RESERVED &&
                 !state.reservation.isInviteTicket &&
-                state.reservation.totalAmountPrice > 0 &&
                 state.reservation.salesEndDateTime >= LocalDateTime.now()
             ) {
                 RefundButton(

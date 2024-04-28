@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.reservations
 
-import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -38,11 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,9 +49,7 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
-import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
-import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -122,9 +116,6 @@ fun ReservationDetailScreen(
                 )
             }
             Header(reservation = state.reservation)
-            if (!state.reservation.isInviteTicket) {
-                DepositInfo(reservation = state.reservation)
-            }
             TicketHolderInfo(reservation = state.reservation)
             if (state.reservation.totalAmountPrice > 0) DepositorInfo(reservation = state.reservation)
             TicketInfo(reservation = state.reservation)
@@ -186,71 +177,6 @@ private fun Header(
                     reservation.ticketCount
                 ),
                 style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
-            )
-        }
-    }
-}
-
-@Composable
-private fun DepositInfo(
-    modifier: Modifier = Modifier,
-    reservation: ReservationDetail,
-) {
-    val snackbarController = LocalSnackbarController.current
-
-    Section(
-        modifier = modifier,
-        title = stringResource(id = R.string.reservation_account_info),
-    ) {
-        Column {
-            NormalRow(
-                modifier = Modifier
-                    .height(32.dp)
-                    .padding(bottom = 8.dp),
-                key = stringResource(id = R.string.bank_name),
-                value = reservation.bankName,
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(bottom = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                val clipboardManager = LocalClipboardManager.current
-                val copiedMessage = stringResource(id = R.string.account_number_copied_message)
-
-                Text(
-                    modifier = Modifier,
-                    text = stringResource(id = R.string.account_number),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                )
-                Text(
-                    modifier = Modifier.clickable {
-                        clipboardManager.setText(AnnotatedString(reservation.accountNumber))
-                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                            snackbarController.showMessage(copiedMessage)
-                        }
-                    },
-                    text = reservation.accountNumber,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
-                    textDecoration = TextDecoration.Underline,
-                )
-            }
-            NormalRow(
-                modifier = Modifier
-                    .height(40.dp)
-                    .padding(bottom = 2.dp),
-                key = stringResource(id = R.string.account_holder),
-                value = reservation.accountHolder,
-            )
-            NormalRow(
-                modifier = Modifier
-                    .height(40.dp)
-                    .padding(bottom = 2.dp),
-                key = stringResource(id = R.string.account_transfer_due_date),
-                value = reservation.salesEndDateTime.format(datetimeFormat),
             )
         }
     }

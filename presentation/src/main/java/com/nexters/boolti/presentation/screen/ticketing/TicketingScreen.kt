@@ -1,5 +1,8 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -30,7 +33,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +65,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.Currency
 import com.nexters.boolti.domain.model.InviteCodeStatus
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtBackAppBar
@@ -87,8 +90,7 @@ import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import java.time.LocalDateTime
 
 @Composable
@@ -102,9 +104,17 @@ fun TicketingScreen(
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
     var showConfirmDialog by remember { mutableStateOf(false) }
-    val specOut = false // TODO 다음 버전(페이 들어오는 버전)에서 추가될 기능 마킹
+    val context = LocalContext.current
+
+    val paymentLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data ?: return@rememberLauncherForActivityResult
+                val reservationId = intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                onReserved(reservationId, viewModel.showId)
+            }
+        }
 
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
@@ -112,6 +122,31 @@ fun TicketingScreen(
                 is TicketingEvent.TicketingSuccess -> {
                     showConfirmDialog = false
                     onReserved(it.reservationId, it.showId)
+                }
+
+                is TicketingEvent.ProgressPayment -> {
+                    paymentLauncher.launch(
+                        TossPaymentWidgetActivity.getIntent(
+                            context = context,
+                            amount = uiState.totalPrice,
+                            clientKey = BuildConfig.TOSS_CLIENT_KEY,
+                            customerKey = it.userId,
+                            orderId = it.orderId,
+                            orderName = "${uiState.showName} ${uiState.ticketName}",
+                            currency = Currency.KRW.name,
+                            countryCode = "KR",
+                            showId = viewModel.showId,
+                            salesTicketTypeId = viewModel.salesTicketTypeId,
+                            ticketCount = uiState.ticketCount,
+                            reservationName = uiState.reservationName,
+                            reservationPhoneNumber = uiState.reservationContact,
+                            depositorName = if (uiState.isSameContactInfo) uiState.reservationName else uiState.depositorName,
+                            depositorPhoneNumber = if (uiState.isSameContactInfo) uiState.reservationContact else uiState.depositorContact,
+                            variantKey = null, // 멀티 결제 UI 사용 시 필요
+                            redirectUrl = null, // 브랜드 페이 사용 시 필요
+                        )
+                    )
+                    showConfirmDialog = false
                 }
             }
         }
@@ -180,11 +215,17 @@ fun TicketingScreen(
                     )
                 }
 
-                if (!uiState.isInviteTicket && uiState.totalPrice > 0) PaymentSection(
-                    scope,
-                    snackbarHostState
-                ) // 결제 수단
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
+
+                // 주문내용 확인 및 결제 동의
+                OrderAgreementSection(
+                    totalAgreed = uiState.orderAgreed,
+                    agreement = uiState.orderAgreement,
+                    agreementLabels = uiState.orderAgreementInfos,
+                    onClickTotalAgree = viewModel::toggleAgreement,
+                    onClickAgree = viewModel::toggleAgreement,
+                    onClickShow = {}, // TODO 기획 확정되면 구현
+                )
 
                 Text(
                     modifier = Modifier
@@ -194,18 +235,6 @@ fun TicketingScreen(
                     style = MaterialTheme.typography.labelMedium,
                     color = Grey70,
                 )
-
-                if (specOut) {
-                    // 주문내용 확인 및 결제 동의
-                    OrderAgreementSection(
-                        totalAgreed = uiState.orderAgreed,
-                        agreement = uiState.orderAgreement,
-                        agreementLabels = uiState.orderAgreementInfos,
-                        onClickTotalAgree = viewModel::toggleAgreement,
-                        onClickAgree = viewModel::toggleAgreement,
-                        onClickShow = {}, // TODO 기획 확정되면 구현
-                    )
-                }
 
                 // 사업자 정보
                 BusinessInformation(
@@ -258,7 +287,6 @@ fun TicketingScreen(
                 ticketName = uiState.ticketName,
                 ticketCount = uiState.ticketCount,
                 totalPrice = uiState.totalPrice,
-                paymentType = uiState.paymentType,
                 onClick = viewModel::reservation,
                 onDismiss = { showConfirmDialog = false },
             )
@@ -357,56 +385,6 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun PaymentSection(
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-) {
-    val context = LocalContext.current
-    Section(title = stringResource(R.string.payment_type_label)) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(4.dp),
-                )
-                .background(MaterialTheme.colorScheme.surfaceTint)
-                .clickable(role = Role.DropdownList) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = context.getString(R.string.ticketing_payment_message),
-                            duration = SnackbarDuration.Short,
-                        )
-                    }
-                }
-                .padding(horizontal = 12.dp),
-        ) {
-            Text(
-                modifier = Modifier.align(Alignment.CenterStart),
-                text = stringResource(R.string.payment_account_transfer),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge,
-            )
-        }
-        Row(Modifier.padding(top = 12.dp)) {
-            Icon(
-                painter = painterResource(R.drawable.ic_info_20),
-                tint = Grey50,
-                contentDescription = null,
-            )
-            Text(
-                text = stringResource(R.string.ticketing_payment_information),
-                modifier = Modifier.padding(start = 4.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
         }
     }
 }

@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -19,9 +21,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("DEV_TOSS_CLIENT_KEY"))
+            buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+            buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
+            buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
         }
     }
     compileOptions {
@@ -36,7 +45,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     testOptions {
         unitTests.all {
@@ -47,6 +56,7 @@ android {
 
 dependencies {
     implementation(projects.domain)
+    implementation(projects.tosspayments)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -83,4 +93,8 @@ dependencies {
     testImplementation(libs.bundles.kotest)
     debugImplementation(libs.androidx.compose.ui.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.ui.test.manifest)
+}
+
+fun getLocalProperty(propertyKey: String): String {
+    return gradleLocalProperties(rootDir).getProperty(propertyKey)
 }

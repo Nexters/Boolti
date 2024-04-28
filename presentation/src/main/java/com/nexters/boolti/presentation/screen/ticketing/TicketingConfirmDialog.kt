@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.extension.toContactFormat
@@ -37,7 +36,6 @@ fun TicketingConfirmDialog(
     ticketName: String,
     ticketCount: Int,
     totalPrice: Int,
-    paymentType: PaymentType,
     onClick: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -80,22 +78,6 @@ fun TicketingConfirmDialog(
                 value1 = ticketName,
                 value2 = stringResource(R.string.reservations_ticket_count_price_format_short, ticketCount, totalPrice),
             )
-            // 결제 수단
-            if (isInviteTicket || totalPrice > 0) {
-                InfoRow(
-                    modifier = Modifier.padding(top = 16.dp),
-                    label = stringResource(R.string.payment_type_label),
-                    value1 = if (isInviteTicket) {
-                        stringResource(R.string.invite_code_label)
-                    } else {
-                        when (paymentType) {
-                            PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
-                            PaymentType.CARD -> stringResource(R.string.payment_card)
-                            PaymentType.UNDEFINED -> ""
-                        }
-                    },
-                )
-            }
         }
     }
 }

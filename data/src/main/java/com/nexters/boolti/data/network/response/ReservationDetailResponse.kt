@@ -15,9 +15,9 @@ internal data class ReservationDetailResponse(
     val salesTicketName: String,
     val salesTicketType: String,
     val ticketCount: Int,
-    val bankName: String,
-    val accountNumber: String,
-    val accountHolder: String,
+    val bankName: String? = "",
+    val accountNumber: String? = "",
+    val accountHolder: String? = "",
     val salesEndTime: String,
     val meansType: String?,
     val totalAmountPrice: Int = 0,
@@ -28,6 +28,7 @@ internal data class ReservationDetailResponse(
     val depositorName: String = "",
     val depositorPhoneNumber: String = "",
     val csReservationId: String,
+    val cardDetail: CardDetailResponse? = null,
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
@@ -38,9 +39,9 @@ internal data class ReservationDetailResponse(
             ticketName = salesTicketName,
             isInviteTicket = salesTicketType == "INVITE",
             ticketCount = ticketCount,
-            bankName = bankName,
-            accountNumber = accountNumber,
-            accountHolder = accountHolder,
+            bankName = bankName ?: "",
+            accountNumber = accountNumber ?: "",
+            accountHolder = accountHolder ?: "",
             salesEndDateTime = salesEndTime.toLocalDateTime(),
             paymentType = meansType.toPaymentType(),
             totalAmountPrice = totalAmountPrice,
@@ -51,6 +52,18 @@ internal data class ReservationDetailResponse(
             depositorName = depositorName,
             depositorPhoneNumber = depositorPhoneNumber,
             csReservationId = csReservationId,
+            cardDetail = cardDetail?.toDomain(),
+        )
+    }
+
+    @Serializable
+    internal data class CardDetailResponse(
+        val installmentPlanMonths: Int,
+        val issuerCode: String,
+    ) {
+        fun toDomain(): ReservationDetail.CardDetail = ReservationDetail.CardDetail(
+            installmentPlanMonths = installmentPlanMonths,
+            issuerCode = issuerCode,
         )
     }
 }

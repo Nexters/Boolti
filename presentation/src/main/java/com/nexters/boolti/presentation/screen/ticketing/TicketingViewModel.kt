@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
+import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -12,10 +13,13 @@ import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -33,8 +37,8 @@ class TicketingViewModel @Inject constructor(
     getUserUsecase: GetUserUsecase,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val showId: String = requireNotNull(savedStateHandle["showId"])
-    private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
+    val showId: String = requireNotNull(savedStateHandle["showId"])
+    val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
     private val userId = getUserUsecase().id
 
@@ -47,48 +51,60 @@ class TicketingViewModel @Inject constructor(
     private val state: TicketingState
         get() = uiState.value
 
-    private val reservationRequest: TicketingRequest
-        get() = when (uiState.value.isInviteTicket) {
-            true -> TicketingRequest.Invite(
-                inviteCode = state.inviteCode,
-                userId = userId,
-                showId = showId,
-                salesTicketTypeId = salesTicketTypeId,
-                reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationContact,
-            )
-
-            false -> TicketingRequest.Normal(
-                ticketCount = uiState.value.ticketCount,
-                depositorName = if (uiState.value.isSameContactInfo) state.reservationName else state.depositorName,
-                depositorPhoneNumber = if (uiState.value.isSameContactInfo) state.reservationContact else state.depositorContact,
-                paymentAmount = uiState.value.totalPrice,
-                paymentType = uiState.value.paymentType,
-                userId = userId,
-                showId = showId,
-                salesTicketTypeId = salesTicketTypeId,
-                reservationName = state.reservationName,
-                reservationPhoneNumber = state.reservationContact,
-            )
-        }
-
     init {
         load()
     }
 
     fun reservation() {
         viewModelScope.launch(recordExceptionHandler) {
-            repository.requestReservation(reservationRequest)
-                .onStart { _uiState.update { it.copy(loading = true) } }
-                .catch { e ->
-                    _uiState.update { it.copy(loading = false) }
-                    throw e
-                }
-                .singleOrNull()?.let { reservationId ->
-                    Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
-                    _uiState.update { it.copy(loading = false) }
-                    event(TicketingEvent.TicketingSuccess(reservationId, showId))
-                }
+            when {
+                state.isInviteTicket -> reservationInviteTicket()
+                !state.isInviteTicket && state.totalPrice > 0 -> progressPayment()
+                else -> reservationFreeTicket()
+            }
+        }
+    }
+
+    private suspend fun progressPayment() {
+        getOrderId()
+            .onStart { _uiState.update { it.copy(loading = true) } }
+            .onEach { orderId ->
+                Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
+                event(TicketingEvent.ProgressPayment(userId, orderId))
+            }
+            .onCompletion { _uiState.update { it.copy(loading = false) } }
+            .firstOrNull()
+    }
+
+    private suspend fun reservationInviteTicket() {
+        val request = TicketingRequest.Invite(
+            inviteCode = state.inviteCode,
+            userId = userId,
+            showId = showId,
+            salesTicketTypeId = salesTicketTypeId,
+            reservationName = state.reservationName,
+            reservationPhoneNumber = state.reservationContact,
+        )
+        repository.requestReservation(request)
+            .onStart { _uiState.update { it.copy(loading = true) } }
+            .onCompletion { _uiState.update { it.copy(loading = false) } }
+            .singleOrNull()?.let { reservationId ->
+                Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
+                event(TicketingEvent.TicketingSuccess(reservationId, showId))
+            }
+    }
+
+    private suspend fun reservationFreeTicket() {
+        val request = TicketingRequest.Free(
+            ticketCount = ticketCount,
+            userId = userId,
+            showId = showId,
+            salesTicketTypeId = salesTicketTypeId,
+            reservationName = uiState.value.reservationName,
+            reservationPhoneNumber = uiState.value.reservationContact,
+        )
+        repository.requestReservation(request).singleOrNull()?.let { reservationId ->
+            event(TicketingEvent.TicketingSuccess(reservationId, showId))
         }
     }
 
@@ -109,7 +125,6 @@ class TicketingViewModel @Inject constructor(
                             ticketCount = info.ticketCount,
                             totalPrice = info.totalPrice,
                             isInviteTicket = info.isInviteTicket,
-                            paymentType = info.paymentType,
                         )
                     }
                 }
@@ -176,6 +191,10 @@ class TicketingViewModel @Inject constructor(
 
     fun toggleAgreement() {
         _uiState.update { it.toggleAgreement() }
+    }
+
+    private fun getOrderId(): Flow<String> {
+        return repository.getOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
     }
 
     private fun event(event: TicketingEvent) {

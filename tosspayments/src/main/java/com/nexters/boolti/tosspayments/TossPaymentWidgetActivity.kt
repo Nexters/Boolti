@@ -32,6 +32,15 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTossPaymentWidgetBinding
     private val viewModel: TossPaymentsWidgetViewModel by viewModels()
 
+    private val paymentFailureDialog by lazy {
+        BTDialog().apply {
+            title = this@TossPaymentWidgetActivity.getString(R.string.payment_failed_title)
+            buttonLabel = this@TossPaymentWidgetActivity.getString(R.string.payment_failure_cta)
+            isCancelable = false
+            listener = BTDialogListener { finish() }
+        }
+    }
+
     private val paymentEventListener
         get() = object : PaymentMethodEventListener() {
             override fun onCustomRequested(paymentMethodKey: String) {
@@ -90,15 +99,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         override fun onFail(fail: TossPaymentResult.Fail) {
             viewModel.onLoadAgreement(false)
             Log.d(TAG, fail.errorMessage)
-        }
-    }
-
-    private val paymentFailureDialog by lazy {
-        BTDialog().apply {
-            title = getString(R.string.payment_failed_title)
-            buttonLabel = getString(R.string.payment_failure_cta)
-            isCancelable = false
-            listener = BTDialogListener { finish() }
         }
     }
 

@@ -24,13 +24,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
+import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -110,6 +113,16 @@ fun RefundScreen(
     }
 
     if (openDialog) {
+        val reservation = uiState.reservation!!
+        val context = LocalContext.current
+        val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
+        val paymentType = when (reservation.paymentType) {
+            PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
+            PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
+            PaymentType.SIMPLE_PAYMENT -> reservation.provider
+            else -> stringResource(id = R.string.reservations_unknown)
+        }
+
         BTDialog(
             positiveButtonLabel = stringResource(id = R.string.refund_button),
             onDismiss = { openDialog = false },
@@ -130,18 +143,18 @@ fun RefundScreen(
                         .background(Grey80)
                         .padding(horizontal = 20.dp, vertical = 16.dp)
                 ) {
-                    if (uiState.reservation!!.totalAmountPrice > 0) {
+                    if (reservation.totalAmountPrice > 0) {
                         InfoRow(
                             modifier = Modifier.padding(bottom = 12.dp),
                             type = stringResource(id = R.string.refund_method),
-                            value = uiState.reservation!!.bankName
+                            value = paymentType
                         )
                     }
                     InfoRow(
                         type = stringResource(id = R.string.refund_price),
                         value = stringResource(
                             id = R.string.unit_won,
-                            uiState.reservation!!.totalAmountPrice,
+                            reservation.totalAmountPrice,
                         )
                     )
                 }

@@ -8,27 +8,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,34 +29,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtCheckBox
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.extension.filterToPhoneNumber
-import com.nexters.boolti.presentation.theme.Error
+import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
-import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
-import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 
 @Composable
 fun RefundInfoPage(
@@ -75,6 +61,15 @@ fun RefundInfoPage(
     onRefundPolicyChecked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
+    val paymentType = when (reservation.paymentType) {
+        PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
+        PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
+        PaymentType.SIMPLE_PAYMENT -> reservation.provider
+        else -> stringResource(id = R.string.reservations_unknown)
+    }
+
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
@@ -95,7 +90,7 @@ fun RefundInfoPage(
                     NormalRow(
                         modifier = Modifier.padding(top = 16.dp),
                         key = stringResource(id = R.string.refund_method),
-                        value = reservation.bankName
+                        value = paymentType
                     )
                 }
             }

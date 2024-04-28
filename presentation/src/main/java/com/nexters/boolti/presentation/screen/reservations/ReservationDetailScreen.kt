@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,6 +50,7 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
+import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -120,7 +122,11 @@ fun ReservationDetailScreen(
             if (state.reservation.totalAmountPrice > 0) DepositorInfo(reservation = state.reservation)
             TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
-            if (state.reservation.reservationState == ReservationState.REFUNDED) {
+            if (state.reservation.reservationState in listOf(
+                    ReservationState.REFUNDED,
+                    ReservationState.CANCELED
+                )
+            ) {
                 RefundInfo(reservation = state.reservation)
             }
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
@@ -186,13 +192,17 @@ private fun PaymentInfo(
     reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+
     Section(
         modifier = modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.payment_state_label),
     ) {
+        val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
         val paymentType = when (reservation.paymentType) {
             PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-            PaymentType.CARD -> "${reservation.bankName} / ${stringResource(id = R.string.payment_pay_in_full)}"
+            PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
+            PaymentType.SIMPLE_PAYMENT -> reservation.provider
             else -> stringResource(id = R.string.reservations_unknown)
         }
 
@@ -217,14 +227,18 @@ private fun PaymentInfo(
 private fun RefundInfo(
     reservation: ReservationDetail,
 ) {
+    val context = LocalContext.current
+
     Section(
         modifier = Modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.reservation_breakdown_of_refund),
     ) {
         Column {
+            val cardName = reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context)
             val paymentType = when (reservation.paymentType) {
                 PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-                PaymentType.CARD -> reservation.bankName
+                PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
+                PaymentType.SIMPLE_PAYMENT -> reservation.provider
                 else -> stringResource(id = R.string.reservations_unknown)
             }
 

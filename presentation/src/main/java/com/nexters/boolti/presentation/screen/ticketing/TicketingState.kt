@@ -21,16 +21,13 @@ data class TicketingState(
     val depositorContact: String = "",
     val inviteCode: String = "",
     val refundPolicy: List<String> = emptyList(),
-    val orderAgreement: List<Boolean> = listOf(false, false, false),
+    val orderAgreement: List<Pair<Int, Boolean>> = listOf(
+        Pair(R.string.order_agreement_privacy_collection, false),
+        Pair(R.string.order_agreement_privacy_offer, false),
+    ),
 ) {
-    val orderAgreementInfos = listOf(
-        R.string.order_agreement_privacy_collection,
-        R.string.order_agreement_privacy_offer,
-        R.string.order_agreement_payment_agency,
-    )
-
     val orderAgreed: Boolean
-        get() = orderAgreement.none { !it }
+        get() = orderAgreement.none { !it.second }
 
     val reservationButtonEnabled: Boolean
         get() = when {
@@ -48,16 +45,16 @@ data class TicketingState(
 
     fun toggleAgreement(index: Int): TicketingState {
         val updated = orderAgreement.toMutableList().apply {
-            set(index, !orderAgreement[index])
+            set(index, orderAgreement[index].copy(second = !orderAgreement[index].second))
         }
         return copy(orderAgreement = updated)
     }
 
     fun toggleAgreement(): TicketingState {
         return if (orderAgreed) {
-            copy(orderAgreement = orderAgreement.map { false })
+            copy(orderAgreement = orderAgreement.map { it.copy(second = false) })
         } else {
-            copy(orderAgreement = orderAgreement.map { true })
+            copy(orderAgreement = orderAgreement.map { it.copy(second = true) })
         }
     }
 }

@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -106,6 +107,7 @@ fun TicketingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -221,10 +223,16 @@ fun TicketingScreen(
                 OrderAgreementSection(
                     totalAgreed = uiState.orderAgreed,
                     agreement = uiState.orderAgreement,
-                    agreementLabels = uiState.orderAgreementInfos,
                     onClickTotalAgree = viewModel::toggleAgreement,
                     onClickAgree = viewModel::toggleAgreement,
-                    onClickShow = {}, // TODO 기획 확정되면 구현
+                    onClickShow = {
+                        val url = when (it) {
+                            0 -> "https://boolti.notion.site/00259d85983c4ba8a987a374e2615396?pvs=4"
+                            1 -> "https://boolti.notion.site/3-354880c7d75e424486b7974e5cc8bcad?pvs=4"
+                            else -> return@OrderAgreementSection
+                        }
+                        uriHandler.openUri(url)
+                    },
                 )
 
                 Text(
@@ -599,8 +607,7 @@ private fun TicketHolderSection(
 @Composable
 private fun OrderAgreementSection(
     totalAgreed: Boolean,
-    agreementLabels: List<Int>,
-    agreement: List<Boolean>,
+    agreement: List<Pair<Int, Boolean>>,
     onClickTotalAgree: () -> Unit,
     onClickAgree: (index: Int) -> Unit,
     onClickShow: (index: Int) -> Unit,
@@ -640,11 +647,11 @@ private fun OrderAgreementSection(
         }
 
         Spacer(modifier = Modifier.size(16.dp))
-        agreementLabels.forEachIndexed { index, labelRes ->
+        agreement.forEachIndexed { index, (labelRes, agreed) ->
             OrderAgreementItem(
                 modifier = Modifier.padding(top = 4.dp),
                 index = index,
-                agreed = agreement[index],
+                agreed = agreed,
                 label = stringResource(labelRes),
                 onClickAgree = onClickAgree,
                 onClickShow = onClickShow,

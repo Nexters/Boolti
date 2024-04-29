@@ -4,6 +4,7 @@ import com.nexters.boolti.data.datasource.HostDataSource
 import com.nexters.boolti.data.datasource.TicketDataSource
 import com.nexters.boolti.domain.exception.ManagerCodeErrorType
 import com.nexters.boolti.domain.exception.ManagerCodeException
+import com.nexters.boolti.domain.exception.TicketException
 import com.nexters.boolti.domain.extension.errorType
 import com.nexters.boolti.domain.model.Ticket
 import com.nexters.boolti.domain.repository.TicketRepository
@@ -21,7 +22,14 @@ internal class TicketRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTicket(ticketId: String): Flow<Ticket> = flow {
-        emit(dataSource.getTicket(ticketId))
+        val response = dataSource.getTicket(ticketId)
+        if (response.isSuccessful) {
+            response.body()?.toDomain()?.let { emit(it) }
+        } else {
+            when (response.code()) {
+                404 -> throw TicketException.TicketNotFound
+            }
+        }
     }
 
     override suspend fun requestEntrance(request: ManagerCodeRequest): Flow<Boolean> = flow {

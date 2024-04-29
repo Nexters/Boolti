@@ -18,6 +18,7 @@
     <string name="error_show_not_today">아직 공연일이 아니에요</string>
     <string name="error_used_ticket">이미 사용된 티켓이에요</string>
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>
+    <string name="error_ticket_not_found">존재하지 않는 티켓이에요</string>
 
     <!-- 유효성 검사 -->
     <string name="validation_name">이름을 올바르게 입력해 주세요</string>

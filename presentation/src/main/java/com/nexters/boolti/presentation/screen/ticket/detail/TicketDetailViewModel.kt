@@ -1,9 +1,9 @@
 package com.nexters.boolti.presentation.screen.ticket.detail
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.ManagerCodeException
+import com.nexters.boolti.domain.exception.TicketException
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -48,9 +48,15 @@ class TicketDetailViewModel @Inject constructor(
 
     private fun load(): Job {
         return viewModelScope.launch(recordExceptionHandler) {
-            repository.getTicket(ticketId).singleOrNull()?.let { ticket ->
-                _uiState.update { it.copy(ticket = ticket) }
-            }
+            repository.getTicket(ticketId)
+                .catch { e ->
+                    when (e) {
+                        TicketException.TicketNotFound -> event(TicketDetailEvent.NotFound)
+                    }
+                }
+                .singleOrNull()?.let { ticket ->
+                    _uiState.update { it.copy(ticket = ticket) }
+                }
 
             getRefundPolicyUsecase().onEach { refundPolicy ->
                 _uiState.update { it.copy(refundPolicy = refundPolicy) }
@@ -70,6 +76,7 @@ class TicketDetailViewModel @Inject constructor(
                     is ManagerCodeException -> {
                         _managerCodeState.update { it.copy(error = e.errorType) }
                     }
+
                     else -> throw e
                 }
             }.singleOrNull()?.let {

@@ -106,6 +106,7 @@ fun TicketingScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showPaymentFailureDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
 
@@ -120,7 +121,7 @@ fun TicketingScreen(
                 }
 
                 Activity.RESULT_CANCELED -> {
-                    onBackClicked()
+                    showPaymentFailureDialog = true
                 }
             }
         }
@@ -305,6 +306,12 @@ fun TicketingScreen(
                 onClick = viewModel::reservation,
                 onDismiss = { showConfirmDialog = false },
             )
+        }
+        if (showPaymentFailureDialog) {
+            PaymentFailureDialog {
+                showPaymentFailureDialog = false
+                onBackClicked()
+            }
         }
     }
 }

@@ -156,6 +156,7 @@
     <string name="ticketing_confirm_dialog_title">결제 정보를 확인해주세요</string>
     <string name="ticketing_address_copied_message">공연장 주소가 복사되었어요</string>
     <string name="ticketing_host_format">%s (%s)</string>
+    <string name="ticketing_again">다시 예매하기</string>
     <string name="order_agreement_label">주문내용 확인 및 결제 동의</string>
     <string name="order_agreement_privacy_collection">[필수] 개인정보 수집・이용 동의</string>
     <string name="order_agreement_privacy_offer">[필수] 개인정보 제 3자 정보 제공 동의</string>
@@ -181,6 +182,8 @@
     <string name="account_transfer_due_date">입금 마감일</string>
     <string name="invite_ticket_complete_title">결제를 완료했어요</string>
     <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
+    <string name="payment_failed">결제에 실패했어요</string>
+    <string name="payment_failed_description">예매 진행 중 오류가 발생하였습니다.\n다시 시도해 주세요</string>
 
     <!-- 마이 -->
     <string name="my_login">불티 로그인 하러가기</string>

@@ -3,10 +3,13 @@ package com.nexters.boolti.tosspayments
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.exception.TicketingErrorType
+import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.PaymentApproveRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.launch
@@ -52,7 +55,10 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                     depositorName = depositorName,
                     depositorPhoneNumber = depositorPhoneNumber,
                 )
-            ).singleOrNull()?.let { (orderId, reservationId) ->
+            ).catch { e ->
+                if (e !is TicketingException) throw e
+                if (e.errorType == TicketingErrorType.NoRemainingQuantity) event(PaymentEvent.TicketSoldOut)
+            }.singleOrNull()?.let { (orderId, reservationId) ->
                 event(PaymentEvent.Approved(orderId, reservationId))
             }
         }

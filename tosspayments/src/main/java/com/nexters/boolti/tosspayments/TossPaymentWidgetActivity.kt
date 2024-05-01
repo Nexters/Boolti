@@ -148,6 +148,10 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 setResult(Activity.RESULT_OK, intent)
                 finish()
             }
+            is PaymentEvent.TicketSoldOut -> {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
         }
     }
 

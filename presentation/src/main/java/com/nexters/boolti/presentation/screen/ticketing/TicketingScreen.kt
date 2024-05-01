@@ -111,10 +111,17 @@ fun TicketingScreen(
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val intent = result.data ?: return@rememberLauncherForActivityResult
-                val reservationId = intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
-                onReserved(reservationId, viewModel.showId)
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    val intent = result.data ?: return@rememberLauncherForActivityResult
+                    val reservationId =
+                        intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                    onReserved(reservationId, viewModel.showId)
+                }
+
+                Activity.RESULT_CANCELED -> {
+                    onBackClicked()
+                }
             }
         }
 

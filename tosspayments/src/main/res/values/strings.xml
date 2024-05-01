@@ -2,4 +2,7 @@
 <resources>
     <string name="payment_failure_cta">다시 예매하기</string>
     <string name="payment_failed_title">결제에 실패했어요</string>
+    <string name="payment_failure_pay_process_canceled">사용자에 의해 결제가 취소되었습니다.</string>
+    <string name="payment_failure_pay_process_aborted">결제 진행 중 승인에 실패하여 결제가 중단되었습니다.</string>
+    <string name="payment_failure_reject_card_company">결제 승인이 거절되었습니다.</string>
 </resources>

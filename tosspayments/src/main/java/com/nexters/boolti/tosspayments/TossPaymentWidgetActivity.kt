@@ -225,8 +225,14 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             TAG,
             "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
         )
+        val errMsg = when (fail.errorCode) {
+            "PAY_PROCESS_CANCELED" -> getString(R.string.payment_failure_pay_process_canceled)
+            "PAY_PROCESS_ABORTED" -> getString(R.string.payment_failure_pay_process_aborted)
+            "REJECT_CARD_COMPANY" -> getString(R.string.payment_failure_reject_card_company)
+            else -> fail.errorMessage
+        }
         paymentFailureDialog.apply {
-            message = fail.errorMessage
+            message = errMsg
             show(supportFragmentManager, fail.errorCode)
         }
     }

@@ -1,6 +1,5 @@
 package com.nexters.boolti.tosspayments
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -145,11 +144,11 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                     putExtra("orderId", event.orderId)
                     putExtra("reservationId", event.reservationId)
                 }
-                setResult(Activity.RESULT_OK, intent)
+                setResult(RESULT_SUCCESS, intent)
                 finish()
             }
             is PaymentEvent.TicketSoldOut -> {
-                setResult(Activity.RESULT_CANCELED)
+                setResult(RESULT_FAIL)
                 finish()
             }
         }
@@ -242,6 +241,8 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val RESULT_SUCCESS = 200
+        const val RESULT_FAIL = 400
         private const val TAG = "PaymentWidgetActivity"
         private const val EXTRA_KEY_AMOUNT = "extraKeyAmount"
         private const val EXTRA_KEY_CLIENT_KEY = "extraKeyClientKey"

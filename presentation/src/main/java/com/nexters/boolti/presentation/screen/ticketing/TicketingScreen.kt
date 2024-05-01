@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
-import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -92,6 +91,8 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
 import java.time.LocalDateTime
 
 @Composable
@@ -113,14 +114,14 @@ fun TicketingScreen(
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             when (result.resultCode) {
-                Activity.RESULT_OK -> {
+                RESULT_SUCCESS -> {
                     val intent = result.data ?: return@rememberLauncherForActivityResult
                     val reservationId =
                         intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
                     onReserved(reservationId, viewModel.showId)
                 }
 
-                Activity.RESULT_CANCELED -> {
+                RESULT_FAIL -> {
                     showPaymentFailureDialog = true
                 }
             }

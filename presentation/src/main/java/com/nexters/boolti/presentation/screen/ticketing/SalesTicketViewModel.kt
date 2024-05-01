@@ -9,7 +9,6 @@ import com.nexters.boolti.domain.request.SalesTicketRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,16 +27,12 @@ class SalesTicketViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SalesTicketState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        load()
-    }
-
-    private fun load() {
+    fun load() {
         viewModelScope.launch {
-            repository.getSalesTickets(SalesTicketRequest(showId)).catch {
-            }.firstOrNull()?.let { tickets ->
-                _uiState.update { it.copy(tickets = tickets) }
-            }
+            repository.getSalesTickets(SalesTicketRequest(showId))
+                .firstOrNull()?.let { tickets ->
+                    _uiState.update { it.copy(tickets = tickets) }
+                }
         }
     }
 

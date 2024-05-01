@@ -150,7 +150,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         TicketingScreen(
             modifier = modifier,
             navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack
+            popBackStack = navController::popBackStack,
         )
         QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)
         HostedShowScreen(

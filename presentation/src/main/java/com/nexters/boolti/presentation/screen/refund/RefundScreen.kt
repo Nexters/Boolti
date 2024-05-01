@@ -56,6 +56,7 @@ fun RefundScreen(
     val snackbarController = LocalSnackbarController.current
 
     val refundMessage = stringResource(id = R.string.refund_completed)
+    val refundError = stringResource(id = R.string.refund_error)
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
@@ -66,6 +67,10 @@ fun RefundScreen(
 
                 is RefundEvent.ShowMessage -> {
                     snackbarController.showMessage(event.message)
+                }
+
+                RefundEvent.RefundError -> {
+                    snackbarController.showMessage(refundError)
                 }
             }
         }

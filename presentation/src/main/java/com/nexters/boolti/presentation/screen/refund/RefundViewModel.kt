@@ -69,7 +69,7 @@ class RefundViewModel @Inject constructor(
 
         ticketingRepository.cancelPayment(request).onEach { isSuccessful ->
             if (isSuccessful) sendEvent(RefundEvent.SuccessfullyRefunded)
-            else sendEvent(RefundEvent.ShowMessage("알 수 없는 오류로 환불에 실패했어요.")) // TODO : 에러 메시지 하드코딩 수정, 방법 제안 환영
+            else sendEvent(RefundEvent.RefundError)
         }.launchIn(viewModelScope + recordExceptionHandler)
     }
 

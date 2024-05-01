@@ -141,7 +141,7 @@
     <string name="ticketing_contact_placeholder">숫자만 입력해 주세요</string>
     <string name="ticketing_invite_code_placeholder">초청 코드를 입력해주세요</string>
     <string name="ticketing_invite_code_use_button">사용하기</string>
-    <string name="ticketing_invite_code_success">사용되었습니다</string>
+    <string name="ticketing_invite_code_success">사용되었어요</string>
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
     <string name="ticketing_invite_code_invalid">올바른 초청 코드를 입력해 주세요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
@@ -154,7 +154,7 @@
     <string name="ticketing_payment_message">지금은 계좌 이체로만 결제할 수 있어요</string>
     <string name="ticketing_payment_button_label">%,d원 결제하기</string>
     <string name="ticketing_payment_button_label_short">결제하기</string>
-    <string name="ticketing_confirm_dialog_title">결제 정보를 확인해주세요</string>
+    <string name="ticketing_confirm_dialog_title">결제 정보를 확인해 주세요</string>
     <string name="ticketing_address_copied_message">공연장 주소가 복사되었어요</string>
     <string name="ticketing_host_format">%s (%s)</string>
     <string name="order_agreement_label">주문내용 확인 및 결제 동의</string>

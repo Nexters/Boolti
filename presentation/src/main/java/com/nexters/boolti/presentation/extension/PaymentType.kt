@@ -10,10 +10,20 @@ import com.nexters.boolti.presentation.R
 @Composable
 fun ReservationDetail.getPaymentString(context: Context): String {
     val cardName = cardDetail?.issuerCode?.cardCodeToCompanyName(context)
+    val periodForPay = if (cardDetail?.installmentPlanMonths == 0) {
+        stringResource(id = R.string.payment_pay_in_full)
+    } else {
+        stringResource(
+            R.string.payment_installment_plan_months,
+            cardDetail?.installmentPlanMonths ?: 0
+        )
+    }
+
     return when (paymentType) {
         PaymentType.ACCOUNT_TRANSFER -> stringResource(id = R.string.payment_account_transfer)
-        PaymentType.CARD -> "$cardName / ${stringResource(id = R.string.payment_pay_in_full)}"
+        PaymentType.CARD -> "$cardName / $periodForPay"
         PaymentType.SIMPLE_PAYMENT -> provider
+        PaymentType.FREE -> stringResource(id = R.string.payment_free)
         else -> stringResource(id = R.string.reservations_unknown)
     }
 }

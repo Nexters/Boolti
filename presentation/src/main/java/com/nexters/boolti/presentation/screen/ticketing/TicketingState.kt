@@ -50,11 +50,5 @@ data class TicketingState(
         return copy(orderAgreement = updated)
     }
 
-    fun toggleAgreement(): TicketingState {
-        return if (orderAgreed) {
-            copy(orderAgreement = orderAgreement.map { it.copy(second = false) })
-        } else {
-            copy(orderAgreement = orderAgreement.map { it.copy(second = true) })
-        }
-    }
+    fun toggleAgreement(): TicketingState = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
 }

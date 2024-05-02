@@ -92,6 +92,7 @@ import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
 import java.time.LocalDateTime
 
@@ -108,6 +109,7 @@ fun TicketingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showPaymentFailureDialog by remember { mutableStateOf(false) }
+    var showTicketSoldOutDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
 
@@ -121,9 +123,8 @@ fun TicketingScreen(
                     onReserved(reservationId, viewModel.showId)
                 }
 
-                RESULT_FAIL -> {
-                    showPaymentFailureDialog = true
-                }
+                RESULT_SOLD_OUT -> showTicketSoldOutDialog = true
+                RESULT_FAIL -> showPaymentFailureDialog = true
             }
         }
 
@@ -311,6 +312,11 @@ fun TicketingScreen(
         if (showPaymentFailureDialog) {
             PaymentFailureDialog {
                 showPaymentFailureDialog = false
+            }
+        }
+        if (showTicketSoldOutDialog) {
+            PaymentFailureDialog {
+                showTicketSoldOutDialog = false
                 onBackClicked()
             }
         }

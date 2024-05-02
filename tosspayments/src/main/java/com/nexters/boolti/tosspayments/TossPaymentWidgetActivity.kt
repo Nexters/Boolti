@@ -31,15 +31,6 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTossPaymentWidgetBinding
     private val viewModel: TossPaymentsWidgetViewModel by viewModels()
 
-    private val paymentFailureDialog by lazy {
-        BTDialog().apply {
-            title = this@TossPaymentWidgetActivity.getString(R.string.payment_failed_title)
-            buttonLabel = this@TossPaymentWidgetActivity.getString(R.string.payment_failure_cta)
-            isCancelable = false
-            listener = BTDialogListener { finish() }
-        }
-    }
-
     private val paymentEventListener
         get() = object : PaymentMethodEventListener() {
             override fun onCustomRequested(paymentMethodKey: String) {
@@ -147,8 +138,9 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 setResult(RESULT_SUCCESS, intent)
                 finish()
             }
+
             is PaymentEvent.TicketSoldOut -> {
-                setResult(RESULT_FAIL)
+                setResult(RESULT_SOLD_OUT)
                 finish()
             }
         }
@@ -224,16 +216,10 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             TAG,
             "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
         )
-        val errMsg = when (fail.errorCode) {
-            "PAY_PROCESS_CANCELED" -> getString(R.string.payment_failure_pay_process_canceled)
-            "PAY_PROCESS_ABORTED" -> getString(R.string.payment_failure_pay_process_aborted)
-            "REJECT_CARD_COMPANY" -> getString(R.string.payment_failure_reject_card_company)
-            else -> fail.errorMessage
-        }
-        paymentFailureDialog.apply {
-            message = errMsg
-            show(supportFragmentManager, fail.errorCode)
-        }
+        if (fail.errorCode == "PAY_PROCESS_CANCELED") return
+
+        setResult(RESULT_FAIL)
+        finish()
     }
 
     private fun toast(message: String) {
@@ -243,6 +229,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     companion object {
         const val RESULT_SUCCESS = 200
         const val RESULT_FAIL = 400
+        const val RESULT_SOLD_OUT = 401
         private const val TAG = "PaymentWidgetActivity"
         private const val EXTRA_KEY_AMOUNT = "extraKeyAmount"
         private const val EXTRA_KEY_CLIENT_KEY = "extraKeyClientKey"

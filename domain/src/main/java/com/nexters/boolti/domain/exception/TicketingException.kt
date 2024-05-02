@@ -5,11 +5,12 @@ data class TicketingException(
 ) : Exception(errorType?.name)
 
 enum class TicketingErrorType {
-    Unknown, NoRemainingQuantity;
+    Unknown, NoRemainingQuantity, ApprovePaymentFailed;
 
     companion object {
         fun fromString(type: String?) = when (type?.trim()?.uppercase()) {
             "NO_REMAINING_QUANTITY" -> NoRemainingQuantity
+            "APPROVE_PAYMENT_FAILED" -> ApprovePaymentFailed
             else -> Unknown
         }
     }

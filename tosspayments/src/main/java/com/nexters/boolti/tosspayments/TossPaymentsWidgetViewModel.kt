@@ -57,7 +57,14 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                 )
             ).catch { e ->
                 if (e !is TicketingException) throw e
-                if (e.errorType == TicketingErrorType.NoRemainingQuantity) event(PaymentEvent.TicketSoldOut)
+                if (
+                    e.errorType in listOf(
+                        TicketingErrorType.NoRemainingQuantity,
+                        TicketingErrorType.ApprovePaymentFailed
+                    )
+                ) {
+                    event(PaymentEvent.TicketSoldOut)
+                }
             }.singleOrNull()?.let { (orderId, reservationId) ->
                 event(PaymentEvent.Approved(orderId, reservationId))
             }

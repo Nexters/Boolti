@@ -16,7 +16,11 @@
 
 </br></br>
 
-## Android developers
+## Architecture
+
+![architecture](https://github.com/Nexters/Boolti/assets/35232655/32df669a-4924-4dd6-b34a-09a0ab428d6a)
+
+## Android Developers
 
 |Android|Android|
 |:---:|:---:|
@@ -25,7 +29,7 @@
 
 </br>
 
-## Articles
+## Technical Content
 | Author | Title |
 | ------------- | -------------|
 | 송준영 | [간격이 안 맞아요! (feat. Compose typography)](https://algosketch.tistory.com/184) |
@@ -35,7 +39,7 @@
 
 </br>
 
-## Other repositories
+## Other Repositories
 
 | Part | Link |
 | --- | --- |

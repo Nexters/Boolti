@@ -1,5 +1,7 @@
 # 핫한 공연 예매의 시작 불티
 
+불티로 밴드 공연의 주최, 예매, QR 입장을 관리해 보세요!
+
 | Type | Link |
 | --- | --- |
 | 플레이 스토어 | https://play.google.com/store/apps/details?id=com.nexters.boolti |

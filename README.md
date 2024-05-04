@@ -28,7 +28,7 @@
 
 ## Architecture
 
-![architecture](https://github.com/Nexters/Boolti/assets/35232655/32df669a-4924-4dd6-b34a-09a0ab428d6a)
+![architecture](https://github.com/Nexters/Boolti/assets/35232655/ebc7714c-c954-4758-9551-f60fb78079d9)
 
 ## Android Developers
 

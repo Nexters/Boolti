@@ -1,8 +1,12 @@
 # 핫한 공연 예매의 시작 불티
 
-- 플레이 스토어 : https://play.google.com/store/apps/details?id=com.nexters.boolti 
-- 앱 스토어 : https://apps.apple.com/kr/app/%EB%B6%88%ED%8B%B0/id6476589322 
-- 주최자용 웹 : https://boolti.in
+불티로 밴드 공연의 주최, 예매, QR 입장을 관리해 보세요!
+
+| Type | Link |
+| --- | --- |
+| 플레이 스토어 | https://play.google.com/store/apps/details?id=com.nexters.boolti |
+| 앱 스토어 | https://apps.apple.com/kr/app/%EB%B6%88%ED%8B%B0/id6476589322 |
+| 주최자용 웹 | https://boolti.in |
 
 </br>
 
@@ -14,7 +18,19 @@
 
 </br></br>
 
-## Android developers
+## Animations
+
+| Home | Ticktes |
+| ------------- | ------------- |
+| <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/66c2ada2-7079-4704-b9a4-237b2c8e2769" /> | <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/37b8640a-38bb-4e03-adad-6931998082a4"/> |
+
+</br>
+
+## Architecture
+
+![architecture](https://github.com/Nexters/Boolti/assets/35232655/ebc7714c-c954-4758-9551-f60fb78079d9)
+
+## Android Developers
 
 |Android|Android|
 |:---:|:---:|
@@ -23,7 +39,20 @@
 
 </br>
 
-## Other repositories
-- iOS Repository : https://github.com/Nexters/Boolti-iOS
-- FE Repository : https://github.com/Nexters/boolti-web
-- BE Repository : private
+## Technical Content
+| Author | Title |
+| ------------- | -------------|
+| 송준영 | [간격이 안 맞아요! (feat. Compose typography)](https://algosketch.tistory.com/184) |
+| 송준영 | [핫한 공연 예매의 시작 불티 출시!](https://algosketch.tistory.com/185) |
+| 송준영 | [Compose를 이용하여 스크롤 가능한 Appbar 만들기](https://algosketch.tistory.com/186) |
+| 송준영 | [Compose 중첩 내비게이션의 문제와 해결](https://algosketch.tistory.com/189) |
+
+</br>
+
+## Other Repositories
+
+| Part | Link |
+| --- | --- |
+| iOS | https://github.com/Nexters/Boolti-iOS
+| FE | https://github.com/Nexters/boolti-web
+| BE | 비공개

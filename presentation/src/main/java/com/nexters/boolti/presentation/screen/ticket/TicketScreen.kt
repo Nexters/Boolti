@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticket
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,13 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nexters.boolti.domain.model.Ticket
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.CenterAlignedHorizontalPager
 import kotlin.math.absoluteValue
@@ -113,10 +110,13 @@ private fun TicketNotEmptyScreen(
                             stop = scaleSizeRatio,
                             fraction = pageOffset.absoluteValue.coerceIn(0f, 1f),
                         ).let {
+                            scaleX = it
                             scaleY = it
+                            val sign = if (pageOffset > 0) 1 else -1
+                            translationX = sign * (screenWidth - size.width) * (1 - it) * 3
                         }
-                    }
-                    .clickable { onClickTicket(ticket.ticketId) },
+                    },
+                onClick = { onClickTicket(ticket.ticketId) },
                 ticket = ticket,
                 onClickQr = onClickQr,
             )
@@ -134,20 +134,5 @@ private fun TicketNotEmptyScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
             )
         }
-    }
-}
-
-@Composable
-private fun Ticket(
-    modifier: Modifier = Modifier,
-    ticket: Ticket,
-    onClickQr: (data: String, ticketName: String) -> Unit,
-) {
-    Card(
-        modifier = modifier,
-        shape = RectangleShape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-    ) {
-        TicketContent(ticket = ticket, onClickQr = onClickQr)
     }
 }

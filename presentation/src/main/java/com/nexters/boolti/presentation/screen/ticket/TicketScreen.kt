@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -18,17 +17,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.Ticket
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
+import com.nexters.boolti.presentation.component.CenterAlignedHorizontalPager
 import kotlin.math.absoluteValue
 
 @Composable
@@ -76,34 +78,31 @@ private fun TicketNotEmptyScreen(
         val pagerState = rememberPagerState(
             pageCount = { uiState.tickets.size }
         )
-
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp
+        var screenWidth by remember { mutableFloatStateOf(300f) }
 
         val contentPadding = 30.dp
         val pageSpacing = 16.dp
         val scaleSizeRatio = 0.8f
 
-        HorizontalPager(
+        CenterAlignedHorizontalPager(
             modifier = Modifier
+                .graphicsLayer { screenWidth = size.width }
+                .padding(top = 36.dp, bottom = 16.dp)
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
-                .weight(1F),
+                .weight(1f),
             state = pagerState,
+            key = { uiState.tickets[it].ticketId },
+            centerHorizontal = true,
             contentPadding = PaddingValues(horizontal = contentPadding),
             pageSpacing = pageSpacing,
-            beyondBoundsPageCount = 3,
         ) { page ->
-
-            Card(
-                Modifier
-                    .fillMaxSize()
-                    .padding(top = 36.dp, bottom = 16.dp)
-                    .align(Alignment.CenterHorizontally)
+            val ticket = uiState.tickets[page]
+            Ticket(
+                modifier = Modifier
                     .graphicsLayer {
                         val pageOffset =
                             ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
-
                         alpha = lerp(
                             start = 0.5f,
                             stop = 1f,
@@ -114,28 +113,14 @@ private fun TicketNotEmptyScreen(
                             stop = scaleSizeRatio,
                             fraction = pageOffset.absoluteValue.coerceIn(0f, 1f),
                         ).let {
-                            scaleX = it
                             scaleY = it
                         }
-                        translationX = calculateTranslationX(
-                            screenWidth = screenWidth,
-                            scaleRatio = scaleSizeRatio,
-                            contentPadding = contentPadding,
-                            pageOffset = pageOffset,
-                        ).toPx()
                     }
-                    .clickable { onClickTicket(uiState.tickets[page].ticketId) },
-                shape = RectangleShape,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-            ) {
-                val ticket = uiState.tickets[page]
-                TicketContent(
-                    ticket = ticket,
-                    onClickQr = onClickQr,
-                )
-            }
+                    .clickable { onClickTicket(ticket.ticketId) },
+                ticket = ticket,
+                onClickQr = onClickQr,
+            )
         }
-
         Card(
             modifier = Modifier.padding(bottom = 28.dp),
             shape = RoundedCornerShape(100.dp),
@@ -152,12 +137,17 @@ private fun TicketNotEmptyScreen(
     }
 }
 
-private fun calculateTranslationX(
-    screenWidth: Int,
-    scaleRatio: Float,
-    contentPadding: Dp,
-    pageOffset: Float,
-): Dp {
-    val pageFullWidth = screenWidth.dp - contentPadding
-    return (((pageFullWidth * (1 - scaleRatio)) / 2) * pageOffset)
+@Composable
+private fun Ticket(
+    modifier: Modifier = Modifier,
+    ticket: Ticket,
+    onClickQr: (data: String, ticketName: String) -> Unit,
+) {
+    Card(
+        modifier = modifier,
+        shape = RectangleShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+    ) {
+        TicketContent(ticket = ticket, onClickQr = onClickQr)
+    }
 }

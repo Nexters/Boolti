@@ -42,10 +42,11 @@
 ## Technical Content
 | Author | Title |
 | ------------- | -------------|
-| 송준영 | [간격이 안 맞아요! (feat. Compose typography)](https://algosketch.tistory.com/184) |
-| 송준영 | [핫한 공연 예매의 시작 불티 출시!](https://algosketch.tistory.com/185) |
-| 송준영 | [Compose를 이용하여 스크롤 가능한 Appbar 만들기](https://algosketch.tistory.com/186) |
+| 박명범 | [Android Compose HorizontalPager Animations(w. 불티)](https://medium.com/@mangbaam/android-compose-horizontalpager-animations-w-%EB%B6%88%ED%8B%B0-e18ab02458d8) |
 | 송준영 | [Compose 중첩 내비게이션의 문제와 해결](https://algosketch.tistory.com/189) |
+| 송준영 | [Compose를 이용하여 스크롤 가능한 Appbar 만들기](https://algosketch.tistory.com/186) |
+| 송준영 | [핫한 공연 예매의 시작 불티 출시!](https://algosketch.tistory.com/185) |
+| 송준영 | [간격이 안 맞아요! (feat. Compose typography)](https://algosketch.tistory.com/184) |
 
 </br>
 

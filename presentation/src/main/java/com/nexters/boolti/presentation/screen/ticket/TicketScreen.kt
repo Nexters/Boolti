@@ -113,7 +113,7 @@ private fun TicketNotEmptyScreen(
                             scaleX = it
                             scaleY = it
                             val sign = if (pageOffset > 0) 1 else -1
-                            translationX = sign * (screenWidth - size.width) * (1 - it) * 3
+                            translationX = sign * size.width * (1 - it) / 2
                         }
                     },
                 onClick = { onClickTicket(ticket.ticketId) },

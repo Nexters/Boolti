@@ -234,7 +234,6 @@ fun TicketingScreen(
                     totalAgreed = uiState.orderAgreed,
                     agreement = uiState.orderAgreement,
                     onClickTotalAgree = viewModel::toggleAgreement,
-                    onClickAgree = viewModel::toggleAgreement,
                     onClickShow = {
                         val url = when (it) {
                             0 -> "https://boolti.notion.site/00259d85983c4ba8a987a374e2615396?pvs=4"
@@ -630,7 +629,6 @@ private fun OrderAgreementSection(
     totalAgreed: Boolean,
     agreement: List<Pair<Int, Boolean>>,
     onClickTotalAgree: () -> Unit,
-    onClickAgree: (index: Int) -> Unit,
     onClickShow: (index: Int) -> Unit,
 ) {
     Column(
@@ -674,7 +672,6 @@ private fun OrderAgreementSection(
                 index = index,
                 agreed = agreed,
                 label = stringResource(labelRes),
-                onClickAgree = onClickAgree,
                 onClickShow = onClickShow,
             )
         }
@@ -687,26 +684,19 @@ private fun OrderAgreementItem(
     index: Int,
     agreed: Boolean,
     label: String,
-    onClickAgree: (index: Int) -> Unit,
     onClickShow: (index: Int) -> Unit,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.clickable { onClickAgree(index) },
-        ) {
-            Icon(
-                modifier = Modifier.padding(end = 4.dp),
-                painter = painterResource(R.drawable.ic_check), contentDescription = label,
-                tint = if (agreed) MaterialTheme.colorScheme.primary else Grey50,
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
-        }
+    Row(modifier = modifier.fillMaxWidth(1f)) {
+        Icon(
+            modifier = Modifier.padding(end = 4.dp),
+            painter = painterResource(R.drawable.ic_check), contentDescription = label,
+            tint = if (agreed) MaterialTheme.colorScheme.primary else Grey50,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = Grey50,
+        )
         Spacer(modifier = Modifier.weight(1f))
         ShowButton { onClickShow(index) }
     }
@@ -835,12 +825,11 @@ private fun TicketingDetailScreenPreview() {
 private fun OrderAgreementItemPreview() {
     BooltiTheme {
         Surface {
-            var agreed by remember { mutableStateOf(false) }
+            val agreed by remember { mutableStateOf(false) }
             OrderAgreementItem(
                 index = 0,
                 agreed = agreed,
                 label = "test",
-                onClickAgree = { agreed = !agreed },
                 onClickShow = {},
             )
         }

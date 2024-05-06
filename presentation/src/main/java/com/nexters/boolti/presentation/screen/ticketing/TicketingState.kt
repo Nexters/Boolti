@@ -43,12 +43,5 @@ data class TicketingState(
                     (isSameContactInfo || depositorContact.isNotBlank())
         }
 
-    fun toggleAgreement(index: Int): TicketingState {
-        val updated = orderAgreement.toMutableList().apply {
-            set(index, orderAgreement[index].copy(second = !orderAgreement[index].second))
-        }
-        return copy(orderAgreement = updated)
-    }
-
     fun toggleAgreement(): TicketingState = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
 }

@@ -185,10 +185,6 @@ class TicketingViewModel @Inject constructor(
         _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
     }
 
-    fun toggleAgreement(index: Int) {
-        _uiState.update { it.toggleAgreement(index) }
-    }
-
     fun toggleAgreement() {
         _uiState.update { it.toggleAgreement() }
     }

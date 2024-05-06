@@ -134,12 +134,12 @@ private fun EmptyContent(
     ) {
         Text(
             text = stringResource(id = R.string.reservations_empty),
-            style = MaterialTheme.typography.titleLarge.copy(color = Grey05),
+            style = MaterialTheme.typography.headlineSmall.copy(color = Grey05),
         )
         Text(
             modifier = Modifier.padding(top = subTextPadding),
             text = stringResource(id = R.string.reservations_empty_sub),
-            style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
+            style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
         )
     }
 }

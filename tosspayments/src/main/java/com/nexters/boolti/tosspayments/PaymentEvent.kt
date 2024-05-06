@@ -5,4 +5,6 @@ sealed interface PaymentEvent {
         val orderId: String,
         val reservationId: String,
     ) : PaymentEvent
+
+    data object TicketSoldOut : PaymentEvent
 }

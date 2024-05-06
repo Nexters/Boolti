@@ -1,6 +1,5 @@
 package com.nexters.boolti.tosspayments
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -31,15 +30,6 @@ import kotlinx.coroutines.launch
 class TossPaymentWidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTossPaymentWidgetBinding
     private val viewModel: TossPaymentsWidgetViewModel by viewModels()
-
-    private val paymentFailureDialog by lazy {
-        BTDialog().apply {
-            title = this@TossPaymentWidgetActivity.getString(R.string.payment_failed_title)
-            buttonLabel = this@TossPaymentWidgetActivity.getString(R.string.payment_failure_cta)
-            isCancelable = false
-            listener = BTDialogListener { finish() }
-        }
-    }
 
     private val paymentEventListener
         get() = object : PaymentMethodEventListener() {
@@ -145,7 +135,12 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                     putExtra("orderId", event.orderId)
                     putExtra("reservationId", event.reservationId)
                 }
-                setResult(Activity.RESULT_OK, intent)
+                setResult(RESULT_SUCCESS, intent)
+                finish()
+            }
+
+            is PaymentEvent.TicketSoldOut -> {
+                setResult(RESULT_SOLD_OUT)
                 finish()
             }
         }
@@ -221,10 +216,10 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             TAG,
             "handlePaymentFailResult. error: ${fail.errorCode}, message: ${fail.errorMessage}, orderId: ${fail.orderId}"
         )
-        paymentFailureDialog.apply {
-            message = fail.errorMessage
-            show(supportFragmentManager, fail.errorCode)
-        }
+        if (fail.errorCode == "PAY_PROCESS_CANCELED") return
+
+        setResult(RESULT_FAIL)
+        finish()
     }
 
     private fun toast(message: String) {
@@ -232,6 +227,9 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val RESULT_SUCCESS = 200
+        const val RESULT_FAIL = 400
+        const val RESULT_SOLD_OUT = 401
         private const val TAG = "PaymentWidgetActivity"
         private const val EXTRA_KEY_AMOUNT = "extraKeyAmount"
         private const val EXTRA_KEY_CLIENT_KEY = "extraKeyClientKey"

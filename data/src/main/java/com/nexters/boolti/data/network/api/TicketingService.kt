@@ -56,7 +56,7 @@ internal interface TicketingService {
     @POST("/app/api/v1/order/approve-payment")
     suspend fun approvePayment(
         @Body request: PaymentApproveRequest,
-    ): ApprovePaymentResponse
+    ): Response<ApprovePaymentResponse>
 
     @POST("/app/api/v1/order/cancel-payment")
     suspend fun cancelPayment(

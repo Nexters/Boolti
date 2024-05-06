@@ -3,6 +3,8 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.datasource.ReservationDataSource
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
+import com.nexters.boolti.domain.exception.TicketingErrorType
+import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.extension.errorType
 import com.nexters.boolti.domain.model.ApprovePaymentResponse
 import com.nexters.boolti.domain.model.InviteCodeStatus
@@ -65,7 +67,13 @@ internal class TicketingRepositoryImpl @Inject constructor(
     }
 
     override fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse> = flow {
-        emit(dataSource.approvePayment(request))
+        val response = dataSource.approvePayment(request)
+        if (response.isSuccessful) {
+            response.body()?.let { emit(it.toDomain()) }
+        } else {
+            val errMsg = response.errorBody()?.string()
+            throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
+        }
     }
 
     override fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean> = flow {

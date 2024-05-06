@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
-import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -92,6 +91,9 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
 import java.time.LocalDateTime
 
 @Composable
@@ -106,15 +108,23 @@ fun TicketingScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showPaymentFailureDialog by remember { mutableStateOf(false) }
+    var showTicketSoldOutDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val intent = result.data ?: return@rememberLauncherForActivityResult
-                val reservationId = intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
-                onReserved(reservationId, viewModel.showId)
+            when (result.resultCode) {
+                RESULT_SUCCESS -> {
+                    val intent = result.data ?: return@rememberLauncherForActivityResult
+                    val reservationId =
+                        intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                    onReserved(reservationId, viewModel.showId)
+                }
+
+                RESULT_SOLD_OUT -> showTicketSoldOutDialog = true
+                RESULT_FAIL -> showPaymentFailureDialog = true
             }
         }
 
@@ -298,6 +308,17 @@ fun TicketingScreen(
                 onClick = viewModel::reservation,
                 onDismiss = { showConfirmDialog = false },
             )
+        }
+        if (showPaymentFailureDialog) {
+            PaymentFailureDialog {
+                showPaymentFailureDialog = false
+            }
+        }
+        if (showTicketSoldOutDialog) {
+            PaymentFailureDialog {
+                showTicketSoldOutDialog = false
+                onBackClicked()
+            }
         }
     }
 }

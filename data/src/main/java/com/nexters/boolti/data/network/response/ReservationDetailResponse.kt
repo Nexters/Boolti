@@ -29,6 +29,7 @@ internal data class ReservationDetailResponse(
     val depositorPhoneNumber: String = "",
     val csReservationId: String,
     val cardDetail: CardDetailResponse? = null,
+    val easyPayDetail: EasyPayDetailResponse? = null,
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
@@ -53,6 +54,7 @@ internal data class ReservationDetailResponse(
             depositorPhoneNumber = depositorPhoneNumber,
             csReservationId = csReservationId,
             cardDetail = cardDetail?.toDomain(),
+            provider = easyPayDetail?.provider ?: ""
         )
     }
 
@@ -66,4 +68,9 @@ internal data class ReservationDetailResponse(
             issuerCode = issuerCode,
         )
     }
+
+    @Serializable
+    internal data class EasyPayDetailResponse(
+        val provider: String?,
+    )
 }

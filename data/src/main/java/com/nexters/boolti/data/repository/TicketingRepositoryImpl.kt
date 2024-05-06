@@ -15,6 +15,7 @@ import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.PaymentApproveRequest
+import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
@@ -73,5 +74,9 @@ internal class TicketingRepositoryImpl @Inject constructor(
             val errMsg = response.errorBody()?.string()
             throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
         }
+    }
+
+    override fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean> = flow {
+        emit(dataSource.cancelPayment(request))
     }
 }

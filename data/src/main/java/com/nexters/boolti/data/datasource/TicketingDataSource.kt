@@ -10,6 +10,7 @@ import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.PaymentApproveRequest
+import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import retrofit2.Response
@@ -54,5 +55,10 @@ internal class TicketingDataSource @Inject constructor(
 
     suspend fun approvePayment(request: PaymentApproveRequest): Response<ApprovePaymentResponse> {
         return ticketingService.approvePayment(request)
+    }
+
+    suspend fun cancelPayment(request: PaymentCancelRequest): Boolean {
+        val response = ticketingService.cancelPayment(request)
+        return response.isSuccessful && response.body() ?: false
     }
 }

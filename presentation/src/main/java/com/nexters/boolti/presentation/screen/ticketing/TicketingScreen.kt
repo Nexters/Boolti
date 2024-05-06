@@ -142,7 +142,7 @@ fun TicketingScreen(
                             context = context,
                             amount = uiState.totalPrice,
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
-                            customerKey = it.userId,
+                            customerKey = "user-${it.userId}",
                             orderId = it.orderId,
                             orderName = "${uiState.showName} ${uiState.ticketName}",
                             currency = Currency.KRW.name,

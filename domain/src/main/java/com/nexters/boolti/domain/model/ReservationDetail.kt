@@ -24,6 +24,7 @@ data class ReservationDetail(
     val depositorPhoneNumber: String,
     val csReservationId: String,
     val cardDetail: CardDetail?,
+    val provider: String = "",
 ) {
     /**
      * @param installmentPlanMonths 할부 개월 수. 0 이면 일시불

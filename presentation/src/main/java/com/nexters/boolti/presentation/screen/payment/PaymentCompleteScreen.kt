@@ -3,6 +3,7 @@
 package com.nexters.boolti.presentation.screen.payment
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,8 @@ import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
@@ -50,7 +53,6 @@ fun PaymentCompleteScreen(
     navigateToTicketDetail: (reservation: ReservationDetail) -> Unit,
     viewModel: PaymentCompleteViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler(onBack = onClickClose)
@@ -59,119 +61,25 @@ fun PaymentCompleteScreen(
         topBar = { PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose) },
     ) { innerPadding ->
         val reservation = uiState.reservationDetail ?: return@Scaffold
-        val scrollState = rememberScrollState()
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = marginHorizontal)
-                    .verticalScroll(scrollState),
-            ) {
-                HeaderSection()
-                SectionDivider(modifier = Modifier.padding(top = 20.dp))
-
-                InfoRow(
-                    modifier = Modifier.padding(top = 24.dp),
-                    label = stringResource(R.string.reservation_number), value = reservation.csReservationId
-                )
-                InfoRow(
-                    modifier = Modifier.padding(top = 16.dp),
-                    label = stringResource(R.string.ticketing_ticket_holder_label),
-                    value = slashFormat(reservation.ticketHolderName, reservation.ticketHolderPhoneNumber),
-                )
-                if (!reservation.isInviteTicket && reservation.totalAmountPrice > 0) {
-                    InfoRow(
-                        modifier = Modifier.padding(top = 16.dp),
-                        label = stringResource(R.string.depositor_info_label),
-                        value = slashFormat(reservation.depositorName, reservation.depositorPhoneNumber),
-                    )
-                }
-                SectionDivider(modifier = Modifier.padding(top = 24.dp))
-
-                val payment = when (reservation.paymentType) {
-                    PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
-                    PaymentType.CARD -> {
-                        val installment = reservation.cardDetail?.installmentPlanMonths?.let { months ->
-                            if (months == 0) {
-                                stringResource(R.string.payment_pay_in_full)
-                            } else {
-                                stringResource(R.string.payment_installment_plan_months, months)
-                            }
-                        }
-                        StringBuilder(reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context) ?: "")
-                            .apply {
-                                installment?.let { append(" / $it") }
-                            }
-                            .toString()
-                    }
-
-                    else -> null
-                }
-                InfoRow(
-                    modifier = Modifier.padding(top = 24.dp),
-                    label = stringResource(R.string.payment_amount_label),
-                    value = stringResource(
-                        R.string.unit_won,
-                        reservation.totalAmountPrice
-                    ),
-                    value2 = payment?.let { "($it)" },
-                )
-                InfoRow(
-                    modifier = Modifier.padding(top = 16.dp),
-                    label = stringResource(R.string.reservation_ticket_type),
-                    value = slashFormat(
-                        reservation.ticketName,
-                        stringResource(R.string.ticket_count, reservation.ticketCount)
-                    ),
-                )
-
-                TicketSummarySection(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp),
-                    poster = reservation.showImage,
-                    showName = reservation.showName,
-                    showDate = reservation.showDate,
-                )
-            }
-
-            // TODO 백엔드에 TicketId 요청 필요 <-- 1.5.0 에 주석 제거
-            /*Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = marginHorizontal)
-                    .padding(bottom = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                SecondaryButton(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.show_reservation),
-                ) {
-                    navigateToReservation(reservation)
-                }
-                MainButton(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.show_ticket),
-                ) {
-                    navigateToTicketDetail(reservation)
-                }
-            }*/
-        }
+        PaymentCompleteScreen(
+            modifier = Modifier.padding(innerPadding),
+            reservation = reservation,
+            navigateToReservation = navigateToReservation,
+            navigateToTicketDetail = navigateToTicketDetail,
+        )
     }
 }
 
 @Composable
-fun PaymentCompleteScreen(
+private fun PaymentCompleteScreen(
     modifier: Modifier = Modifier,
     reservation: ReservationDetail,
     navigateToReservation: (reservation: ReservationDetail) -> Unit = {},
     navigateToTicketDetail: (reservation: ReservationDetail) -> Unit = {},
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -211,7 +119,7 @@ fun PaymentCompleteScreen(
                             stringResource(R.string.payment_installment_plan_months, months)
                         }
                     }
-                    StringBuilder(reservation.bankName)
+                    StringBuilder(reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context) ?: "")
                         .apply {
                             installment?.let { append(" / $it") }
                         }
@@ -248,8 +156,7 @@ fun PaymentCompleteScreen(
             )
         }
 
-        // TODO 백엔드에 TicketId 요청 필요 <-- 1.5.0 에 주석 제거
-        /*Row(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -269,7 +176,7 @@ fun PaymentCompleteScreen(
             ) {
                 navigateToTicketDetail(reservation)
             }
-        }*/
+        }
     }
 }
 
@@ -291,11 +198,10 @@ private fun InfoRow(
     value: String,
     value2: String? = null,
 ) {
-    Column {
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    Column(
+        modifier = modifier,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.width(100.dp),
                 text = label,
@@ -311,7 +217,7 @@ private fun InfoRow(
         }
         value2?.let {
             Text(
-                modifier = Modifier.padding(horizontal = 112.dp),
+                modifier = Modifier.padding(start = 112.dp),
                 text = it,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Grey15,
@@ -355,7 +261,7 @@ private fun PaymentCompleteScreenPreview() {
                 depositorName = "Dick Haley",
                 depositorPhoneNumber = "(869) 823-0418",
                 csReservationId = "mutat",
-                cardDetail = ReservationDetail.CardDetail(3, ""),
+                cardDetail = ReservationDetail.CardDetail(3, "15"),
             ),
             navigateToReservation = {},
             navigateToTicketDetail = {},

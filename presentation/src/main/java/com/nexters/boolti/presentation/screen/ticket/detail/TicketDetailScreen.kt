@@ -140,6 +140,7 @@ private fun TicketDetailScreen(
 ) {
     val scrollState = rememberScrollState()
     var showEnterCodeDialog by remember { mutableStateOf(false) }
+    var showTicketNotFoundDialog by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val clipboardManager = LocalClipboardManager.current
@@ -168,6 +169,7 @@ private fun TicketDetailScreen(
                 )
 
                 TicketDetailEvent.OnRefresh -> showEnterCodeDialog = false
+                TicketDetailEvent.NotFound -> showTicketNotFoundDialog = true
             }
         }
     }
@@ -370,6 +372,23 @@ private fun TicketDetailScreen(
                 error = managerCodeState.error,
                 onDismiss = { showEnterCodeDialog = false },
                 onClickConfirm = { viewModel.requestEntrance(it) }
+            )
+        }
+    }
+
+    if (showTicketNotFoundDialog) {
+        BTDialog(
+            enableDismiss = false,
+            showCloseButton = false,
+            onClickPositiveButton = {
+                showTicketNotFoundDialog = false
+                onBackClicked()
+            },
+        ) {
+            Text(
+                text = stringResource(R.string.error_ticket_not_found),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

@@ -8,9 +8,9 @@ import com.nexters.boolti.data.network.response.OrderIdDto
 import com.nexters.boolti.data.network.response.ReservationDto
 import com.nexters.boolti.data.network.response.SalesTicketTypeDto
 import com.nexters.boolti.data.network.response.TicketingInfoDto
-import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.PaymentApproveRequest
+import com.nexters.boolti.domain.request.PaymentCancelRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -34,12 +34,12 @@ internal interface TicketingService {
     @POST("/app/api/v1/reservation/sales-ticket")
     suspend fun requestReservationSalesTicket(
         @Body request: ReservationSalesTicketRequest,
-    ): ReservationDto
+    ): Response<ReservationDto>
 
     @POST("/app/api/v1/reservation/invite-ticket")
     suspend fun requestReservationInviteTicket(
         @Body request: ReservationInviteTicketRequest,
-    ): ReservationDto
+    ): Response<ReservationDto>
 
     @GET("/app/api/v1/check/invite-code")
     suspend fun checkInviteCode(

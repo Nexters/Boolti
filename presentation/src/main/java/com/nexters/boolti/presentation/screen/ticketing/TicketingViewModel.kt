@@ -2,6 +2,8 @@ package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.exception.TicketingErrorType
+import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
@@ -103,7 +105,20 @@ class TicketingViewModel @Inject constructor(
             reservationName = uiState.value.reservationName,
             reservationPhoneNumber = uiState.value.reservationContact,
         )
-        repository.requestReservation(request).singleOrNull()?.let { reservationId ->
+        repository.requestReservation(request)
+            .catch { e ->
+                if (e !is TicketingException) throw e
+                if (
+                    e.errorType in listOf(
+                        TicketingErrorType.NoRemainingQuantity,
+                        TicketingErrorType.ApprovePaymentFailed,
+                        TicketingErrorType.Unknown,
+                    )
+                ) {
+                    event(TicketingEvent.NoRemainingQuantity)
+                }
+            }
+            .singleOrNull()?.let { reservationId ->
             event(TicketingEvent.TicketingSuccess(reservationId, showId))
         }
     }

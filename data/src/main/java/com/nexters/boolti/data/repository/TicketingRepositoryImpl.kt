@@ -40,7 +40,12 @@ internal class TicketingRepositoryImpl @Inject constructor(
             is TicketingRequest.Invite -> dataSource.requestReservationInviteTicket(request.toData())
             is TicketingRequest.Free -> dataSource.requestReservationSalesTicket(request.toData())
         }
-        emit(response)
+        if (response.isSuccessful) {
+            response.body()?.reservationId?.let { emit(it) }
+        } else {
+            val errMsg = response.errorBody()?.string()
+            throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
+        }
     }
 
     override fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus> = flow {

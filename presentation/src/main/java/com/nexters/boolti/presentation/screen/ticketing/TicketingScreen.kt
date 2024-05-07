@@ -160,6 +160,11 @@ fun TicketingScreen(
                     )
                     showConfirmDialog = false
                 }
+
+                is TicketingEvent.NoRemainingQuantity -> {
+                    showConfirmDialog = false
+                    showTicketSoldOutDialog = true
+                }
             }
         }
     }

@@ -147,6 +147,7 @@ private fun Header(
 ) {
     Row(
         modifier = modifier.padding(horizontal = marginHorizontal, vertical = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
             modifier = Modifier

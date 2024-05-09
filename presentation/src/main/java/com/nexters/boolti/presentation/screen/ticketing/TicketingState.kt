@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import com.nexters.boolti.domain.model.InviteCodeStatus
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import java.time.LocalDateTime
 
@@ -16,54 +15,33 @@ data class TicketingState(
     val isSameContactInfo: Boolean = false,
     val isInviteTicket: Boolean = false,
     val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val paymentType: PaymentType = PaymentType.ACCOUNT_TRANSFER,
     val reservationName: String = "",
     val reservationContact: String = "",
     val depositorName: String = "",
     val depositorContact: String = "",
     val inviteCode: String = "",
     val refundPolicy: List<String> = emptyList(),
-    val orderAgreement: List<Boolean> = listOf(false, false, false),
+    val orderAgreement: List<Pair<Int, Boolean>> = listOf(
+        Pair(R.string.order_agreement_privacy_collection, false),
+        Pair(R.string.order_agreement_privacy_offer, false),
+    ),
 ) {
-    val orderAgreementInfos = listOf(
-        R.string.order_agreement_privacy_collection,
-        R.string.order_agreement_privacy_offer,
-        R.string.order_agreement_payment_agency,
-    )
-
     val orderAgreed: Boolean
-        get() = orderAgreement.none { !it }
+        get() = orderAgreement.none { !it.second }
 
     val reservationButtonEnabled: Boolean
         get() = when {
-            isInviteTicket -> //            orderAgreed &&
-                reservationName.isNotBlank() &&
-                        reservationContact.isNotBlank() &&
-                        inviteCodeStatus is InviteCodeStatus.Valid
+            !orderAgreed ||
+                    reservationName.isBlank() ||
+                    reservationContact.isBlank() -> false
 
-            totalPrice == 0 -> // orderAgreed &7
-                reservationName.isNotBlank() &&
-                        reservationContact.isNotBlank()
+            isInviteTicket -> inviteCodeStatus is InviteCodeStatus.Valid
 
-            else -> //            orderAgreed &&
-                reservationName.isNotBlank() &&
-                        reservationContact.isNotBlank() &&
-                        (isSameContactInfo || depositorName.isNotBlank()) &&
-                        (isSameContactInfo || depositorContact.isNotBlank())
+            totalPrice == 0 -> true
+
+            else -> (isSameContactInfo || depositorName.isNotBlank()) &&
+                    (isSameContactInfo || depositorContact.isNotBlank())
         }
 
-    fun toggleAgreement(index: Int): TicketingState {
-        val updated = orderAgreement.toMutableList().apply {
-            set(index, !orderAgreement[index])
-        }
-        return copy(orderAgreement = updated)
-    }
-
-    fun toggleAgreement(): TicketingState {
-        return if (orderAgreed) {
-            copy(orderAgreement = orderAgreement.map { false })
-        } else {
-            copy(orderAgreement = orderAgreement.map { true })
-        }
-    }
+    fun toggleAgreement(): TicketingState = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
 }

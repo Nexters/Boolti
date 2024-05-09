@@ -22,6 +22,8 @@ private val DarkColorScheme = darkColorScheme(
     onSecondaryContainer = Grey40,
     onSurface = Grey10,
     onSurfaceVariant = Grey15,
+    outline = Grey80,
+    outlineVariant = Grey10,
 
 //    secondary = PurpleGrey80,
 //    tertiary = Pink80

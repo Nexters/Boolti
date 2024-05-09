@@ -1,5 +1,9 @@
+@file:JvmName("PaymentCompleteScreenKt")
+
 package com.nexters.boolti.presentation.screen.payment
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,17 +15,27 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.SecondaryButton
+import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -32,12 +46,39 @@ import java.time.LocalDateTime
 
 @Composable
 fun PaymentCompleteScreen(
+    onClickHome: () -> Unit,
+    onClickClose: () -> Unit,
+    navigateToReservation: (reservation: ReservationDetail) -> Unit,
+    navigateToTicketDetail: (reservation: ReservationDetail) -> Unit,
+    viewModel: PaymentCompleteViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler(onBack = onClickClose)
+
+    Scaffold(
+        topBar = { PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose) },
+    ) { innerPadding ->
+        val reservation = uiState.reservationDetail ?: return@Scaffold
+        PaymentCompleteScreen(
+            modifier = Modifier.padding(innerPadding),
+            reservation = reservation,
+            navigateToReservation = navigateToReservation,
+            navigateToTicketDetail = navigateToTicketDetail,
+        )
+    }
+}
+
+@Composable
+private fun PaymentCompleteScreen(
     modifier: Modifier = Modifier,
     reservation: ReservationDetail,
     navigateToReservation: (reservation: ReservationDetail) -> Unit = {},
     navigateToTicketDetail: (reservation: ReservationDetail) -> Unit = {},
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -67,13 +108,33 @@ fun PaymentCompleteScreen(
             }
             SectionDivider(modifier = Modifier.padding(top = 24.dp))
 
+            val payment = when (reservation.paymentType) {
+                PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
+                PaymentType.CARD -> {
+                    val installment = reservation.cardDetail?.installmentPlanMonths?.let { months ->
+                        if (months == 0) {
+                            stringResource(R.string.payment_pay_in_full)
+                        } else {
+                            stringResource(R.string.payment_installment_plan_months, months)
+                        }
+                    }
+                    StringBuilder(reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context) ?: "")
+                        .apply {
+                            installment?.let { append(" / $it") }
+                        }
+                        .toString()
+                }
+
+                else -> null
+            }
             InfoRow(
                 modifier = Modifier.padding(top = 24.dp),
                 label = stringResource(R.string.payment_amount_label),
                 value = stringResource(
                     R.string.unit_won,
                     reservation.totalAmountPrice
-                ), // TODO (카카오뱅크카드 / 일시불) 형태의 정보 추가
+                ),
+                value2 = payment?.let { "($it)" },
             )
             InfoRow(
                 modifier = Modifier.padding(top = 16.dp),
@@ -94,8 +155,7 @@ fun PaymentCompleteScreen(
             )
         }
 
-        // TODO 백엔드에 TicketId 요청 필요 <-- 1.5.0 에 주석 제거
-        /*Row(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -109,13 +169,13 @@ fun PaymentCompleteScreen(
             ) {
                 navigateToReservation(reservation)
             }
-            MainButton(
+            /*MainButton(
                 modifier = Modifier.weight(1f),
                 label = stringResource(R.string.show_ticket),
             ) {
                 navigateToTicketDetail(reservation)
-            }
-        }*/
+            }*/
+        }
     }
 }
 
@@ -135,23 +195,33 @@ private fun InfoRow(
     modifier: Modifier = Modifier,
     label: String,
     value: String,
+    value2: String? = null,
 ) {
-    Row(
+    Column(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            modifier = Modifier.width(100.dp),
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Grey30,
-        )
-        Text(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Grey15,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.width(100.dp),
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30,
+            )
+            Text(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey15,
+            )
+        }
+        value2?.let {
+            Text(
+                modifier = Modifier.padding(start = 112.dp),
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey15,
+            )
+        }
     }
 }
 
@@ -177,11 +247,11 @@ private fun PaymentCompleteScreenPreview() {
                 ticketName = "Juliet Greer",
                 isInviteTicket = false,
                 ticketCount = 6931,
-                bankName = "Corinne Leon",
+                bankName = "카카오뱅크카드",
                 accountNumber = "graece",
                 accountHolder = "reprimique",
                 salesEndDateTime = LocalDateTime.now(),
-                paymentType = PaymentType.UNDEFINED,
+                paymentType = PaymentType.CARD,
                 totalAmountPrice = 3473,
                 reservationState = ReservationState.REFUNDING,
                 completedDateTime = null,
@@ -189,10 +259,45 @@ private fun PaymentCompleteScreenPreview() {
                 ticketHolderPhoneNumber = "(453) 355-6682",
                 depositorName = "Dick Haley",
                 depositorPhoneNumber = "(869) 823-0418",
-                csReservationId = "mutat"
+                csReservationId = "mutat",
+                cardDetail = ReservationDetail.CardDetail(3, "15"),
             ),
             navigateToReservation = {},
             navigateToTicketDetail = {},
         )
+    }
+}
+
+
+@Composable
+private fun PaymentToolbar(
+    onClickHome: () -> Unit,
+    onClickClose: () -> Unit,
+) {
+    BtAppBar(
+        navigateButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_home,
+                description = stringResource(R.string.description_toolbar_home),
+                onClick = onClickHome,
+            )
+        },
+        actionButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_close,
+                description = stringResource(R.string.description_close_button),
+                onClick = onClickClose,
+            )
+        }
+    )
+}
+
+@Preview
+@Composable
+private fun PaymentToolBarPreview() {
+    BooltiTheme {
+        Surface {
+            PaymentToolbar({}, {})
+        }
     }
 }

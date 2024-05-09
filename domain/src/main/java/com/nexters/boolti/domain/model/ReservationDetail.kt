@@ -23,4 +23,15 @@ data class ReservationDetail(
     val depositorName: String,
     val depositorPhoneNumber: String,
     val csReservationId: String,
-)
+    val cardDetail: CardDetail?,
+    val provider: String = "",
+) {
+    /**
+     * @param installmentPlanMonths 할부 개월 수. 0 이면 일시불
+     * @param issuerCode 카드 발급사 [숫자 코드](https://docs.tosspayments.com/reference/codes#%EC%B9%B4%EB%93%9C%EC%82%AC-%EC%BD%94%EB%93%9C)
+     */
+    data class CardDetail(
+        val installmentPlanMonths: Int,
+        val issuerCode: String,
+    )
+}

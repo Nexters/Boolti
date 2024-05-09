@@ -29,6 +29,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -70,6 +71,10 @@ fun ChooseTicketBottomSheet(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    LaunchedEffect(Unit) {
+        viewModel.load()
+    }
 
     ModalBottomSheet(
         onDismissRequest = {
@@ -222,7 +227,7 @@ private fun ChooseTicketBottomSheetContent2(
             )
             Spacer(modifier = Modifier.weight(1F))
             Text(
-                text = stringResource(R.string.format_total_price, ticket.ticket.price * ticketCount),
+                text = stringResource(R.string.format_price, ticket.ticket.price * ticketCount),
                 style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
             )
         }

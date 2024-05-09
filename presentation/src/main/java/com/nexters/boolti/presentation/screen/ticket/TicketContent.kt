@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,7 +33,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -54,7 +56,6 @@ import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
-import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -65,8 +66,25 @@ import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import java.time.LocalDateTime
 
 @Composable
-fun TicketContent(
+fun Ticket(
+    modifier: Modifier = Modifier,
     ticket: Ticket,
+    onClick: () -> Unit,
+    onClickQr: (data: String, ticketName: String) -> Unit,
+) {
+    Card(
+        modifier = modifier,
+        shape = RectangleShape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+    ) {
+        TicketContent(ticket = ticket, onClick = onClick, onClickQr = onClickQr)
+    }
+}
+
+@Composable
+private fun TicketContent(
+    ticket: Ticket,
+    onClick: () -> Unit,
     onClickQr: (data: String, ticketName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,7 +114,8 @@ fun TicketContent(
                 width = 1.dp,
                 brush = Brush.verticalGradient(listOf(White.copy(.5f), White.copy(.2f))),
                 shape = ticketShape,
-            ),
+            )
+            .clickable(onClick = onClick),
     ) {
         // 배경 블러된 이미지
         AsyncImage(
@@ -189,7 +208,9 @@ private fun Title(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            modifier = Modifier.padding(end = 4.dp).size(20.dp),
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .size(20.dp),
             painter = painterResource(R.drawable.ic_logo),
             tint = Grey80,
             contentDescription = null,

@@ -27,6 +27,8 @@ internal fun String?.toPaymentType(): PaymentType {
     return when (this) {
         "BANK_TRANSFER", "ACCOUNT_TRANSFER" -> PaymentType.ACCOUNT_TRANSFER
         "CARD" -> PaymentType.CARD
+        "SIMPLE_PAYMENT" -> PaymentType.SIMPLE_PAYMENT
+        "FREE" -> PaymentType.FREE
         else -> PaymentType.UNDEFINED
     }
 }

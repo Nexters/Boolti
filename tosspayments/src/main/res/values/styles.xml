@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Button" parent="Widget.AppCompat.Button" />
+
+    <style name="Button.Cta">
+        <item name="android:background">@drawable/selector_rounded_cta</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingRight">24dp</item>
+        <item name="android:radius">12dp</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <style name="Input" parent="TextAppearance.AppCompat" />
+
+    <style name="Input.Label">
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize" tools:ignore="SpUsage">16dp</item>
+    </style>
+</resources>

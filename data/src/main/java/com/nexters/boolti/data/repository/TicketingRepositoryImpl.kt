@@ -3,14 +3,19 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.datasource.ReservationDataSource
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
-import com.nexters.boolti.domain.exception.InviteCodeException
+import com.nexters.boolti.domain.exception.TicketingErrorType
+import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.extension.errorType
+import com.nexters.boolti.domain.model.ApprovePaymentResponse
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
+import com.nexters.boolti.domain.request.OrderIdRequest
+import com.nexters.boolti.domain.request.PaymentApproveRequest
+import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
@@ -33,9 +38,14 @@ internal class TicketingRepositoryImpl @Inject constructor(
     override fun requestReservation(request: TicketingRequest): Flow<String> = flow {
         val response = when (request) {
             is TicketingRequest.Invite -> dataSource.requestReservationInviteTicket(request.toData())
-            is TicketingRequest.Normal -> dataSource.requestReservationSalesTicket(request.toData())
+            is TicketingRequest.Free -> dataSource.requestReservationSalesTicket(request.toData())
         }
-        emit(response)
+        if (response.isSuccessful) {
+            response.body()?.reservationId?.let { emit(it) }
+        } else {
+            val errMsg = response.errorBody()?.string()
+            throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
+        }
     }
 
     override fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus> = flow {
@@ -55,5 +65,23 @@ internal class TicketingRepositoryImpl @Inject constructor(
 
     override fun getPaymentInfo(reservationId: String): Flow<ReservationDetail> = flow {
         emit(reservationDataSource.findReservationById(reservationId).toDomain())
+    }
+
+    override fun getOrderId(request: OrderIdRequest): Flow<String> = flow {
+        emit(dataSource.requestOrderId(request))
+    }
+
+    override fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse> = flow {
+        val response = dataSource.approvePayment(request)
+        if (response.isSuccessful) {
+            response.body()?.let { emit(it.toDomain()) }
+        } else {
+            val errMsg = response.errorBody()?.string()
+            throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
+        }
+    }
+
+    override fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean> = flow {
+        emit(dataSource.cancelPayment(request))
     }
 }

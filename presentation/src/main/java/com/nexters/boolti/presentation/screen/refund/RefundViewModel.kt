@@ -3,6 +3,8 @@ package com.nexters.boolti.presentation.screen.refund
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.ReservationRepository
+import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.RefundRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -24,6 +26,7 @@ import javax.inject.Inject
 class RefundViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
+    private val ticketingRepository: TicketingRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
     private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
@@ -59,37 +62,19 @@ class RefundViewModel @Inject constructor(
     }
 
     fun refund() {
-        val request = RefundRequest(
+        val request = PaymentCancelRequest(
             reservationId = reservationId,
-            reason = uiState.value.reason,
-            phoneNumber = uiState.value.contact,
-            accountName = uiState.value.name,
-            accountNumber = uiState.value.accountNumber,
-            bankCode = uiState.value.bankInfo!!.code,
+            cancelReason = uiState.value.reason
         )
-        reservationRepository.refund(request).onEach {
-            sendEvent(RefundEvent.SuccessfullyRefunded)
+
+        ticketingRepository.cancelPayment(request).onEach { isSuccessful ->
+            if (isSuccessful) sendEvent(RefundEvent.SuccessfullyRefunded)
+            else sendEvent(RefundEvent.RefundError)
         }.launchIn(viewModelScope + recordExceptionHandler)
     }
 
     fun updateReason(newReason: String) {
         _uiState.update { it.copy(reason = newReason) }
-    }
-
-    fun updateName(newName: String) {
-        _uiState.update { it.copy(name = newName) }
-    }
-
-    fun updateContact(newContact: String) {
-        _uiState.update { it.copy(contact = newContact) }
-    }
-
-    fun updateBankInfo(newBankInfo: BankInfo) {
-        _uiState.update { it.copy(bankInfo = newBankInfo) }
-    }
-
-    fun updateAccountNumber(newAccountNumber: String) {
-        _uiState.update { it.copy(accountNumber = newAccountNumber) }
     }
 
     fun toggleRefundPolicyCheck(selected: Boolean) {

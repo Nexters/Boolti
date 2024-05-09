@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticket
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,10 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -76,34 +72,26 @@ private fun TicketNotEmptyScreen(
         val pagerState = rememberPagerState(
             pageCount = { uiState.tickets.size }
         )
-
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp
-
         val contentPadding = 30.dp
         val pageSpacing = 16.dp
         val scaleSizeRatio = 0.8f
 
         HorizontalPager(
             modifier = Modifier
+                .padding(top = 36.dp, bottom = 16.dp)
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
-                .weight(1F),
+                .weight(1f),
             state = pagerState,
+            key = { uiState.tickets[it].ticketId },
             contentPadding = PaddingValues(horizontal = contentPadding),
             pageSpacing = pageSpacing,
-            beyondBoundsPageCount = 3,
         ) { page ->
-
-            Card(
-                Modifier
-                    .fillMaxSize()
-                    .padding(top = 36.dp, bottom = 16.dp)
-                    .align(Alignment.CenterHorizontally)
+            val ticket = uiState.tickets[page]
+            Ticket(
+                modifier = Modifier
                     .graphicsLayer {
-                        val pageOffset =
-                            ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
-
+                        val pageOffset = pagerState.currentPage - page + pagerState.currentPageOffsetFraction
                         alpha = lerp(
                             start = 0.5f,
                             stop = 1f,
@@ -116,26 +104,15 @@ private fun TicketNotEmptyScreen(
                         ).let {
                             scaleX = it
                             scaleY = it
+                            val sign = if (pageOffset > 0) 1 else -1
+                            translationX = sign * size.width * (1 - it) / 2
                         }
-                        translationX = calculateTranslationX(
-                            screenWidth = screenWidth,
-                            scaleRatio = scaleSizeRatio,
-                            contentPadding = contentPadding,
-                            pageOffset = pageOffset,
-                        ).toPx()
-                    }
-                    .clickable { onClickTicket(uiState.tickets[page].ticketId) },
-                shape = RectangleShape,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-            ) {
-                val ticket = uiState.tickets[page]
-                TicketContent(
-                    ticket = ticket,
-                    onClickQr = onClickQr,
-                )
-            }
+                    },
+                onClick = { onClickTicket(ticket.ticketId) },
+                ticket = ticket,
+                onClickQr = onClickQr,
+            )
         }
-
         Card(
             modifier = Modifier.padding(bottom = 28.dp),
             shape = RoundedCornerShape(100.dp),
@@ -150,14 +127,4 @@ private fun TicketNotEmptyScreen(
             )
         }
     }
-}
-
-private fun calculateTranslationX(
-    screenWidth: Int,
-    scaleRatio: Float,
-    contentPadding: Dp,
-    pageOffset: Float,
-): Dp {
-    val pageFullWidth = screenWidth.dp - contentPadding
-    return (((pageFullWidth * (1 - scaleRatio)) / 2) * pageOffset)
 }

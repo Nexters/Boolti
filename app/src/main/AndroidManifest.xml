@@ -72,6 +72,11 @@
             android:exported="false"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
+        <activity
+            android:name="com.tosspayments.paymentsdk.activity.TossPaymentsWebActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
         <!--suppress AndroidDomInspection -->
         <activity
             android:name="com.tosspayments.paymentsdk.activity.TossPaymentActivity"

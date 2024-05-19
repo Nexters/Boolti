@@ -35,9 +35,9 @@ import com.nexters.boolti.presentation.screen.refund.RefundScreen
 import com.nexters.boolti.presentation.screen.report.ReportScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
-import com.nexters.boolti.presentation.screen.show.ShowDetailContentScreen
-import com.nexters.boolti.presentation.screen.show.ShowDetailScreen
-import com.nexters.boolti.presentation.screen.show.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
+import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
+import com.nexters.boolti.presentation.screen.showdetail.ShowImagesScreen
 import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen

@@ -1,7 +1,6 @@
-package com.nexters.boolti.presentation.screen.show
+package com.nexters.boolti.presentation.screen.showdetail
 
 import com.nexters.boolti.domain.model.ShowDetail
-import com.nexters.boolti.domain.model.TicketingTicket
 
 data class ShowDetailUiState(
     val showDetail: ShowDetail = ShowDetail(),

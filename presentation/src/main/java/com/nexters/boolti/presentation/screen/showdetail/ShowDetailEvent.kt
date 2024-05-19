@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.show
+package com.nexters.boolti.presentation.screen.showdetail
 
 sealed interface ShowDetailEvent {
     data object PopBackStack : ShowDetailEvent

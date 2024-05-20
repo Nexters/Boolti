@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.show
+package com.nexters.boolti.presentation.screen.showdetail
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState

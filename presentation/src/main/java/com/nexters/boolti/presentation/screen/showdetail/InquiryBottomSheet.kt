@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
@@ -34,6 +37,7 @@ fun InquiryBottomSheet(
     contact: String,
 ) {
     val textId = if (isTelephone) R.string.show_call_to_ask else R.string.show_text_to_ask
+    val context = LocalContext.current
 
     ModalBottomSheet(
         containerColor = MaterialTheme.colorScheme.surfaceTint,
@@ -53,7 +57,12 @@ fun InquiryBottomSheet(
             Modifier
                 .height(58.dp)
                 .fillMaxWidth()
-                .clickable { }
+                .clickable {
+                    val uriKey = if (isTelephone) "tel" else "smsto"
+                    val action = if (isTelephone) Intent.ACTION_DIAL else Intent.ACTION_SENDTO
+                    val intent = Intent(action).setData(Uri.parse("$uriKey:$contact"))
+                    context.startActivity(intent)
+                }
                 .padding(horizontal = 24.dp, vertical = 18.dp)) {
             Text(
                 text = stringResource(id = textId),

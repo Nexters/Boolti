@@ -256,24 +256,24 @@ private fun ShowDetailAppBar(
                         link = uri
                         domainUriPrefix = "https://boolti.page.link"
 
-                    androidParameters {
-                        fallbackUrl = uri
-                    }
-                    iosParameters("com.nexters.boolti") {
-                        setFallbackUrl(uri)
-                    }
-                }.addOnSuccessListener {
-                    it.shortLink?.let { link ->
-                        println(link)
-
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(
-                                Intent.EXTRA_TEXT,
-                                link.toString()
-                            )
-                            type = "text/plain"
+                        androidParameters {
+                            fallbackUrl = uri
                         }
+                        iosParameters("com.nexters.boolti") {
+                            setFallbackUrl(uri)
+                        }
+                    }.addOnSuccessListener {
+                        it.shortLink?.let { link ->
+                            println(link)
+
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    link.toString()
+                                )
+                                type = "text/plain"
+                            }
 
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             context.startActivity(shareIntent)
@@ -323,6 +323,7 @@ private fun ContentScaffold(
     modifier: Modifier = Modifier,
 ) {
     val snackbarController = LocalSnackbarController.current
+    var telephoneBottomSheet: Boolean? by remember { mutableStateOf(null) }
 
     Column(
         modifier = modifier,
@@ -413,31 +414,41 @@ private fun ContentScaffold(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = host,
+                        text = host.substringBefore("("),
                         style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
                     )
                     IconButton(
                         modifier = Modifier.size(24.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { telephoneBottomSheet = true }
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_telephone),
-                            contentDescription = stringResource(id = R.string.show_call_to_ask)
+                            contentDescription = stringResource(id = R.string.show_call_to_ask),
+                            tint = Grey30
                         )
                     }
                     IconButton(
                         modifier = Modifier.size(24.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { telephoneBottomSheet = false }
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_message),
-                            contentDescription = stringResource(id = R.string.show_text_to_ask)
+                            contentDescription = stringResource(id = R.string.show_text_to_ask),
+                            tint = Grey30
                         )
                     }
                 }
             },
+        )
+    }
+
+    telephoneBottomSheet?.let { isTelephone ->
+        InquiryBottomSheet(
+            isTelephone = isTelephone,
+            onDismissRequest = { telephoneBottomSheet = null },
+            contact = host.substringAfter("(").substringBefore(")")
         )
     }
 }

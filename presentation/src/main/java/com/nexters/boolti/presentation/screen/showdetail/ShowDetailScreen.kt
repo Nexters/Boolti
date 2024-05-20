@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -42,10 +45,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -403,15 +408,35 @@ private fun ContentScaffold(
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
             content = {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = MaterialTheme.colorScheme.surfaceTint)
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                    text = host,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(28.dp),
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = host,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                    )
+                    IconButton(
+                        modifier = Modifier.size(24.dp),
+                        onClick = { /*TODO*/ }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_telephone),
+                            contentDescription = stringResource(id = R.string.show_call_to_ask)
+                        )
+                    }
+                    IconButton(
+                        modifier = Modifier.size(24.dp),
+                        onClick = { /*TODO*/ }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_message),
+                            contentDescription = stringResource(id = R.string.show_text_to_ask)
+                        )
+                    }
+                }
             },
         )
     }

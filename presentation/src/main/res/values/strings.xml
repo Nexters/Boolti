@@ -164,6 +164,10 @@
     <string name="order_agreement_privacy_offer">[필수] 개인정보 제 3자 정보 제공 동의</string>
     <string name="order_agreement_payment_agency">[필수] 결제대행 서비스 이용약관 동의</string>
 
+    <!-- 공연 -->
+    <string name="show_call_to_ask">전화 문의하기</string>
+    <string name="show_text_to_ask">문자 문의하기</string>
+
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>

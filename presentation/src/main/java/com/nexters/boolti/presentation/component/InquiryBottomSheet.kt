@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.showdetail
+package com.nexters.boolti.presentation.component
 
 import android.content.Intent
 import android.net.Uri

@@ -83,6 +83,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.DottedDivider
+import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
@@ -577,7 +578,7 @@ private fun Notice(notice: String) {
 }
 
 @Composable
-fun Inquiry(
+private fun Inquiry(
     hostName: String,
     hostPhoneNumber: String,
     onClickCopyPlace: () -> Unit,
@@ -586,35 +587,22 @@ fun Inquiry(
     Column(
         modifier = Modifier
             .padding(horizontal = marginHorizontal)
-            .padding(top = 16.dp, bottom = 24.dp)
+            .padding(top = 16.dp, bottom = 20.dp)
             .fillMaxWidth(),
     ) {
         Text(
             text = stringResource(R.string.ticket_show_inquiry_title),
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        ShowInquiry(
+            modifier = Modifier.padding(top = 12.dp, bottom = 20.dp),
+            hostName = hostName,
+            hostNumber = hostPhoneNumber
         )
         Row(
-            modifier = Modifier.padding(top = 12.dp, bottom = 20.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.ticketing_host),
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
-
-            Spacer(modifier = Modifier.size(16.dp))
-
-            val hostInfo = String.format("%s (%s)", hostName, hostPhoneNumber)
-            Text(
-                text = hostInfo,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(9.dp)
         ) {
             TextButton(
                 modifier = Modifier.weight(1f),

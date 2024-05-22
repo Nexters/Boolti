@@ -24,10 +24,12 @@ import com.nexters.boolti.presentation.theme.Grey30
 fun ShowInquiry(
     hostName: String,
     hostNumber: String,
+    modifier: Modifier = Modifier,
 ) {
     var telephoneBottomSheet: Boolean? by remember { mutableStateOf(null) }
 
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Text(

@@ -115,7 +115,7 @@
     <string name="ticketing_content">공연 내용</string>
     <string name="ticketing_all_content">전체보기</string>
     <string name="ticketing_all_content_title">공연 내용</string>
-    <string name="ticketing_host">주최자</string>
+    <string name="ticketing_host">공연 관련 문의</string>
     <string name="ticketing_button_label">예매하기</string>
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
     <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>

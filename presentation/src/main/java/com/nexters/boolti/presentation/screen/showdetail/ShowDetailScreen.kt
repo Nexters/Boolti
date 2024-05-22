@@ -410,7 +410,7 @@ private fun ContentScaffold(
             title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
             content = {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(28.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),

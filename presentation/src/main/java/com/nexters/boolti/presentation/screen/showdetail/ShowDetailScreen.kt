@@ -63,6 +63,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
@@ -251,24 +252,24 @@ private fun ShowDetailAppBar(
                         link = uri
                         domainUriPrefix = "https://boolti.page.link"
 
-                    androidParameters {
-                        fallbackUrl = uri
-                    }
-                    iosParameters("com.nexters.boolti") {
-                        setFallbackUrl(uri)
-                    }
-                }.addOnSuccessListener {
-                    it.shortLink?.let { link ->
-                        println(link)
-
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(
-                                Intent.EXTRA_TEXT,
-                                link.toString()
-                            )
-                            type = "text/plain"
+                        androidParameters {
+                            fallbackUrl = uri
                         }
+                        iosParameters("com.nexters.boolti") {
+                            setFallbackUrl(uri)
+                        }
+                    }.addOnSuccessListener {
+                        it.shortLink?.let { link ->
+                            println(link)
+
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    link.toString()
+                                )
+                                type = "text/plain"
+                            }
 
                             val shareIntent = Intent.createChooser(sendIntent, null)
                             context.startActivity(shareIntent)
@@ -403,14 +404,9 @@ private fun ContentScaffold(
         Section(
             title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
             content = {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(color = MaterialTheme.colorScheme.surfaceTint)
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                    text = host,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                ShowInquiry(
+                    hostName = host.substringBefore("("),
+                    hostNumber = host.substringAfter("(").substringBefore(")")
                 )
             },
         )

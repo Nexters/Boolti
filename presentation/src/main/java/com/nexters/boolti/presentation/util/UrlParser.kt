@@ -7,7 +7,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 
 class UrlParser(
-    url: String
+    url: String,
+    urlRegex: Regex = "(https?://\\S+\\b)".toRegex(),
 ) {
     val annotatedString: AnnotatedString
 
@@ -15,8 +16,7 @@ class UrlParser(
     val urlOffsets = _urlOffsets.toList()
 
     init {
-        val urlPattern = "(https?://\\S+\\b)".toRegex().toPattern()
-        val linkMatch = urlPattern.matcher(url)
+        val linkMatch = urlRegex.toPattern().matcher(url)
 
         while (linkMatch.find()) {
             _urlOffsets.add(UrlOffset(linkMatch.start(), linkMatch.end()))

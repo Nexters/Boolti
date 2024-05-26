@@ -13,7 +13,7 @@ class UrlParser(
     val annotatedString: AnnotatedString
 
     private val _urlOffsets = mutableListOf<UrlOffset>()
-    val urlOffsets = _urlOffsets.toList()
+    val urlOffsets get() = _urlOffsets.toList()
 
     init {
         val linkMatch = urlRegex.toPattern().matcher(url)
@@ -24,7 +24,7 @@ class UrlParser(
 
         annotatedString = buildAnnotatedString {
             append(url)
-            urlOffsets.forEach { (start, end) ->
+            _urlOffsets.forEach { (start, end) ->
                 addStyle(
                     SpanStyle(
                         textDecoration = TextDecoration.Underline,

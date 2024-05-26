@@ -10,14 +10,16 @@ class UrlParser(
     url: String
 ) {
     val annotatedString: AnnotatedString
-    val urlOffsets = mutableListOf<UrlOffset>()
+
+    private val _urlOffsets = mutableListOf<UrlOffset>()
+    val urlOffsets = _urlOffsets.toList()
 
     init {
         val urlPattern = "(https?://\\S+\\b)".toRegex().toPattern()
         val linkMatch = urlPattern.matcher(url)
 
         while (linkMatch.find()) {
-            urlOffsets.add(UrlOffset(linkMatch.start(), linkMatch.end()))
+            _urlOffsets.add(UrlOffset(linkMatch.start(), linkMatch.end()))
         }
 
         annotatedString = buildAnnotatedString {

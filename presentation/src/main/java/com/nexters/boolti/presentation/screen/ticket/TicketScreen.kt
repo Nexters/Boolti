@@ -83,7 +83,7 @@ private fun TicketNotEmptyScreen(
                 .align(Alignment.CenterHorizontally)
                 .weight(1f),
             state = pagerState,
-            key = { uiState.tickets[it].ticketId },
+            key = { uiState.tickets[it].reservationId },
             contentPadding = PaddingValues(horizontal = contentPadding),
             pageSpacing = pageSpacing,
         ) { page ->
@@ -108,9 +108,8 @@ private fun TicketNotEmptyScreen(
                             translationX = sign * size.width * (1 - it) / 2
                         }
                     },
-                onClick = { onClickTicket(ticket.ticketId) },
+                onClick = { onClickTicket(ticket.reservationId) },
                 ticket = ticket,
-                onClickQr = onClickQr,
             )
         }
         Card(

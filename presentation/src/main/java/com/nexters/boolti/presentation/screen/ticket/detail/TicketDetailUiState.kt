@@ -1,8 +1,8 @@
 package com.nexters.boolti.presentation.screen.ticket.detail
 
-import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.LegacyTicket
 
 data class TicketDetailUiState(
-    val ticket: Ticket = Ticket(),
+    val legacyTicket: LegacyTicket = LegacyTicket(),
     val refundPolicy: List<String> = emptyList(),
 )

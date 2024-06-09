@@ -157,7 +157,7 @@ private fun TicketDetailScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
-    val ticket = uiState.ticket
+    val ticket = uiState.legacyTicket
 
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -332,7 +332,7 @@ private fun TicketDetailScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
-                if (uiState.ticket.ticketState == TicketState.Ready) {
+                if (uiState.legacyTicket.ticketState == TicketState.Ready) {
                     Text(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 60.dp)
@@ -353,7 +353,7 @@ private fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        if (LocalDate.now().toEpochDay() < uiState.ticket.showDate.toLocalDate().toEpochDay()) {
+        if (LocalDate.now().toEpochDay() < uiState.legacyTicket.showDate.toLocalDate().toEpochDay()) {
             // 아직 공연일 아님
             BTDialog(
                 showCloseButton = false,
@@ -366,7 +366,7 @@ private fun TicketDetailScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        } else if (uiState.ticket.ticketState == TicketState.Ready) {
+        } else if (uiState.legacyTicket.ticketState == TicketState.Ready) {
             ManagerCodeDialog(
                 managerCode = managerCodeState.code,
                 onManagerCodeChanged = viewModel::setManagerCode,

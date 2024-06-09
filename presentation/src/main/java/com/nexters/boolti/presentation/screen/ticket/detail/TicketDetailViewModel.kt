@@ -48,14 +48,14 @@ class TicketDetailViewModel @Inject constructor(
 
     private fun load(): Job {
         return viewModelScope.launch(recordExceptionHandler) {
-            repository.getTicket(ticketId)
+            repository.legacyGetTicket(ticketId)
                 .catch { e ->
                     when (e) {
                         TicketException.TicketNotFound -> event(TicketDetailEvent.NotFound)
                     }
                 }
                 .singleOrNull()?.let { ticket ->
-                    _uiState.update { it.copy(ticket = ticket) }
+                    _uiState.update { it.copy(legacyTicket = ticket) }
                 }
 
             getRefundPolicyUsecase().onEach { refundPolicy ->
@@ -67,7 +67,7 @@ class TicketDetailViewModel @Inject constructor(
     fun refresh() = load()
 
     fun requestEntrance(managerCode: String) {
-        val ticket = uiState.value.ticket
+        val ticket = uiState.value.legacyTicket
         viewModelScope.launch(recordExceptionHandler) {
             repository.requestEntrance(
                 ManagerCodeRequest(showId = ticket.showId, ticketId = ticket.ticketId, managerCode = managerCode)

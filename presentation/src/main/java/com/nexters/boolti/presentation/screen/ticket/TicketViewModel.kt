@@ -1,17 +1,17 @@
 package com.nexters.boolti.presentation.screen.ticket
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,18 +22,14 @@ class TicketViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun load() {
-        viewModelScope.launch(recordExceptionHandler) {
-            _uiState.update { it.copy(loading = true) }
-            ticketRepository.getTicket()
-                .onCompletion {
-                    _uiState.update { it.copy(loading = false) }
-                }.catch { e ->
-                    e.printStackTrace()
-                }.singleOrNull()?.let { tickets ->
-                    _uiState.update {
-                        it.copy(tickets = tickets)
-                    }
+        ticketRepository.getTickets()
+            .onStart { _uiState.update { it.copy(loading = true) } }
+            .onCompletion { _uiState.update { it.copy(loading = false) } }
+            .onEach { tickets ->
+                _uiState.update {
+                    it.copy(tickets = tickets)
                 }
-        }
+            }
+            .launchIn(viewModelScope + recordExceptionHandler)
     }
 }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.home
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.annotation.DrawableRes
@@ -20,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.HomeViewModel
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
@@ -40,7 +43,6 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
-import kotlinx.coroutines.channels.consumeEach
 
 @Composable
 fun HomeScreen(
@@ -60,6 +62,8 @@ fun HomeScreen(
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+
+    removeInvalidDeepLink(LocalContext.current)
 
     LaunchedEffect(Unit) {
         viewModel.event.collect { deepLink ->
@@ -132,6 +136,19 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+/**
+ * issue #209를 해결하기 위한 메서드.
+ * 처리하지 말아야 할 deep link가 부적절한 destination과 match되는 것을 방지하기 위함.
+ */
+private fun removeInvalidDeepLink(context: Context) {
+    runCatching {
+        val intent = context.requireActivity().intent
+        if (intent.action == null) return
+        val deepLink = intent.action!!
+        if (!deepLink.contains("home")) intent.setAction(null)
     }
 }
 

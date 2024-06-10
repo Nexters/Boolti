@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,6 +71,7 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -168,50 +170,19 @@ fun ShowDetailScreen(
                 )
             }
 
-            Column(
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                Spacer(modifier = Modifier.weight(1.0f))
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    MaterialTheme.colorScheme.background,
-                                )
-                            )
-                        )
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = MaterialTheme.colorScheme.background)
-                        .padding(horizontal = marginHorizontal)
-                        .padding(top = 8.dp, bottom = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(9.dp),
-                ) {
-                    GiftButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = { TODO("구현하시오~~") }
-                    )
-                    TicketingButton(
-                        modifier = Modifier.weight(1f),
-                        showState = uiState.showDetail.state,
-                        onClick = {
-                            scope.launch {
-                                if (isLoggedIn == true) {
-                                    showBottomSheet = true
-                                } else {
-                                    navigateToLogin()
-                                }
-                            }
-                        },
-                    )
-                }
-            }
+            ShowDetailButtons(
+                showState = uiState.showDetail.state,
+                onTicketingClicked = {
+                    scope.launch {
+                        if (isLoggedIn == true) {
+                            showBottomSheet = true
+                        } else {
+                            navigateToLogin()
+                        }
+                    }
+                },
+                onGiftClicked = { TODO("구현하시오~~") }
+            )
         }
         if (showBottomSheet) {
             ChooseTicketBottomSheet(
@@ -511,6 +482,50 @@ private fun SectionContent(
 }
 
 @Composable
+private fun ShowDetailButtons(
+    showState: ShowState,
+    onTicketingClicked: () -> Unit,
+    onGiftClicked: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxHeight()
+    ) {
+        Spacer(modifier = Modifier.weight(1.0f))
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.background,
+                        )
+                    )
+                )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(horizontal = marginHorizontal)
+                .padding(top = 8.dp, bottom = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(9.dp),
+        ) {
+            GiftButton(
+                modifier = Modifier.weight(1f),
+                onClick = onGiftClicked
+            )
+            TicketingButton(
+                modifier = Modifier.weight(1f),
+                showState = showState,
+                onClick = onTicketingClicked,
+            )
+        }
+    }
+}
+
+@Composable
 private fun GiftButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -550,4 +565,16 @@ private fun TicketingButton(
         enabled = enabled,
         colors = MainButtonDefaults.buttonColors(disabledContentColor = disabledContentColor),
     )
+}
+
+@Preview(heightDp = 100)
+@Composable
+fun ShowDetailButtonsPreview() {
+    BooltiTheme {
+        ShowDetailButtons(
+            showState = ShowState.TicketingInProgress,
+            onTicketingClicked = {},
+            onGiftClicked = {}
+        )
+    }
 }

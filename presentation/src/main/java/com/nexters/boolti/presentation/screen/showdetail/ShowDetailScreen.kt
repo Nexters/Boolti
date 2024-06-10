@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -66,6 +65,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -525,6 +525,6 @@ fun ShowDetailCtaButton(
         label = text,
         onClick = onClick,
         enabled = enabled,
-        disabledContentColor = disabledContentColor,
+        colors = MainButtonDefaults.buttonColors(disabledContentColor = disabledContentColor),
     )
 }

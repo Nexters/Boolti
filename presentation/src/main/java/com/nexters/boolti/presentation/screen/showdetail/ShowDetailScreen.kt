@@ -185,18 +185,32 @@ fun ShowDetailScreen(
                             )
                         )
                 )
-                ShowDetailCtaButton(
-                    showState = uiState.showDetail.state,
-                    onClick = {
-                        scope.launch {
-                            if (isLoggedIn == true) {
-                                showBottomSheet = true
-                            } else {
-                                navigateToLogin()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.background)
+                        .padding(horizontal = marginHorizontal)
+                        .padding(top = 8.dp, bottom = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                ) {
+                    GiftButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = { TODO("구현하시오~~") }
+                    )
+                    TicketingButton(
+                        modifier = Modifier.weight(1f),
+                        showState = uiState.showDetail.state,
+                        onClick = {
+                            scope.launch {
+                                if (isLoggedIn == true) {
+                                    showBottomSheet = true
+                                } else {
+                                    navigateToLogin()
+                                }
                             }
-                        }
-                    },
-                )
+                        },
+                    )
+                }
             }
         }
         if (showBottomSheet) {
@@ -497,7 +511,20 @@ private fun SectionContent(
 }
 
 @Composable
-fun ShowDetailCtaButton(
+private fun GiftButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    MainButton(
+        modifier = modifier,
+        label = stringResource(R.string.ticketing_give_a_gift),
+        onClick = onClick,
+        colors = MainButtonDefaults.buttonColors(containerColor = Grey80),
+    )
+}
+
+@Composable
+private fun TicketingButton(
     onClick: () -> Unit,
     showState: ShowState,
     modifier: Modifier = Modifier,
@@ -517,11 +544,7 @@ fun ShowDetailCtaButton(
         if (showState is ShowState.WaitingTicketing) MaterialTheme.colorScheme.primary else Grey50
 
     MainButton(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(horizontal = marginHorizontal)
-            .padding(top = 8.dp, bottom = 20.dp),
+        modifier = modifier,
         label = text,
         onClick = onClick,
         enabled = enabled,

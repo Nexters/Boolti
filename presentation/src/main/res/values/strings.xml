@@ -117,6 +117,7 @@
     <string name="ticketing_all_content_title">공연 내용</string>
     <string name="ticketing_host">공연 관련 문의</string>
     <string name="ticketing_button_label">예매하기</string>
+    <string name="ticketing_give_a_gift">선물하기</string>
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
     <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>
     <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>

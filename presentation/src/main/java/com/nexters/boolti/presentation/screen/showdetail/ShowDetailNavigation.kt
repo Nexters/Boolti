@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.ShowDetailScreen(
     navigateTo: (String) -> Unit,
@@ -25,6 +26,15 @@ fun NavGraphBuilder.ShowDetailScreen(
             onClickContent = { navigateTo("content") },
             onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
                 navigateTo("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
+            },
+            onGiftTicketSelected = { showId, ticketId, ticketCount ->
+                navigateTo(
+                    MainDestination.Gift.createRoute(
+                        showId = showId,
+                        salesTicketId = ticketId,
+                        ticketCount = ticketCount
+                    )
+                )
             },
             viewModel = showViewModel,
             navigateToLogin = { navigateTo("login") },

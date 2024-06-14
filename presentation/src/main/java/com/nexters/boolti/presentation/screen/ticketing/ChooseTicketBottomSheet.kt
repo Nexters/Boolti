@@ -62,6 +62,7 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 
+// TODO : 티켓 정보와 수신자 정보도 같이 담자
 enum class TicketBottomSheetType {
     PURCHASE,
     GIFT
@@ -72,6 +73,7 @@ enum class TicketBottomSheetType {
 fun ChooseTicketBottomSheet(
     ticketType: TicketBottomSheetType = TicketBottomSheetType.PURCHASE,
     onTicketingClicked: (ticket: SalesTicket, count: Int) -> Unit,
+    onGiftTicketClicked: (ticket: SalesTicket, count: Int) -> Unit,
     onDismissRequest: () -> Unit,
     viewModel: SalesTicketViewModel = hiltViewModel(),
 ) {
@@ -112,10 +114,16 @@ fun ChooseTicketBottomSheet(
         ) {
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
+                    ticketType = ticketType,
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
                     onTicketingClicked = { ticket, count ->
-                        onTicketingClicked(ticket.ticket, count)
+                        if (ticketType == TicketBottomSheetType.PURCHASE) {
+                            onTicketingClicked(ticket.ticket, count)
+                        } else {
+                            onGiftTicketClicked(ticket.ticket, count)
+                        }
+
                         viewModel.unSelectTicket()
                     },
                 )
@@ -159,10 +167,11 @@ private fun ChooseTicketBottomSheetContent1(
 
 @Composable
 private fun ChooseTicketBottomSheetContent2(
-    modifier: Modifier = Modifier,
+    ticketType: TicketBottomSheetType,
     ticket: TicketWithQuantity,
     onCloseClicked: () -> Unit,
     onTicketingClicked: (ticket: TicketWithQuantity, count: Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var ticketCount by remember { mutableIntStateOf(1) }
 
@@ -338,6 +347,7 @@ private fun TicketingTicket1Preview() {
 private fun TicketingTicket2Preview() {
     BooltiTheme {
         ChooseTicketBottomSheetContent2(
+            ticketType = TicketBottomSheetType.PURCHASE,
             ticket = TicketWithQuantity(
                 ticket = SalesTicket(
                     id = "legimus",
@@ -349,7 +359,8 @@ private fun TicketingTicket2Preview() {
                 quantity = 100,
             ),
             onCloseClicked = {},
-        ) { _, _ -> }
+            onTicketingClicked = { _, _ -> },
+        )
     }
 }
 

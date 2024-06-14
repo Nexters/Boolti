@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,15 +19,29 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 
 @Composable
 fun GiftScreen(
+    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GiftViewModel = hiltViewModel()
+    viewModel: GiftViewModel = hiltViewModel(),
 ) {
     Scaffold(
-        topBar = { BtAppBar(title = stringResource(id = R.string.ticketing_give_a_gift)) }
+        modifier = modifier,
+        topBar = {
+            BtAppBar(
+                title = stringResource(id = R.string.ticketing_give_a_gift),
+                navigateButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        iconRes = R.drawable.ic_arrow_back,
+                        description = stringResource(id = R.string.description_navigate_back),
+                        onClick = popBackStack,
+                    )
+                }
+            )
+        }
     ) { innerPadding ->
         Box(
             modifier = Modifier.padding(innerPadding)

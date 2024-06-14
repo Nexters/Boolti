@@ -26,6 +26,7 @@ import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.business.BusinessScreen
+import com.nexters.boolti.presentation.screen.gift.addGiftScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
@@ -150,6 +151,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         TicketingScreen(
             modifier = modifier,
             navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        addGiftScreen(
+            modifier = modifier,
             popBackStack = navController::popBackStack,
         )
         QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)

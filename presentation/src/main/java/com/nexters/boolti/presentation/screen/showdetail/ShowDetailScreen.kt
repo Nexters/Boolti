@@ -98,6 +98,11 @@ fun ShowDetailScreen(
         ticketCount: Int,
         isInviteTicket: Boolean,
     ) -> Unit,
+    onGiftTicketSelected: (
+        showId: String,
+        ticketId: String,
+        ticketCount: Int,
+    ) -> Unit,
     navigateToReport: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
@@ -198,6 +203,14 @@ fun ShowDetailScreen(
                         ticket.id,
                         count,
                         ticket.isInviteTicket,
+                    )
+                    showBottomSheet = null
+                },
+                onGiftTicketClicked = { ticket, count ->
+                    onGiftTicketSelected(
+                        uiState.showDetail.id,
+                        ticket.id,
+                        count,
                     )
                     showBottomSheet = null
                 },

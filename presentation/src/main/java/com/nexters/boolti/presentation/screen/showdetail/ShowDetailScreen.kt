@@ -71,6 +71,7 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
+import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -105,7 +106,7 @@ fun ShowDetailScreen(
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
@@ -170,22 +171,26 @@ fun ShowDetailScreen(
                 )
             }
 
+            val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
+                scope.launch {
+                    if (isLoggedIn == true) {
+                        showBottomSheet = type
+                    } else {
+                        navigateToLogin()
+                    }
+                }
+            }
+
             ShowDetailButtons(
                 showState = uiState.showDetail.state,
-                onTicketingClicked = {
-                    scope.launch {
-                        if (isLoggedIn == true) {
-                            showBottomSheet = true
-                        } else {
-                            navigateToLogin()
-                        }
-                    }
-                },
-                onGiftClicked = { TODO("구현하시오~~") }
+                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
+                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
             )
         }
-        if (showBottomSheet) {
+
+        showBottomSheet?.let { type ->
             ChooseTicketBottomSheet(
+                ticketType = type,
                 onTicketingClicked = { ticket, count ->
                     Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
                     onTicketSelected(
@@ -194,10 +199,10 @@ fun ShowDetailScreen(
                         count,
                         ticket.isInviteTicket,
                     )
-                    showBottomSheet = false
+                    showBottomSheet = null
                 },
                 onDismissRequest = {
-                    showBottomSheet = false
+                    showBottomSheet = null
                 }
             )
         }

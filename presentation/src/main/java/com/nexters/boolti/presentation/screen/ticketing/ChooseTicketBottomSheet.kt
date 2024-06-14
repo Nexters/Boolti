@@ -62,12 +62,18 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 
+enum class TicketBottomSheetType {
+    PURCHASE,
+    GIFT
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseTicketBottomSheet(
-    viewModel: SalesTicketViewModel = hiltViewModel(),
+    ticketType: TicketBottomSheetType = TicketBottomSheetType.PURCHASE,
     onTicketingClicked: (ticket: SalesTicket, count: Int) -> Unit,
     onDismissRequest: () -> Unit,
+    viewModel: SalesTicketViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)

@@ -1,14 +1,20 @@
 package com.nexters.boolti.presentation.screen.gift
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,11 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +45,9 @@ import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
 import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
+import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
@@ -70,7 +82,11 @@ fun GiftScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Column {
-                // TODO : 카드, 카드 선택
+                // TODO : 메서드 연결
+                CardSelection(
+                    message = uiState.message,
+                    onMessageChanged = {}
+                )
 
                 // TODO : 받는 분, 보내는 분 데이터 연결
                 // TODO : 결제 후 카카오톡 친구 목록에서 받는... 어쩌구 문구 추가
@@ -177,6 +193,78 @@ fun GiftScreen(
 }
 
 @Composable
+private fun CardSelection(
+    message: String,
+    onMessageChanged: (String) -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFF5A14),
+                            Color(0xFFFFA883),
+                        )
+                    )
+                )
+                .padding(horizontal = 20.dp, vertical = 32.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            val maximumLength = 40
+            val messageLengthUnit = stringResource(id = R.string.gift_message_length_unit)
+
+            BasicTextField(
+                modifier = Modifier.height(80.dp),
+                value = message,
+                onValueChange = onMessageChanged,
+                textStyle = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+            )
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = "${message.length}/${maximumLength}${messageLengthUnit}",
+                style = MaterialTheme.typography.labelMedium.copy(color = Grey10),
+            )
+
+            // TODO : 이미지 영역, 아마도 2:3 비율인듯
+            Box(
+                modifier = Modifier
+                    .padding(top = 28.dp)
+                    .height(180.dp)
+                    .fillMaxWidth()
+                    .background(Color.White)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .padding(top = 44.dp)
+                .fillMaxWidth(),
+        ) {
+            // TODO : 카드 배경 이미지 목록 연결
+            LazyRow(
+                contentPadding = PaddingValues(start = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(10) {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(color = Grey50)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun ContactInfo(
     sectionName: String,
     name: String,
@@ -202,5 +290,16 @@ private fun ContactInfo(
         ) {
             onPhoneNumberChanged(it)
         }
+    }
+}
+
+@Preview
+@Composable
+private fun CardSelectionPreview() {
+    BooltiTheme {
+        CardSelection(
+            message = "공연에 초대합니다.",
+            onMessageChanged = {}
+        )
     }
 }

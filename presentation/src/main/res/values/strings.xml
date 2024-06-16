@@ -168,6 +168,7 @@
     <!-- 선물하기 -->
     <string name="gift_receiver_info">받는 분 정보</string>
     <string name="gift_sender_info">보내는 분 정보</string>
+    <string name="gift_message_length_unit">자</string>
 
     <!-- 공연 -->
     <string name="show_call_to_ask">전화 문의하기</string>

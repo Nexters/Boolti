@@ -327,8 +327,9 @@ fun TicketingScreen(
     }
 }
 
+// TODO : 자주 쓰이는 컴포넌트이므로 별도의 컴포넌트로 관리하는 게 빼야겠다
 @Composable
-private fun Header(
+internal fun Header(
     poster: String,
     showName: String,
     showDate: LocalDateTime,
@@ -724,7 +725,7 @@ private fun ShowButton(
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     modifier: Modifier = Modifier,
     title: String,
     titleRowOption: (@Composable () -> Unit)? = null,

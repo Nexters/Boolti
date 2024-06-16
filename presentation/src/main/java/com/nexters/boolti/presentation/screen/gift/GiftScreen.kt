@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,6 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,8 +30,11 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.screen.ticketing.Header
+import com.nexters.boolti.presentation.screen.ticketing.InputRow
 import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
+import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -57,12 +64,41 @@ fun GiftScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
         ) {
             Column {
                 // TODO : 카드, 카드 선택
-                // TODO : 받는 분 정보
-                // TODO : 보내는 분 정보
+
+                // TODO : 받는 분, 보내는 분 데이터 연결
+                // TODO : 결제 후 카카오톡 친구 목록에서 받는... 어쩌구 문구 추가
+                // 받는 분
+                ContactInfo(
+                    sectionName = stringResource(id = R.string.gift_receiver_info),
+                    name = "",
+                    phoneNumber = "",
+                    onNameChanged = {},
+                    onPhoneNumberChanged = {},
+                )
+
+                // 보내는 분
+                ContactInfo(
+                    sectionName = stringResource(id = R.string.gift_sender_info),
+                    name = "",
+                    phoneNumber = "",
+                    onNameChanged = {},
+                    onPhoneNumberChanged = {},
+                )
+
+                // TODO : 섹션 제목 추가
+                // 공연 및 티켓 정보
+                Header(
+                    poster = uiState.poster,
+                    showName = uiState.showName,
+                    showDate = uiState.showDate,
+                )
 
                 TicketInfoSection(
                     ticketName = uiState.ticketName,
@@ -136,6 +172,35 @@ fun GiftScreen(
                     },
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ContactInfo(
+    sectionName: String,
+    name: String,
+    phoneNumber: String,
+    onNameChanged: (name: String) -> Unit,
+    onPhoneNumberChanged: (number: String) -> Unit,
+) {
+    Section(title = sectionName) {
+        InputRow(
+            stringResource(R.string.name_label),
+            name,
+            placeholder = stringResource(R.string.ticketing_name_placeholder),
+        ) {
+            onNameChanged(it)
+        }
+        Spacer(modifier = Modifier.size(16.dp))
+        InputRow(
+            stringResource(R.string.contact_label),
+            phoneNumber,
+            placeholder = stringResource(R.string.ticketing_contact_placeholder),
+            isPhoneNumber = true,
+            imeAction = ImeAction.Next,
+        ) {
+            onPhoneNumberChanged(it)
         }
     }
 }

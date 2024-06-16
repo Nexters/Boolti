@@ -30,7 +30,6 @@ import kotlin.math.absoluteValue
 @Composable
 fun TicketScreen(
     onClickTicket: (String) -> Unit,
-    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TicketViewModel = hiltViewModel(),
 ) {
@@ -49,7 +48,6 @@ fun TicketScreen(
         uiState.tickets.isNotEmpty() -> TicketNotEmptyScreen(
             modifier,
             uiState,
-            onClickQr,
             onClickTicket = onClickTicket
         )
 
@@ -62,7 +60,6 @@ fun TicketScreen(
 private fun TicketNotEmptyScreen(
     modifier: Modifier,
     uiState: TicketUiState,
-    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
 ) {
     Column(

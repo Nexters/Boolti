@@ -6,22 +6,30 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +65,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -64,6 +73,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -78,11 +88,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.TicketGroup
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.DottedDivider
+import com.nexters.boolti.presentation.component.InstagramIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.dayOfWeekString
@@ -92,6 +104,7 @@ import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.ticketId
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
@@ -101,6 +114,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
+import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
@@ -130,7 +144,7 @@ fun NavGraphBuilder.TicketDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun TicketDetailScreen(
     modifier: Modifier = Modifier,
@@ -157,7 +171,11 @@ private fun TicketDetailScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
-    val ticket = uiState.legacyTicket
+    val ticketGroup = uiState.ticketGroup
+    val pagerState = rememberPagerState { ticketGroup.tickets.size }
+    val currentTicket = remember(ticketGroup, pagerState.currentPage) {
+        ticketGroup.tickets.getOrElse(pagerState.currentPage) { TicketGroup.Ticket() }
+    }
 
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -176,7 +194,12 @@ private fun TicketDetailScreen(
     }
 
     Scaffold(
-        topBar = { BtBackAppBar(onClickBack = onBackClicked) },
+        topBar = {
+            BtBackAppBar(
+                title = stringResource(R.string.ticket_detail_title),
+                onClickBack = onBackClicked,
+            )
+        },
         snackbarHost = {
             ToastSnackbarHost(
                 modifier = Modifier.padding(bottom = 54.dp),
@@ -190,7 +213,11 @@ private fun TicketDetailScreen(
             }
         }
 
-        Box(modifier = Modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+        Box(
+            modifier = Modifier
+                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                .padding(top = 16.dp)
+        ) {
             Column(
                 modifier = modifier
                     .padding(innerPadding)
@@ -225,7 +252,7 @@ private fun TicketDetailScreen(
                     Box {
                         // 배경 블러된 이미지
                         AsyncImage(
-                            model = asyncImageBlurModel(context, ticket.poster, radius = 24),
+                            model = asyncImageBlurModel(context, ticketGroup.poster, radius = 24),
                             modifier = Modifier
                                 .size(
                                     width = contentWidth.toDp(),
@@ -263,16 +290,14 @@ private fun TicketDetailScreen(
                                         coordinates.size.height.toFloat()
                                 }
                         ) {
-                            Title(ticketName = ticket.ticketName, csTicketId = ticket.csTicketId)
+                            Title(showName = ticketGroup.showName)
 
-                            AsyncImage(
+                            QrCodes(
                                 modifier = Modifier
-                                    .padding(marginHorizontal)
-                                    .aspectRatio(0.75f)
-                                    .clip(RoundedCornerShape(8.dp)),
-                                model = ticket.poster,
-                                contentScale = ContentScale.Crop,
-                                contentDescription = stringResource(R.string.description_poster)
+                                    .fillMaxWidth()
+                                    .padding(marginHorizontal),
+                                ticketGroup = ticketGroup,
+                                pagerState = pagerState,
                             )
 
                             DottedDivider(
@@ -285,12 +310,12 @@ private fun TicketDetailScreen(
 
                             TicketInfo(
                                 bottomAreaHeight = ticketInfoHeight,
-                                showName = ticket.showName,
-                                showDate = ticket.showDate,
-                                placeName = ticket.placeName,
-                                entryCode = ticket.entryCode,
-                                ticketState = ticket.ticketState,
-                                onClickQr = { onClickQr(it, ticket.ticketName) },
+                                showName = ticketGroup.showName,
+                                showDate = ticketGroup.showDate,
+                                placeName = ticketGroup.placeName,
+                                entryCode = currentTicket.entryCode,
+                                ticketState = currentTicket.ticketState,
+                                onClickQr = { onClickQr(it, ticketGroup.ticketName) },
                             )
                         }
                         // 티켓 좌상단 꼭지점 그라데이션
@@ -308,15 +333,14 @@ private fun TicketDetailScreen(
                         )
                     }
 
-                    Notice(notice = ticket.ticketNotice)
+                    Notice(notice = ticketGroup.ticketNotice)
 
-                    val copiedMessage =
-                        stringResource(id = R.string.ticketing_address_copied_message)
+                    val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
                     Inquiry(
-                        hostName = ticket.hostName,
-                        hostPhoneNumber = ticket.hostPhoneNumber,
+                        hostName = ticketGroup.hostName,
+                        hostPhoneNumber = ticketGroup.hostPhoneNumber,
                         onClickCopyPlace = {
-                            clipboardManager.setText(AnnotatedString(ticket.streetAddress))
+                            clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(copiedMessage)
@@ -324,7 +348,7 @@ private fun TicketDetailScreen(
                             }
                         },
                         onClickNavigateToShowDetail = {
-                            navigateToShowDetail(ticket.showId)
+                            navigateToShowDetail(ticketGroup.showId)
                         }
                     )
                 }
@@ -332,7 +356,7 @@ private fun TicketDetailScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
-                if (uiState.legacyTicket.ticketState == TicketState.Ready) {
+                if (currentTicket.ticketState == TicketState.Ready) {
                     Text(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 60.dp)
@@ -353,7 +377,7 @@ private fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        if (LocalDate.now().toEpochDay() < uiState.legacyTicket.showDate.toLocalDate().toEpochDay()) {
+        if (LocalDate.now().toEpochDay() < uiState.ticketGroup.showDate.toLocalDate().toEpochDay()) {
             // 아직 공연일 아님
             BTDialog(
                 showCloseButton = false,
@@ -366,7 +390,7 @@ private fun TicketDetailScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        } else if (uiState.legacyTicket.ticketState == TicketState.Ready) {
+        } else if (currentTicket.ticketState == TicketState.Ready) {
             ManagerCodeDialog(
                 managerCode = managerCodeState.code,
                 onManagerCodeChanged = viewModel::setManagerCode,
@@ -396,10 +420,7 @@ private fun TicketDetailScreen(
 }
 
 @Composable
-private fun Title(
-    ticketName: String = "",
-    csTicketId: String = "",
-) {
+private fun Title(showName: String = "") {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
@@ -407,23 +428,137 @@ private fun Title(
             .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = showName,
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
+        )
         Image(
             modifier = Modifier.padding(end = 4.dp),
             painter = painterResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
             contentDescription = null,
         )
-        Text(
-            modifier = Modifier.weight(1f),
-            text = ticketName,
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-            color = Grey80,
-        )
-        Text(
-            text = csTicketId,
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-            color = Grey80,
-        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun QrCodes(
+    modifier: Modifier = Modifier,
+    ticketGroup: TicketGroup,
+    pagerState: PagerState,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        HorizontalPager(
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(0.75f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(White),
+            state = pagerState,
+            pageSpacing = 8.dp,
+        ) { i ->
+            val ticket = ticketGroup.tickets[i]
+            QrCode(
+                ticketName = ticketGroup.ticketName,
+                qrCode = ticket.entryCode,
+                csTicketId = ticket.csTicketId,
+                ticketState = ticket.ticketState,
+            )
+        }
+        if (ticketGroup.tickets.size > 1) {
+            InstagramIndicator(
+                modifier = Modifier.padding(top = 16.dp),
+                pagerState = pagerState,
+            )
+        }
+    }
+}
+
+@Composable
+private fun QrCode(
+    ticketName: String,
+    qrCode: String,
+    csTicketId: String,
+    ticketState: TicketState,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(100.dp))
+                    .background(Grey10)
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                text = ticketName,
+                color = Grey70,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Box(
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .width(IntrinsicSize.Max),
+            ) {
+                Image(
+                    modifier = Modifier.padding(top = 16.dp),
+                    painter = rememberQrBitmapPainter(qrCode, size = 178.dp),
+                    contentDescription = stringResource(R.string.description_qr),
+                )
+                when (ticketState) {
+                    TicketState.Used -> QrCoverView(MaterialTheme.colorScheme.primary, "입장 완료")
+                    TicketState.Finished -> QrCoverView(Grey80, "공연 종료")
+                    TicketState.Ready -> Unit
+                }
+            }
+            Text(
+                modifier = Modifier
+                    .padding(top = 16.dp),
+                text = csTicketId,
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey70,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.QrCoverView(
+    color: Color,
+    text: String,
+) {
+    Box(
+        modifier = Modifier.Companion
+            .matchParentSize()
+            .background(White.copy(0.9f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(
+                modifier = Modifier.size(42.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_logo),
+                tint = color,
+                contentDescription = null,
+            )
+            Text(
+                text = text,
+                style = point4,
+                fontSize = 20.sp,
+                color = color,
+            )
+        }
     }
 }
 
@@ -601,7 +736,9 @@ private fun Inquiry(
             hostNumber = hostPhoneNumber
         )
         Row(
-            modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(9.dp)
         ) {
             TextButton(

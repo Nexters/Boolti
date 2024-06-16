@@ -630,7 +630,7 @@ private fun TicketHolderSection(
 }
 
 @Composable
-private fun OrderAgreementSection(
+fun OrderAgreementSection(
     totalAgreed: Boolean,
     agreement: List<Pair<Int, Boolean>>,
     onClickTotalAgree: () -> Unit,

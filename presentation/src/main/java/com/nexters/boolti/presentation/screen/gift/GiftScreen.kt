@@ -27,6 +27,8 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
+import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
+import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
@@ -61,8 +63,14 @@ fun GiftScreen(
                 // TODO : 카드, 카드 선택
                 // TODO : 받는 분 정보
                 // TODO : 보내는 분 정보
-                // TODO : 티켓 정보
-                // TODO : 환불 규정
+
+                TicketInfoSection(
+                    ticketName = uiState.ticketName,
+                    ticketCount = uiState.ticketCount,
+                    totalPrice = uiState.totalPrice,
+                )
+
+                RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
                 // 주문내용 확인 및 결제 동의
                 OrderAgreementSection(

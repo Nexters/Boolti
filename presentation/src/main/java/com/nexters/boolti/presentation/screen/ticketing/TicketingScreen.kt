@@ -370,7 +370,7 @@ private fun Header(
 }
 
 @Composable
-private fun RefundPolicySection(refundPolicy: List<String>) {
+internal fun RefundPolicySection(refundPolicy: List<String>) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0F else 180F,
@@ -491,7 +491,7 @@ private fun InviteCodeSection(
 }
 
 @Composable
-private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
+internal fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
     Section(title = stringResource(R.string.ticket_info_label)) {
         SectionTicketInfo(
             stringResource(R.string.ticket_type_label),
@@ -630,7 +630,7 @@ private fun TicketHolderSection(
 }
 
 @Composable
-fun OrderAgreementSection(
+internal fun OrderAgreementSection(
     totalAgreed: Boolean,
     agreement: List<Pair<Int, Boolean>>,
     onClickTotalAgree: () -> Unit,

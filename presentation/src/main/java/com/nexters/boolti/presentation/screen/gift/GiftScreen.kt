@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -82,30 +83,28 @@ fun GiftScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Column {
-                // TODO : 메서드 연결
                 CardSelection(
                     message = uiState.message,
-                    onMessageChanged = {}
+                    onMessageChanged = viewModel::updateMessage
                 )
 
-                // TODO : 받는 분, 보내는 분 데이터 연결
                 // TODO : 결제 후 카카오톡 친구 목록에서 받는... 어쩌구 문구 추가
                 // 받는 분
                 ContactInfo(
                     sectionName = stringResource(id = R.string.gift_receiver_info),
-                    name = "",
-                    phoneNumber = "",
-                    onNameChanged = {},
-                    onPhoneNumberChanged = {},
+                    name = uiState.receiverName,
+                    phoneNumber = uiState.receiverContact,
+                    onNameChanged = viewModel::updateReceiverName,
+                    onPhoneNumberChanged = viewModel::updateReceiverContact,
                 )
 
                 // 보내는 분
                 ContactInfo(
                     sectionName = stringResource(id = R.string.gift_sender_info),
-                    name = "",
-                    phoneNumber = "",
-                    onNameChanged = {},
-                    onPhoneNumberChanged = {},
+                    name = uiState.senderName,
+                    phoneNumber = uiState.senderContact,
+                    onNameChanged = viewModel::updateSenderName,
+                    onPhoneNumberChanged = viewModel::updateSenderContact,
                 )
 
                 // TODO : 섹션 제목 추가
@@ -224,6 +223,7 @@ private fun CardSelection(
                 value = message,
                 onValueChange = onMessageChanged,
                 textStyle = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+                cursorBrush = SolidColor(Color.White)
             )
             Text(
                 modifier = Modifier.padding(top = 12.dp),

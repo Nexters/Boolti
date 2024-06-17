@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -52,7 +53,6 @@ class GiftViewModel @Inject constructor(
         }.onEach { info ->
             _uiState.update {
                 it.copy(
-                    loading = false,
                     poster = info.showImg,
                     showDate = info.showDate,
                     showName = info.showName,
@@ -61,6 +61,30 @@ class GiftViewModel @Inject constructor(
                     totalPrice = info.totalPrice,
                 )
             }
+        }.onCompletion {
+            _uiState.update {
+                it.copy(loading = false)
+            }
         }.launchIn(viewModelScope + recordExceptionHandler)
+    }
+
+    fun updateMessage(message: String) {
+        _uiState.update { it.copy(message = message) }
+    }
+
+    fun updateSenderName(name: String) {
+        _uiState.update { it.copy(senderName = name) }
+    }
+
+    fun updateSenderContact(contact: String) {
+        _uiState.update { it.copy(senderContact = contact) }
+    }
+
+    fun updateReceiverName(name: String) {
+        _uiState.update { it.copy(receiverName = name) }
+    }
+
+    fun updateReceiverContact(contact: String) {
+        _uiState.update { it.copy(receiverContact = contact) }
     }
 }

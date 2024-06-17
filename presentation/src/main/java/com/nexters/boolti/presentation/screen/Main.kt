@@ -155,6 +155,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         )
         addGiftScreen(
             modifier = modifier,
+            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
         QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)

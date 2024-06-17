@@ -9,6 +9,7 @@ import com.nexters.boolti.presentation.screen.showId
 import com.nexters.boolti.presentation.screen.ticketCount
 
 fun NavGraphBuilder.addGiftScreen(
+    navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -19,6 +20,7 @@ fun NavGraphBuilder.addGiftScreen(
         GiftScreen(
             modifier = modifier,
             popBackStack = popBackStack,
+            navigateToBusiness = { navigateTo(MainDestination.Business.route) },
         )
     }
 }

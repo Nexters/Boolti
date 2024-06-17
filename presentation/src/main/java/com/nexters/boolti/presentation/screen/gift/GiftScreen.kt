@@ -62,6 +62,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 @Composable
 fun GiftScreen(
     popBackStack: () -> Unit,
+    navigateToBusiness: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GiftViewModel = hiltViewModel(),
 ) {
@@ -162,7 +163,7 @@ fun GiftScreen(
                 // 사업자 정보
                 BusinessInformation(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { TODO("navigateToBusiness") }
+                    onClick = navigateToBusiness
                 )
                 Spacer(modifier = Modifier.height(120.dp))
             }

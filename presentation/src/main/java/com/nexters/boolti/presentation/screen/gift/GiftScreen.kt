@@ -87,10 +87,12 @@ fun GiftScreen(
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background)
-                .verticalScroll(rememberScrollState())
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 CardSelection(
                     message = uiState.message,
                     onMessageChanged = viewModel::updateMessage,
@@ -190,7 +192,7 @@ fun GiftScreen(
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
                         .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-                    enabled = false,
+                    enabled = uiState.isComplete,
                     label = stringResource(
                         R.string.ticketing_payment_button_label,
                         uiState.totalPrice

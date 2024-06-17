@@ -29,6 +29,10 @@ data class GiftUiState(
     val orderAgreed: Boolean
         get() = orderAgreement.none { !it.second }
 
+    val isComplete: Boolean
+        get() = orderAgreed && senderName.isNotBlank() && senderContact.isNotBlank() &&
+                receiverName.isNotBlank() && receiverContact.isNotBlank()
+
     fun toggleAgreement(): GiftUiState =
         copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
 }

@@ -176,6 +176,11 @@ private fun ChooseTicketBottomSheetContent2(
     modifier: Modifier = Modifier,
 ) {
     var ticketCount by remember { mutableIntStateOf(1) }
+    val buttonTextId = if (ticketType == TicketBottomSheetType.PURCHASE) {
+        R.string.ticketing_button_label
+    } else {
+        R.string.ticketing_give_a_gift
+    }
 
     Column(modifier) {
         Row(
@@ -250,7 +255,7 @@ private fun ChooseTicketBottomSheetContent2(
         }
 
         MainButton(
-            label = stringResource(R.string.ticketing_button_label),
+            label = stringResource(buttonTextId),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)

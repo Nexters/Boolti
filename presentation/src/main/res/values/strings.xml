@@ -170,6 +170,7 @@
     <string name="gift_sender_info">보내는 분 정보</string>
     <string name="gift_message_length_unit">자</string>
     <string name="gift_receiver_note">결제 후 카카오톡 친구 목록에서 받는 분을 선택해주세요.</string>
+    <string name="gift_show_info">공연 및 티켓 정보</string>
 
     <!-- 공연 -->
     <string name="show_call_to_ask">전화 문의하기</string>

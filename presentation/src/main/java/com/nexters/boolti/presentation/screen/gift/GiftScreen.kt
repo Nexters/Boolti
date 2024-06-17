@@ -118,19 +118,20 @@ fun GiftScreen(
                     isReceiver = false,
                 )
 
-                // TODO : 섹션 제목 추가
                 // 공연 및 티켓 정보
-                Header(
-                    poster = uiState.poster,
-                    showName = uiState.showName,
-                    showDate = uiState.showDate,
-                )
-
-                TicketInfoSection(
-                    ticketName = uiState.ticketName,
-                    ticketCount = uiState.ticketCount,
-                    totalPrice = uiState.totalPrice,
-                )
+                Section(title = stringResource(id = R.string.gift_show_info)) {
+                    Header(
+                        poster = uiState.poster,
+                        showName = uiState.showName,
+                        showDate = uiState.showDate,
+                    )
+                    TicketInfoSection(
+                        modifier = Modifier.padding(top = 28.dp),
+                        ticketName = uiState.ticketName,
+                        ticketCount = uiState.ticketCount,
+                        totalPrice = uiState.totalPrice,
+                    )
+                }
 
                 RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
@@ -227,7 +228,8 @@ private fun CardSelection(
                 )
                 .border(
                     width = 1.dp,
-                    color = Color(0xFFFFA883)
+                    color = Color(0xFFFFA883),
+                    shape = RoundedCornerShape(8.dp)
                 )
                 .padding(horizontal = 20.dp, vertical = 32.dp)
                 .fillMaxWidth(),

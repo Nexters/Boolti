@@ -119,7 +119,8 @@ fun TicketingScreen(
                 RESULT_SUCCESS -> {
                     val intent = result.data ?: return@rememberLauncherForActivityResult
                     val reservationId =
-                        intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                        intent.getStringExtra("reservationId")
+                            ?: return@rememberLauncherForActivityResult
                     onReserved(reservationId, viewModel.showId)
                 }
 
@@ -190,6 +191,7 @@ fun TicketingScreen(
                     .verticalScroll(scrollState),
             ) {
                 Header(
+                    modifier = Modifier.padding(20.dp),
                     poster = uiState.poster,
                     showName = uiState.showName,
                     showDate = uiState.showDate,
@@ -216,11 +218,13 @@ fun TicketingScreen(
                 }
 
                 // 티켓 정보
-                TicketInfoSection(
-                    ticketName = uiState.ticketName,
-                    ticketCount = uiState.ticketCount,
-                    totalPrice = uiState.totalPrice,
-                )
+                Section(title = stringResource(R.string.ticket_info_label)) {
+                    TicketInfoSection(
+                        ticketName = uiState.ticketName,
+                        ticketCount = uiState.ticketCount,
+                        totalPrice = uiState.totalPrice,
+                    )
+                }
 
                 // 초청 코드
                 if (uiState.isInviteTicket) {
@@ -333,9 +337,10 @@ internal fun Header(
     poster: String,
     showName: String,
     showDate: LocalDateTime,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.padding(20.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
@@ -492,8 +497,15 @@ private fun InviteCodeSection(
 }
 
 @Composable
-internal fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
-    Section(title = stringResource(R.string.ticket_info_label)) {
+internal fun TicketInfoSection(
+    ticketName: String,
+    ticketCount: Int,
+    totalPrice: Int,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
         SectionTicketInfo(
             stringResource(R.string.ticket_type_label),
             ticketName,

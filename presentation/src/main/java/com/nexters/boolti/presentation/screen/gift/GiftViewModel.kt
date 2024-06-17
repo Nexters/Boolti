@@ -87,4 +87,8 @@ class GiftViewModel @Inject constructor(
     fun updateReceiverContact(contact: String) {
         _uiState.update { it.copy(receiverContact = contact) }
     }
+
+    fun selectImage(image: String) {
+        _uiState.update { it.copy(selectedImage = image) }
+    }
 }

@@ -19,6 +19,8 @@ data class GiftUiState(
         Pair(R.string.order_agreement_privacy_offer, false),
     ),
     val message: String = "공연에 초대합니다.",
+    val images: List<String> = (1..10).map { it.toString() }, // TODO : 서버에서 이미지 데이터 가져오기
+    val selectedImage: String = "1", // TODO : 서버에서 이미지 데이터 가져오기
     val senderName: String = "",
     val senderContact: String = "",
     val receiverName: String = "",

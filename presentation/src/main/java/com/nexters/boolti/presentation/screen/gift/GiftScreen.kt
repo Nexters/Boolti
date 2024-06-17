@@ -1,6 +1,8 @@
 package com.nexters.boolti.presentation.screen.gift
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -85,7 +88,10 @@ fun GiftScreen(
             Column {
                 CardSelection(
                     message = uiState.message,
-                    onMessageChanged = viewModel::updateMessage
+                    onMessageChanged = viewModel::updateMessage,
+                    images = uiState.images,
+                    selectedImage = uiState.selectedImage,
+                    onImageSelected = viewModel::selectImage
                 )
 
                 // TODO : 결제 후 카카오톡 친구 목록에서 받는... 어쩌구 문구 추가
@@ -195,6 +201,9 @@ fun GiftScreen(
 private fun CardSelection(
     message: String,
     onMessageChanged: (String) -> Unit,
+    images: List<String>,
+    selectedImage: String,
+    onImageSelected: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
@@ -251,12 +260,25 @@ private fun CardSelection(
                 contentPadding = PaddingValues(start = 32.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(10) {
+                items(images) { image ->
+                    val modifier = if (image == selectedImage) {
+                        Modifier.border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(4.dp)
+                        )
+                    } else {
+                        Modifier
+                    }
+
                     Box(
-                        modifier = Modifier
+                        modifier = modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(color = Grey50)
+                            .clickable {
+                                onImageSelected(image)
+                            }
                     )
                 }
             }
@@ -299,7 +321,10 @@ private fun CardSelectionPreview() {
     BooltiTheme {
         CardSelection(
             message = "공연에 초대합니다.",
-            onMessageChanged = {}
+            onMessageChanged = {},
+            images = (1..10).map { it.toString() },
+            selectedImage = "1",
+            onImageSelected = {}
         )
     }
 }

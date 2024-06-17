@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,8 +32,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +54,7 @@ import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -94,7 +98,6 @@ fun GiftScreen(
                     onImageSelected = viewModel::selectImage
                 )
 
-                // TODO : 결제 후 카카오톡 친구 목록에서 받는... 어쩌구 문구 추가
                 // 받는 분
                 ContactInfo(
                     sectionName = stringResource(id = R.string.gift_receiver_info),
@@ -102,6 +105,7 @@ fun GiftScreen(
                     phoneNumber = uiState.receiverContact,
                     onNameChanged = viewModel::updateReceiverName,
                     onPhoneNumberChanged = viewModel::updateReceiverContact,
+                    isReceiver = true,
                 )
 
                 // 보내는 분
@@ -111,6 +115,7 @@ fun GiftScreen(
                     phoneNumber = uiState.senderContact,
                     onNameChanged = viewModel::updateSenderName,
                     onPhoneNumberChanged = viewModel::updateSenderContact,
+                    isReceiver = false,
                 )
 
                 // TODO : 섹션 제목 추가
@@ -186,7 +191,7 @@ fun GiftScreen(
                     enabled = false,
                     label = stringResource(
                         R.string.ticketing_payment_button_label,
-                        0 // TODO : 가격 수정
+                        uiState.totalPrice
                     ),
                     onClick = {
                         TODO("팝업 구현")
@@ -219,6 +224,10 @@ private fun CardSelection(
                             Color(0xFFFFA883),
                         )
                     )
+                )
+                .border(
+                    width = 1.dp,
+                    color = Color(0xFFFFA883)
                 )
                 .padding(horizontal = 20.dp, vertical = 32.dp)
                 .fillMaxWidth(),
@@ -293,6 +302,7 @@ private fun ContactInfo(
     phoneNumber: String,
     onNameChanged: (name: String) -> Unit,
     onPhoneNumberChanged: (number: String) -> Unit,
+    isReceiver: Boolean,
 ) {
     Section(title = sectionName) {
         InputRow(
@@ -311,6 +321,24 @@ private fun ContactInfo(
             imeAction = ImeAction.Next,
         ) {
             onPhoneNumberChanged(it)
+        }
+
+        if (!isReceiver) return@Section
+
+        Row(
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_info_20),
+                contentDescription = null,
+                tint = Grey40,
+            )
+            Text(
+                modifier = Modifier.padding(start = 6.dp),
+                text = stringResource(id = R.string.gift_receiver_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey40,
+            )
         }
     }
 }

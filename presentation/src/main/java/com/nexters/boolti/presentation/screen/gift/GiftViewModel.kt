@@ -1,6 +1,9 @@
 package com.nexters.boolti.presentation.screen.gift
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,15 +12,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 @HiltViewModel
 class GiftViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val ticketingRepository: TicketingRepository,
     private val getRefundPolicyUseCase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
+    val showId: String = requireNotNull(savedStateHandle["showId"])
+    private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
+    private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
+
     private val _uiState = MutableStateFlow(GiftUiState())
     val uiState: StateFlow<GiftUiState> = _uiState.asStateFlow()
 
@@ -30,14 +39,28 @@ class GiftViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch(recordExceptionHandler) {
-            getRefundPolicyUseCase()
-                .onEach { refundPolicy ->
-                    _uiState.update {
-                        it.copy(refundPolicy = refundPolicy)
-                    }
-                }
-                .launchIn(viewModelScope + recordExceptionHandler)
-        }
+        getRefundPolicyUseCase().onEach { refundPolicy ->
+            _uiState.update {
+                it.copy(refundPolicy = refundPolicy)
+            }
+        }.launchIn(viewModelScope + recordExceptionHandler)
+
+        ticketingRepository.getTicketingInfo(
+            TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)
+        ).onStart {
+            _uiState.update { it.copy(loading = true) }
+        }.onEach { info ->
+            _uiState.update {
+                it.copy(
+                    loading = false,
+                    poster = info.showImg,
+                    showDate = info.showDate,
+                    showName = info.showName,
+                    ticketName = info.saleTicketName,
+                    ticketCount = info.ticketCount,
+                    totalPrice = info.totalPrice,
+                )
+            }
+        }.launchIn(viewModelScope + recordExceptionHandler)
     }
 }

@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 
 @Stable
 data class GiftUiState(
+    val loading: Boolean = true,
     val message: String = "",
     val poster: String = "",
     val showDate: LocalDateTime = LocalDateTime.now(),

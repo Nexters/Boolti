@@ -25,6 +25,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BusinessInformation
@@ -52,6 +56,7 @@ import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
 import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
+import com.nexters.boolti.presentation.screen.ticketing.TicketingConfirmDialog
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey40
@@ -68,6 +73,7 @@ fun GiftScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -198,11 +204,25 @@ fun GiftScreen(
                         uiState.totalPrice
                     ),
                     onClick = {
-                        TODO("팝업 구현")
+                        showDialog = true
                     },
                 )
             }
         }
+    }
+
+    if (showDialog) {
+        GiftConfirmDialog(
+            receiverName = uiState.receiverName,
+            receiverContact = uiState.receiverContact,
+            senderName = uiState.senderName,
+            senderContact = uiState.senderContact,
+            ticketName = uiState.ticketName,
+            ticketCount = uiState.ticketCount,
+            totalPrice = uiState.totalPrice,
+            onClick = viewModel::pay,
+            onDismiss = { showDialog = false },
+        )
     }
 }
 

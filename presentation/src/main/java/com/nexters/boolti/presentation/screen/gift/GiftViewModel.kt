@@ -91,4 +91,8 @@ class GiftViewModel @Inject constructor(
     fun selectImage(image: String) {
         _uiState.update { it.copy(selectedImage = image) }
     }
+
+    fun pay() {
+        TODO("일해라 송준영")
+    }
 }

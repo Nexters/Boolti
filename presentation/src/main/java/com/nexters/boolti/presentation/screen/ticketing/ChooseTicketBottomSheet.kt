@@ -129,7 +129,9 @@ fun ChooseTicketBottomSheet(
                 )
             } ?: run {
                 ChooseTicketBottomSheetContent1(
-                    tickets = uiState.tickets,
+                    tickets = uiState.tickets.filter { ticket ->
+                        ticketType == TicketBottomSheetType.PURCHASE || !ticket.ticket.isInviteTicket
+                    },
                     onSelectItem = viewModel::selectTicket,
                 )
             }

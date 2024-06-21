@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BusinessInformation
@@ -56,7 +56,6 @@ import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
 import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
-import com.nexters.boolti.presentation.screen.ticketing.TicketingConfirmDialog
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey40
@@ -74,6 +73,17 @@ fun GiftScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(viewModel.events) {
+        viewModel.events
+            .collect { event ->
+                when (event) {
+                    is GiftEvent.GiftSuccess -> {}
+                    is GiftEvent.ProgressPayment -> {}
+                    GiftEvent.NoRemainingQuantity -> {}
+                }
+            }
+    }
 
     Scaffold(
         modifier = modifier,

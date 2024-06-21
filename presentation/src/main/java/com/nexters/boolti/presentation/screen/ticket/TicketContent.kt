@@ -266,27 +266,28 @@ private fun TicketInfo(
             }
         }
         Spacer(modifier = Modifier.padding(12.dp))
-        TicketQr(onClickQr)
+        TicketQr(onClickQr = onClickQr)
     }
 }
 
 @Composable
 private fun TicketQr(
+    modifier: Modifier = Modifier,
     onClickQr: () -> Unit,
 ) {
     Box(
-        modifier = Modifier,
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         Image(
             modifier = Modifier
-                .padding(vertical = 8.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(White)
-                .padding(2.dp)
+                .size(58.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(width = 1.dp, color = White, RoundedCornerShape(8.dp))
+                .padding(12.dp)
                 .clickable(onClick = onClickQr),
             imageVector = ImageVector.vectorResource(R.drawable.ic_qr),
-            contentScale = ContentScale.Inside,
+            contentScale = ContentScale.Fit,
             contentDescription = stringResource(R.string.description_qr),
         )
     }

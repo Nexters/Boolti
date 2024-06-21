@@ -85,6 +85,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
@@ -102,7 +103,6 @@ import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.ticketId
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
@@ -125,12 +125,13 @@ import java.time.LocalDateTime
 fun NavGraphBuilder.TicketDetailScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
+    getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
     composable(
-        route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+        route = "detail",
         arguments = MainDestination.TicketDetail.arguments,
-    ) {
+    ) { entry ->
         TicketDetailScreen(
             modifier = modifier,
             onBackClicked = popBackStack,
@@ -139,7 +140,8 @@ fun NavGraphBuilder.TicketDetailScreen(
                     "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
                 )
             },
-            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") }
+            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
+            viewModel = getSharedViewModel(entry),
         )
     }
 }

@@ -230,7 +230,13 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         const val RESULT_SUCCESS = 200
         const val RESULT_FAIL = 400
         const val RESULT_SOLD_OUT = 401
+        // TODO : ViewModel에서도 사용할 수 있도록 변경하기
+        private const val ORDER_TYPE_TICKETING = 0
+        private const val ORDER_TYPE_GIFT = 1
+
+        // 공통
         private const val TAG = "PaymentWidgetActivity"
+        private const val EXTRA_KEY_ORDER_TYPE = "extraKeyOrderType"
         private const val EXTRA_KEY_AMOUNT = "extraKeyAmount"
         private const val EXTRA_KEY_CLIENT_KEY = "extraKeyClientKey"
         private const val EXTRA_KEY_CUSTOMER_KEY = "extraKeyCustomerKey"
@@ -243,10 +249,20 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         private const val EXTRA_KEY_SHOW_ID = "extraKeyShowId"
         private const val EXTRA_KEY_SALES_TICKET_ID = "extraKeySalesTicketId"
         private const val EXTRA_KEY_TICKET_COUNT = "extraKeyTicketCount"
+
+        // 예매하기
         private const val EXTRA_KEY_RESERVATION_NAME = "extraKeyReservationName"
         private const val EXTRA_KEY_RESERVATION_PHONE_NUMBER = "extraKeyReservationPhoneNumber"
         private const val EXTRA_KEY_DEPOSITOR_NAME = "extraKeyDepositorName"
         private const val EXTRA_KEY_DEPOSITOR_PHONE_NUMBER = "extraKeyDepositorPhoneNumber"
+
+        // 선물하기
+        private const val EXTRA_KEY_SENDER_NAME = "extraKeySenderName"
+        private const val EXTRA_KEY_SENDER_PHONE_NUMBER = "extraKeySenderPhoneNumber"
+        private const val EXTRA_KEY_RECEIVER_NAME = "extraKeyReceiverName"
+        private const val EXTRA_KEY_RECEIVER_PHONE_NUMBER = "extraKeyReceiverPhoneNumber"
+        private const val EXTRA_KEY_MESSAGE = "extraKeyMessage"
+        private const val EXTRA_KEY_IMAGE_ID = "extraKeyImageId"
 
         fun getIntent(
             context: Context,
@@ -268,6 +284,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             redirectUrl: String? = null,
         ): Intent {
             return Intent(context, TossPaymentWidgetActivity::class.java)
+                .putExtra(EXTRA_KEY_ORDER_TYPE, ORDER_TYPE_TICKETING)
                 .putExtra(EXTRA_KEY_AMOUNT, amount)
                 .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
                 .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
@@ -295,8 +312,18 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             orderName: String,
             currency: String,
             countryCode: String,
+            showId: String,
+            salesTicketTypeId: String,
+            ticketCount: Int,
+            senderName: String,
+            senderContact: String,
+            receiverName: String,
+            receiverContact: String,
+            message: String,
+            imageId: String,
         ): Intent {
             return Intent(context, TossPaymentWidgetActivity::class.java)
+                .putExtra(EXTRA_KEY_ORDER_TYPE, ORDER_TYPE_GIFT)
                 .putExtra(EXTRA_KEY_AMOUNT, amount)
                 .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
                 .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
@@ -304,6 +331,15 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
                 .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
                 .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
+                .putExtra(EXTRA_KEY_SHOW_ID, showId)
+                .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
+                .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
+                .putExtra(EXTRA_KEY_SENDER_NAME, senderName)
+                .putExtra(EXTRA_KEY_SENDER_PHONE_NUMBER, senderContact)
+                .putExtra(EXTRA_KEY_RECEIVER_NAME, receiverName)
+                .putExtra(EXTRA_KEY_RECEIVER_PHONE_NUMBER, receiverContact)
+                .putExtra(EXTRA_KEY_MESSAGE, message)
+                .putExtra(EXTRA_KEY_IMAGE_ID, imageId)
         }
     }
 }

@@ -117,6 +117,15 @@ fun GiftScreen(
                                 orderName = "${uiState.showName} ${uiState.ticketName}",
                                 currency = Currency.KRW.name,
                                 countryCode = "KR",
+                                showId = viewModel.showId,
+                                salesTicketTypeId = viewModel.salesTicketTypeId,
+                                ticketCount = uiState.ticketCount,
+                                senderName = uiState.senderName,
+                                senderContact = uiState.senderContact,
+                                receiverName = uiState.receiverName,
+                                receiverContact = uiState.receiverContact,
+                                message = uiState.message,
+                                imageId = uiState.selectedImage,
                             )
                         )
                         showDialog = false

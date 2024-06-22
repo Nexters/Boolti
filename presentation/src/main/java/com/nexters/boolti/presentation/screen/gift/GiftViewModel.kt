@@ -33,7 +33,7 @@ class GiftViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val userId = getUserUseCase().id
     val showId: String = requireNotNull(savedStateHandle["showId"])
-    private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
+    val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
 
     private val _uiState = MutableStateFlow(GiftUiState())

@@ -20,6 +20,7 @@ class TossPaymentsWidgetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val ticketingRepository: TicketingRepository,
 ) : ViewModel() {
+    private val orderType: Int = savedStateHandle["extraKeyOrderType"] ?: 0
     private val showId: String = savedStateHandle["extraKeyShowId"] ?: ""
     private val salesTicketTypeId: String = savedStateHandle["extraKeySalesTicketId"] ?: ""
     private val ticketCount: Int = savedStateHandle["extraKeyTicketCount"] ?: 1
@@ -27,6 +28,13 @@ class TossPaymentsWidgetViewModel @Inject constructor(
     private val reservationPhoneNumber: String = savedStateHandle["extraKeyReservationPhoneNumber"] ?: ""
     private val depositorName: String = savedStateHandle["extraKeyDepositorName"] ?: ""
     private val depositorPhoneNumber: String = savedStateHandle["extraKeyDepositorPhoneNumber"] ?: ""
+    // TODO : 별도 데이터 클래스로 정의하여 깔끔하게 초기화하기
+    private val senderName: String = savedStateHandle["extraKeySenderName"] ?: ""
+    private val senderContact: String = savedStateHandle["extraKeySenderPhoneNumber"] ?: ""
+    private val receiverName: String = savedStateHandle["extraKeyReceiverName"] ?: ""
+    private val receiverContact: String = savedStateHandle["extraKeyReceiverPhoneNumber"] ?: ""
+    private val giftMessage: String = savedStateHandle["extraKeyMessage"] ?: ""
+    private val giftImageId: String = savedStateHandle["extraKeyImageId"] ?: ""
 
     private var widgetLoadSuccess: Boolean = false
     private var agreementLoadSuccess: Boolean = false
@@ -42,32 +50,36 @@ class TossPaymentsWidgetViewModel @Inject constructor(
         totalPrice: Int,
     ) {
         viewModelScope.launch {
-            ticketingRepository.approvePayment(
-                PaymentApproveRequest(
-                    orderId = orderId,
-                    amount = totalPrice,
-                    paymentKey = paymentKey,
-                    showId = showId,
-                    salesTicketTypeId = salesTicketTypeId,
-                    ticketCount = ticketCount,
-                    reservationName = reservationName,
-                    reservationPhoneNumber = reservationPhoneNumber,
-                    depositorName = depositorName,
-                    depositorPhoneNumber = depositorPhoneNumber,
-                )
-            ).catch { e ->
-                if (e !is TicketingException) throw e
-                if (
-                    e.errorType in listOf(
-                        TicketingErrorType.NoRemainingQuantity,
-                        TicketingErrorType.ApprovePaymentFailed,
-                        TicketingErrorType.Unknown,
+            if (orderType == 0) {
+                ticketingRepository.approvePayment(
+                    PaymentApproveRequest(
+                        orderId = orderId,
+                        amount = totalPrice,
+                        paymentKey = paymentKey,
+                        showId = showId,
+                        salesTicketTypeId = salesTicketTypeId,
+                        ticketCount = ticketCount,
+                        reservationName = reservationName,
+                        reservationPhoneNumber = reservationPhoneNumber,
+                        depositorName = depositorName,
+                        depositorPhoneNumber = depositorPhoneNumber,
                     )
-                ) {
-                    event(PaymentEvent.TicketSoldOut)
+                ).catch { e ->
+                    if (e !is TicketingException) throw e
+                    if (
+                        e.errorType in listOf(
+                            TicketingErrorType.NoRemainingQuantity,
+                            TicketingErrorType.ApprovePaymentFailed,
+                            TicketingErrorType.Unknown,
+                        )
+                    ) {
+                        event(PaymentEvent.TicketSoldOut)
+                    }
+                }.singleOrNull()?.let { (orderId, reservationId) ->
+                    event(PaymentEvent.Approved(orderId, reservationId))
                 }
-            }.singleOrNull()?.let { (orderId, reservationId) ->
-                event(PaymentEvent.Approved(orderId, reservationId))
+            } else {
+                // TODO : 선물하기 승인 api 호출
             }
         }
     }

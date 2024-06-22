@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.gift
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -45,6 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.Currency
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -62,6 +67,10 @@ import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
+import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
 
 @Composable
 fun GiftScreen(
@@ -72,14 +81,47 @@ fun GiftScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
+
+    val paymentLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_SUCCESS -> {
+                    val intent = result.data ?: return@rememberLauncherForActivityResult
+                    val reservationId =
+                        intent.getStringExtra("reservationId")
+                            ?: return@rememberLauncherForActivityResult
+                    TODO("성공했을 때 메서드 호출")
+                }
+
+                RESULT_SOLD_OUT -> TODO("품절 다이얼로그")
+                RESULT_FAIL -> TODO("실패 다이얼로그")
+            }
+        }
 
     LaunchedEffect(viewModel.events) {
         viewModel.events
             .collect { event ->
                 when (event) {
                     is GiftEvent.GiftSuccess -> {}
-                    is GiftEvent.ProgressPayment -> {}
+
+                    is GiftEvent.ProgressPayment -> {
+                        paymentLauncher.launch(
+                            TossPaymentWidgetActivity.getGiftIntent(
+                                context = context,
+                                amount = uiState.totalPrice,
+                                clientKey = BuildConfig.TOSS_CLIENT_KEY,
+                                customerKey = "user-${event.userId}",
+                                orderId = event.orderId,
+                                orderName = "${uiState.showName} ${uiState.ticketName}",
+                                currency = Currency.KRW.name,
+                                countryCode = "KR",
+                            )
+                        )
+                        showDialog = false
+                    }
+
                     GiftEvent.NoRemainingQuantity -> {}
                 }
             }

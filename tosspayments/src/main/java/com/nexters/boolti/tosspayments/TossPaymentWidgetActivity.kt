@@ -285,5 +285,25 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_DEPOSITOR_NAME, depositorName)
                 .putExtra(EXTRA_KEY_DEPOSITOR_PHONE_NUMBER, depositorPhoneNumber)
         }
+
+        fun getGiftIntent(
+            context: Context,
+            amount: Number,
+            clientKey: String,
+            customerKey: String,
+            orderId: String,
+            orderName: String,
+            currency: String,
+            countryCode: String,
+        ): Intent {
+            return Intent(context, TossPaymentWidgetActivity::class.java)
+                .putExtra(EXTRA_KEY_AMOUNT, amount)
+                .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
+                .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
+                .putExtra(EXTRA_KEY_ORDER_ID, orderId)
+                .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
+                .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
+                .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
+        }
     }
 }

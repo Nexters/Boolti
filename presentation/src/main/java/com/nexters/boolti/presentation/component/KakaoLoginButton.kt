@@ -65,7 +65,7 @@ fun KakaoLoginButton(
             contentAlignment = Alignment.CenterStart,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_kakaotalk), contentDescription = "카카오톡 아이콘",
+                painter = painterResource(R.drawable.ic_kakaotalk), contentDescription = null,
                 modifier = Modifier.size(width = 20.dp, height = 20.dp),
                 tint = Color.Black,
             )

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.gift
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
@@ -29,6 +30,7 @@ class GiftViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getUserUseCase: GetUserUsecase,
     private val ticketingRepository: TicketingRepository,
+    private val giftRepository: GiftRepository,
     private val getRefundPolicyUseCase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
     private val userId = getUserUseCase().id

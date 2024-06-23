@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.TicketingErrorType
 import com.nexters.boolti.domain.exception.TicketingException
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.PaymentApproveRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class TossPaymentsWidgetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val ticketingRepository: TicketingRepository,
+    private val giftRepository: GiftRepository,
 ) : ViewModel() {
     private val orderType: Int = savedStateHandle["extraKeyOrderType"] ?: 0
     private val showId: String = savedStateHandle["extraKeyShowId"] ?: ""

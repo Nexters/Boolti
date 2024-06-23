@@ -8,6 +8,7 @@ import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.network.AuthInterceptor
 import com.nexters.boolti.data.network.api.DeviceTokenService
+import com.nexters.boolti.data.network.api.GiftService
 import com.nexters.boolti.data.network.api.HostService
 import com.nexters.boolti.data.network.api.ReservationService
 import com.nexters.boolti.data.network.api.ShowService
@@ -94,6 +95,10 @@ internal object NetworkModule {
     @Singleton
     @Provides
     fun provideTicketingService(@Named("auth") retrofit: Retrofit): TicketingService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideGiftService(@Named("auth") retrofit: Retrofit): GiftService = retrofit.create()
 
     @Singleton
     @Provides

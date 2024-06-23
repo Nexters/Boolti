@@ -1,11 +1,11 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.GiftService
-import com.nexters.boolti.data.network.request.GiftApproveRequest
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
 import com.nexters.boolti.data.network.response.GiftResponse
 import com.nexters.boolti.data.network.response.ImageResponse
+import com.nexters.boolti.domain.request.GiftApproveRequest
 import javax.inject.Inject
 
 internal class GiftDataSource @Inject constructor(

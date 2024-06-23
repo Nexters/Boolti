@@ -1,10 +1,10 @@
 package com.nexters.boolti.data.network.api
 
-import com.nexters.boolti.data.network.request.GiftApproveRequest
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
 import com.nexters.boolti.data.network.response.GiftResponse
 import com.nexters.boolti.data.network.response.ImageResponse
+import com.nexters.boolti.domain.request.GiftApproveRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

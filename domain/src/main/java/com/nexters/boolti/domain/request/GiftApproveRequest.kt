@@ -1,5 +1,8 @@
-package com.nexters.boolti.data.network.request
+package com.nexters.boolti.domain.request
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GiftApproveRequest(
     val orderId: String,
     val amount: Int,

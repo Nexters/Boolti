@@ -13,7 +13,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -65,7 +64,6 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -73,7 +71,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -103,18 +100,19 @@ import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
-import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
@@ -519,8 +517,16 @@ private fun QrCode(
                     contentDescription = stringResource(R.string.description_qr),
                 )
                 when (ticketState) {
-                    TicketState.Used -> QrCoverView(MaterialTheme.colorScheme.primary, "입장 완료")
-                    TicketState.Finished -> QrCoverView(Grey80, "공연 종료")
+                    TicketState.Used -> QrCoverView(
+                        MaterialTheme.colorScheme.primary,
+                        stringResource(R.string.ticket_used_state),
+                    )
+
+                    TicketState.Finished -> QrCoverView(
+                        Grey60,
+                        stringResource(R.string.ticket_show_finished_state),
+                    )
+
                     TicketState.Ready -> Unit
                 }
             }
@@ -530,36 +536,6 @@ private fun QrCode(
                 text = csTicketId,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey70,
-            )
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.QrCoverView(
-    color: Color,
-    text: String,
-) {
-    Box(
-        modifier = Modifier.Companion
-            .matchParentSize()
-            .background(White.copy(0.9f)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Icon(
-                modifier = Modifier.size(42.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.ic_logo),
-                tint = color,
-                contentDescription = null,
-            )
-            Text(
-                text = text,
-                style = point4,
-                fontSize = 20.sp,
-                color = color,
             )
         }
     }

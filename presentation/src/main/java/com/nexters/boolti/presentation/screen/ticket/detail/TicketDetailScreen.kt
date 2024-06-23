@@ -135,10 +135,8 @@ fun NavGraphBuilder.TicketDetailScreen(
         TicketDetailScreen(
             modifier = modifier,
             onBackClicked = popBackStack,
-            onClickQr = { code, ticketName ->
-                navigateTo(
-                    "${MainDestination.Qr.route}/${code.filter { c -> c.isLetterOrDigit() }}?ticketName=$ticketName"
-                )
+            onClickQr = {
+                navigateTo(MainDestination.Qr.route)
             },
             navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
             viewModel = getSharedViewModel(entry),
@@ -152,7 +150,7 @@ private fun TicketDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketDetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
-    onClickQr: (entryCode: String, ticketName: String) -> Unit,
+    onClickQr: () -> Unit,
     navigateToShowDetail: (showId: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -300,6 +298,7 @@ private fun TicketDetailScreen(
                                     .padding(marginHorizontal),
                                 ticketGroup = ticketGroup,
                                 pagerState = pagerState,
+                                onClickQr = onClickQr,
                             )
 
                             DottedDivider(
@@ -317,7 +316,7 @@ private fun TicketDetailScreen(
                                 placeName = ticketGroup.placeName,
                                 entryCode = currentTicket.entryCode,
                                 ticketState = currentTicket.ticketState,
-                                onClickQr = { onClickQr(it, ticketGroup.ticketName) },
+                                onClickQr = onClickQr,
                             )
                         }
                         // 티켓 좌상단 꼭지점 그라데이션
@@ -451,6 +450,7 @@ private fun QrCodes(
     modifier: Modifier = Modifier,
     ticketGroup: TicketGroup,
     pagerState: PagerState,
+    onClickQr: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -467,6 +467,7 @@ private fun QrCodes(
         ) { i ->
             val ticket = ticketGroup.tickets[i]
             QrCode(
+                modifier = Modifier.clickable(onClick = onClickQr),
                 ticketName = ticketGroup.ticketName,
                 qrCode = ticket.entryCode,
                 csTicketId = ticket.csTicketId,
@@ -572,7 +573,7 @@ private fun TicketInfo(
     placeName: String,
     entryCode: String,
     ticketState: TicketState,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -632,7 +633,7 @@ private fun TicketInfo(
 private fun TicketQr(
     entryCode: String,
     ticketState: TicketState,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: () -> Unit,
 ) {
     if (entryCode.isBlank()) return
 
@@ -647,7 +648,7 @@ private fun TicketQr(
                 .background(White)
                 .padding(2.dp)
                 .clickable {
-                    if (ticketState == TicketState.Ready) onClickQr(entryCode)
+                    if (ticketState == TicketState.Ready) onClickQr()
                 },
             painter = rememberQrBitmapPainter(
                 entryCode,
@@ -873,7 +874,7 @@ fun TicketDetailPreview() {
             TicketDetailScreen(
                 modifier = Modifier,
                 onBackClicked = {},
-                onClickQr = { _, _ -> },
+                onClickQr = {},
                 navigateToShowDetail = {})
         }
     }

@@ -39,6 +39,12 @@ sealed class MainDestination(val route: String) {
         )
     }
 
+    data object GiftComplete : MainDestination(route = "giftComplete") {
+        val arguments = listOf(
+            navArgument(showId) { type = NavType.StringType }
+        )
+    }
+
     data object TicketDetail : MainDestination(route = "tickets") {
         val arguments = listOf(navArgument(ticketId) { type = NavType.StringType })
     }

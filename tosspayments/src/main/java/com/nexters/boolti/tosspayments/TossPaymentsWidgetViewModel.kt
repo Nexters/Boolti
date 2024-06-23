@@ -129,8 +129,8 @@ class TossPaymentsWidgetViewModel @Inject constructor(
             ) {
                 event(PaymentEvent.TicketSoldOut)
             }
-        }.singleOrNull()?.let { (orderId, reservationId) ->
-            event(PaymentEvent.Approved(orderId, reservationId))
+        }.singleOrNull()?.let {
+            event(PaymentEvent.Approved(it.orderId, it.reservationId, it.giftId))
         }
     }
 

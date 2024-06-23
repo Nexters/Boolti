@@ -134,6 +134,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 val intent = Intent().apply {
                     putExtra("orderId", event.orderId)
                     putExtra("reservationId", event.reservationId)
+                    putExtra("giftId", event.giftId)
                 }
                 setResult(RESULT_SUCCESS, intent)
                 finish()

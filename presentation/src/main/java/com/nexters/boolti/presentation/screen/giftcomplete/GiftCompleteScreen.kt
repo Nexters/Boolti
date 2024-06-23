@@ -57,6 +57,7 @@ fun GiftCompleteScreen(
     viewModel: GiftCompleteViewModel = hiltViewModel(),
 ) {
     val reservation by viewModel.reservation.collectAsStateWithLifecycle()
+    val gift by viewModel.gift.collectAsStateWithLifecycle()
 
     BackHandler(onBack = onClickClose)
 
@@ -83,7 +84,7 @@ fun GiftCompleteScreen(
             )
             InfoRow(
                 label = stringResource(R.string.gift_receiver),
-                value = "TODO (선물 정보)"
+                value = "${gift?.recipientName} / ${gift?.recipientPhoneNumber}"
             )
             TextButton(
                 modifier = Modifier
@@ -250,17 +251,6 @@ private fun ShowInformation(
             poster = reservation.showImage,
             showName = reservation.showName,
             showDate = reservation.showDate,
-        )
-    }
-}
-
-@Composable
-@Preview
-fun TempPreview() {
-    BooltiTheme {
-        GiftCompleteScreen(
-            onClickClose = {},
-            onClickHome = {}
         )
     }
 }

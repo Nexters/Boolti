@@ -14,14 +14,14 @@ fun NavGraphBuilder.addGiftScreen(
     modifier: Modifier = Modifier,
 ) {
     composable(
-        route = "${MainDestination.Ticketing.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}",
+        route = "${MainDestination.Gift.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}",
         arguments = MainDestination.Gift.arguments,
     ) {
         GiftScreen(
             modifier = modifier,
             popBackStack = popBackStack,
             navigateToBusiness = { navigateTo(MainDestination.Business.route) },
-            navigateToComplete = { navigateTo(MainDestination.GiftComplete.route) }
+            navigateToComplete = { reservationId -> navigateTo(MainDestination.GiftComplete.createRoute(reservationId)) }
         )
     }
 }

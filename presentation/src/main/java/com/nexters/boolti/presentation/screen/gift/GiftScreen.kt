@@ -76,7 +76,7 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESUL
 fun GiftScreen(
     popBackStack: () -> Unit,
     navigateToBusiness: () -> Unit,
-    navigateToComplete: () -> Unit,
+    navigateToComplete: (reservationId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GiftViewModel = hiltViewModel(),
 ) {
@@ -93,7 +93,7 @@ fun GiftScreen(
                     val reservationId =
                         intent.getStringExtra("reservationId")
                             ?: return@rememberLauncherForActivityResult
-                    navigateToComplete() // TODO : 파라미터 넘기기
+                    navigateToComplete(reservationId) // TODO : 파라미터 넘기기
                 }
 
                 RESULT_SOLD_OUT -> TODO("품절 다이얼로그")

@@ -29,7 +29,7 @@ sealed class MainDestination(val route: String) {
             showId: String,
             salesTicketId: String,
             ticketCount: Int,
-        ): String = "ticketing/$showId?salesTicketId=$salesTicketId&ticketCount=$ticketCount"
+        ): String = "gift/$showId?salesTicketId=$salesTicketId&ticketCount=$ticketCount"
     }
 
     data object PaymentComplete : MainDestination(route = "paymentComplete") {
@@ -39,10 +39,14 @@ sealed class MainDestination(val route: String) {
         )
     }
 
-    data object GiftComplete : MainDestination(route = "giftComplete") {
+    data object GiftComplete : MainDestination(route = "giftComplete?reservationId={reservationId}") {
         val arguments = listOf(
-            navArgument(showId) { type = NavType.StringType }
+            navArgument(reservationId) { type = NavType.StringType },
         )
+
+        fun createRoute(
+            reservationId: String,
+        ): String = "giftComplete?reservationId=$reservationId"
     }
 
     data object TicketDetail : MainDestination(route = "tickets") {

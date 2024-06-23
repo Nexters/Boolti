@@ -20,18 +20,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.PaymentType
+import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
+import com.nexters.boolti.presentation.screen.payment.TicketSummarySection
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -46,7 +54,10 @@ import com.nexters.boolti.presentation.theme.point4
 fun GiftCompleteScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
+    viewModel: GiftCompleteViewModel = hiltViewModel(),
 ) {
+    val reservation by viewModel.reservation.collectAsStateWithLifecycle()
+
     BackHandler(onBack = onClickClose)
 
     Scaffold(
@@ -68,11 +79,11 @@ fun GiftCompleteScreen(
             InfoRow(
                 modifier = Modifier.padding(top = 24.dp),
                 label = stringResource(R.string.reservation_number),
-                value = "TODO"
+                value = reservation?.csReservationId ?: ""
             )
             InfoRow(
                 label = stringResource(R.string.gift_receiver),
-                value = "TODO"
+                value = "TODO (선물 정보)"
             )
             TextButton(
                 modifier = Modifier
@@ -89,7 +100,8 @@ fun GiftCompleteScreen(
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_kakaotalk), contentDescription = null,
+                        painter = painterResource(R.drawable.ic_kakaotalk),
+                        contentDescription = null,
                         modifier = Modifier.size(width = 20.dp, height = 20.dp),
                         tint = Color.Black,
                     )
@@ -107,9 +119,12 @@ fun GiftCompleteScreen(
                 giftPolicy = stringArrayResource(id = R.array.gift_information).toList()
             )
             HorizontalDivider(color = Grey85)
-            // TODO : 결제 금액
-            // TODO : 공연 정보
-            // TODO : 결제 내역 보기
+            reservation?.let {
+                ShowInformation(
+                    modifier = Modifier.padding(top = 24.dp),
+                    reservation = it
+                )
+            }
         }
     }
 }
@@ -177,6 +192,64 @@ private fun PolicyLine(
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium.copy(color = Grey50),
+        )
+    }
+}
+
+@Composable
+private fun ShowInformation(
+    reservation: ReservationDetail,
+    modifier: Modifier,
+) {
+    val context = LocalContext.current
+
+    val payment = when (reservation.paymentType) {
+        PaymentType.ACCOUNT_TRANSFER -> stringResource(R.string.payment_account_transfer)
+        PaymentType.CARD -> {
+            val installment = reservation.cardDetail?.installmentPlanMonths?.let { months ->
+                if (months == 0) {
+                    stringResource(R.string.payment_pay_in_full)
+                } else {
+                    stringResource(R.string.payment_installment_plan_months, months)
+                }
+            }
+            StringBuilder(reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context) ?: "")
+                .apply {
+                    installment?.let { append(" / $it") }
+                }
+                .toString()
+        }
+
+        else -> null
+    }
+
+    Column {
+        InfoRow(
+            modifier = modifier.padding(top = 24.dp),
+            label = stringResource(R.string.payment_amount_label),
+            value = stringResource(
+                R.string.unit_won,
+                reservation.totalAmountPrice
+            ),
+            value2 = payment?.let { "($it)" },
+        )
+        InfoRow(
+            modifier = Modifier.padding(top = 16.dp),
+            label = stringResource(R.string.reservation_ticket_type),
+            value = "${reservation.ticketName} / ${
+                stringResource(
+                    R.string.ticket_count,
+                    reservation.ticketCount
+                )
+            }",
+        )
+        TicketSummarySection(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            poster = reservation.showImage,
+            showName = reservation.showName,
+            showDate = reservation.showDate,
         )
     }
 }

@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
@@ -260,44 +261,40 @@ private fun TicketDetailScreen(
                 ) {
                     Box {
                         // 배경 블러된 이미지
-                        AsyncImage(
-                            model = asyncImageBlurModel(context, ticketGroup.poster, radius = 24),
-                            modifier = Modifier
-                                .size(
-                                    width = contentWidth.toDp(),
-                                    height = ticketSectionHeightUntilTicketInfo.toDp(),
-                                )
-                                .alpha(.8f),
-                            contentScale = ContentScale.Crop,
-                            contentDescription = null,
-                        )
-                        // 배경 블러된 이미지 위에 올라가는 그라데이션 배경
-                        Box(
-                            modifier = Modifier
-                                .size(
-                                    width = contentWidth.toDp(),
-                                    height = ticketSectionHeightUntilTicketInfo.toDp(),
-                                )
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(
-                                            Color(0x33C5CACD),
-                                            Grey95.copy(alpha = .2f)
-                                        ),
-                                        start = Offset.Zero,
-                                        end = Offset(
-                                            x = contentWidth,
-                                            y = ticketSectionHeightUntilTicketInfo
-                                        ),
-                                    ),
-                                )
-                        )
+                        Box(contentAlignment = Alignment.BottomCenter) {
+                            AsyncImage(
+                                model = asyncImageBlurModel(context, ticketGroup.poster, radius = 24),
+                                modifier = Modifier
+                                    .width(contentWidth.toDp())
+                                    .aspectRatio(317 / 570f)
+                                    .alpha(.8f),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                            )
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(317 / 125f)
+                                    .background(
+                                        brush = Brush.verticalGradient(listOf(Black.copy(alpha = 0f), Black)),
+                                    )
+                            )
+                        }
                         Column(
                             modifier = Modifier
                                 .onGloballyPositioned { coordinates ->
                                     ticketSectionHeightUntilTicketInfo =
                                         coordinates.size.height.toFloat()
                                 }
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            Color(0xCCC5CACD),
+                                            Grey95.copy(alpha = .8f)
+                                        ),
+                                    ),
+                                    shape = ticketShape,
+                                )
                         ) {
                             Title(showName = ticketGroup.showName)
 
@@ -318,16 +315,26 @@ private fun TicketDetailScreen(
                                 thickness = 2.dp
                             )
 
-                            TicketInfo(
-                                bottomAreaHeight = ticketInfoHeight,
-                                showName = ticketGroup.showName,
-                                showDate = ticketGroup.showDate,
-                                placeName = ticketGroup.placeName,
-                                entryCode = currentTicket.entryCode,
-                                ticketState = currentTicket.ticketState,
-                                onClickQr = onClickQr,
+                            Notice(notice = ticketGroup.ticketNotice)
+
+                            val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                            Inquiry(
+                                hostName = ticketGroup.hostName,
+                                hostPhoneNumber = ticketGroup.hostPhoneNumber,
+                                onClickCopyPlace = {
+                                    clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
+                                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(copiedMessage)
+                                        }
+                                    }
+                                },
+                                onClickNavigateToShowDetail = {
+                                    navigateToShowDetail(ticketGroup.showId)
+                                }
                             )
                         }
+
                         // 티켓 좌상단 꼭지점 그라데이션
                         Box(
                             modifier = Modifier
@@ -342,25 +349,6 @@ private fun TicketDetailScreen(
                                 ),
                         )
                     }
-
-                    Notice(notice = ticketGroup.ticketNotice)
-
-                    val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
-                    Inquiry(
-                        hostName = ticketGroup.hostName,
-                        hostPhoneNumber = ticketGroup.hostPhoneNumber,
-                        onClickCopyPlace = {
-                            clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(copiedMessage)
-                                }
-                            }
-                        },
-                        onClickNavigateToShowDetail = {
-                            navigateToShowDetail(ticketGroup.showId)
-                        }
-                    )
                 }
 
                 Spacer(modifier = Modifier.size(20.dp))
@@ -697,7 +685,7 @@ private fun Notice(notice: String) {
             modifier = Modifier.padding(top = 12.dp),
             text = notice,
             style = MaterialTheme.typography.bodySmall,
-            color = Grey50,
+            color = Grey30,
         )
     }
 }

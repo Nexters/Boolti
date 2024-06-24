@@ -108,14 +108,16 @@ fun QrFullScreen(
                     csTicketId = uiState.ticketGroup.tickets[page].csTicketId,
                 )
             }
-            InstagramIndicator(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 20.dp),
-                pagerState = pagerState,
-                activeColor = Color.Black,
-                inactiveColor = Grey20,
-            )
+            if (pagerState.targetPage > 1) {
+                InstagramIndicator(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 20.dp),
+                    pagerState = pagerState,
+                    activeColor = Color.Black,
+                    inactiveColor = Grey20,
+                )
+            }
         }
     }
 }

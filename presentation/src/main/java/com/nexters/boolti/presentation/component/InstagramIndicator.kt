@@ -116,7 +116,7 @@ private class IndicatorUtil(
 fun InstagramIndicator(
     pagerState: PagerState,
     modifier: Modifier = Modifier,
-    dotCount: Int = 5,
+    dotCount: Int = 6,
     dotSize: Dp = 7.dp,
     spacedBy: Dp = 8.dp,
     activeColor: Color = White,
@@ -124,6 +124,7 @@ fun InstagramIndicator(
 ) {
     val indicatorUtil = remember {
         IndicatorUtil(
+            dotCount = dotCount,
             dotSize = dotSize,
             mediumDotSize = dotSize * 0.714f,
             smallDotSize = dotSize * 0.571f,
@@ -133,6 +134,11 @@ fun InstagramIndicator(
         )
     }
 
+    /**
+     * Normal 크기의 Dot 범위
+     *
+     * 이 범위 내에서는 인디케이터가 슬라이딩 되지 않고 active dot 을 이동할 수 있다.
+     */
     var range by remember {
         mutableStateOf(IndicatorRange(0, dotCount - 1))
     }
@@ -143,6 +149,11 @@ fun InstagramIndicator(
         }
     }
 
+    /**
+     * 화면에 보이는 모든 Dot 범위
+     *
+     * [range] 양 옆에 2개의 추가 Dot 이 있으며, 표시할 수 있는 페이지 범위에서 벗어난 경우 화면에 그리지 않는다.
+     */
     val visibleRange by remember {
         derivedStateOf {
             IndicatorRange(range.start - 2, range.end + 2)
@@ -155,6 +166,9 @@ fun InstagramIndicator(
         label = "offsetFraction",
     )
 
+    /**
+     * 현재 페이지가 [range]를 벗어난 경우 [range]를 조정
+     */
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             range = when {

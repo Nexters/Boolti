@@ -23,24 +23,22 @@ class TossPaymentsWidgetViewModel @Inject constructor(
     private val ticketingRepository: TicketingRepository,
     private val giftRepository: GiftRepository,
 ) : ViewModel() {
-    private val orderType: Int = savedStateHandle["extraKeyOrderType"] ?: 0
-    private val showId: String = savedStateHandle["extraKeyShowId"] ?: ""
-    private val salesTicketTypeId: String = savedStateHandle["extraKeySalesTicketId"] ?: ""
-    private val ticketCount: Int = savedStateHandle["extraKeyTicketCount"] ?: 1
-    private val reservationName: String = savedStateHandle["extraKeyReservationName"] ?: ""
-    private val reservationPhoneNumber: String =
-        savedStateHandle["extraKeyReservationPhoneNumber"] ?: ""
-    private val depositorName: String = savedStateHandle["extraKeyDepositorName"] ?: ""
-    private val depositorPhoneNumber: String =
-        savedStateHandle["extraKeyDepositorPhoneNumber"] ?: ""
+    private val orderType: Int = savedStateHandle[EXTRA_KEY_ORDER_TYPE] ?: 0
+    private val showId: String = savedStateHandle[EXTRA_KEY_SHOW_ID] ?: ""
+    private val salesTicketTypeId: String = savedStateHandle[EXTRA_KEY_SALES_TICKET_ID] ?: ""
+    private val ticketCount: Int = savedStateHandle[EXTRA_KEY_TICKET_COUNT] ?: 1
+    private val reservationName: String = savedStateHandle[EXTRA_KEY_RESERVATION_NAME] ?: ""
+    private val reservationPhoneNumber: String = savedStateHandle[EXTRA_KEY_RESERVATION_PHONE_NUMBER] ?: ""
+    private val depositorName: String = savedStateHandle[EXTRA_KEY_DEPOSITOR_NAME] ?: ""
+    private val depositorPhoneNumber: String = savedStateHandle[EXTRA_KEY_DEPOSITOR_PHONE_NUMBER] ?: ""
 
     // TODO : 별도 데이터 클래스로 정의하여 깔끔하게 초기화하기
-    private val senderName: String = savedStateHandle["extraKeySenderName"] ?: ""
-    private val senderContact: String = savedStateHandle["extraKeySenderPhoneNumber"] ?: ""
-    private val receiverName: String = savedStateHandle["extraKeyReceiverName"] ?: ""
-    private val receiverContact: String = savedStateHandle["extraKeyReceiverPhoneNumber"] ?: ""
-    private val giftMessage: String = savedStateHandle["extraKeyMessage"] ?: ""
-    private val giftImageId: String = savedStateHandle["extraKeyImageId"] ?: ""
+    private val senderName: String = savedStateHandle[EXTRA_KEY_SENDER_NAME] ?: ""
+    private val senderContact: String = savedStateHandle[EXTRA_KEY_SENDER_PHONE_NUMBER] ?: ""
+    private val receiverName: String = savedStateHandle[EXTRA_KEY_RECEIVER_NAME] ?: ""
+    private val receiverContact: String = savedStateHandle[EXTRA_KEY_RECEIVER_PHONE_NUMBER] ?: ""
+    private val giftMessage: String = savedStateHandle[EXTRA_KEY_MESSAGE] ?: ""
+    private val giftImageId: String = savedStateHandle[EXTRA_KEY_IMAGE_ID] ?: ""
 
     private var widgetLoadSuccess: Boolean = false
     private var agreementLoadSuccess: Boolean = false

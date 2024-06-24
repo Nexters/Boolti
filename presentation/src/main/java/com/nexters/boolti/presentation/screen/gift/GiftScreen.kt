@@ -58,6 +58,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.ticketing.Header
 import com.nexters.boolti.presentation.screen.ticketing.InputRow
 import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
+import com.nexters.boolti.presentation.screen.ticketing.PaymentFailureDialog
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
 import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
@@ -83,7 +84,9 @@ fun GiftScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
-    var showDialog by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    var showTicketSoldOutDialog by remember { mutableStateOf(false) }
+    var showPaymentFailureDialog by remember { mutableStateOf(false) }
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -99,8 +102,8 @@ fun GiftScreen(
                     navigateToComplete(reservationId, giftId)
                 }
 
-                RESULT_SOLD_OUT -> TODO("품절 다이얼로그")
-                RESULT_FAIL -> TODO("실패 다이얼로그")
+                RESULT_SOLD_OUT -> showTicketSoldOutDialog = true
+                RESULT_FAIL -> showPaymentFailureDialog = true
             }
         }
 
@@ -132,10 +135,13 @@ fun GiftScreen(
                                 imageId = uiState.selectedImage,
                             )
                         )
-                        showDialog = false
+                        showConfirmDialog = false
                     }
 
-                    GiftEvent.NoRemainingQuantity -> {}
+                    GiftEvent.NoRemainingQuantity -> {
+                        showConfirmDialog = false
+                        showTicketSoldOutDialog = true
+                    }
                 }
             }
     }
@@ -269,14 +275,14 @@ fun GiftScreen(
                         uiState.totalPrice
                     ),
                     onClick = {
-                        showDialog = true
+                        showConfirmDialog = true
                     },
                 )
             }
         }
     }
 
-    if (showDialog) {
+    if (showConfirmDialog) {
         GiftConfirmDialog(
             receiverName = uiState.receiverName,
             receiverContact = uiState.receiverContact,
@@ -286,8 +292,19 @@ fun GiftScreen(
             ticketCount = uiState.ticketCount,
             totalPrice = uiState.totalPrice,
             onClick = viewModel::pay,
-            onDismiss = { showDialog = false },
+            onDismiss = { showConfirmDialog = false },
         )
+    }
+    if (showPaymentFailureDialog) {
+        PaymentFailureDialog {
+            showPaymentFailureDialog = false
+        }
+    }
+    if (showTicketSoldOutDialog) {
+        PaymentFailureDialog {
+            showTicketSoldOutDialog = false
+            popBackStack()
+        }
     }
 }
 

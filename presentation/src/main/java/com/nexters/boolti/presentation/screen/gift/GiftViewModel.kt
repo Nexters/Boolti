@@ -106,6 +106,8 @@ class GiftViewModel @Inject constructor(
     }
 
     fun pay() {
+        // TODO : 무료 케이스 처리
+
         ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
             .onStart { _uiState.update { it.copy(loading = true) } }
             .onEach { orderId ->

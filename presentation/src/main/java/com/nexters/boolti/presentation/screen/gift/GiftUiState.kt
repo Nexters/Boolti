@@ -1,12 +1,14 @@
 package com.nexters.boolti.presentation.screen.gift
 
 import androidx.compose.runtime.Stable
+import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.presentation.R
 import java.time.LocalDateTime
 
 @Stable
 data class GiftUiState(
     val loading: Boolean = true,
+    val giftImages: List<ImagePair> = emptyList(),
     val poster: String = "",
     val showDate: LocalDateTime = LocalDateTime.now(),
     val showName: String = "",
@@ -19,8 +21,7 @@ data class GiftUiState(
         Pair(R.string.order_agreement_privacy_offer, false),
     ),
     val message: String = "공연에 초대합니다.",
-    val images: List<String> = (1..10).map { it.toString() }, // TODO : 서버에서 이미지 데이터 가져오기
-    val selectedImage: String = "1", // TODO : 서버에서 이미지 데이터 가져오기
+    val selectedImage: ImagePair? = null,
     val senderName: String = "",
     val senderContact: String = "",
     val receiverName: String = "",

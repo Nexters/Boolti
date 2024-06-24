@@ -175,6 +175,8 @@
     <string name="gift_show_info">공연 및 티켓 정보</string>
     <string name="gift_complete_note">결제를 완료했어요 \n카카오톡에서 받는 분을 \n선택해 주세요</string>
     <string name="gift_select_receiver">받는 분 선택하기</string>
+    <string name="gift_selected_image">선택된 선물 이미지</string>
+    <string name="gift_image">선물 편지에 포함될 이미지</string>
     <string-array name="gift_information">
         <item>선물 등록 기간은 해당 공연의 티켓 판매 기간까지입니다.</item>
         <item>마이 > 결제 내역 > 결제 내역 상세에서 선물을 취소할 수 있습니다.</item>

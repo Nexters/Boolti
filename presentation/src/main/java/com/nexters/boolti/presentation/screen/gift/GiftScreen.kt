@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -48,7 +50,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Currency
+import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
@@ -65,8 +69,8 @@ import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey40
-import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
@@ -114,6 +118,8 @@ fun GiftScreen(
                     is GiftEvent.GiftSuccess -> {}
 
                     is GiftEvent.ProgressPayment -> {
+                        val selectedImage = uiState.selectedImage ?: return@collect
+
                         paymentLauncher.launch(
                             TossPaymentWidgetActivity.getGiftIntent(
                                 context = context,
@@ -132,7 +138,7 @@ fun GiftScreen(
                                 receiverName = uiState.receiverName,
                                 receiverContact = uiState.receiverContact,
                                 message = uiState.message,
-                                imageId = uiState.selectedImage,
+                                imageId = selectedImage.id,
                             )
                         )
                         showConfirmDialog = false
@@ -173,7 +179,7 @@ fun GiftScreen(
                 CardSelection(
                     message = uiState.message,
                     onMessageChanged = viewModel::updateMessage,
-                    images = uiState.images,
+                    images = uiState.giftImages,
                     selectedImage = uiState.selectedImage,
                     onImageSelected = viewModel::selectImage
                 )
@@ -312,9 +318,9 @@ fun GiftScreen(
 private fun CardSelection(
     message: String,
     onMessageChanged: (String) -> Unit,
-    images: List<String>,
-    selectedImage: String,
-    onImageSelected: (String) -> Unit,
+    images: List<ImagePair>,
+    selectedImage: ImagePair?,
+    onImageSelected: (ImagePair) -> Unit,
 ) {
     Column(
         modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
@@ -356,13 +362,15 @@ private fun CardSelection(
                 style = MaterialTheme.typography.labelMedium.copy(color = Grey10),
             )
 
-            // TODO : 이미지 영역, 아마도 2:3 비율인듯
-            Box(
+            AsyncImage(
+                model = selectedImage?.originImage,
+                contentDescription = stringResource(id = R.string.gift_selected_image),
                 modifier = Modifier
                     .padding(top = 28.dp)
-                    .height(180.dp)
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .aspectRatio(3 / 2f)
+                    .background(Color.White),
+                contentScale = ContentScale.Crop,
             )
         }
 
@@ -371,7 +379,6 @@ private fun CardSelection(
                 .padding(top = 44.dp)
                 .fillMaxWidth(),
         ) {
-            // TODO : 카드 배경 이미지 목록 연결
             LazyRow(
                 contentPadding = PaddingValues(start = 32.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -387,14 +394,16 @@ private fun CardSelection(
                         Modifier
                     }
 
-                    Box(
+                    AsyncImage(
+                        model = image.thumbnailImage,
+                        contentDescription = stringResource(id = R.string.gift_image),
                         modifier = modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(color = Grey50)
                             .clickable {
                                 onImageSelected(image)
-                            }
+                            },
+                        contentScale = ContentScale.Crop,
                     )
                 }
             }
@@ -457,8 +466,14 @@ private fun CardSelectionPreview() {
         CardSelection(
             message = "공연에 초대합니다.",
             onMessageChanged = {},
-            images = (1..10).map { it.toString() },
-            selectedImage = "1",
+            images = (1..10).map {
+                ImagePair(
+                    it.toString(),
+                    "https://picsum.photos/200",
+                    "https://picsum.photos/200"
+                )
+            },
+            selectedImage = ImagePair("", "", ""),
             onImageSelected = {}
         )
     }

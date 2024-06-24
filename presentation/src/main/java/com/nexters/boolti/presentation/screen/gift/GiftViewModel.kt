@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.gift
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.OrderIdRequest
@@ -59,6 +60,17 @@ class GiftViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope + recordExceptionHandler)
 
+        giftRepository.getGiftImages()
+            .onEach { images ->
+                _uiState.update {
+                    it.copy(
+                        giftImages = images,
+                        selectedImage = images.first()
+                    )
+                }
+            }
+            .launchIn(viewModelScope + recordExceptionHandler)
+
         ticketingRepository.getTicketingInfo(
             TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)
         ).onStart {
@@ -101,7 +113,7 @@ class GiftViewModel @Inject constructor(
         _uiState.update { it.copy(receiverContact = contact) }
     }
 
-    fun selectImage(image: String) {
+    fun selectImage(image: ImagePair) {
         _uiState.update { it.copy(selectedImage = image) }
     }
 

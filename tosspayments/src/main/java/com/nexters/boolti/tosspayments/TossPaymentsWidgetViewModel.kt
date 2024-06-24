@@ -23,22 +23,7 @@ class TossPaymentsWidgetViewModel @Inject constructor(
     private val ticketingRepository: TicketingRepository,
     private val giftRepository: GiftRepository,
 ) : ViewModel() {
-    private val orderType: Int = savedStateHandle[EXTRA_KEY_ORDER_TYPE] ?: 0
-    private val showId: String = savedStateHandle[EXTRA_KEY_SHOW_ID] ?: ""
-    private val salesTicketTypeId: String = savedStateHandle[EXTRA_KEY_SALES_TICKET_ID] ?: ""
-    private val ticketCount: Int = savedStateHandle[EXTRA_KEY_TICKET_COUNT] ?: 1
-    private val reservationName: String = savedStateHandle[EXTRA_KEY_RESERVATION_NAME] ?: ""
-    private val reservationPhoneNumber: String = savedStateHandle[EXTRA_KEY_RESERVATION_PHONE_NUMBER] ?: ""
-    private val depositorName: String = savedStateHandle[EXTRA_KEY_DEPOSITOR_NAME] ?: ""
-    private val depositorPhoneNumber: String = savedStateHandle[EXTRA_KEY_DEPOSITOR_PHONE_NUMBER] ?: ""
-
-    // TODO : 별도 데이터 클래스로 정의하여 깔끔하게 초기화하기
-    private val senderName: String = savedStateHandle[EXTRA_KEY_SENDER_NAME] ?: ""
-    private val senderContact: String = savedStateHandle[EXTRA_KEY_SENDER_PHONE_NUMBER] ?: ""
-    private val receiverName: String = savedStateHandle[EXTRA_KEY_RECEIVER_NAME] ?: ""
-    private val receiverContact: String = savedStateHandle[EXTRA_KEY_RECEIVER_PHONE_NUMBER] ?: ""
-    private val giftMessage: String = savedStateHandle[EXTRA_KEY_MESSAGE] ?: ""
-    private val giftImageId: String = savedStateHandle[EXTRA_KEY_IMAGE_ID] ?: ""
+    private val paymentState = TossPaymentState.from(savedStateHandle)
 
     private var widgetLoadSuccess: Boolean = false
     private var agreementLoadSuccess: Boolean = false
@@ -54,15 +39,26 @@ class TossPaymentsWidgetViewModel @Inject constructor(
         totalPrice: Int,
     ) {
         viewModelScope.launch {
-            if (orderType == 0) {
-                approveTicketingPayment(orderId, paymentKey, totalPrice)
-            } else {
-                approveGiftPayment(orderId, paymentKey, totalPrice)
+            when (paymentState) {
+                is TossPaymentState.Ticketing -> approveTicketingPayment(
+                    paymentState,
+                    orderId,
+                    paymentKey,
+                    totalPrice
+                )
+
+                is TossPaymentState.Gift -> approveGiftPayment(
+                    paymentState,
+                    orderId,
+                    paymentKey,
+                    totalPrice
+                )
             }
         }
     }
 
     private suspend fun approveTicketingPayment(
+        state: TossPaymentState.Ticketing,
         orderId: String,
         paymentKey: String,
         totalPrice: Int,
@@ -72,13 +68,13 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                 orderId = orderId,
                 amount = totalPrice,
                 paymentKey = paymentKey,
-                showId = showId,
-                salesTicketTypeId = salesTicketTypeId,
-                ticketCount = ticketCount,
-                reservationName = reservationName,
-                reservationPhoneNumber = reservationPhoneNumber,
-                depositorName = depositorName,
-                depositorPhoneNumber = depositorPhoneNumber,
+                showId = state.showId,
+                salesTicketTypeId = state.salesTicketTypeId,
+                ticketCount = state.ticketCount,
+                reservationName = state.reservationName,
+                reservationPhoneNumber = state.reservationPhoneNumber,
+                depositorName = state.depositorName,
+                depositorPhoneNumber = state.depositorPhoneNumber,
             )
         ).catch { e ->
             if (e !is TicketingException) throw e
@@ -97,6 +93,7 @@ class TossPaymentsWidgetViewModel @Inject constructor(
     }
 
     private suspend fun approveGiftPayment(
+        state: TossPaymentState.Gift,
         orderId: String,
         paymentKey: String,
         totalPrice: Int,
@@ -106,15 +103,15 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                 orderId = orderId,
                 amount = totalPrice,
                 paymentKey = paymentKey,
-                showId = showId,
-                salesTicketTypeId = salesTicketTypeId,
-                ticketCount = ticketCount,
-                giftImageId = giftImageId,
-                message = giftMessage,
-                senderName = senderName,
-                senderPhoneNumber = senderContact,
-                recipientName = receiverName,
-                recipientPhoneNumber = receiverContact,
+                showId = state.showId,
+                salesTicketTypeId = state.salesTicketTypeId,
+                ticketCount = state.ticketCount,
+                giftImageId = state.giftImageId,
+                message = state.giftMessage,
+                senderName = state.senderName,
+                senderPhoneNumber = state.senderContact,
+                recipientName = state.receiverName,
+                recipientPhoneNumber = state.receiverContact,
             )
         ).catch { e ->
             if (e !is TicketingException) throw e

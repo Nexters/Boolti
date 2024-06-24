@@ -52,6 +52,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -116,6 +117,9 @@ import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -189,6 +193,13 @@ private fun TicketDetailScreen(
                 TicketDetailEvent.NotFound -> showTicketNotFoundDialog = true
             }
         }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        snapshotFlow { pagerState }
+            .map { it.currentPage }
+            .onEach(viewModel::syncCurrentPage)
+            .launchIn(this)
     }
 
     Scaffold(

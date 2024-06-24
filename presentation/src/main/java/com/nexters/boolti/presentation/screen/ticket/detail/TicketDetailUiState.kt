@@ -7,4 +7,5 @@ data class TicketDetailUiState(
     val legacyTicket: LegacyTicket = LegacyTicket(),
     val refundPolicy: List<String> = emptyList(),
     val ticketGroup: TicketGroup = TicketGroup(),
+    val currentPage: Int = 0,
 )

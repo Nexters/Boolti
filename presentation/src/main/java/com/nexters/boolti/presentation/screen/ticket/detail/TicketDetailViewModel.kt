@@ -94,6 +94,10 @@ class TicketDetailViewModel @Inject constructor(
         _managerCodeState.update { it.copy(code = code, error = null) }
     }
 
+    fun syncCurrentPage(page: Int) {
+        _uiState.update { it.copy(currentPage = page) }
+    }
+
     private fun event(event: TicketDetailEvent) {
         viewModelScope.launch {
             _event.send(event)

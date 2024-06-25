@@ -140,7 +140,16 @@ fun InstagramIndicator(
      * 이 범위 내에서는 인디케이터가 슬라이딩 되지 않고 active dot 을 이동할 수 있다.
      */
     var range by remember {
-        mutableStateOf(IndicatorRange(0, dotCount - 1))
+        val s = when {
+            pagerState.currentPage >= dotCount -> (pagerState.currentPage - dotCount)
+            else -> 0
+        }
+        mutableStateOf(
+            IndicatorRange(
+                start = s,
+                end = s + dotCount - 1,
+            )
+        )
     }
 
     val pageFraction by remember {

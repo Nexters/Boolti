@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,11 +77,7 @@ fun QrFullScreen(
     onClose: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState { uiState.ticketGroup.tickets.size }
-
-    LaunchedEffect(uiState.currentPage) {
-        pagerState.scrollToPage(uiState.currentPage)
-    }
+    val pagerState = rememberPagerState(uiState.currentPage) { uiState.ticketGroup.tickets.size }
 
     Scaffold(
         modifier = modifier,
@@ -108,7 +103,7 @@ fun QrFullScreen(
                     csTicketId = uiState.ticketGroup.tickets[page].csTicketId,
                 )
             }
-            if (pagerState.targetPage > 1) {
+            if (pagerState.pageCount > 1) {
                 InstagramIndicator(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)

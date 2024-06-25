@@ -67,7 +67,7 @@ internal class TicketingRepositoryImpl @Inject constructor(
         emit(reservationDataSource.findReservationById(reservationId).toDomain())
     }
 
-    override fun getOrderId(request: OrderIdRequest): Flow<String> = flow {
+    override fun requestOrderId(request: OrderIdRequest): Flow<String> = flow {
         emit(dataSource.requestOrderId(request))
     }
 

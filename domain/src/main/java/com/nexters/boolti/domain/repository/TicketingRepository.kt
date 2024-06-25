@@ -20,7 +20,7 @@ interface TicketingRepository {
     fun requestReservation(request: TicketingRequest): Flow<String>
     fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus>
     fun getPaymentInfo(reservationId: String): Flow<ReservationDetail>
-    fun getOrderId(request: OrderIdRequest): Flow<String>
+    fun requestOrderId(request: OrderIdRequest): Flow<String>
     fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse>
     fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean>
 }

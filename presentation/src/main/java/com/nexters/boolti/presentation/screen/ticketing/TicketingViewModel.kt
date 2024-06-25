@@ -68,7 +68,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     private suspend fun progressPayment() {
-        getOrderId()
+        requestOrderId()
             .onStart { _uiState.update { it.copy(loading = true) } }
             .onEach { orderId ->
                 Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
@@ -204,8 +204,8 @@ class TicketingViewModel @Inject constructor(
         _uiState.update { it.toggleAgreement() }
     }
 
-    private fun getOrderId(): Flow<String> {
-        return repository.getOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
+    private fun requestOrderId(): Flow<String> {
+        return repository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
     }
 
     private fun event(event: TicketingEvent) {

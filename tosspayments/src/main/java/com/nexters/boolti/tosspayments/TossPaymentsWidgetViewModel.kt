@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.TicketingErrorType
 import com.nexters.boolti.domain.exception.TicketingException
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.GiftApproveRequest
 import com.nexters.boolti.domain.request.PaymentApproveRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -19,14 +21,9 @@ import javax.inject.Inject
 class TossPaymentsWidgetViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val ticketingRepository: TicketingRepository,
+    private val giftRepository: GiftRepository,
 ) : ViewModel() {
-    private val showId: String = savedStateHandle["extraKeyShowId"] ?: ""
-    private val salesTicketTypeId: String = savedStateHandle["extraKeySalesTicketId"] ?: ""
-    private val ticketCount: Int = savedStateHandle["extraKeyTicketCount"] ?: 1
-    private val reservationName: String = savedStateHandle["extraKeyReservationName"] ?: ""
-    private val reservationPhoneNumber: String = savedStateHandle["extraKeyReservationPhoneNumber"] ?: ""
-    private val depositorName: String = savedStateHandle["extraKeyDepositorName"] ?: ""
-    private val depositorPhoneNumber: String = savedStateHandle["extraKeyDepositorPhoneNumber"] ?: ""
+    private val paymentState = TossPaymentState.from(savedStateHandle)
 
     private var widgetLoadSuccess: Boolean = false
     private var agreementLoadSuccess: Boolean = false
@@ -42,33 +39,93 @@ class TossPaymentsWidgetViewModel @Inject constructor(
         totalPrice: Int,
     ) {
         viewModelScope.launch {
-            ticketingRepository.approvePayment(
-                PaymentApproveRequest(
-                    orderId = orderId,
-                    amount = totalPrice,
-                    paymentKey = paymentKey,
-                    showId = showId,
-                    salesTicketTypeId = salesTicketTypeId,
-                    ticketCount = ticketCount,
-                    reservationName = reservationName,
-                    reservationPhoneNumber = reservationPhoneNumber,
-                    depositorName = depositorName,
-                    depositorPhoneNumber = depositorPhoneNumber,
+            when (paymentState) {
+                is TossPaymentState.Ticketing -> approveTicketingPayment(
+                    paymentState,
+                    orderId,
+                    paymentKey,
+                    totalPrice
                 )
-            ).catch { e ->
-                if (e !is TicketingException) throw e
-                if (
-                    e.errorType in listOf(
-                        TicketingErrorType.NoRemainingQuantity,
-                        TicketingErrorType.ApprovePaymentFailed,
-                        TicketingErrorType.Unknown,
-                    )
-                ) {
-                    event(PaymentEvent.TicketSoldOut)
-                }
-            }.singleOrNull()?.let { (orderId, reservationId) ->
-                event(PaymentEvent.Approved(orderId, reservationId))
+
+                is TossPaymentState.Gift -> approveGiftPayment(
+                    paymentState,
+                    orderId,
+                    paymentKey,
+                    totalPrice
+                )
             }
+        }
+    }
+
+    private suspend fun approveTicketingPayment(
+        state: TossPaymentState.Ticketing,
+        orderId: String,
+        paymentKey: String,
+        totalPrice: Int,
+    ) {
+        ticketingRepository.approvePayment(
+            PaymentApproveRequest(
+                orderId = orderId,
+                amount = totalPrice,
+                paymentKey = paymentKey,
+                showId = state.showId,
+                salesTicketTypeId = state.salesTicketTypeId,
+                ticketCount = state.ticketCount,
+                reservationName = state.reservationName,
+                reservationPhoneNumber = state.reservationPhoneNumber,
+                depositorName = state.depositorName,
+                depositorPhoneNumber = state.depositorPhoneNumber,
+            )
+        ).catch { e ->
+            if (e !is TicketingException) throw e
+            if (
+                e.errorType in listOf(
+                    TicketingErrorType.NoRemainingQuantity,
+                    TicketingErrorType.ApprovePaymentFailed,
+                    TicketingErrorType.Unknown,
+                )
+            ) {
+                event(PaymentEvent.TicketSoldOut)
+            }
+        }.singleOrNull()?.let { (orderId, reservationId) ->
+            event(PaymentEvent.Approved(orderId, reservationId))
+        }
+    }
+
+    private suspend fun approveGiftPayment(
+        state: TossPaymentState.Gift,
+        orderId: String,
+        paymentKey: String,
+        totalPrice: Int,
+    ) {
+        giftRepository.approveGiftPayment(
+            GiftApproveRequest(
+                orderId = orderId,
+                amount = totalPrice,
+                paymentKey = paymentKey,
+                showId = state.showId,
+                salesTicketTypeId = state.salesTicketTypeId,
+                ticketCount = state.ticketCount,
+                giftImageId = state.giftImageId,
+                message = state.giftMessage,
+                senderName = state.senderName,
+                senderPhoneNumber = state.senderContact,
+                recipientName = state.receiverName,
+                recipientPhoneNumber = state.receiverContact,
+            )
+        ).catch { e ->
+            if (e !is TicketingException) throw e
+            if (
+                e.errorType in listOf(
+                    TicketingErrorType.NoRemainingQuantity,
+                    TicketingErrorType.ApprovePaymentFailed,
+                    TicketingErrorType.Unknown,
+                )
+            ) {
+                event(PaymentEvent.TicketSoldOut)
+            }
+        }.singleOrNull()?.let {
+            event(PaymentEvent.Approved(it.orderId, it.reservationId, it.giftId))
         }
     }
 

@@ -18,11 +18,36 @@ sealed class MainDestination(val route: String) {
         )
     }
 
+    data object Gift : MainDestination(route = "gift/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}") {
+        val arguments = listOf(
+            navArgument(showId) { type = NavType.StringType },
+            navArgument(salesTicketId) { type = NavType.StringType },
+            navArgument(ticketCount) { type = NavType.IntType },
+        )
+
+        fun createRoute(
+            showId: String,
+            salesTicketId: String,
+            ticketCount: Int,
+        ): String = "gift/$showId?salesTicketId=$salesTicketId&ticketCount=$ticketCount"
+    }
+
     data object PaymentComplete : MainDestination(route = "paymentComplete") {
         val arguments = listOf(
             navArgument(reservationId) { type = NavType.StringType },
             navArgument(showId) { type = NavType.StringType }
         )
+    }
+
+    data object GiftComplete : MainDestination(route = "giftComplete?reservationId={reservationId}&giftId={giftId}") {
+        val arguments = listOf(
+            navArgument(reservationId) { type = NavType.StringType },
+        )
+
+        fun createRoute(
+            reservationId: String,
+            giftId: String,
+        ): String = "giftComplete?reservationId=$reservationId&giftId=$giftId"
     }
 
     data object TicketDetail : MainDestination(route = "tickets") {

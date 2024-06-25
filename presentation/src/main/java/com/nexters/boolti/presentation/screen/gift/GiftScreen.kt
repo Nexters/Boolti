@@ -439,7 +439,7 @@ private fun ContactInfo(
             phoneNumber,
             placeholder = stringResource(R.string.ticketing_contact_placeholder),
             isPhoneNumber = true,
-            imeAction = ImeAction.Next,
+            imeAction = ImeAction.Done,
         ) {
             onPhoneNumberChanged(it)
         }

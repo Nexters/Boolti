@@ -11,6 +11,6 @@ fun NavGraphBuilder.addGiftCompleteScreen(
     composable(
         route = MainDestination.GiftComplete.route,
     ) {
-        GiftCompleteScreen(onClickClose = { TODO() }, onClickHome = navigateToHome)
+        GiftCompleteScreen(onClickClose = popBackStack, onClickHome = navigateToHome)
     }
 }

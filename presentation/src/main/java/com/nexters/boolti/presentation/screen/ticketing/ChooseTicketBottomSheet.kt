@@ -62,7 +62,6 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 
-// TODO : 티켓 정보와 수신자 정보도 같이 담자
 enum class TicketBottomSheetType {
     PURCHASE,
     GIFT

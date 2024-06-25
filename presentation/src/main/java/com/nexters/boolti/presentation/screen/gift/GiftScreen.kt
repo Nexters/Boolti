@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -70,7 +71,6 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey70
-import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
@@ -350,10 +350,15 @@ private fun CardSelection(
             val messageLengthUnit = stringResource(id = R.string.gift_message_length_unit)
 
             BasicTextField(
-                modifier = Modifier.height(80.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
                 value = message,
                 onValueChange = onMessageChanged,
-                textStyle = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+                textStyle = MaterialTheme.typography.titleLarge.copy(
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                ),
                 cursorBrush = SolidColor(Color.White)
             )
             Text(

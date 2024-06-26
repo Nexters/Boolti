@@ -49,7 +49,6 @@ private data class IndicatorRange(
     val size: Int
         get() = (endInclusive - start).absoluteValue + 1
 
-    override fun contains(value: Int): Boolean = value in start .. endInclusive
     operator fun minus(amount: Int): IndicatorRange = copy(start = start - amount, endInclusive = endInclusive - amount)
     operator fun plus(amount: Int): IndicatorRange = copy(start = start + amount, endInclusive = endInclusive + amount)
 }

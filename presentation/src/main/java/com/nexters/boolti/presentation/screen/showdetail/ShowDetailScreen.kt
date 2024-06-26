@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -44,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -74,6 +77,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
+import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
@@ -473,13 +477,23 @@ private fun SectionContent(
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
-    Text(
+    val uriHandler = LocalUriHandler.current
+    val urlParser = UrlParser(text)
+
+    ClickableText(
         modifier = modifier.heightIn(0.dp, 246.dp),
-        text = text,
+        text = urlParser.annotatedString,
         style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
         maxLines = maxLines,
         overflow = overflow,
-    )
+    ) { offset ->
+        val urlOffset = urlParser.urlOffsets.find { (start, end) -> offset in start..<end }
+        if (urlOffset == null) return@ClickableText
+        val (start, end) = urlOffset
+        val url = text.substring(start, end)
+
+        uriHandler.openUri(url)
+    }
 }
 
 @Composable

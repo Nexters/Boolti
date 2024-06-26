@@ -64,8 +64,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -77,9 +75,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -97,8 +93,6 @@ import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.InstagramIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.dayOfWeekString
-import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.MainDestination
@@ -107,23 +101,17 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 fun NavGraphBuilder.TicketDetailScreen(
     navigateTo: (String) -> Unit,
@@ -196,11 +184,9 @@ private fun TicketDetailScreen(
         }
     }
 
-    LaunchedEffect(pagerState.currentPage) {
-        snapshotFlow { pagerState }
-            .map { it.currentPage }
-            .onEach(viewModel::syncCurrentPage)
-            .launchIn(this)
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .collect(viewModel::syncCurrentPage)
     }
 
     Scaffold(
@@ -535,134 +521,6 @@ private fun QrCode(
                 text = csTicketId,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey70,
-            )
-        }
-    }
-}
-
-@Composable
-private fun TicketInfo(
-    bottomAreaHeight: Dp,
-    showName: String,
-    showDate: LocalDateTime,
-    placeName: String,
-    entryCode: String,
-    ticketState: TicketState,
-    onClickQr: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .height(bottomAreaHeight)
-            .background(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.background.copy(alpha = .2f),
-                        MaterialTheme.colorScheme.background
-                    ),
-                )
-            )
-            .padding(marginHorizontal),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = showName,
-                style = point2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onPrimary,
-            )
-            Row(
-                modifier = Modifier.padding(top = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-
-                Text(
-                    text = showDate.format("yyyy.MM.dd (${showDate.dayOfWeekString})"),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Grey30,
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 6.dp)
-                        .size(width = 1.dp, height = 13.dp)
-                        .background(Grey50),
-                )
-                Text(
-                    text = placeName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Grey30,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-        Spacer(modifier = Modifier.padding(12.dp))
-        TicketQr(entryCode, ticketState, onClickQr)
-    }
-}
-
-@Composable
-private fun TicketQr(
-    entryCode: String,
-    ticketState: TicketState,
-    onClickQr: () -> Unit,
-) {
-    if (entryCode.isBlank()) return
-
-    Box(
-        modifier = Modifier,
-        contentAlignment = Alignment.Center,
-    ) {
-        Image(
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(White)
-                .padding(2.dp)
-                .clickable {
-                    if (ticketState == TicketState.Ready) onClickQr()
-                },
-            painter = rememberQrBitmapPainter(
-                entryCode,
-                size = 66.dp,
-            ),
-            contentScale = ContentScale.Inside,
-            contentDescription = stringResource(R.string.description_qr),
-        )
-        if (ticketState != TicketState.Ready) {
-            val color = when (ticketState) {
-                TicketState.Used -> MaterialTheme.colorScheme.primary
-                TicketState.Finished -> Grey40
-                else -> Grey40
-            }
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .size(70.dp)
-                    .background(
-                        brush = SolidColor(Color.Black),
-                        alpha = 0.8f,
-                    )
-            )
-            Text(
-                modifier = Modifier
-                    .graphicsLayer(rotationZ = -16f)
-                    .border(
-                        width = 2.dp,
-                        color = color,
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                text = when (ticketState) {
-                    TicketState.Used -> stringResource(R.string.ticket_used_state)
-                    TicketState.Finished -> stringResource(R.string.ticket_show_finished_state)
-                    else -> ""
-                },
-                style = MaterialTheme.typography.titleMedium,
-                color = color,
             )
         }
     }

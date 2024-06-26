@@ -39,19 +39,19 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import kotlin.math.absoluteValue
 
 private data class IndicatorRange(
-    @androidx.annotation.IntRange(from = 0) val start: Int,
-    @androidx.annotation.IntRange(from = 0) val end: Int,
-) {
+    override val start: Int,
+    override val endInclusive: Int,
+) : ClosedRange<Int> {
     init {
-        check(start <= end)
+        check(start <= endInclusive)
     }
 
     val size: Int
-        get() = (end - start).absoluteValue + 1
+        get() = (endInclusive - start).absoluteValue + 1
 
-    operator fun invoke(): IntRange = start..end
-    operator fun minus(amount: Int): IndicatorRange = copy(start = start - amount, end = end - amount)
-    operator fun plus(amount: Int): IndicatorRange = copy(start = start + amount, end = end + amount)
+    override fun contains(value: Int): Boolean = value in start .. endInclusive
+    operator fun minus(amount: Int): IndicatorRange = copy(start = start - amount, endInclusive = endInclusive - amount)
+    operator fun plus(amount: Int): IndicatorRange = copy(start = start + amount, endInclusive = endInclusive + amount)
 }
 
 private class IndicatorUtil(
@@ -79,7 +79,7 @@ private class IndicatorUtil(
         range: IndicatorRange,
         offsetFraction: Float,
     ): Dp {
-        if (index in range()) return dotSize / 2
+        if (range.contains(index)) return dotSize / 2
 
         val diff = when (index < range.start) {
             true -> offsetFraction - index
@@ -147,7 +147,7 @@ fun InstagramIndicator(
         mutableStateOf(
             IndicatorRange(
                 start = s,
-                end = s + dotCount - 1,
+                endInclusive = s + dotCount - 1,
             )
         )
     }
@@ -165,7 +165,7 @@ fun InstagramIndicator(
      */
     val visibleRange by remember {
         derivedStateOf {
-            IndicatorRange(range.start - 2, range.end + 2)
+            IndicatorRange(range.start - 2, range.endInclusive + 2)
         }
     }
 
@@ -181,7 +181,7 @@ fun InstagramIndicator(
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             range = when {
-                page > range.end -> range + 1
+                page > range.endInclusive -> range + 1
                 page < range.start -> range - 1
                 else -> range
             }

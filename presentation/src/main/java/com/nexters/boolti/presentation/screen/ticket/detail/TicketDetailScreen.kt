@@ -73,7 +73,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -99,7 +98,7 @@ import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
-import com.nexters.boolti.presentation.theme.Grey20
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey60
@@ -153,12 +152,9 @@ private fun TicketDetailScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val ticketInfoHeight = 125.dp
     var contentWidth by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeight by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
-    val bottomAreaHeight =
-        ticketSectionHeight - ticketSectionHeightUntilTicketInfo + ticketInfoHeight.toPx()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
@@ -225,7 +221,7 @@ private fun TicketDetailScreen(
                     height = ticketSectionHeight,
                     circleRadius = 10.dp.toPx(),
                     cornerRadius = 8.dp.toPx(),
-                    bottomAreaHeight = bottomAreaHeight,
+                    bottomAreaHeight = ticketSectionHeightUntilTicketInfo,
                 )
                 Column(
                     modifier = Modifier
@@ -268,10 +264,6 @@ private fun TicketDetailScreen(
                         }
                         Column(
                             modifier = Modifier
-                                .onGloballyPositioned { coordinates ->
-                                    ticketSectionHeightUntilTicketInfo =
-                                        coordinates.size.height.toFloat()
-                                }
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
@@ -287,7 +279,8 @@ private fun TicketDetailScreen(
                             QrCodes(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(marginHorizontal),
+                                    .padding(top = 20.dp)
+                                    .padding(horizontal = marginHorizontal),
                                 ticketGroup = ticketGroup,
                                 pagerState = pagerState,
                                 onClickQr = onClickQr,
@@ -296,29 +289,38 @@ private fun TicketDetailScreen(
                             DottedDivider(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .padding(top = 28.dp)
                                     .padding(horizontal = marginHorizontal),
                                 color = White.copy(alpha = 0.3f),
                                 thickness = 2.dp
                             )
 
-                            Notice(notice = ticketGroup.ticketNotice)
-
-                            val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
-                            Inquiry(
-                                hostName = ticketGroup.hostName,
-                                hostPhoneNumber = ticketGroup.hostPhoneNumber,
-                                onClickCopyPlace = {
-                                    clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
-                                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(copiedMessage)
-                                        }
+                            Column(
+                                modifier = Modifier
+                                    .onGloballyPositioned { coordinates ->
+                                        ticketSectionHeightUntilTicketInfo =
+                                            coordinates.size.height.toFloat()
                                     }
-                                },
-                                onClickNavigateToShowDetail = {
-                                    navigateToShowDetail(ticketGroup.showId)
-                                }
-                            )
+                            ) {
+                                Notice(notice = ticketGroup.ticketNotice)
+
+                                val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                                Inquiry(
+                                    hostName = ticketGroup.hostName,
+                                    hostPhoneNumber = ticketGroup.hostPhoneNumber,
+                                    onClickCopyPlace = {
+                                        clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
+                                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(copiedMessage)
+                                            }
+                                        }
+                                    },
+                                    onClickNavigateToShowDetail = {
+                                        navigateToShowDetail(ticketGroup.showId)
+                                    }
+                                )
+                            }
                         }
 
                         // 티켓 좌상단 꼭지점 그라데이션
@@ -409,17 +411,19 @@ private fun Title(showName: String = "") {
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .alpha(0.65f)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
             text = showName,
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            style = MaterialTheme.typography.titleMedium,
             color = Grey80,
         )
         Image(
-            modifier = Modifier.padding(end = 4.dp),
+            modifier = Modifier
+                .padding(end = 4.dp)
+                .size(22.dp),
             painter = painterResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
             contentDescription = null,
@@ -531,7 +535,7 @@ private fun Notice(notice: String) {
     Column(
         modifier = Modifier
             .padding(horizontal = marginHorizontal)
-            .padding(top = 16.dp, bottom = 20.dp)
+            .padding(top = 36.dp, bottom = 20.dp)
             .fillMaxWidth(),
     ) {
         Text(
@@ -596,7 +600,7 @@ private fun Inquiry(
                 modifier = Modifier.weight(1f),
                 onClick = onClickNavigateToShowDetail,
                 colors = ButtonDefaults.textButtonColors(
-                    containerColor = Grey20,
+                    containerColor = Grey15,
                     contentColor = MaterialTheme.colorScheme.surface,
                 ),
                 contentPadding = PaddingValues(vertical = 13.dp),

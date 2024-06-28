@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -117,6 +118,7 @@ private fun TicketContent(
             model = asyncImageBlurModel(context, ticket.poster, radius = 24),
             modifier = Modifier
                 .fillMaxSize()
+                .shadow(10.dp, RoundedCornerShape(8.dp), ambientColor = White, spotColor = White)
                 .alpha(.8f),
             contentScale = ContentScale.Crop,
             contentDescription = null,
@@ -197,7 +199,7 @@ private fun Title(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .alpha(0.65f)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -209,7 +211,7 @@ private fun Title(
         Icon(
             modifier = Modifier
                 .padding(end = 4.dp)
-                .size(20.dp),
+                .size(22.dp),
             painter = painterResource(R.drawable.ic_logo),
             tint = Grey80,
             contentDescription = null,

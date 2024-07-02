@@ -32,6 +32,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,6 +70,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -107,6 +109,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.TicketShape
+import com.nexters.boolti.presentation.util.UrlParser
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
@@ -538,17 +541,26 @@ private fun Notice(notice: String) {
             .padding(top = 36.dp, bottom = 20.dp)
             .fillMaxWidth(),
     ) {
+        val uriHandler = LocalUriHandler.current
+        val urlParser = remember(notice) { UrlParser(notice) }
+
         Text(
             text = stringResource(R.string.ticket_notice_title),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(
+        ClickableText(
             modifier = Modifier.padding(top = 12.dp),
-            text = notice,
-            style = MaterialTheme.typography.bodySmall,
-            color = Grey30,
-        )
+            text = urlParser.annotatedString,
+            style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
+        ) { offset ->
+            val urlOffset = urlParser.urlOffsets.find { (start, end) -> offset in start..<end }
+            if (urlOffset == null) return@ClickableText
+            val (start, end) = urlOffset
+            val url = notice.substring(start, end)
+
+            uriHandler.openUri(url)
+        }
     }
 }
 

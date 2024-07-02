@@ -199,18 +199,20 @@ private fun Title(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .alpha(0.65f)
-            .padding(horizontal = 20.dp, vertical = 6.dp),
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .weight(1f),
             text = ticketName + " • " + stringResource(R.string.ticket_count, ticketCount),
             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
             color = Grey80,
         )
         Icon(
             modifier = Modifier
-                .padding(end = 4.dp)
+                .padding(end = 16.dp)
                 .size(22.dp),
             painter = painterResource(R.drawable.ic_logo),
             tint = Grey80,

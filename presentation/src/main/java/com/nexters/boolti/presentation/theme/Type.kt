@@ -60,6 +60,13 @@ private val subhead1 = createTextStyle(
     lineHeight = 24.sp,
 )
 
+private val subhead0 = createTextStyle(
+    fontFamily = pretendardFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 15.sp,
+    lineHeight = 21.sp,
+)
+
 private val body4 = createTextStyle(
     fontFamily = pretendardFamily,
     fontWeight = FontWeight.Normal,
@@ -154,8 +161,8 @@ val Typography = Typography(
 
     titleLarge = subhead2,
     titleMedium = subhead1,
+    titleSmall = subhead0,
 
-    titleSmall = body4,
     bodyLarge = body3,
     bodyMedium = body2,
     bodySmall = body1,

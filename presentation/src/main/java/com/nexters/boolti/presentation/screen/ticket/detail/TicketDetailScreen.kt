@@ -417,7 +417,7 @@ private fun Title(showName: String = "") {
         Text(
             modifier = Modifier.weight(1f),
             text = showName,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
             color = Grey80,
         )
         Image(
@@ -493,7 +493,7 @@ private fun QrCode(
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 text = ticketName,
                 color = Grey70,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
             )
             Box(
                 modifier = Modifier

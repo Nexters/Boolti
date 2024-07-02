@@ -55,7 +55,7 @@
     <string name="next">다음</string>
     <string name="show">보기</string>
 
-    <string name="ticket_holder">예매자</string>
+    <string name="ticket_holder">방문자</string>
     <string name="depositor">결제자</string>
     <string name="ticket">티켓</string>
     <string name="invite_ticket">초청 티켓</string>
@@ -125,7 +125,7 @@
     <string name="ticketing_button_finished_show">공연 종료</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
     <string name="ticketing_toolbar_title">결제하기</string>
-    <string name="ticketing_ticket_holder_label">예매자 정보</string>
+    <string name="ticketing_ticket_holder_label">방문자 정보</string>
     <string name="depositor_info_label">결제자 정보</string>
     <string name="ticket_info_label">티켓 정보</string>
     <string name="invite_code_label">초청 코드</string>
@@ -147,7 +147,7 @@
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
     <string name="ticketing_invite_code_invalid">올바른 초청 코드를 입력해 주세요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
-    <string name="ticketing_same_contact_info">예매자와 결제자가 같아요</string>
+    <string name="ticketing_same_contact_info">방문자와 결제자가 같아요</string>
     <string name="ticket_type_label">티켓 종류</string>
     <string name="ticket_count_label">티켓 매수</string>
     <string name="total_payment_amount_label">총 결제 금액</string>
@@ -188,7 +188,6 @@
     <string name="account_holder">예금주</string>
     <string name="account_transfer_due_date">입금 마감일</string>
     <string name="invite_ticket_complete_title">결제를 완료했어요</string>
-    <string name="invite_ticket_complete_description">예매자 정보 확인 후 티켓이 발권됩니다.</string>
     <string name="payment_failed">결제에 실패했어요</string>
     <string name="payment_failed_description">예매 진행 중 오류가 발생하였습니다.\n다시 시도해 주세요</string>
 
@@ -196,7 +195,7 @@
     <string name="my_login">불티 로그인 하러가기</string>
     <string name="my_login_sub">원하는 공연 티켓을 예매해보세요!</string>
     <string name="my_logout">로그아웃</string>
-    <string name="my_ticketing_history">예매 내역</string>
+    <string name="my_ticketing_history">결제 내역</string>
     <string name="my_scan_qr">QR 스캔</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
     <string name="my_register_show">공연 등록</string>
@@ -207,8 +206,8 @@
     <string name="hosted_shows_empty_desc">공연을 주최하고 QR 스캐너로\n관객 입장을 관리해 보세요</string>
     <string name="message_ticket_validated">사용되었어요</string>
 
-    <!-- 예매 내역 -->
-    <string name="reservations_empty">예매 내역이 없어요</string>
+    <!-- 결제 내역 -->
+    <string name="reservations_empty">결제 내역이 없어요</string>
     <string name="reservations_empty_sub">티켓을 예매하고 공연을 즐겨보세요!</string>
     <string name="reservations_depositing">입금 확인 중</string>
     <string name="reservations_refunding">취소 진행 중</string>
@@ -220,8 +219,8 @@
     <string name="reservations_ticket_count_price_format">"%s / %d매 / %,d원"</string>
     <string name="reservations_ticket_count_price_format_short">%d매 / %,d원"</string>
 
-    <!-- 예매 내역 상세 -->
-    <string name="reservation_detail">예매 내역 상세</string>
+    <!-- 결제 내역 상세 -->
+    <string name="reservation_detail">결제 내역 상세</string>
     <string name="reservation_account_info">입금 계좌 정보</string>
     <string name="payment_info_label">결제 정보</string>
     <string name="payment_state_label">결제 수단</string>
@@ -235,7 +234,7 @@
     <string name="reservation_breakdown_of_refund">환불 내역</string>
     <string name="reservation_price_of_refund">총 환불 금액</string>
     <string name="show_ticket">티켓 보기</string>
-    <string name="show_reservation">예매 내역보기</string>
+    <string name="show_reservation">결제 내역보기</string>
 
     <!-- 환불 -->
     <string name="refund_button">취소 요청하기</string>

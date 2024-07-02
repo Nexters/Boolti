@@ -29,12 +29,7 @@ sealed class MainDestination(val route: String) {
         val arguments = listOf(navArgument(ticketId) { type = NavType.StringType })
     }
 
-    data object Qr : MainDestination(route = "qr") {
-        val arguments = listOf(
-            navArgument(data) { type = NavType.StringType },
-            navArgument(ticketName) { type = NavType.StringType },
-        )
-    }
+    data object Qr : MainDestination(route = "qr")
 
     data object Reservations : MainDestination(route = "reservations")
     data object ReservationDetail : MainDestination(route = "reservations") {

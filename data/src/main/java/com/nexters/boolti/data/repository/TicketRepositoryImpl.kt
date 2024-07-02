@@ -6,7 +6,8 @@ import com.nexters.boolti.domain.exception.ManagerCodeErrorType
 import com.nexters.boolti.domain.exception.ManagerCodeException
 import com.nexters.boolti.domain.exception.TicketException
 import com.nexters.boolti.domain.extension.errorType
-import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.LegacyTicket
+import com.nexters.boolti.domain.model.TicketGroup
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
 import kotlinx.coroutines.flow.Flow
@@ -17,12 +18,27 @@ internal class TicketRepositoryImpl @Inject constructor(
     private val dataSource: TicketDataSource,
     private val hostDataSource: HostDataSource,
 ) : TicketRepository {
-    override suspend fun getTicket(): Flow<List<Ticket>> = flow {
+    override suspend fun legacyGetTicket(): Flow<List<LegacyTicket>> = flow {
+        emit(dataSource.legacyGetTickets())
+    }
+
+    override suspend fun legacyGetTicket(ticketId: String): Flow<LegacyTicket> = flow {
+        val response = dataSource.legacyGetTicket(ticketId)
+        if (response.isSuccessful) {
+            response.body()?.toDomain()?.let { emit(it) }
+        } else {
+            when (response.code()) {
+                404 -> throw TicketException.TicketNotFound
+            }
+        }
+    }
+
+    override fun getTickets(): Flow<List<TicketGroup>> = flow {
         emit(dataSource.getTickets())
     }
 
-    override suspend fun getTicket(ticketId: String): Flow<Ticket> = flow {
-        val response = dataSource.getTicket(ticketId)
+    override fun getTicket(reservationId: String): Flow<TicketGroup> = flow {
+        val response = dataSource.getTicket(reservationId)
         if (response.isSuccessful) {
             response.body()?.toDomain()?.let { emit(it) }
         } else {

@@ -1,7 +1,7 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.data.util.toLocalDateTime
-import com.nexters.boolti.domain.model.Ticket
+import com.nexters.boolti.domain.model.LegacyTicket
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -21,7 +21,7 @@ internal data class TicketDto(
     val ticketCreatedAt: String,
     val csTicketId: String,
 ) {
-    fun toDomain(): Ticket = Ticket(
+    fun toDomain(): LegacyTicket = LegacyTicket(
         userId = userId,
         ticketId = ticketId,
         showName = showName,
@@ -61,7 +61,7 @@ data class TicketDetailDto(
     val csReservationId: String = "",
     val csTicketId: String = "",
 ) {
-    fun toDomain(): Ticket = Ticket(
+    fun toDomain(): LegacyTicket = LegacyTicket(
         userId = userId,
         showId = showId,
         ticketId = ticketId,

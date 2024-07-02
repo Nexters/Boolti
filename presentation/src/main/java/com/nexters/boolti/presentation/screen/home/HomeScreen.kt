@@ -7,7 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -40,13 +40,11 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
-import kotlinx.coroutines.channels.consumeEach
 
 @Composable
 fun HomeScreen(
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
-    onClickQr: (data: String, ticketName: String) -> Unit,
     onClickQrScan: () -> Unit,
     onClickSignout: () -> Unit,
     navigateToReservations: () -> Unit,
@@ -108,7 +106,6 @@ fun HomeScreen(
                 when (loggedIn) {
                     true -> TicketScreen(
                         onClickTicket = onClickTicket,
-                        onClickQr = onClickQr,
                         modifier = modifier.padding(innerPadding),
                     )
 
@@ -153,7 +150,7 @@ private fun HomeNavigationBar(
     modifier: Modifier = Modifier,
 ) {
     Column {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,
             color = Grey85,

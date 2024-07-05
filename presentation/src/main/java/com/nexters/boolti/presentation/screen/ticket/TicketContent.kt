@@ -118,7 +118,6 @@ private fun TicketContent(
             model = asyncImageBlurModel(context, ticket.poster, radius = 24),
             modifier = Modifier
                 .fillMaxSize()
-                .shadow(10.dp, RoundedCornerShape(8.dp), ambientColor = White, spotColor = White)
                 .alpha(.8f),
             contentScale = ContentScale.Crop,
             contentDescription = null,

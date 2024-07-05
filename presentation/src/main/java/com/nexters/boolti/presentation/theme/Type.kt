@@ -62,7 +62,7 @@ private val subhead1 = createTextStyle(
 
 private val subhead0 = createTextStyle(
     fontFamily = pretendardFamily,
-    fontWeight = FontWeight.Normal,
+    fontWeight = FontWeight.SemiBold,
     fontSize = 14.sp,
     lineHeight = 22.sp,
 )

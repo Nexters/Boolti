@@ -428,7 +428,7 @@ private fun Title(showName: String = "") {
                 .padding(end = 4.dp)
                 .size(22.dp),
             painter = painterResource(R.drawable.ic_logo),
-            colorFilter = ColorFilter.tint(Grey70.copy(alpha = 0.5f)),
+            colorFilter = ColorFilter.tint(Grey80),
             contentDescription = null,
         )
     }

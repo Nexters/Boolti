@@ -28,33 +28,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.Ticket
-import com.nexters.boolti.domain.model.TicketState
+import com.nexters.boolti.domain.model.TicketGroup
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.extension.dayOfWeekString
 import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
@@ -62,30 +61,27 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
-import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import java.time.LocalDateTime
 
 @Composable
 fun Ticket(
     modifier: Modifier = Modifier,
-    ticket: Ticket,
+    ticket: TicketGroup,
     onClick: () -> Unit,
-    onClickQr: (data: String, ticketName: String) -> Unit,
 ) {
     Card(
         modifier = modifier,
         shape = RectangleShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
     ) {
-        TicketContent(ticket = ticket, onClick = onClick, onClickQr = onClickQr)
+        TicketContent(ticket = ticket, onClick = onClick)
     }
 }
 
 @Composable
 private fun TicketContent(
-    ticket: Ticket,
+    ticket: TicketGroup,
     onClick: () -> Unit,
-    onClickQr: (data: String, ticketName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -151,7 +147,7 @@ private fun TicketContent(
                 ),
         )
         Column {
-            Title(ticket.ticketName, ticket.csTicketId)
+            Title(ticket.ticketName, ticket.tickets.size)
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -174,9 +170,7 @@ private fun TicketContent(
                 showName = ticket.showName,
                 showDate = ticket.showDate,
                 placeName = ticket.placeName,
-                entryCode = ticket.entryCode,
-                ticketState = ticket.ticketState,
-                onClickQr = { onClickQr(it, ticket.ticketName) },
+                onClickQr = onClick,
             )
         }
         // 티켓 좌상단 꼭지점 그라데이션
@@ -198,33 +192,30 @@ private fun TicketContent(
 @Composable
 private fun Title(
     ticketName: String = "",
-    csTicketId: String = "",
+    ticketCount: Int = 0,
 ) {
     Row(
         modifier = Modifier
             .background(White.copy(alpha = 0.3f))
             .alpha(0.65f)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Text(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .weight(1f),
+            text = ticketName + " • " + stringResource(R.string.ticket_count, ticketCount),
+            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+            color = Grey80,
+        )
         Icon(
             modifier = Modifier
-                .padding(end = 4.dp)
-                .size(20.dp),
+                .padding(end = 16.dp)
+                .size(22.dp),
             painter = painterResource(R.drawable.ic_logo),
             tint = Grey80,
             contentDescription = null,
-        )
-        Text(
-            modifier = Modifier.weight(1f),
-            text = ticketName,
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-            color = Grey80,
-        )
-        Text(
-            text = csTicketId,
-            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-            color = Grey80,
         )
     }
 }
@@ -235,9 +226,7 @@ private fun TicketInfo(
     showName: String,
     showDate: LocalDateTime,
     placeName: String,
-    entryCode: String,
-    ticketState: TicketState,
-    onClickQr: (entryCode: String) -> Unit,
+    onClickQr: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -280,68 +269,29 @@ private fun TicketInfo(
             }
         }
         Spacer(modifier = Modifier.padding(12.dp))
-        TicketQr(entryCode, ticketState, onClickQr)
+        TicketQr(onClickQr = onClickQr)
     }
 }
 
 @Composable
 private fun TicketQr(
-    entryCode: String,
-    ticketState: TicketState,
-    onClickQr: (entryCode: String) -> Unit,
+    modifier: Modifier = Modifier,
+    onClickQr: () -> Unit,
 ) {
     Box(
-        modifier = Modifier,
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         Image(
             modifier = Modifier
-                .padding(vertical = 8.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(White)
-                .padding(2.dp)
-                .clickable {
-                    if (ticketState == TicketState.Ready) onClickQr(entryCode)
-                },
-            painter = rememberQrBitmapPainter(
-                entryCode,
-                size = 66.dp,
-            ),
-            contentScale = ContentScale.Inside,
+                .size(58.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(width = 1.dp, color = White, RoundedCornerShape(8.dp))
+                .padding(12.dp)
+                .clickable(onClick = onClickQr),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_qr),
+            contentScale = ContentScale.Fit,
             contentDescription = stringResource(R.string.description_qr),
         )
-        if (ticketState != TicketState.Ready) {
-            val color = when (ticketState) {
-                TicketState.Used -> MaterialTheme.colorScheme.primary
-                TicketState.Finished -> Grey40
-                else -> Grey40
-            }
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .size(70.dp)
-                    .background(
-                        brush = SolidColor(Black),
-                        alpha = 0.8f,
-                    )
-            )
-            Text(
-                modifier = Modifier
-                    .graphicsLayer(rotationZ = -16f)
-                    .border(
-                        width = 2.dp,
-                        color = color,
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                text = when (ticketState) {
-                    TicketState.Used -> stringResource(R.string.ticket_used_state)
-                    TicketState.Finished -> stringResource(R.string.ticket_show_finished_state)
-                    else -> ""
-                },
-                style = MaterialTheme.typography.titleMedium,
-                color = color,
-            )
-        }
     }
 }

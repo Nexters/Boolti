@@ -65,7 +65,7 @@ fun ShowFeed(
                 contentScale = ContentScale.Crop,
             )
 
-            if (showState is ShowState.WaitingTicketing || showState is ShowState.FinishedShow) {
+            if (showState is ShowState.WaitingTicketing) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

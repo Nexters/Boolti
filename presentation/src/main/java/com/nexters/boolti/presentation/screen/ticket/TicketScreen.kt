@@ -30,7 +30,6 @@ import kotlin.math.absoluteValue
 @Composable
 fun TicketScreen(
     onClickTicket: (String) -> Unit,
-    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TicketViewModel = hiltViewModel(),
 ) {
@@ -49,7 +48,6 @@ fun TicketScreen(
         uiState.tickets.isNotEmpty() -> TicketNotEmptyScreen(
             modifier,
             uiState,
-            onClickQr,
             onClickTicket = onClickTicket
         )
 
@@ -62,7 +60,6 @@ fun TicketScreen(
 private fun TicketNotEmptyScreen(
     modifier: Modifier,
     uiState: TicketUiState,
-    onClickQr: (entryCode: String, ticketName: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
 ) {
     Column(
@@ -83,7 +80,7 @@ private fun TicketNotEmptyScreen(
                 .align(Alignment.CenterHorizontally)
                 .weight(1f),
             state = pagerState,
-            key = { uiState.tickets[it].ticketId },
+            key = { uiState.tickets[it].reservationId },
             contentPadding = PaddingValues(horizontal = contentPadding),
             pageSpacing = pageSpacing,
         ) { page ->
@@ -108,9 +105,8 @@ private fun TicketNotEmptyScreen(
                             translationX = sign * size.width * (1 - it) / 2
                         }
                     },
-                onClick = { onClickTicket(ticket.ticketId) },
+                onClick = { onClickTicket(ticket.reservationId) },
                 ticket = ticket,
-                onClickQr = onClickQr,
             )
         }
         Card(
@@ -124,6 +120,7 @@ private fun TicketNotEmptyScreen(
             Text(
                 text = "${pagerState.currentPage + 1}/${pagerState.pageCount}",
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
+                style = MaterialTheme.typography.bodySmall,
             )
         }
     }

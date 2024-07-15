@@ -30,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,7 +39,6 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
 import com.nexters.boolti.presentation.screen.payment.TicketSummarySection
-import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey40
@@ -85,7 +83,7 @@ fun GiftCompleteScreen(
             )
             InfoRow(
                 label = stringResource(R.string.gift_receiver),
-                value = "${gift?.recipientName} / ${gift?.recipientPhoneNumber}"
+                value = if (gift != null) "${gift?.recipientName} / ${gift?.recipientPhoneNumber}" else ""
             )
             TextButton(
                 modifier = Modifier

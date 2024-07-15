@@ -28,3 +28,5 @@ val Grey80 = Color(0xFF2E303A)
 val Grey85 = Color(0xFF1B1D23)
 val Grey90 = Color(0xFF121318)
 val Grey95 = Color(0xFF090A0B)
+
+val KakaoYellow = Color(0XFFFFE833)

@@ -47,6 +47,7 @@ import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey95
+import com.nexters.boolti.presentation.theme.KakaoYellow
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point4
 
@@ -92,7 +93,7 @@ fun GiftCompleteScreen(
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(4.dp),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0XFFFFE833)),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = KakaoYellow),
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 onClick = { TODO() }
             ) {

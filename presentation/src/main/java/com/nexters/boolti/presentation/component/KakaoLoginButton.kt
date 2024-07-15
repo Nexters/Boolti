@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.component
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +24,7 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey95
+import com.nexters.boolti.presentation.theme.KakaoYellow
 import timber.log.Timber
 
 @Composable
@@ -57,7 +57,7 @@ fun KakaoLoginButton(
             .fillMaxWidth()
             .height(48.dp),
         shape = RoundedCornerShape(4.dp),
-        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0XFFFFE833)),
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = KakaoYellow),
         contentPadding = PaddingValues(horizontal = 20.dp)
     ) {
         Box(

@@ -54,9 +54,10 @@ class TicketDetailViewModel @Inject constructor(
                         TicketException.TicketNotFound -> event(TicketDetailEvent.NotFound)
                     }
                 }
-                .singleOrNull()?.let { ticket ->
-                    _uiState.update { it.copy(ticket = ticket) }
+                .onEach { ticketGroup ->
+                    _uiState.update { it.copy(ticketGroup = ticketGroup) }
                 }
+                .launchIn(viewModelScope + recordExceptionHandler)
 
             getRefundPolicyUsecase().onEach { refundPolicy ->
                 _uiState.update { it.copy(refundPolicy = refundPolicy) }
@@ -67,10 +68,11 @@ class TicketDetailViewModel @Inject constructor(
     fun refresh() = load()
 
     fun requestEntrance(managerCode: String) {
-        val ticket = uiState.value.ticket
+        val ticket = uiState.value.legacyTicket
+        val ticketGroup = uiState.value.ticketGroup
         viewModelScope.launch(recordExceptionHandler) {
             repository.requestEntrance(
-                ManagerCodeRequest(showId = ticket.showId, ticketId = ticket.ticketId, managerCode = managerCode)
+                ManagerCodeRequest(showId = ticketGroup.showId, ticketId = ticket.ticketId, managerCode = managerCode)
             ).catch { e ->
                 when (e) {
                     is ManagerCodeException -> {
@@ -90,6 +92,10 @@ class TicketDetailViewModel @Inject constructor(
 
     fun setManagerCode(code: String) {
         _managerCodeState.update { it.copy(code = code, error = null) }
+    }
+
+    fun syncCurrentPage(page: Int) {
+        _uiState.update { it.copy(currentPage = page) }
     }
 
     private fun event(event: TicketDetailEvent) {

@@ -140,22 +140,36 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             )
         }
 
-        TicketDetailScreen(
-            modifier = modifier,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack
-        )
         TicketingScreen(
             modifier = modifier,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
+
+        navigation(
+            route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+            startDestination = "detail",
+            arguments = MainDestination.TicketDetail.arguments,
+        ) {
+            TicketDetailScreen(
+                modifier = modifier,
+                navigateTo = navController::navigateTo,
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+            )
+            QrFullScreen(
+                modifier = modifier,
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+            )
+        }
+
         addGiftScreen(
             modifier = modifier,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
-        QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)
+
         HostedShowScreen(
             modifier = modifier,
             onClickShow = onClickQrScan,

@@ -270,7 +270,7 @@ private fun PaymentCompleteScreenPreview() {
 
 
 @Composable
-private fun PaymentToolbar(
+fun PaymentToolbar(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
 ) {

@@ -119,7 +119,8 @@ fun TicketingScreen(
                 RESULT_SUCCESS -> {
                     val intent = result.data ?: return@rememberLauncherForActivityResult
                     val reservationId =
-                        intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                        intent.getStringExtra("reservationId")
+                            ?: return@rememberLauncherForActivityResult
                     onReserved(reservationId, viewModel.showId)
                 }
 
@@ -190,6 +191,7 @@ fun TicketingScreen(
                     .verticalScroll(scrollState),
             ) {
                 Header(
+                    modifier = Modifier.padding(20.dp),
                     poster = uiState.poster,
                     showName = uiState.showName,
                     showDate = uiState.showDate,
@@ -216,11 +218,13 @@ fun TicketingScreen(
                 }
 
                 // 티켓 정보
-                TicketInfoSection(
-                    ticketName = uiState.ticketName,
-                    ticketCount = uiState.ticketCount,
-                    totalPrice = uiState.totalPrice,
-                )
+                Section(title = stringResource(R.string.ticket_info_label)) {
+                    TicketInfoSection(
+                        ticketName = uiState.ticketName,
+                        ticketCount = uiState.ticketCount,
+                        totalPrice = uiState.totalPrice,
+                    )
+                }
 
                 // 초청 코드
                 if (uiState.isInviteTicket) {
@@ -327,14 +331,16 @@ fun TicketingScreen(
     }
 }
 
+// TODO : 자주 쓰이는 컴포넌트이므로 별도의 컴포넌트로 관리하는 게 빼야겠다
 @Composable
-private fun Header(
+internal fun Header(
     poster: String,
     showName: String,
     showDate: LocalDateTime,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier.padding(20.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
@@ -370,7 +376,7 @@ private fun Header(
 }
 
 @Composable
-private fun RefundPolicySection(refundPolicy: List<String>) {
+internal fun RefundPolicySection(refundPolicy: List<String>) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0F else 180F,
@@ -491,8 +497,15 @@ private fun InviteCodeSection(
 }
 
 @Composable
-private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
-    Section(title = stringResource(R.string.ticket_info_label)) {
+internal fun TicketInfoSection(
+    ticketName: String,
+    ticketCount: Int,
+    totalPrice: Int,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
         SectionTicketInfo(
             stringResource(R.string.ticket_type_label),
             ticketName,
@@ -630,7 +643,7 @@ private fun TicketHolderSection(
 }
 
 @Composable
-private fun OrderAgreementSection(
+internal fun OrderAgreementSection(
     totalAgreed: Boolean,
     agreement: List<Pair<Int, Boolean>>,
     onClickTotalAgree: () -> Unit,
@@ -724,7 +737,7 @@ private fun ShowButton(
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     modifier: Modifier = Modifier,
     title: String,
     titleRowOption: (@Composable () -> Unit)? = null,

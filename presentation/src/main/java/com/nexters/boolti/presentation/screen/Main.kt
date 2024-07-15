@@ -26,6 +26,8 @@ import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.business.BusinessScreen
+import com.nexters.boolti.presentation.screen.gift.addGiftScreen
+import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
@@ -109,10 +111,6 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             startDestination = "detail",
             arguments = ShowDetail.arguments,
             deepLinks = listOf(
-//                navDeepLink {
-//                    uriPattern = "https://app.boolti.in/show?showId={$showId}"
-//                    action = Intent.ACTION_VIEW
-//                },
                 navDeepLink {
                     uriPattern = "https://preview.boolti.in/show/{$showId}"
                     action = Intent.ACTION_VIEW
@@ -166,6 +164,12 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             )
         }
 
+        addGiftScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+
         HostedShowScreen(
             modifier = modifier,
             onClickShow = onClickQrScan,
@@ -182,6 +186,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                 )
             },
             navigateToHome = navController::navigateToHome,
+        )
+        addGiftCompleteScreen(
+            navigateToHome = navController::navigateToHome,
+            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true)}
         )
         BusinessScreen(popBackStack = navController::popBackStack)
     }

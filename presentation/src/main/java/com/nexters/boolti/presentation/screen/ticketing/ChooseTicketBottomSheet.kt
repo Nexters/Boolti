@@ -62,12 +62,19 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 
+enum class TicketBottomSheetType {
+    PURCHASE,
+    GIFT
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseTicketBottomSheet(
-    viewModel: SalesTicketViewModel = hiltViewModel(),
+    ticketType: TicketBottomSheetType = TicketBottomSheetType.PURCHASE,
     onTicketingClicked: (ticket: SalesTicket, count: Int) -> Unit,
+    onGiftTicketClicked: (ticket: SalesTicket, count: Int) -> Unit,
     onDismissRequest: () -> Unit,
+    viewModel: SalesTicketViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -106,16 +113,24 @@ fun ChooseTicketBottomSheet(
         ) {
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
+                    ticketType = ticketType,
                     ticket = it,
                     onCloseClicked = viewModel::unSelectTicket,
                     onTicketingClicked = { ticket, count ->
-                        onTicketingClicked(ticket.ticket, count)
+                        if (ticketType == TicketBottomSheetType.PURCHASE) {
+                            onTicketingClicked(ticket.ticket, count)
+                        } else {
+                            onGiftTicketClicked(ticket.ticket, count)
+                        }
+
                         viewModel.unSelectTicket()
                     },
                 )
             } ?: run {
                 ChooseTicketBottomSheetContent1(
-                    tickets = uiState.tickets,
+                    tickets = uiState.tickets.filter { ticket ->
+                        ticketType == TicketBottomSheetType.PURCHASE || !ticket.ticket.isInviteTicket
+                    },
                     onSelectItem = viewModel::selectTicket,
                 )
             }
@@ -153,12 +168,18 @@ private fun ChooseTicketBottomSheetContent1(
 
 @Composable
 private fun ChooseTicketBottomSheetContent2(
-    modifier: Modifier = Modifier,
+    ticketType: TicketBottomSheetType,
     ticket: TicketWithQuantity,
     onCloseClicked: () -> Unit,
     onTicketingClicked: (ticket: TicketWithQuantity, count: Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var ticketCount by remember { mutableIntStateOf(1) }
+    val buttonTextId = if (ticketType == TicketBottomSheetType.PURCHASE) {
+        R.string.ticketing_button_label
+    } else {
+        R.string.ticketing_give_a_gift
+    }
 
     Column(modifier) {
         Row(
@@ -233,7 +254,7 @@ private fun ChooseTicketBottomSheetContent2(
         }
 
         MainButton(
-            label = stringResource(R.string.ticketing_button_label),
+            label = stringResource(buttonTextId),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
@@ -332,6 +353,7 @@ private fun TicketingTicket1Preview() {
 private fun TicketingTicket2Preview() {
     BooltiTheme {
         ChooseTicketBottomSheetContent2(
+            ticketType = TicketBottomSheetType.PURCHASE,
             ticket = TicketWithQuantity(
                 ticket = SalesTicket(
                     id = "legimus",
@@ -343,7 +365,8 @@ private fun TicketingTicket2Preview() {
                 quantity = 100,
             ),
             onCloseClicked = {},
-        ) { _, _ -> }
+            onTicketingClicked = { _, _ -> },
+        )
     }
 }
 

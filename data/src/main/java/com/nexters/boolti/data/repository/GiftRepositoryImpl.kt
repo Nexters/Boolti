@@ -15,8 +15,8 @@ import javax.inject.Inject
 internal class GiftRepositoryImpl @Inject constructor(
     private val dataSource: GiftDataSource
 ) : GiftRepository {
-    override fun receiverGift(giftId: String): Flow<Boolean> = flow {
-        emit(dataSource.receiverGift(GiftReceiveRequest(giftId)))
+    override fun receiveGift(giftId: String): Flow<Boolean> = flow {
+        emit(dataSource.receiveGift(GiftReceiveRequest(giftId)))
     }
 
     override fun approveGiftPayment(request: GiftApproveRequest): Flow<ApproveGiftPayment> = flow {

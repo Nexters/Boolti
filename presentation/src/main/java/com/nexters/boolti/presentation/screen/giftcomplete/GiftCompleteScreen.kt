@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.giftcomplete
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kakao.sdk.share.ShareClient
+import com.kakao.sdk.template.model.Button
+import com.kakao.sdk.template.model.Content
+import com.kakao.sdk.template.model.FeedTemplate
+import com.kakao.sdk.template.model.ItemContent
+import com.kakao.sdk.template.model.ItemInfo
+import com.kakao.sdk.template.model.Link
+import com.kakao.sdk.template.model.Social
+import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
@@ -48,6 +58,7 @@ import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.KakaoYellow
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point4
+import timber.log.Timber
 
 @Composable
 fun GiftCompleteScreen(
@@ -57,6 +68,7 @@ fun GiftCompleteScreen(
 ) {
     val reservation by viewModel.reservation.collectAsStateWithLifecycle()
     val gift by viewModel.gift.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     BackHandler(onBack = onClickClose)
 
@@ -93,7 +105,15 @@ fun GiftCompleteScreen(
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = KakaoYellow),
                 contentPadding = PaddingValues(horizontal = 20.dp),
-                onClick = { TODO() }
+                onClick = {
+                    if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
+                        gift?.let {
+                            sendMessage(context, it)
+                        }
+                    } else {
+                        // 카카오톡 미설치: 웹 공유 사용 권장
+                    }
+                }
             ) {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -125,6 +145,41 @@ fun GiftCompleteScreen(
                     reservation = it
                 )
             }
+        }
+    }
+}
+
+private fun sendMessage(context: Context, gift: Gift) {
+    val defaultFeed = FeedTemplate(
+        content = Content(
+            title = "To. ${gift.recipientName}",
+            description = "0월 0일까지 불티앱에서 선물을 등록해주세요.", // TODO: 날짜 입력
+            imageUrl = "https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png",
+            link = Link(
+                webUrl = "https://boolti.in/gift/${gift.id}",
+                mobileWebUrl = "https://boolti.in/${gift.id}"
+            )
+        ),
+        buttons = listOf(
+            Button(
+                "선물 확인하기",
+                Link(
+                    webUrl = "https://boolti.in/${gift.id}",
+                    mobileWebUrl = "https://boolti.in/${gift.id}"
+                )
+            ),
+        )
+    )
+
+    ShareClient.instance.shareDefault(context, defaultFeed) { sharingResult, error ->
+        if (error != null) {
+            // 카톡 공유 실패
+        }
+        else if (sharingResult != null) {
+            context.startActivity(sharingResult.intent)
+
+            Timber.w("Warning Msg: ${sharingResult.warningMsg}")
+            Timber.w("Argument Msg: ${sharingResult.argumentMsg}")
         }
     }
 }

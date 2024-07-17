@@ -156,16 +156,16 @@ private fun sendMessage(context: Context, gift: Gift) {
             description = "0월 0일까지 불티앱에서 선물을 등록해주세요.", // TODO: 날짜 입력
             imageUrl = "https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png",
             link = Link(
-                webUrl = "https://boolti.in/gift/${gift.id}",
-                mobileWebUrl = "https://boolti.in/${gift.id}"
+                webUrl = "https://boolti.in/gift/${gift.uuid}",
+                mobileWebUrl = "https://boolti.in/${gift.uuid}"
             )
         ),
         buttons = listOf(
             Button(
                 "선물 확인하기",
                 Link(
-                    webUrl = "https://boolti.in/${gift.id}",
-                    mobileWebUrl = "https://boolti.in/${gift.id}"
+                    webUrl = "https://boolti.in/${gift.uuid}",
+                    mobileWebUrl = "https://boolti.in/${gift.uuid}"
                 )
             ),
         )

@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GiftResponse(
+    val id: String,
     val giftUuid: String,
     val orderId: String,
     val reservationId: String,
@@ -18,7 +19,8 @@ data class GiftResponse(
 ) {
     fun toDomain(): Gift {
         return Gift(
-            id = giftUuid,
+            id = id,
+            uuid = giftUuid,
             orderId = orderId,
             reservationId = reservationId,
             giftImgId = giftImgId,

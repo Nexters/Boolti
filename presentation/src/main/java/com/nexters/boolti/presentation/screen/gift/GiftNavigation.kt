@@ -18,8 +18,8 @@ fun NavGraphBuilder.addGiftScreen(
             modifier = modifier,
             popBackStack = popBackStack,
             navigateToBusiness = { navigateTo(MainDestination.Business.route) },
-            navigateToComplete = { reservationId, giftId ->
-                navigateTo(MainDestination.GiftComplete.createRoute(reservationId, giftId))
+            navigateToComplete = { reservationId, giftUuid ->
+                navigateTo(MainDestination.GiftComplete.createRoute(reservationId, giftUuid))
             }
         )
     }

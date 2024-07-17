@@ -19,8 +19,8 @@ class GiftCompleteViewModel @Inject constructor(
     private val reservationId: String = requireNotNull(savedStateHandle["reservationId"]) {
         "reservationId 가 전달되지 않았습니다."
     }
-    private val giftId: String = requireNotNull(savedStateHandle["giftId"]) {
-        "giftId 가 전달되지 않았습니다."
+    private val giftUuid: String = requireNotNull(savedStateHandle["giftUuid"]) {
+        "giftUuid 가 전달되지 않았습니다."
     }
 
     val reservation = ticketingRepository
@@ -31,7 +31,7 @@ class GiftCompleteViewModel @Inject constructor(
             initialValue = null,
         )
 
-    val gift = giftRepository.getGift(giftId)
+    val gift = giftRepository.getGift(giftUuid)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,

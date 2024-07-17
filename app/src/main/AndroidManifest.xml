@@ -45,6 +45,9 @@
                 <data android:scheme="https" />
                 <data android:host="app.boolti.in" />
                 <data android:host="preview.boolti.in" />
+                <data
+                    android:host="kakaolink"
+                    android:scheme="kakao${KAKAO_APP_KEY}" />
             </intent-filter>
         </activity>
 

@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.lottie)
     implementation(libs.bundles.coil)
     api(libs.kakao.login)
+    implementation(libs.kakao.share)
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)

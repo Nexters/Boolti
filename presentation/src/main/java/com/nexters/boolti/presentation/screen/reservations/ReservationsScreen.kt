@@ -10,11 +10,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -58,7 +59,10 @@ fun ReservationsScreen(
 
     Scaffold(
         topBar = {
-            BtBackAppBar(title = stringResource(id = R.string.my_ticketing_history), onClickBack = onBackPressed)
+            BtBackAppBar(
+                title = stringResource(id = R.string.my_ticketing_history),
+                onClickBack = onBackPressed
+            )
         }
     ) { innerPadding ->
         Box(
@@ -180,7 +184,27 @@ private fun ReservationItem(
                 tint = Grey50
             )
         }
-        Divider(thickness = 1.dp, color = Grey85)
+        HorizontalDivider(thickness = 1.dp, color = Grey85)
+        // TODO: 선물 여부 판별하는 임시 코드, 선물 여부 필드 추가되면 변경
+        if (reservation.reservationState == ReservationState.REGISTERING_GIFT) {
+            Row(
+                modifier = Modifier.height(34.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(R.drawable.ic_gift),
+                    contentDescription = null,
+                    tint = Grey50
+                )
+                // TODO: 받는 사람 이름 연동, 현재 임시 코드
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    text = "TO. 김불티",
+                    style = MaterialTheme.typography.titleSmall.copy(color = Grey30)
+                )
+            }
+        }
         Row(
             modifier = Modifier.padding(top = 12.dp, bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically,

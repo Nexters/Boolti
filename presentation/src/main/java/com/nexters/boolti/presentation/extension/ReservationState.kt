@@ -14,6 +14,7 @@ fun ReservationState.toDescriptionAndColorPair(): Pair<Int, Color> {
         ReservationState.CANCELED -> Pair(R.string.reservations_canceled, Error)
         ReservationState.RESERVED -> Pair(R.string.reservations_reserved, Success)
         ReservationState.REFUNDED -> Pair(R.string.reservations_refunded, Error)
+        ReservationState.REGISTERING_GIFT -> Pair(R.string.reservations_registering_gift, Grey30)
         ReservationState.UNDEFINED -> Pair(R.string.reservations_unknown, Error)
     }
 }

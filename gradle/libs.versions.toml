@@ -2,7 +2,7 @@
 minSdk = "26"
 targetSdk = "34"
 versionCode = "12"
-versionName = "1.5.3"
+versionName = "1.5.4"
 packageName = "com.nexters.boolti"
 compileSdk = "34"
 targetJvm = "17"

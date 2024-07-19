@@ -6,6 +6,7 @@ data class Gift(
     val orderId: String,
     val reservationId: String,
     val giftImgId: String,
+    val imagePath: String,
     val message: String,
     val senderName: String,
     val senderPhoneNumber: String,

@@ -34,14 +34,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kakao.sdk.share.ShareClient
 import com.kakao.sdk.template.model.Button
 import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
-import com.kakao.sdk.template.model.ItemContent
-import com.kakao.sdk.template.model.ItemInfo
 import com.kakao.sdk.template.model.Link
-import com.kakao.sdk.template.model.Social
 import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
@@ -154,18 +152,18 @@ private fun sendMessage(context: Context, gift: Gift) {
         content = Content(
             title = "To. ${gift.recipientName}",
             description = "0월 0일까지 불티앱에서 선물을 등록해주세요.", // TODO: 날짜 입력
-            imageUrl = "https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png",
+            imageUrl = gift.imagePath,
             link = Link(
                 webUrl = "https://boolti.in/gift/${gift.uuid}",
-                mobileWebUrl = "https://boolti.in/${gift.uuid}"
+                mobileWebUrl = "https://boolti.in/gift/${gift.uuid}"
             )
         ),
         buttons = listOf(
             Button(
                 "선물 확인하기",
                 Link(
-                    webUrl = "https://boolti.in/${gift.uuid}",
-                    mobileWebUrl = "https://boolti.in/${gift.uuid}"
+                    webUrl = "https://boolti.in/gift/${gift.uuid}",
+                    mobileWebUrl = "https://boolti.in/gift/${gift.uuid}"
                 )
             ),
         )
@@ -173,7 +171,8 @@ private fun sendMessage(context: Context, gift: Gift) {
 
     ShareClient.instance.shareDefault(context, defaultFeed) { sharingResult, error ->
         if (error != null) {
-            // 카톡 공유 실패
+            FirebaseCrashlytics.getInstance().recordException(error)
+            Timber.e(error)
         }
         else if (sharingResult != null) {
             context.startActivity(sharingResult.intent)

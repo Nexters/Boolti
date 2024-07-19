@@ -80,6 +80,9 @@ fun GiftCompleteScreen(
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal)
         ) {
+            val dateText = stringResource(id = R.string.gift_expiration_date, 0, 0) // TODO: 0 대신 날짜(월, 일) 입력
+            val buttonsText = stringResource(id = R.string.gift_check)
+
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
                 text = stringResource(id = R.string.gift_complete_note),
@@ -106,7 +109,7 @@ fun GiftCompleteScreen(
                 onClick = {
                     if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
                         gift?.let {
-                            sendMessage(context, it)
+                            sendMessage(context, it, dateText, buttonsText)
                         }
                     } else {
                         // 카카오톡 미설치: 웹 공유 사용 권장
@@ -147,11 +150,11 @@ fun GiftCompleteScreen(
     }
 }
 
-private fun sendMessage(context: Context, gift: Gift) {
+private fun sendMessage(context: Context, gift: Gift, dateText: String, buttonText: String) {
     val defaultFeed = FeedTemplate(
         content = Content(
             title = "To. ${gift.recipientName}",
-            description = "0월 0일까지 불티앱에서 선물을 등록해주세요.", // TODO: 날짜 입력
+            description = dateText,
             imageUrl = gift.imagePath,
             link = Link(
                 webUrl = "https://boolti.in/gift/${gift.uuid}",
@@ -160,7 +163,7 @@ private fun sendMessage(context: Context, gift: Gift) {
         ),
         buttons = listOf(
             Button(
-                "선물 확인하기",
+                buttonText,
                 Link(
                     webUrl = "https://boolti.in/gift/${gift.uuid}",
                     mobileWebUrl = "https://boolti.in/gift/${gift.uuid}"
@@ -173,8 +176,7 @@ private fun sendMessage(context: Context, gift: Gift) {
         if (error != null) {
             FirebaseCrashlytics.getInstance().recordException(error)
             Timber.e(error)
-        }
-        else if (sharingResult != null) {
+        } else if (sharingResult != null) {
             context.startActivity(sharingResult.intent)
 
             Timber.w("Warning Msg: ${sharingResult.warningMsg}")

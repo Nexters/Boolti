@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.response
 
+import com.nexters.boolti.data.util.toLocalDate
 import com.nexters.boolti.domain.model.Gift
 import kotlinx.serialization.Serializable
 
@@ -16,6 +17,7 @@ data class GiftResponse(
     val senderPhoneNumber: String,
     val recipientName: String,
     val recipientPhoneNumber: String,
+    val salesEndTime: String,
     val isDone: Boolean,
 ) {
     fun toDomain(): Gift {
@@ -31,6 +33,7 @@ data class GiftResponse(
             senderPhoneNumber = senderPhoneNumber,
             recipientName = recipientName,
             recipientPhoneNumber = recipientPhoneNumber,
+            salesEndTime = salesEndTime.toLocalDate(),
             isDone = isDone,
         )
     }

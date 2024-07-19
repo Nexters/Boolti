@@ -80,7 +80,9 @@ fun GiftCompleteScreen(
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal)
         ) {
-            val dateText = stringResource(id = R.string.gift_expiration_date, 0, 0) // TODO: 0 대신 날짜(월, 일) 입력
+            val month = gift?.salesEndTime?.month ?: 0
+            val day = gift?.salesEndTime?.dayOfMonth ?: 0
+            val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
             val buttonsText = stringResource(id = R.string.gift_check)
 
             Text(

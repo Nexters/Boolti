@@ -1,5 +1,7 @@
 package com.nexters.boolti.domain.model
 
+import java.time.LocalDate
+
 data class Gift(
     val id: String,
     val uuid: String,
@@ -12,5 +14,6 @@ data class Gift(
     val senderPhoneNumber: String,
     val recipientName: String,
     val recipientPhoneNumber: String,
+    val salesEndTime: LocalDate,
     val isDone: Boolean,
 )

@@ -52,6 +52,7 @@ fun MyScreen(
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
     requireLogin: () -> Unit,
+    onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     onClickQrScan: () -> Unit,
 ) {
@@ -66,6 +67,7 @@ fun MyScreen(
         modifier = modifier,
         user = user,
         onClickHeaderButton = if (user != null) requireLogin else requireLogin, // TODO 프로필 구현 후 프로필 화면 이동 연결
+        onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
         onClickRegisterShow = {
             val url = if (user != null) "https://boolti.in/home" else "https://boolti.in/login"

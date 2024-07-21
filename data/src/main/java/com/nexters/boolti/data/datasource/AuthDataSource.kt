@@ -35,6 +35,7 @@ internal class AuthDataSource @Inject constructor(
                         nickname = it.nickname ?: "",
                         email = it.email ?: "",
                         imgPath = it.photo,
+                        userCode = it.userCode,
                     )
                 }
             }
@@ -61,6 +62,7 @@ internal class AuthDataSource @Inject constructor(
                 email = null,
                 phoneNumber = null,
                 photo = null,
+                userCode = null,
                 accessToken = "",
                 refreshToken = "",
             )
@@ -80,6 +82,7 @@ internal class AuthDataSource @Inject constructor(
                 nickname = user.nickname,
                 email = user.email,
                 photo = user.imgPath,
+                userCode = user.userCode,
             )
         }
     }

@@ -15,6 +15,7 @@ internal data class AppSettings(
     val email: String? = null,
     val phoneNumber: String? = null,
     val photo: String? = null,
+    val userCode: String? = null,
     val accessToken: String = "",
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),

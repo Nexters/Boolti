@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.my
+package com.nexters.boolti.presentation.screen.accountsetting
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,18 +51,22 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 @Composable
 fun AccountSettingScreen(
     modifier: Modifier = Modifier,
-    viewModel: MyViewModel = hiltViewModel(),
+    viewModel: AccountSettingViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
-    requireLogout: () -> Unit,
     onClickResign: () -> Unit,
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
+    val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+
+    LaunchedEffect(loggedIn) {
+        if (loggedIn == false) navigateBack()
+    }
 
     AccountSettingScreen(
         modifier = modifier,
         userCode = user?.userCode ?: "",
         onClickBack = navigateBack,
-        requireLogout = requireLogout,
+        requireLogout = viewModel::logout,
         onClickResign = onClickResign,
     )
 }

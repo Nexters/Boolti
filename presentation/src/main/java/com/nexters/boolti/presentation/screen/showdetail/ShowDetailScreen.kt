@@ -64,10 +64,10 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.component.CopyButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ShowInquiry
+import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
@@ -360,7 +360,8 @@ private fun ContentScaffold(
                     val clipboardManager = LocalClipboardManager.current
                     val copiedMessage =
                         stringResource(id = R.string.ticketing_address_copied_message)
-                    CopyButton(
+                    SmallButton(
+                        iconRes = R.drawable.ic_copy,
                         label = stringResource(id = R.string.ticketing_copy_address),
                         onClick = {
                             clipboardManager.setText(AnnotatedString(showDetail.streetAddress))

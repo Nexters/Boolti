@@ -144,7 +144,7 @@ fun AccountSettingScreen(
             ) {
                 Text(
                     style = MaterialTheme.typography.bodyLarge,
-                    text = stringResource(R.string.signout_button),
+                    text = stringResource(R.string.signout),
                     textDecoration = TextDecoration.Underline,
                     color = Grey50,
                 )

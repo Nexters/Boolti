@@ -20,6 +20,8 @@
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>
     <string name="error_ticket_not_found">존재하지 않는 티켓이에요</string>
 
+    <string name="kakao">카카오</string>
+
     <!-- 유효성 검사 -->
     <string name="validation_name">이름을 올바르게 입력해 주세요</string>
     <string name="validation_contact">연락처를 올바르게 입력해 주세요</string>
@@ -74,10 +76,11 @@
     <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">불티 유저</string>
     <string name="signout_cancelled_message">탈퇴 후 30일 이내에 로그인하여, 계정 삭제가 취소되었어요\n불티를 다시 찾아주셔서 감사해요!</string>
+    <string name="user_code">식별 코드</string>
 
     <!-- 탈퇴 -->
     <string name="signout">회원 탈퇴</string>
-    <string name="signout_button">탈퇴하기</string>
+    <string name="signout_button">계정 삭제</string>
     <string name="signout_dialog_title">탈퇴하시겠어요?</string>
     <string name="signout_dialog_message">탈퇴일로부터 30일 이내로 로그인 시 계정 삭제를 취소할 수 있습니다. 30일이 지나면 계정 및 정보가 영구 삭제됩니다.</string>
     <string name="signout_notice_title">탈퇴 전, 꼭 읽어보세요!</string>
@@ -222,6 +225,7 @@
     <string name="show_profile_button">프로필 보기</string>
     <string name="account_setting">계정 설정</string>
     <string name="my_show">내 공연</string>
+    <string name="sns_provider">연결 서비스</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

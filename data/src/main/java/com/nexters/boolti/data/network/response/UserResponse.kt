@@ -9,6 +9,7 @@ internal data class UserResponse(
     val nickname: String? = null,
     val email: String? = null,
     val imgPath: String? = null,
+    val userCode: String? = null,
 ) {
     fun toDomain(): User {
         return User(
@@ -16,6 +17,7 @@ internal data class UserResponse(
             nickname = nickname ?: "",
             email = email ?: "",
             photo = imgPath,
+            userCode = userCode ?: "",
         )
     }
 }

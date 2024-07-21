@@ -257,7 +257,8 @@ private fun MyHeaderUserPreview() {
         id = "",
         nickname = "일이삼사오육칠팔구십",
         email = "boolti@gmail.com",
-        photo = "https://images.unsplash.com/photo-1721497684662-cf36f0ee232e?q=80&w=4965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        photo = "https://images.unsplash.com/photo-1721497684662-cf36f0ee232e?q=80&w=4965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        userCode = "AB1800028",
     )
     BooltiTheme {
         MyHeader(user = user) {}
@@ -279,7 +280,8 @@ private fun MyScreenPreview() {
         id = "",
         nickname = "불티유저",
         email = "boolti@gmail.com",
-        photo = "https://images.unsplash.com/photo-1721497684662-cf36f0ee232e?q=80&w=4965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        photo = "https://images.unsplash.com/photo-1721497684662-cf36f0ee232e?q=80&w=4965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        userCode = "AB1800028",
     )
     BooltiTheme {
         MyScreen(
@@ -287,22 +289,3 @@ private fun MyScreenPreview() {
         )
     }
 }
-
-/*
-* if (openLogoutDialog) {
-        BTDialog(
-            positiveButtonLabel = stringResource(id = R.string.my_logout),
-            onClickPositiveButton = {
-                openLogoutDialog = false
-                viewModel.logout()
-            },
-            onDismiss = { openLogoutDialog = false }
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.my_logout_popup),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-* */

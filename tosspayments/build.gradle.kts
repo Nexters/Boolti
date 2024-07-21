@@ -20,15 +20,15 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "DEV_TOSS_CLIENT_KEY", getLocalProperty("DEV_TOSS_CLIENT_KEY"))
-            buildConfigField("String", "DEV_TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
+            buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("DEV_TOSS_CLIENT_KEY"))
+            buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
-            buildConfigField("String", "PROD_TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
-            buildConfigField("String", "PROD_TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
+            buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
+            buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
         }
     }
     compileOptions {

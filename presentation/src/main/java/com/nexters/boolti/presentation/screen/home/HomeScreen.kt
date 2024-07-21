@@ -125,7 +125,6 @@ fun HomeScreen(
                     requireLogin = requireLogin,
                     navigateToReservations = navigateToReservations,
                     onClickQrScan = onClickQrScan,
-                    onClickSignout = onClickSignout,
                 )
             }
         }

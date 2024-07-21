@@ -80,7 +80,7 @@ fun GiftCompleteScreen(
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal)
         ) {
-            val month = gift?.salesEndTime?.month ?: 0
+            val month = gift?.salesEndTime?.month?.value ?: 0
             val day = gift?.salesEndTime?.dayOfMonth ?: 0
             val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
             val buttonsText = stringResource(id = R.string.gift_check)
@@ -114,7 +114,7 @@ fun GiftCompleteScreen(
                             sendMessage(context, it, dateText, buttonsText)
                         }
                     } else {
-                        // 카카오톡 미설치: 웹 공유 사용 권장
+                        // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
                     }
                 }
             ) {

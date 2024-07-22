@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -80,6 +82,7 @@ fun AccountSettingScreen(
     onClickResign: () -> Unit = {},
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     Scaffold(
         modifier = modifier,
@@ -96,9 +99,9 @@ fun AccountSettingScreen(
                 .padding(innerPadding)
         ) {
             Column(
+                modifier = Modifier.verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-
                 Section(
                     modifier = Modifier.padding(top = 20.dp),
                 ) {
@@ -118,7 +121,9 @@ fun AccountSettingScreen(
                 }
 
                 Section(
-                    modifier = Modifier.clickable { showLogoutDialog = true },
+                    modifier = Modifier
+                        .padding(bottom = 100.dp)
+                        .clickable { showLogoutDialog = true },
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),

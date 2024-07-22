@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -87,56 +91,63 @@ fun MyScreen(
     onClickRegisterShow: () -> Unit = { },
     onClickQrScan: () -> Unit = {},
 ) {
+    val scrollState = rememberScrollState()
+
     Surface {
         Box(
             modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
         ) {
-            Column(
-                modifier = modifier,
-            ) {
+            Column {
                 MyHeader(
+                    modifier = Modifier.zIndex(1f),
                     user = user,
                     onClickButton = onClickHeaderButton,
                 )
-                MyMenu(
-                    modifier = Modifier.padding(top = 20.dp),
-                    iconRes = R.drawable.ic_profile,
-                    label = stringResource(R.string.account_setting),
-                    onClick = onClickAccountSetting,
-                )
-                MyMenu(
-                    iconRes = R.drawable.ic_list,
-                    label = stringResource(R.string.my_ticketing_history),
-                    onClick = onClickReservations
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 32.dp, horizontal = marginHorizontal),
-                    color = MaterialTheme.colorScheme.surfaceTint,
-                )
-
-                Text(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = marginHorizontal),
-                    text = stringResource(R.string.my_show),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
+                        .offset(y = (-12).dp)
+                        .verticalScroll(scrollState),
+                ) {
+                    MyMenu(
+                        modifier = Modifier.padding(top = 32.dp),
+                        iconRes = R.drawable.ic_profile,
+                        label = stringResource(R.string.account_setting),
+                        onClick = onClickAccountSetting,
+                    )
+                    MyMenu(
+                        iconRes = R.drawable.ic_list,
+                        label = stringResource(R.string.my_ticketing_history),
+                        onClick = onClickReservations
+                    )
 
-                MyMenu(
-                    modifier = Modifier.padding(top = 8.dp),
-                    iconRes = R.drawable.ic_plus_ticket,
-                    label = stringResource(R.string.my_register_show),
-                    onClick = onClickRegisterShow,
-                )
-                MyMenu(
-                    iconRes = R.drawable.ic_qr_simple,
-                    label = stringResource(R.string.my_scan_qr),
-                    onClick = onClickQrScan,
-                )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 32.dp, horizontal = marginHorizontal),
+                        color = MaterialTheme.colorScheme.surfaceTint,
+                    )
+
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = marginHorizontal),
+                        text = stringResource(R.string.my_show),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+
+                    MyMenu(
+                        modifier = Modifier.padding(top = 8.dp),
+                        iconRes = R.drawable.ic_plus_ticket,
+                        label = stringResource(R.string.my_register_show),
+                        onClick = onClickRegisterShow,
+                    )
+                    MyMenu(
+                        iconRes = R.drawable.ic_qr_simple,
+                        label = stringResource(R.string.my_scan_qr),
+                        onClick = onClickQrScan,
+                    )
+                }
             }
             Column(
                 modifier = Modifier
@@ -278,6 +289,23 @@ private fun MyHeaderGuestPreview() {
 @Preview
 @Composable
 private fun MyScreenPreview() {
+    val user = User(
+        id = "",
+        nickname = "불티유저",
+        email = "boolti@gmail.com",
+        photo = "https://images.unsplash.com/photo-1721497684662-cf36f0ee232e?q=80&w=4965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        userCode = "AB1800028",
+    )
+    BooltiTheme {
+        MyScreen(
+            user = user,
+        )
+    }
+}
+
+@Preview(device = "spec:parent=pixel_5,orientation=landscape")
+@Composable
+private fun MyScreenLandscapePreview() {
     val user = User(
         id = "",
         nickname = "불티유저",

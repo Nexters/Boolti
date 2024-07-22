@@ -15,6 +15,7 @@ internal data class ReservationResponse(
     val salesTicketName: String,
     val ticketCount: Int,
     val ticketPrice: Int = 0,
+    val recipientName: String?,
 ) {
     fun toDomain(): Reservation {
         return Reservation(
@@ -26,6 +27,7 @@ internal data class ReservationResponse(
             salesTicketName = salesTicketName,
             ticketCount = ticketCount,
             ticketPrice = ticketPrice,
+            receiver = recipientName,
         )
     }
 }

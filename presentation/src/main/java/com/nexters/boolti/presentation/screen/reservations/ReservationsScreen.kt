@@ -185,8 +185,7 @@ private fun ReservationItem(
             )
         }
         HorizontalDivider(thickness = 1.dp, color = Grey85)
-        // TODO: 선물 여부 판별하는 임시 코드, 선물 여부 필드 추가되면 변경
-        if (reservation.reservationState == ReservationState.REGISTERING_GIFT) {
+        if (reservation.receiver != null) {
             Row(
                 modifier = Modifier.height(34.dp),
                 verticalAlignment = Alignment.Bottom
@@ -197,10 +196,9 @@ private fun ReservationItem(
                     contentDescription = null,
                     tint = Grey50
                 )
-                // TODO: 받는 사람 이름 연동, 현재 임시 코드
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
-                    text = "TO. 김불티",
+                    text = "TO. ${reservation.receiver}",
                     style = MaterialTheme.typography.titleSmall.copy(color = Grey30)
                 )
             }

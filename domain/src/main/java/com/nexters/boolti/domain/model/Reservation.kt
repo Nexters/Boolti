@@ -11,4 +11,5 @@ data class Reservation(
     val salesTicketName: String,
     val ticketCount: Int,
     val ticketPrice: Int,
+    val receiver: String?,
 )

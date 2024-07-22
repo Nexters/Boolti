@@ -43,6 +43,7 @@ import com.kakao.sdk.template.model.Link
 import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
@@ -153,22 +154,25 @@ fun GiftCompleteScreen(
 }
 
 private fun sendMessage(context: Context, gift: Gift, dateText: String, buttonText: String) {
+    val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
+    val giftUrl = "https://${subDomain}boolti.in/gift/${gift.uuid}"
+
     val defaultFeed = FeedTemplate(
         content = Content(
             title = "To. ${gift.recipientName}",
             description = dateText,
             imageUrl = gift.imagePath,
             link = Link(
-                webUrl = "https://boolti.in/gift/${gift.uuid}",
-                mobileWebUrl = "https://boolti.in/gift/${gift.uuid}"
+                webUrl = giftUrl,
+                mobileWebUrl = giftUrl
             )
         ),
         buttons = listOf(
             Button(
                 buttonText,
                 Link(
-                    webUrl = "https://boolti.in/gift/${gift.uuid}",
-                    mobileWebUrl = "https://boolti.in/gift/${gift.uuid}"
+                    webUrl = giftUrl,
+                    mobileWebUrl = giftUrl
                 )
             ),
         )

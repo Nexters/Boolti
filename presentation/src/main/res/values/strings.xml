@@ -75,7 +75,7 @@
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
     <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">불티 유저</string>
-    <string name="signout_cancelled_message">탈퇴 후 30일 이내에 로그인하여, 계정 삭제가 취소되었어요\n불티를 다시 찾아주셔서 감사해요!</string>
+    <string name="signout_cancelled_message">30일 내에 로그인하여 계정 삭제가 취소되었어요.\n불티를 다시 찾아주셔서 감사해요!</string>
     <string name="user_code">식별 코드</string>
 
     <!-- 탈퇴 -->
@@ -85,10 +85,10 @@
     <string-array name="signout_notice">
         <item>주최한 공연 정보는 사라지지 않아요</item>
         <item>예매한 티켓은 전부 사라지며 복구할 수 없어요</item>
-        <item>탈퇴 일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
+        <item>삭제일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
     </string-array>
     <string name="signout_reason_title">삭제 이유를 입력해주세요</string>
-    <string name="signout_reason_placeholder">예) 계정 탈퇴 후 재가입할게요</string>
+    <string name="signout_reason_placeholder">예) 계정 삭제 후 재가입할게요</string>
 
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>

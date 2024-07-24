@@ -4,6 +4,7 @@ import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
 import com.nexters.boolti.data.network.response.GiftResponse
 import com.nexters.boolti.data.network.response.ImageResponse
+import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.GiftApproveRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,6 +17,9 @@ internal interface GiftService {
 
     @POST("/app/api/v1/order/gift-approve-payment")
     suspend fun approveGiftPayment(@Body request: GiftApproveRequest): ApproveGiftPaymentResponse
+
+    @POST
+    suspend fun createFreeGift(@Body request: FreeGiftRequest): ApproveGiftPaymentResponse
 
     @GET("/app/api/v1/gift/{giftUuid}")
     suspend fun getGift(@Path("giftUuid") giftUuid: String): GiftResponse

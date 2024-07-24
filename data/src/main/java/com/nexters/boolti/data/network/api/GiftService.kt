@@ -2,6 +2,7 @@ package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
+import com.nexters.boolti.data.network.response.GiftPaymentInfoResponse
 import com.nexters.boolti.data.network.response.GiftResponse
 import com.nexters.boolti.data.network.response.ImageResponse
 import com.nexters.boolti.domain.request.GiftApproveRequest
@@ -22,4 +23,7 @@ internal interface GiftService {
 
     @GET("/app/api/v1/gift/img-list")
     suspend fun getGiftImages(): List<ImageResponse>
+
+    @GET("app/api/v1/gift/approve-payment/{giftId}")
+    suspend fun getGiftPaymentInfo(): GiftPaymentInfoResponse
 }

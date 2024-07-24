@@ -3,6 +3,7 @@ package com.nexters.boolti.data.datasource
 import com.nexters.boolti.data.network.api.GiftService
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
+import com.nexters.boolti.data.network.response.GiftPaymentInfoResponse
 import com.nexters.boolti.data.network.response.GiftResponse
 import com.nexters.boolti.data.network.response.ImageResponse
 import com.nexters.boolti.domain.request.GiftApproveRequest
@@ -19,4 +20,6 @@ internal class GiftDataSource @Inject constructor(
     suspend fun getGift(giftUuid: String): GiftResponse = service.getGift(giftUuid)
 
     suspend fun getGiftImages(): List<ImageResponse> = service.getGiftImages()
+
+    suspend fun getGiftPaymentInfo(): GiftPaymentInfoResponse = service.getGiftPaymentInfo()
 }

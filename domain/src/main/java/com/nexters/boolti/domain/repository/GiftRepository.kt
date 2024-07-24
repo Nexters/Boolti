@@ -14,4 +14,8 @@ interface GiftRepository {
     fun getGift(giftUuid: String): Flow<Gift>
 
     fun getGiftImages(): Flow<List<ImagePair>>
+
+    fun saveGift(giftUuid: String)
+
+    fun popPendingGift(): String?
 }

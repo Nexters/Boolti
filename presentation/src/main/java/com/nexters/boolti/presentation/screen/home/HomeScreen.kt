@@ -19,6 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -33,6 +36,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
@@ -61,18 +65,24 @@ fun HomeScreen(
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    var dialog: HomeDialog? by rememberSaveable { mutableStateOf(null) }
+
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
+                HomeEvent.RequireLoginForGift -> {
+                    dialog = HomeDialog.NEED_LOGIN_FOR_GIFT
+                }
             }
         }
     }
 
     LaunchedEffect(Unit) {
         val intent = context.requireActivity().intent
-        intent.action?.let { deepLink ->
-            val regex = "^https://app.boolti.in/gift/(\\w)+$".toRegex()
+        intent.action?.let { _ ->
+            val deepLink = intent.data.toString()
+            val regex = "^https://app.boolti.in/gift/([\\w-])+$".toRegex()
             if (regex.matches(deepLink)) {
                 val giftUuid = deepLink.split("/").last()
                 viewModel.receiveGift(giftUuid)
@@ -149,6 +159,19 @@ fun HomeScreen(
                     onClickQrScan = onClickQrScan,
                 )
             }
+        }
+    }
+
+    if (dialog != null) {
+        val dialogText = stringResource(id = R.string.gift_need_login)
+        val action = requireLogin
+
+        BTDialog(
+            onDismiss = { dialog = null },
+            onClickPositiveButton = action,
+            positiveButtonLabel = stringResource(id = R.string.gift_login),
+        ) {
+            Text(text = dialogText)
         }
     }
 }

@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -62,7 +61,15 @@ class HomeViewModel @Inject constructor(
     }
 
     fun receiveGift(giftUuid: String) {
-        // TODO: 선물 받는 로직
+        when (loggedIn.value) {
+            true -> TODO("선물 받는 로직")
+            false -> {
+                giftRepository.saveGift(giftUuid)
+                sendEvent(HomeEvent.RequireLoginForGift)
+            }
+
+            null -> TODO()
+        }
     }
 
     private fun sendEvent(event: HomeEvent) {

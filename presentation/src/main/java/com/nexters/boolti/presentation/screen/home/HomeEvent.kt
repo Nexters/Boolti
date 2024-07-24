@@ -4,4 +4,6 @@ sealed interface HomeEvent {
     data class DeepLinkEvent(
         val deepLink: String,
     ) : HomeEvent
+
+    data object RequireLoginForGift : HomeEvent
 }

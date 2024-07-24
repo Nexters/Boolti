@@ -187,6 +187,8 @@
         <item>마이 > 결제 내역 > 결제 내역 상세에서 선물을 취소할 수 있습니다.</item>
         <item>받는 분이 선물 거절 시 결제가 자동 취소됩니다.</item>
     </string-array>
+    <string name="gift_login">로그인하기</string>
+    <string name="gift_need_login">로그인 후 선물 등록이 가능합니다.\n로그인해 주세요.</string>
 
     <!-- 공연 -->
     <string name="show_call_to_ask">전화 문의하기</string>

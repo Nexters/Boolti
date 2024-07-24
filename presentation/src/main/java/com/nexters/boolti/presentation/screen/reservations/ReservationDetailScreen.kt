@@ -127,11 +127,11 @@ fun ReservationDetailScreen(
                 RefundInfo(reservation = state.reservation)
             }
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
-            Spacer(modifier = Modifier.height(40.dp))
             if (
-                state.reservation.reservationState == ReservationState.RESERVED &&
+                (state.reservation.reservationState == ReservationState.RESERVED &&
                 !state.reservation.isInviteTicket &&
-                state.reservation.salesEndDateTime >= LocalDateTime.now()
+                state.reservation.salesEndDateTime >= LocalDateTime.now()) ||
+                state.reservation.reservationState == ReservationState.REGISTERING_GIFT
             ) {
                 MainButton(
                     modifier = modifier
@@ -329,7 +329,7 @@ private fun RefundPolicy(
     refundPolicy: List<String>,
 ) {
     Section(
-        modifier = modifier.padding(top = 12.dp),
+        modifier = modifier.padding(vertical = 12.dp),
         title = stringResource(id = R.string.refund_policy_label),
         defaultExpanded = false,
     ) {

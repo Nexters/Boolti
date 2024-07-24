@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.screen.HomeViewModel
+import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
@@ -58,10 +59,24 @@ fun HomeScreen(
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.event.collect { deepLink ->
-            navController.navigate(Uri.parse(deepLink))
+        viewModel.events.collect { event ->
+            when (event) {
+                is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val intent = context.requireActivity().intent
+        intent.action?.let { deepLink ->
+            val regex = "^https://app.boolti.in/gift/(\\w)+$".toRegex()
+            if (regex.matches(deepLink)) {
+                val giftUuid = deepLink.split("/").last()
+                viewModel.receiveGift(giftUuid)
+            }
         }
     }
 

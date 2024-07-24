@@ -86,6 +86,12 @@ fun HomeScreen(
         ) {
             composable(
                 route = Destination.Show.route,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "https://app.boolti.in/home/shows"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
             ) {
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),

@@ -15,8 +15,6 @@ import javax.inject.Inject
 internal class GiftRepositoryImpl @Inject constructor(
     private val dataSource: GiftDataSource
 ) : GiftRepository {
-    var pendingGiftUuid: String? = null
-
     override fun receiveGift(giftUuid: String): Flow<Boolean> = flow {
         emit(dataSource.receiveGift(GiftReceiveRequest(giftUuid)))
     }
@@ -31,15 +29,5 @@ internal class GiftRepositoryImpl @Inject constructor(
 
     override fun getGiftImages(): Flow<List<ImagePair>> = flow {
         emit(dataSource.getGiftImages().toDomains())
-    }
-
-    override fun saveGift(giftUuid: String) {
-        pendingGiftUuid = giftUuid
-    }
-
-    override fun popPendingGift(): String? {
-        val giftUuid = pendingGiftUuid
-        pendingGiftUuid = null
-        return giftUuid
     }
 }

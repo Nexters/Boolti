@@ -34,6 +34,8 @@ class HomeViewModel @Inject constructor(
     private val _events = MutableSharedFlow<HomeEvent>()
     val events: SharedFlow<HomeEvent> = _events.asSharedFlow()
 
+    var pendingGiftUuid: String? = null
+
     init {
         initUserInfo()
         sendFcmToken()
@@ -60,18 +62,20 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun receiveGift(giftUuid: String) {
+    fun processGift(giftUuid: String) {
+        // TODO: 자기 자신의 선물을 받는 케이스 처리
+        pendingGiftUuid = giftUuid
+
         when (loggedIn.value) {
             true -> {
                 sendEvent(HomeEvent.ShowMessage(GiftStatus.CAN_REGISTER))
             }
 
             false -> {
-                giftRepository.saveGift(giftUuid)
                 sendEvent(HomeEvent.ShowMessage(GiftStatus.NEED_LOGIN))
             }
 
-            null -> TODO()
+            null -> TODO("null인 케이스 처리")
         }
     }
 
@@ -79,5 +83,18 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _events.emit(event)
         }
+    }
+
+    fun receiveGift() {
+        val giftUuid = pendingGiftUuid ?: return
+        pendingGiftUuid = null
+
+        giftRepository.receiveGift(giftUuid)
+            .onEach { isSuccessful ->
+                if (!isSuccessful) {
+                    sendEvent(HomeEvent.ShowMessage(GiftStatus.FAILED))
+                }
+            }
+            .launchIn(viewModelScope + recordExceptionHandler)
     }
 }

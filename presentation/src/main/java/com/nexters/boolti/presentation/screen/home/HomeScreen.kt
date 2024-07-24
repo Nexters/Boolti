@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +44,7 @@ import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 
@@ -85,7 +87,7 @@ fun HomeScreen(
             val regex = "^https://app.boolti.in/gift/([\\w-])+$".toRegex()
             if (regex.matches(deepLink)) {
                 val giftUuid = deepLink.split("/").last()
-                viewModel.receiveGift(giftUuid)
+                viewModel.processGift(giftUuid)
             }
         }
     }
@@ -163,22 +165,35 @@ fun HomeScreen(
     }
 
     if (dialog != null) {
+        // TODO: 중복코드 제거
+
+        val buttonTextRes = when (dialog!!) {
+            GiftStatus.SELF, GiftStatus.CAN_REGISTER -> R.string.gift_register
+            GiftStatus.NEED_LOGIN -> R.string.gift_login
+            GiftStatus.FAILED -> R.string.description_close_button
+        }
+
         val textRes = when (dialog!!) {
-            GiftStatus.SELF -> R.string.gift_need_login
-            GiftStatus.NEED_LOGIN -> R.string.gift_register
-            GiftStatus.CAN_REGISTER -> R.string.gift_self_dialog
+            GiftStatus.SELF -> R.string.gift_self_dialog
+            GiftStatus.NEED_LOGIN -> R.string.gift_need_login
+            GiftStatus.CAN_REGISTER -> R.string.gift_register_dialog
             GiftStatus.FAILED -> R.string.gift_registration_failed
         }
-        val dialogText = stringResource(id = textRes)
 
         val action: () -> Unit = when (dialog!!) {
             GiftStatus.SELF -> {
-                {}
+                {
+                    viewModel.receiveGift()
+                    dialog = null
+                }
             }
 
             GiftStatus.NEED_LOGIN -> requireLogin
             GiftStatus.CAN_REGISTER -> {
-                {}
+                {
+                    viewModel.receiveGift()
+                    dialog = null
+                }
             }
 
             GiftStatus.FAILED -> {
@@ -191,11 +206,17 @@ fun HomeScreen(
         BTDialog(
             onDismiss = { dialog = null },
             onClickPositiveButton = action,
-            positiveButtonLabel = stringResource(id = R.string.gift_login),
+            positiveButtonLabel = stringResource(id = buttonTextRes),
             hasNegativeButton = hasNegativeButton,
             onClickNegativeButton = { dialog = GiftStatus.FAILED }
         ) {
-            Text(text = dialogText)
+            Text(
+                text = stringResource(id = textRes),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = Grey15,
+                    textAlign = TextAlign.Center
+                ),
+            )
         }
     }
 }

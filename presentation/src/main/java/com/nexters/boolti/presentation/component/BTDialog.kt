@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -28,7 +29,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey80
 
 @Composable
 fun BTDialog(
@@ -83,12 +86,18 @@ fun BTDialog(
                 }
                 content()
                 Spacer(modifier = Modifier.size(28.dp))
-                Row {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(9.dp)
+                ) {
                     if (hasNegativeButton) {
                         MainButton(
                             modifier = Modifier.weight(1f),
                             label = negativeButtonLabel,
                             onClick = onClickNegativeButton,
+                            colors = MainButtonDefaults.buttonColors(
+                                containerColor = Grey80,
+                                contentColor = Grey05,
+                            )
                         )
                     }
                     MainButton(

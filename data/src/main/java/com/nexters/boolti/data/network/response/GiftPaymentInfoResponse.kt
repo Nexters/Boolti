@@ -2,6 +2,10 @@ package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.data.network.response.ReservationDetailResponse.CardDetailResponse
 import com.nexters.boolti.data.network.response.ReservationDetailResponse.EasyPayDetailResponse
+import com.nexters.boolti.data.util.toLocalDateTime
+import com.nexters.boolti.data.util.toPaymentType
+import com.nexters.boolti.data.util.toReservationState
+import com.nexters.boolti.domain.model.ReservationDetail
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,10 +24,37 @@ internal data class GiftPaymentInfoResponse(
     val senderName: String,
     val senderPhoneNumber: String,
     val recipientName: String = "",
+    val recipientPhoneNumber: String = "",
     val giftId: String,
     val giftUuid: String,
     val giftMessage: String,
-    val recipientPhoneNumber: String = "",
     val cardDetail: CardDetailResponse? = null,
     val easyPayDetail: EasyPayDetailResponse? = null,
-)
+) {
+    fun toDomain(): ReservationDetail {
+        return ReservationDetail(
+            id = giftUuid,
+            showImage = showImg,
+            showName = showName,
+            showDate = showDate.toLocalDateTime(),
+            ticketName = salesTicketName,
+            isInviteTicket = false,
+            ticketCount = ticketCount,
+            bankName = "",
+            accountNumber = "",
+            accountHolder = "",
+            salesEndDateTime = salesEndTime.toLocalDateTime(),
+            paymentType = meansType.toPaymentType(),
+            totalAmountPrice = totalAmountPrice,
+            reservationState = reservationStatus.toReservationState(),
+            completedDateTime = null,
+            visitorName = recipientName,
+            visitorPhoneNumber = recipientPhoneNumber,
+            depositorName = senderName,
+            depositorPhoneNumber = senderPhoneNumber,
+            csReservationId = csReservationId,
+            cardDetail = cardDetail?.toDomain(),
+            provider = easyPayDetail?.provider ?: ""
+        )
+    }
+}

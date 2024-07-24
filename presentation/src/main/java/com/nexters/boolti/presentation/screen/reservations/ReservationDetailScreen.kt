@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -287,12 +286,12 @@ private fun TicketHolderInfo(
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.name_label),
-                value = reservation.ticketHolderName
+                value = reservation.visitorName
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.contact_label),
-                value = reservation.ticketHolderPhoneNumber
+                value = reservation.visitorPhoneNumber
             )
         }
     }

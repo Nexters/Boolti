@@ -6,6 +6,7 @@ import com.nexters.boolti.data.network.response.toDomains
 import com.nexters.boolti.domain.model.ApproveGiftPayment
 import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.ImagePair
+import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.request.GiftApproveRequest
 import kotlinx.coroutines.flow.Flow
@@ -29,5 +30,9 @@ internal class GiftRepositoryImpl @Inject constructor(
 
     override fun getGiftImages(): Flow<List<ImagePair>> = flow {
         emit(dataSource.getGiftImages().toDomains())
+    }
+
+    override fun getGiftPaymentInfo(): Flow<ReservationDetail> = flow {
+        emit(dataSource.getGiftPaymentInfo().toDomain())
     }
 }

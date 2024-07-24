@@ -92,6 +92,10 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(loggedIn) {
+        if (loggedIn == true) viewModel.processGift()
+    }
+
     Scaffold(
         bottomBar = {
             HomeNavigationBar(

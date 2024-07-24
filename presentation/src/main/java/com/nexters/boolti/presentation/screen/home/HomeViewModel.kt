@@ -62,6 +62,13 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    fun processGift() {
+        // TODO: 자기 자신의 선물을 받는 케이스 처리
+        if (pendingGiftUuid != null) {
+            sendEvent(HomeEvent.ShowMessage(GiftStatus.CAN_REGISTER))
+        }
+    }
+
     fun processGift(giftUuid: String) {
         // TODO: 자기 자신의 선물을 받는 케이스 처리
         pendingGiftUuid = giftUuid

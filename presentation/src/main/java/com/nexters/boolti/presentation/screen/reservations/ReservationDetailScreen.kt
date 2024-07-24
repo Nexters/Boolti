@@ -5,11 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -49,6 +45,8 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
+import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey10
@@ -135,8 +133,15 @@ fun ReservationDetailScreen(
                 !state.reservation.isInviteTicket &&
                 state.reservation.salesEndDateTime >= LocalDateTime.now()
             ) {
-                RefundButton(
-                    modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
+                MainButton(
+                    modifier = modifier
+                        .padding(horizontal = marginHorizontal, vertical = 8.dp)
+                        .fillMaxWidth(),
+                    colors = MainButtonDefaults.buttonColors(
+                        containerColor = Grey20,
+                        contentColor = Grey90,
+                    ),
+                    label = stringResource(id = R.string.refund_button),
                     onClick = { navigateToRefund(state.reservation.id) }
                 )
             }
@@ -430,29 +435,5 @@ private fun Section(
         ) {
             content()
         }
-    }
-}
-
-
-@Composable
-private fun RefundButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Grey20,
-            contentColor = Grey90,
-        ),
-        shape = RoundedCornerShape(4.dp),
-        contentPadding = PaddingValues(12.dp),
-        interactionSource = remember { MutableInteractionSource() },
-    ) {
-        Text(
-            text = stringResource(id = R.string.refund_button),
-            style = MaterialTheme.typography.titleMedium
-        )
     }
 }

@@ -18,7 +18,7 @@ internal interface GiftService {
     @POST("/app/api/v1/order/gift-approve-payment")
     suspend fun approveGiftPayment(@Body request: GiftApproveRequest): ApproveGiftPaymentResponse
 
-    @POST
+    @POST("/app/api/v1/order/free-gift-reservation")
     suspend fun createFreeGift(@Body request: FreeGiftRequest): ApproveGiftPaymentResponse
 
     @GET("/app/api/v1/gift/{giftUuid}")

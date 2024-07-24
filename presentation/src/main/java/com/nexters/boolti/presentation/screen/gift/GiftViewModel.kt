@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -15,7 +16,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -117,8 +117,38 @@ class GiftViewModel @Inject constructor(
         _uiState.update { it.copy(selectedImage = image) }
     }
 
-    fun pay() {
-        // TODO : 무료 케이스 처리
+    fun pay(isFree: Boolean) {
+        if (isFree) {
+            val state = uiState.value
+
+            giftRepository.sendFreeGift(
+                FreeGiftRequest(
+                    amount = 0,
+                    showId = showId,
+                    salesTicketTypeId = salesTicketTypeId,
+                    ticketCount = state.ticketCount,
+                    senderName = state.senderName,
+                    senderPhoneNumber = state.senderContact,
+                    recipientName = state.receiverName,
+                    recipientPhoneNumber = state.receiverContact,
+                    message = state.message,
+                    giftImageId = state.selectedImage?.id ?: state.giftImages.first().id
+                )
+            )
+                .onStart { _uiState.update { it.copy(loading = true) } }
+                .onEach { giftPayment ->
+                    sendEvent(
+                        GiftEvent.GiftSuccess(
+                            reservationId = giftPayment.reservationId,
+                            giftUuid = giftPayment.giftUuid
+                        )
+                    )
+                }
+                .onCompletion { _uiState.update { it.copy(loading = false) } }
+                .launchIn(viewModelScope + recordExceptionHandler)
+
+            return
+        }
 
         ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
             .onStart { _uiState.update { it.copy(loading = true) } }

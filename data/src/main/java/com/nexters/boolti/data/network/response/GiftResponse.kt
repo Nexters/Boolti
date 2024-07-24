@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class GiftResponse(
     val id: String,
     val giftUuid: String,
-    val orderId: String,
+    val orderId: String?,
     val reservationId: String,
     val giftImgId: String,
     val giftImgPath: String,

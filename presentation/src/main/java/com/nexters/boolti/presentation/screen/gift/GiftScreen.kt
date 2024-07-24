@@ -3,24 +3,15 @@ package com.nexters.boolti.presentation.screen.gift
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,26 +25,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Currency
-import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
@@ -67,8 +50,6 @@ import com.nexters.boolti.presentation.screen.ticketing.PaymentFailureDialog
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
 import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
-import com.nexters.boolti.presentation.theme.BooltiTheme
-import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -115,7 +96,9 @@ fun GiftScreen(
         viewModel.events
             .collect { event ->
                 when (event) {
-                    is GiftEvent.GiftSuccess -> {}
+                    is GiftEvent.GiftSuccess -> {
+                        navigateToComplete(event.reservationId, event.giftUuid)
+                    }
 
                     is GiftEvent.ProgressPayment -> {
                         val selectedImage = uiState.selectedImage ?: return@collect
@@ -297,7 +280,7 @@ fun GiftScreen(
             ticketName = uiState.ticketName,
             ticketCount = uiState.ticketCount,
             totalPrice = uiState.totalPrice,
-            onClick = viewModel::pay,
+            onClick = { viewModel.pay(uiState.totalPrice == 0) },
             onDismiss = { showConfirmDialog = false },
         )
     }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.giftcomplete
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,8 +34,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.kakao.sdk.share.ShareClient
+import com.kakao.sdk.template.model.Button
+import com.kakao.sdk.template.model.Content
+import com.kakao.sdk.template.model.FeedTemplate
+import com.kakao.sdk.template.model.Link
+import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
@@ -48,6 +57,7 @@ import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.KakaoYellow
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point4
+import timber.log.Timber
 
 @Composable
 fun GiftCompleteScreen(
@@ -57,6 +67,7 @@ fun GiftCompleteScreen(
 ) {
     val reservation by viewModel.reservation.collectAsStateWithLifecycle()
     val gift by viewModel.gift.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     BackHandler(onBack = onClickClose)
 
@@ -70,6 +81,11 @@ fun GiftCompleteScreen(
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal)
         ) {
+            val month = gift?.salesEndTime?.month?.value ?: 0
+            val day = gift?.salesEndTime?.dayOfMonth ?: 0
+            val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
+            val buttonsText = stringResource(id = R.string.gift_check)
+
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
                 text = stringResource(id = R.string.gift_complete_note),
@@ -93,7 +109,15 @@ fun GiftCompleteScreen(
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = KakaoYellow),
                 contentPadding = PaddingValues(horizontal = 20.dp),
-                onClick = { TODO() }
+                onClick = {
+                    if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
+                        gift?.let {
+                            sendMessage(context, it, dateText, buttonsText)
+                        }
+                    } else {
+                        // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
+                    }
+                }
             ) {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -125,6 +149,44 @@ fun GiftCompleteScreen(
                     reservation = it
                 )
             }
+        }
+    }
+}
+
+private fun sendMessage(context: Context, gift: Gift, dateText: String, buttonText: String) {
+    val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
+    val giftUrl = "https://${subDomain}boolti.in/gift/${gift.uuid}"
+
+    val defaultFeed = FeedTemplate(
+        content = Content(
+            title = "To. ${gift.recipientName}",
+            description = dateText,
+            imageUrl = gift.imagePath,
+            link = Link(
+                webUrl = giftUrl,
+                mobileWebUrl = giftUrl
+            )
+        ),
+        buttons = listOf(
+            Button(
+                buttonText,
+                Link(
+                    webUrl = giftUrl,
+                    mobileWebUrl = giftUrl
+                )
+            ),
+        )
+    )
+
+    ShareClient.instance.shareDefault(context, defaultFeed) { sharingResult, error ->
+        if (error != null) {
+            FirebaseCrashlytics.getInstance().recordException(error)
+            Timber.e(error)
+        } else if (sharingResult != null) {
+            context.startActivity(sharingResult.intent)
+
+            Timber.w("Warning Msg: ${sharingResult.warningMsg}")
+            Timber.w("Argument Msg: ${sharingResult.argumentMsg}")
         }
     }
 }

@@ -16,7 +16,7 @@ internal class GiftDataSource @Inject constructor(
     suspend fun approveGiftPayment(request: GiftApproveRequest): ApproveGiftPaymentResponse =
         service.approveGiftPayment(request)
 
-    suspend fun getGift(giftId: String): GiftResponse = service.getGift(giftId)
+    suspend fun getGift(giftUuid: String): GiftResponse = service.getGift(giftUuid)
 
     suspend fun getGiftImages(): List<ImageResponse> = service.getGiftImages()
 }

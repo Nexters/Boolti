@@ -1,7 +1,7 @@
 [versions]
 minSdk = "26"
 targetSdk = "34"
-versionCode = "12"
+versionCode = "13"
 versionName = "1.5.4"
 packageName = "com.nexters.boolti"
 compileSdk = "34"
@@ -109,6 +109,7 @@ firebase-dynamic-links = { module = "com.google.firebase:firebase-dynamic-links-
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxing" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
+kakao-share = { group = "com.kakao.sdk", name = "v2-share", version.ref = "kakao" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }

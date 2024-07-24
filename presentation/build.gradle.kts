@@ -18,6 +18,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "PACKAGE_NAME", "\"${libs.versions.packageName.get()}\"")
+        buildConfigField("String", "DEV_SUBDOMAIN", getLocalProperty("DEV_SUBDOMAIN"))
     }
 
     buildTypes {
@@ -81,6 +82,7 @@ dependencies {
     implementation(libs.lottie)
     implementation(libs.bundles.coil)
     api(libs.kakao.login)
+    implementation(libs.kakao.share)
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)

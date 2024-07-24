@@ -7,11 +7,11 @@ import com.nexters.boolti.domain.request.GiftApproveRequest
 import kotlinx.coroutines.flow.Flow
 
 interface GiftRepository {
-    fun receiveGift(giftId: String): Flow<Boolean>
+    fun receiveGift(giftUuid: String): Flow<Boolean>
 
     fun approveGiftPayment(request: GiftApproveRequest): Flow<ApproveGiftPayment>
 
-    fun getGift(giftId: String): Flow<Gift>
+    fun getGift(giftUuid: String): Flow<Gift>
 
     fun getGiftImages(): Flow<List<ImagePair>>
 }

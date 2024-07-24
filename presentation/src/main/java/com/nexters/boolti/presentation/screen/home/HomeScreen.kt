@@ -65,14 +65,14 @@ fun HomeScreen(
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    var dialog: HomeDialog? by rememberSaveable { mutableStateOf(null) }
+    var dialog: GiftStatus? by rememberSaveable { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
-                HomeEvent.RequireLoginForGift -> {
-                    dialog = HomeDialog.NEED_LOGIN_FOR_GIFT
+                is HomeEvent.ShowMessage -> {
+                    dialog = event.status
                 }
             }
         }
@@ -163,13 +163,37 @@ fun HomeScreen(
     }
 
     if (dialog != null) {
-        val dialogText = stringResource(id = R.string.gift_need_login)
-        val action = requireLogin
+        val textRes = when (dialog!!) {
+            GiftStatus.SELF -> R.string.gift_need_login
+            GiftStatus.NEED_LOGIN -> R.string.gift_register
+            GiftStatus.CAN_REGISTER -> R.string.gift_self_dialog
+            GiftStatus.FAILED -> R.string.gift_registration_failed
+        }
+        val dialogText = stringResource(id = textRes)
+
+        val action: () -> Unit = when (dialog!!) {
+            GiftStatus.SELF -> {
+                {}
+            }
+
+            GiftStatus.NEED_LOGIN -> requireLogin
+            GiftStatus.CAN_REGISTER -> {
+                {}
+            }
+
+            GiftStatus.FAILED -> {
+                { dialog = null }
+            }
+        }
+
+        val hasNegativeButton = dialog in listOf(GiftStatus.SELF, GiftStatus.CAN_REGISTER)
 
         BTDialog(
             onDismiss = { dialog = null },
             onClickPositiveButton = action,
             positiveButtonLabel = stringResource(id = R.string.gift_login),
+            hasNegativeButton = hasNegativeButton,
+            onClickNegativeButton = { dialog = GiftStatus.FAILED }
         ) {
             Text(text = dialogText)
         }

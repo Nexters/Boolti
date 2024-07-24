@@ -62,10 +62,13 @@ class HomeViewModel @Inject constructor(
 
     fun receiveGift(giftUuid: String) {
         when (loggedIn.value) {
-            true -> TODO("선물 받는 로직")
+            true -> {
+                sendEvent(HomeEvent.ShowMessage(GiftStatus.CAN_REGISTER))
+            }
+
             false -> {
                 giftRepository.saveGift(giftUuid)
-                sendEvent(HomeEvent.RequireLoginForGift)
+                sendEvent(HomeEvent.ShowMessage(GiftStatus.NEED_LOGIN))
             }
 
             null -> TODO()

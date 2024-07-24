@@ -34,13 +34,15 @@ import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 
 
 @Composable
 fun CardSelection(
     message: String,
     onMessageChanged: (String) -> Unit,
-    images: List<ImagePair>,
+    images: ImmutableList<ImagePair>,
     selectedImage: ImagePair?,
     onImageSelected: (ImagePair) -> Unit,
 ) {
@@ -115,7 +117,7 @@ fun CardSelection(
 
 @Composable
 private fun CardCarousel(
-    images: List<ImagePair>,
+    images: ImmutableList<ImagePair>,
     selectedImage: ImagePair?,
     onImageSelected: (ImagePair) -> Unit,
     modifier: Modifier = Modifier,
@@ -164,7 +166,7 @@ private fun CardSelectionPreview() {
                     "https://picsum.photos/200",
                     "https://picsum.photos/200"
                 )
-            },
+            }.toPersistentList(),
             selectedImage = ImagePair("", "", ""),
             onImageSelected = {}
         )

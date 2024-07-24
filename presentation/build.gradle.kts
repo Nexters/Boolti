@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.bundles.lifecycle)
     implementation(libs.bundles.compose)
+    implementation(libs.immutable)
     implementation(platform(libs.andoridx.compose.compose.bom))
     implementation(libs.bundles.coroutines)
     implementation(libs.bundles.firebase)

@@ -12,6 +12,7 @@ import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +57,7 @@ class GiftViewModel @Inject constructor(
     private fun load() {
         getRefundPolicyUseCase().onEach { refundPolicy ->
             _uiState.update {
-                it.copy(refundPolicy = refundPolicy)
+                it.copy(refundPolicy = refundPolicy.toPersistentList())
             }
         }.launchIn(viewModelScope + recordExceptionHandler)
 
@@ -64,7 +65,7 @@ class GiftViewModel @Inject constructor(
             .onEach { images ->
                 _uiState.update {
                     it.copy(
-                        giftImages = images,
+                        giftImages = images.toPersistentList(),
                         selectedImage = images.first()
                     )
                 }

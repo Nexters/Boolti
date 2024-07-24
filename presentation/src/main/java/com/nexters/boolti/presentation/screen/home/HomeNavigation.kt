@@ -17,10 +17,10 @@ fun NavGraphBuilder.HomeScreen(
             onClickShowItem = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
             onClickTicket = { navigateTo("${MainDestination.TicketDetail.route}/$it") },
             onClickQrScan = { navigateTo(MainDestination.HostedShows.route) },
-            onClickSignout = { navigateTo(MainDestination.SignOut.route) },
+            onClickAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },
             navigateToReservations = { navigateTo(MainDestination.Reservations.route) },
             navigateToBusiness = { navigateTo(MainDestination.Business.route) },
-            requireLogin = { navigateTo(MainDestination.Login.route) }
+            requireLogin = { navigateTo(MainDestination.Login.route) },
         )
     }
 }

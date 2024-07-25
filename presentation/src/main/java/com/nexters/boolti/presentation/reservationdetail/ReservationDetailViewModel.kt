@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.reservations
+package com.nexters.boolti.presentation.reservationdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope

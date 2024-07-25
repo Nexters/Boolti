@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.reservations
+package com.nexters.boolti.presentation.reservationdetail
 
 import com.nexters.boolti.domain.model.ReservationDetail
 

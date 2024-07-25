@@ -35,7 +35,7 @@ import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
 import com.nexters.boolti.presentation.screen.report.ReportScreen
-import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
+import com.nexters.boolti.presentation.reservationdetail.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen

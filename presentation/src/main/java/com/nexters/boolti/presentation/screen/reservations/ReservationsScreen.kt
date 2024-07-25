@@ -121,7 +121,10 @@ private fun ReservationsContent(
             val isGift = reservations[index].giftId != null
             ReservationItem(
                 reservation = reservations[index],
-                navigateToDetail = { navigateToDetail(reservations[index].id, isGift) },
+                navigateToDetail = {
+                    val id = if (isGift) reservations[index].giftId!! else reservations[index].id
+                    navigateToDetail(id, isGift)
+                },
             )
         }
     }

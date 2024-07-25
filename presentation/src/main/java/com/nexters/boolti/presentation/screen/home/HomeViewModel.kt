@@ -35,7 +35,7 @@ class HomeViewModel @Inject constructor(
     private val _events = MutableSharedFlow<HomeEvent>()
     val events: SharedFlow<HomeEvent> = _events.asSharedFlow()
 
-    var pendingGiftUuid: String? = null
+    private var pendingGiftUuid: String? = null
 
     init {
         initUserInfo()
@@ -113,5 +113,9 @@ class HomeViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope + recordExceptionHandler)
+    }
+
+    fun cancelGift() {
+        pendingGiftUuid = null
     }
 }

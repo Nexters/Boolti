@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,14 +36,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
-import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 
@@ -171,10 +168,19 @@ fun HomeScreen(
     if (dialog != null) {
         GiftDialog(
             status = dialog!!,
-            onDismiss = { dialog = null },
+            onDismiss = {
+                dialog = null
+                viewModel.cancelGift()
+            },
             receiveGift = viewModel::receiveGift,
-            requireLogin = requireLogin,
-            onFailed = { dialog = GiftStatus.FAILED }
+            requireLogin = {
+                dialog = null
+                requireLogin()
+            },
+            onFailed = {
+                dialog = GiftStatus.FAILED
+                viewModel.cancelGift()
+            }
         )
     }
 }

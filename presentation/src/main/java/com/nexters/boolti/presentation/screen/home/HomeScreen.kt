@@ -169,59 +169,13 @@ fun HomeScreen(
     }
 
     if (dialog != null) {
-        // TODO: 중복코드 제거
-
-        val buttonTextRes = when (dialog!!) {
-            GiftStatus.SELF, GiftStatus.CAN_REGISTER -> R.string.gift_register
-            GiftStatus.NEED_LOGIN -> R.string.gift_login
-            GiftStatus.FAILED -> R.string.description_close_button
-        }
-
-        val textRes = when (dialog!!) {
-            GiftStatus.SELF -> R.string.gift_self_dialog
-            GiftStatus.NEED_LOGIN -> R.string.gift_need_login
-            GiftStatus.CAN_REGISTER -> R.string.gift_register_dialog
-            GiftStatus.FAILED -> R.string.gift_registration_failed
-        }
-
-        val action: () -> Unit = when (dialog!!) {
-            GiftStatus.SELF -> {
-                {
-                    viewModel.receiveGift()
-                    dialog = null
-                }
-            }
-
-            GiftStatus.NEED_LOGIN -> requireLogin
-            GiftStatus.CAN_REGISTER -> {
-                {
-                    viewModel.receiveGift()
-                    dialog = null
-                }
-            }
-
-            GiftStatus.FAILED -> {
-                { dialog = null }
-            }
-        }
-
-        val hasNegativeButton = dialog in listOf(GiftStatus.SELF, GiftStatus.CAN_REGISTER)
-
-        BTDialog(
+        GiftDialog(
+            status = dialog!!,
             onDismiss = { dialog = null },
-            onClickPositiveButton = action,
-            positiveButtonLabel = stringResource(id = buttonTextRes),
-            hasNegativeButton = hasNegativeButton,
-            onClickNegativeButton = { dialog = GiftStatus.FAILED }
-        ) {
-            Text(
-                text = stringResource(id = textRes),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    color = Grey15,
-                    textAlign = TextAlign.Center
-                ),
-            )
-        }
+            receiveGift = viewModel::receiveGift,
+            requireLogin = requireLogin,
+            onFailed = { dialog = GiftStatus.FAILED }
+        )
     }
 }
 

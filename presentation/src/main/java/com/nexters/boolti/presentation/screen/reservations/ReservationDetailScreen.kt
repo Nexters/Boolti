@@ -34,12 +34,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.kakao.sdk.share.ShareClient
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
@@ -48,6 +50,8 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
+import com.nexters.boolti.presentation.screen.giftcomplete.GiftPolicy
+import com.nexters.boolti.presentation.screen.giftcomplete.sendMessage
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -128,8 +132,8 @@ fun ReservationDetailScreen(
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
             if (
                 (state.reservation.reservationState == ReservationState.RESERVED &&
-                !state.reservation.isInviteTicket &&
-                state.reservation.salesEndDateTime >= LocalDateTime.now()) ||
+                        !state.reservation.isInviteTicket &&
+                        state.reservation.salesEndDateTime >= LocalDateTime.now()) ||
                 state.reservation.reservationState == ReservationState.REGISTERING_GIFT
             ) {
                 MainButton(
@@ -277,10 +281,13 @@ private fun TicketHolderInfo(
     reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val isGift = reservation.giftUuid != null
+
     Section(
         modifier = modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.ticketing_ticket_holder_label),
-        defaultExpanded = false,
+        defaultExpanded = isGift,
     ) {
         Column {
             NormalRow(
@@ -293,6 +300,33 @@ private fun TicketHolderInfo(
                 key = stringResource(id = R.string.contact_label),
                 value = reservation.visitorPhoneNumber
             )
+            if (isGift) {
+                val month = reservation.salesEndDateTime.month.value
+                val day = reservation.salesEndDateTime.dayOfMonth
+                val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
+                val buttonText = stringResource(id = R.string.gift_check)
+
+                ResendGiftButton(
+                    modifier = Modifier.padding(top = 6.dp),
+                    onClick = {
+                        if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
+                            sendMessage(
+                                context = context,
+                                giftUuid = reservation.giftUuid!!,
+                                receiverName = reservation.visitorName,
+                                image = reservation.giftInviteImage,
+                                dateText = dateText,
+                                buttonText = buttonText
+                            )
+                        } else {
+                            // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
+                        }
+                    })
+                GiftPolicy(
+                    modifier = Modifier.padding(top = 12.dp),
+                    giftPolicy = stringArrayResource(id = R.array.gift_information).toList()
+                )
+            }
         }
     }
 }

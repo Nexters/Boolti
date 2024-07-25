@@ -6,6 +6,7 @@ import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.data.util.toPaymentType
 import com.nexters.boolti.data.util.toReservationState
 import com.nexters.boolti.domain.model.ReservationDetail
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -28,6 +29,7 @@ internal data class GiftPaymentInfoResponse(
     val giftId: String,
     val giftUuid: String,
     val giftMessage: String,
+    @SerialName("giftImgPath") val giftInvitePath: String, // TODO: giftInvitePath 가 맞는 거 같은데, 지금 서버에서 null 내려줌
     val cardDetail: CardDetailResponse? = null,
     val easyPayDetail: EasyPayDetailResponse? = null,
 ) {
@@ -35,6 +37,7 @@ internal data class GiftPaymentInfoResponse(
         return ReservationDetail(
             id = giftId,
             giftUuid = giftUuid,
+            giftInviteImage = giftInvitePath,
             showImage = showImg,
             showName = showName,
             showDate = showDate.toLocalDateTime(),

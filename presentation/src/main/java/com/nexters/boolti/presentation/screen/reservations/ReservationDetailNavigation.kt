@@ -10,7 +10,7 @@ fun NavGraphBuilder.ReservationDetailScreen(
     popBackStack: () -> Unit,
 ) {
     composable(
-        route = "${MainDestination.ReservationDetail.route}/{$reservationId}",
+        route = MainDestination.ReservationDetail.route,
         arguments = MainDestination.ReservationDetail.arguments,
     ) {
         ReservationDetailScreen(

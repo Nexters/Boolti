@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 data class Reservation(
     val id: String,
+    val giftId: String?,
     val reservationState: ReservationState,
     val reservationDateTime: LocalDateTime,
     val showName: String,

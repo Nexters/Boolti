@@ -52,7 +52,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ReservationsScreen(
     onBackPressed: () -> Unit,
-    navigateToDetail: (reservationId: String) -> Unit,
+    navigateToDetail: (id: String, isGift: Boolean) -> Unit,
     viewModel: ReservationsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -91,7 +91,7 @@ fun ReservationsScreen(
 @Composable
 private fun SuccessContent(
     modifier: Modifier = Modifier,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (id: String, isGift: Boolean) -> Unit,
     reservations: List<Reservation>,
 ) {
     if (reservations.isNotEmpty()) {
@@ -108,7 +108,7 @@ private fun SuccessContent(
 @Composable
 private fun ReservationsContent(
     reservations: List<Reservation>,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (id: String, isGift: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -118,9 +118,10 @@ private fun ReservationsContent(
         items(
             count = reservations.size,
             key = { reservations[it].id }) { index ->
+            val isGift = reservations[index].giftId != null
             ReservationItem(
                 reservation = reservations[index],
-                navigateToDetail = { navigateToDetail(reservations[index].id) },
+                navigateToDetail = { navigateToDetail(reservations[index].id, isGift) },
             )
         }
     }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -63,26 +64,35 @@ class HomeViewModel @Inject constructor(
     }
 
     fun processGift() {
-        // TODO: 자기 자신의 선물을 받는 케이스 처리
         if (pendingGiftUuid != null) {
-            sendEvent(HomeEvent.ShowMessage(GiftStatus.CAN_REGISTER))
+            processGiftWhenLoggedIn(pendingGiftUuid!!)
         }
     }
 
     fun processGift(giftUuid: String) {
-        // TODO: 자기 자신의 선물을 받는 케이스 처리
         pendingGiftUuid = giftUuid
 
         when (loggedIn.value) {
-            true -> {
+            true -> processGiftWhenLoggedIn(giftUuid)
+            false -> sendEvent(HomeEvent.ShowMessage(GiftStatus.NEED_LOGIN))
+            null -> Unit
+        }
+    }
+
+    private fun processGiftWhenLoggedIn(giftUuid: String) {
+        viewModelScope.launch(recordExceptionHandler) {
+            val senderId = giftRepository
+                .getGift(giftUuid)
+                .first()
+                .userId
+
+            val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
+
+            if (senderId == myUserId) {
+                sendEvent(HomeEvent.ShowMessage(GiftStatus.SELF))
+            } else {
                 sendEvent(HomeEvent.ShowMessage(GiftStatus.CAN_REGISTER))
             }
-
-            false -> {
-                sendEvent(HomeEvent.ShowMessage(GiftStatus.NEED_LOGIN))
-            }
-
-            null -> TODO("null인 케이스 처리")
         }
     }
 

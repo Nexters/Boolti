@@ -1,13 +1,17 @@
 package com.nexters.boolti.presentation.screen.home
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.theme.Grey15
+import com.nexters.boolti.presentation.theme.Grey50
 
 @Composable
 fun GiftDialog(
@@ -65,5 +69,15 @@ fun GiftDialog(
                 textAlign = TextAlign.Center
             ),
         )
+        if (status == GiftStatus.FAILED) {
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(id = R.string.gift_registration_failed_dialog),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = Grey50,
+                    textAlign = TextAlign.Center
+                ),
+            )
+        }
     }
 }

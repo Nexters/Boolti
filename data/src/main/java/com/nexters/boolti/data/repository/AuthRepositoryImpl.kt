@@ -13,6 +13,7 @@ import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import com.nexters.boolti.domain.request.SignoutRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -34,6 +35,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         return authDataSource.login(request).onSuccess { response ->
             tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             deviceTokenDataSource.sendFcmToken()
+            getUserAndCache().first()
         }.mapCatching(LoginResponse::toDomain)
     }
 

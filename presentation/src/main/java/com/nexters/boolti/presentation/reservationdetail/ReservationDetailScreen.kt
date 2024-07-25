@@ -100,7 +100,8 @@ fun ReservationDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                val (textId, textColor) = state.reservation.reservationState.toDescriptionAndColorPair()
+                val (textId, textColor) =
+                    state.reservation.reservationState.toDescriptionAndColorPair(state.reservation.isGift)
 
                 Text(
                     modifier = Modifier
@@ -282,7 +283,7 @@ private fun TicketHolderInfo(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val isGift = reservation.giftUuid != null
+    val isGift = reservation.isGift
 
     Section(
         modifier = modifier.padding(top = 12.dp),

@@ -235,6 +235,7 @@
     <string name="reservations_refunding">취소 진행 중</string>
     <string name="reservations_canceled">취소 완료</string>
     <string name="reservations_reserved">발권 완료</string>
+    <string name="reservations_gift_received">등록 완료</string>
     <string name="reservations_refunded">취소 완료</string>
     <string name="reservations_detail_view">상세 보기</string>
     <string name="reservations_registering_gift">등록 대기</string>

@@ -118,7 +118,7 @@ private fun ReservationsContent(
         items(
             count = reservations.size,
             key = { reservations[it].id }) { index ->
-            val isGift = reservations[index].giftId != null
+            val isGift = reservations[index].isGift
             ReservationItem(
                 reservation = reservations[index],
                 navigateToDetail = {
@@ -224,7 +224,10 @@ private fun ReservationItem(
                 modifier = Modifier.padding(start = 16.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                ReservationStateLabel(reservationState = reservation.reservationState)
+                ReservationStateLabel(
+                    isGift = reservation.isGift,
+                    reservationState = reservation.reservationState,
+                )
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = reservation.showName,
@@ -248,10 +251,11 @@ private fun ReservationItem(
 
 @Composable
 fun ReservationStateLabel(
-    modifier: Modifier = Modifier,
+    isGift: Boolean,
     reservationState: ReservationState,
+    modifier: Modifier = Modifier,
 ) {
-    val (stringId, color) = reservationState.toDescriptionAndColorPair()
+    val (stringId, color) = reservationState.toDescriptionAndColorPair(isGift)
 
     Text(
         modifier = modifier,

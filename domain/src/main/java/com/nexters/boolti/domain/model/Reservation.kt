@@ -13,4 +13,6 @@ data class Reservation(
     val ticketCount: Int,
     val ticketPrice: Int,
     val receiver: String?,
-)
+) {
+    val isGift = giftId != null
+}

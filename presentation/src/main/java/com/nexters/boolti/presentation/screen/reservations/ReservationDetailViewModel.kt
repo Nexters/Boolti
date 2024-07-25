@@ -1,9 +1,8 @@
 package com.nexters.boolti.presentation.screen.reservations
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.repository.ConfigRepository
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -23,11 +22,15 @@ import javax.inject.Inject
 class ReservationDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
+    private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
-        "reservationId가 전달되어야 합니다."
+    private val id: String = checkNotNull(savedStateHandle["reservationId"]) {
+        "id가 전달되어야 합니다."
     }
+
+    private val isGift: Boolean = savedStateHandle["isGift"] ?: false
+
     private val _uiState: MutableStateFlow<ReservationDetailUiState> =
         MutableStateFlow(ReservationDetailUiState.Loading)
     val uiState: StateFlow<ReservationDetailUiState> = _uiState.asStateFlow()
@@ -40,7 +43,13 @@ class ReservationDetailViewModel @Inject constructor(
     }
 
     fun fetchReservation() {
-        reservationRepository.findReservationById(reservationId)
+        val reservationFlow = if (isGift) {
+            giftRepository.getGiftPaymentInfo(id)
+        } else {
+            reservationRepository.findReservationById(id)
+        }
+
+        reservationFlow
             .onStart {
                 _uiState.update { ReservationDetailUiState.Loading }
             }

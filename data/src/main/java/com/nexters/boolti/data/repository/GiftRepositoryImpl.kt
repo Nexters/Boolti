@@ -32,7 +32,7 @@ internal class GiftRepositoryImpl @Inject constructor(
         emit(dataSource.getGiftImages().toDomains())
     }
 
-    override fun getGiftPaymentInfo(): Flow<ReservationDetail> = flow {
-        emit(dataSource.getGiftPaymentInfo().toDomain())
+    override fun getGiftPaymentInfo(giftId: String): Flow<ReservationDetail> = flow {
+        emit(dataSource.getGiftPaymentInfo(giftId).toDomain())
     }
 }

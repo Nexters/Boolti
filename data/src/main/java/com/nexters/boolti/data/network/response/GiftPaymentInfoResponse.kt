@@ -33,7 +33,8 @@ internal data class GiftPaymentInfoResponse(
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
-            id = giftUuid,
+            id = giftId,
+            giftUuid = giftUuid,
             showImage = showImg,
             showName = showName,
             showDate = showDate.toLocalDateTime(),

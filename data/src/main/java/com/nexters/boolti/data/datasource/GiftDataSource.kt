@@ -21,5 +21,6 @@ internal class GiftDataSource @Inject constructor(
 
     suspend fun getGiftImages(): List<ImageResponse> = service.getGiftImages()
 
-    suspend fun getGiftPaymentInfo(): GiftPaymentInfoResponse = service.getGiftPaymentInfo()
+    suspend fun getGiftPaymentInfo(giftId: String): GiftPaymentInfoResponse =
+        service.getGiftPaymentInfo(giftId)
 }

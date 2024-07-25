@@ -7,6 +7,7 @@ data class ReservationDetail(
     val showImage: String,
     val showName: String,
     val showDate: LocalDateTime,
+    val giftUuid: String? = null,
     val ticketName: String,
     val isInviteTicket: Boolean,
     val ticketCount: Int,

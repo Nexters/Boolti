@@ -24,6 +24,6 @@ internal interface GiftService {
     @GET("/app/api/v1/gift/img-list")
     suspend fun getGiftImages(): List<ImageResponse>
 
-    @GET("app/api/v1/gift/approve-payment/{giftId}")
-    suspend fun getGiftPaymentInfo(): GiftPaymentInfoResponse
+    @GET("app/api/v1/gift/approve-payment-info/{giftId}")
+    suspend fun getGiftPaymentInfo(@Path("giftId") giftId: String): GiftPaymentInfoResponse
 }

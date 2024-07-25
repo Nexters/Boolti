@@ -16,5 +16,5 @@ interface GiftRepository {
 
     fun getGiftImages(): Flow<List<ImagePair>>
 
-    fun getGiftPaymentInfo(): Flow<ReservationDetail>
+    fun getGiftPaymentInfo(giftId: String): Flow<ReservationDetail>
 }

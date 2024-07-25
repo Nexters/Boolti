@@ -81,6 +81,7 @@ fun HomeScreen(
         val intent = context.requireActivity().intent
         intent.action?.let { _ ->
             val deepLink = intent.data.toString()
+            intent.data = null
             val regex = "^https://app.boolti.in/gift/([\\w-])+$".toRegex()
             if (regex.matches(deepLink)) {
                 val giftUuid = deepLink.split("/").last()

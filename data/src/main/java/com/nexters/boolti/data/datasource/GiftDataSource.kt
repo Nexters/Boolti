@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.GiftService
+import com.nexters.boolti.data.network.request.GiftCancelRequest
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
 import com.nexters.boolti.data.network.response.GiftPaymentInfoResponse
@@ -23,4 +24,7 @@ internal class GiftDataSource @Inject constructor(
 
     suspend fun getGiftPaymentInfo(giftId: String): GiftPaymentInfoResponse =
         service.getGiftPaymentInfo(giftId)
+
+    suspend fun cancelGift(giftUuid: String): Boolean =
+        service.cancelGift(GiftCancelRequest(giftUuid = giftUuid))
 }

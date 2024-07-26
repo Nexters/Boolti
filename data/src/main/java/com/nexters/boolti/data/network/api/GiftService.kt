@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.request.GiftCancelRequest
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
 import com.nexters.boolti.data.network.response.GiftPaymentInfoResponse
@@ -26,4 +27,7 @@ internal interface GiftService {
 
     @GET("app/api/v1/gift/approve-payment-info/{giftId}")
     suspend fun getGiftPaymentInfo(@Path("giftId") giftId: String): GiftPaymentInfoResponse
+
+    @POST("app/api/v1/order/cancel-gift")
+    suspend fun cancelGift(@Body request: GiftCancelRequest): Boolean
 }

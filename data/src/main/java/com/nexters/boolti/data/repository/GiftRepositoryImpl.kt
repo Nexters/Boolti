@@ -35,4 +35,8 @@ internal class GiftRepositoryImpl @Inject constructor(
     override fun getGiftPaymentInfo(giftId: String): Flow<ReservationDetail> = flow {
         emit(dataSource.getGiftPaymentInfo(giftId).toDomain())
     }
+
+    override fun cancelGift(giftUuid: String): Flow<Boolean> = flow {
+        emit(dataSource.cancelGift(giftUuid))
+    }
 }

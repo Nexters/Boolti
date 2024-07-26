@@ -2,10 +2,10 @@ package com.nexters.boolti.presentation.screen.refund
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.PaymentCancelRequest
-import com.nexters.boolti.domain.request.RefundRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,11 +27,14 @@ class RefundViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
     private val ticketingRepository: TicketingRepository,
+    private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
-        "reservationId가 전달되어야 합니다."
+    private val id: String = checkNotNull(savedStateHandle["reservationId"]) {
+        "id가 전달되어야 합니다."
     }
+
+    private val isGift: Boolean = savedStateHandle["isGift"] ?: false
 
     private val _uiState: MutableStateFlow<RefundUiState> = MutableStateFlow(RefundUiState())
     val uiState: StateFlow<RefundUiState> = _uiState.asStateFlow()
@@ -54,7 +57,13 @@ class RefundViewModel @Inject constructor(
     }
 
     private fun fetchReservation() {
-        reservationRepository.findReservationById(reservationId)
+        val reservationFlow = if (isGift) {
+            giftRepository.getGiftPaymentInfo(id)
+        } else {
+            reservationRepository.findReservationById(id)
+        }
+
+        reservationFlow
             .onEach { reservation ->
                 _uiState.update { it.copy(reservation = reservation) }
             }
@@ -62,15 +71,26 @@ class RefundViewModel @Inject constructor(
     }
 
     fun refund() {
-        val request = PaymentCancelRequest(
-            reservationId = reservationId,
-            cancelReason = uiState.value.reason
-        )
+        if (isGift) {
+            uiState.value.reservation?.giftUuid?.let { uuid ->
+                giftRepository.cancelGift(uuid)
+                    .onEach { isSuccessful ->
+                        if (isSuccessful) sendEvent(RefundEvent.SuccessfullyRefunded)
+                        else sendEvent(RefundEvent.RefundError)
+                    }
+                    .launchIn(viewModelScope + recordExceptionHandler)
+            }
+        } else {
+            val request = PaymentCancelRequest(
+                reservationId = id,
+                cancelReason = uiState.value.reason
+            )
 
-        ticketingRepository.cancelPayment(request).onEach { isSuccessful ->
-            if (isSuccessful) sendEvent(RefundEvent.SuccessfullyRefunded)
-            else sendEvent(RefundEvent.RefundError)
-        }.launchIn(viewModelScope + recordExceptionHandler)
+            ticketingRepository.cancelPayment(request).onEach { isSuccessful ->
+                if (isSuccessful) sendEvent(RefundEvent.SuccessfullyRefunded)
+                else sendEvent(RefundEvent.RefundError)
+            }.launchIn(viewModelScope + recordExceptionHandler)
+        }
     }
 
     fun updateReason(newReason: String) {

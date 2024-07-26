@@ -161,6 +161,7 @@ fun ReservationDetailScreen(
                 onDismiss = { showRefundDialog = false },
                 positiveButtonLabel = stringResource(id = R.string.refund_button),
                 onClickPositiveButton = {
+                    showRefundDialog = false
                     navigateToRefund(state.reservation.id, true)
                 }
             ) {

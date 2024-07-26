@@ -9,7 +9,7 @@ fun NavGraphBuilder.RefundScreen(
     popBackStack: () -> Unit,
 ) {
     composable(
-        route = "${MainDestination.Refund.route}/{$reservationId}",
+        route = MainDestination.Refund.route,
         arguments = MainDestination.Refund.arguments,
     ) {
         RefundScreen(

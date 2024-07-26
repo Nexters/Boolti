@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,6 +47,7 @@ import com.kakao.sdk.share.ShareClient
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
@@ -66,12 +69,13 @@ import java.time.LocalDateTime
 @Composable
 fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
-    navigateToRefund: (id: String) -> Unit,
+    navigateToRefund: (id: String, isGift: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
+    var showRefundDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchReservation()
@@ -141,7 +145,29 @@ fun ReservationDetailScreen(
                         contentColor = Grey90,
                     ),
                     label = stringResource(id = R.string.refund_button),
-                    onClick = { navigateToRefund(state.reservation.id) }
+                    onClick = {
+                        if (state.reservation.isGift) {
+                            showRefundDialog = true
+                        } else {
+                            navigateToRefund(state.reservation.id, false)
+                        }
+                    }
+                )
+            }
+        }
+
+        if (showRefundDialog) {
+            BTDialog(
+                onDismiss = { showRefundDialog = false },
+                positiveButtonLabel = stringResource(id = R.string.refund_button),
+                onClickPositiveButton = {
+                    navigateToRefund(state.reservation.id, true)
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.reservation_refund_gift_dialog),
+                    style = MaterialTheme.typography.titleLarge.copy(color = Grey15),
+                    textAlign = TextAlign.Center,
                 )
             }
         }

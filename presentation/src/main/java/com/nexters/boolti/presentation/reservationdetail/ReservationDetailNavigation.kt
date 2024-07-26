@@ -14,7 +14,9 @@ fun NavGraphBuilder.ReservationDetailScreen(
     ) {
         ReservationDetailScreen(
             onBackPressed = popBackStack,
-            navigateToRefund = { id -> navigateTo("${MainDestination.Refund.route}/$id") },
+            navigateToRefund = { id, isGift ->
+                navigateTo(MainDestination.Refund.createRoute(id = id, isGift = isGift))
+            },
         )
     }
 }

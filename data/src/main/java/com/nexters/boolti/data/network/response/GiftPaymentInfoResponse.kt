@@ -29,7 +29,7 @@ internal data class GiftPaymentInfoResponse(
     val giftId: String,
     val giftUuid: String,
     val giftMessage: String,
-    @SerialName("giftImgPath") val giftInvitePath: String, // TODO: giftInvitePath 가 맞는 거 같은데, 지금 서버에서 null 내려줌
+    val giftInvitePath: String,
     val cardDetail: CardDetailResponse? = null,
     val easyPayDetail: EasyPayDetailResponse? = null,
 ) {

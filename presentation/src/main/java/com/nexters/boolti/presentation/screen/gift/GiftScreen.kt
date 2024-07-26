@@ -373,7 +373,6 @@ private fun CardSelection(
                 modifier = Modifier
                     .padding(top = 28.dp)
                     .fillMaxWidth()
-                    .aspectRatio(3 / 2f)
                     .background(Color.White),
                 contentScale = ContentScale.Crop,
             )

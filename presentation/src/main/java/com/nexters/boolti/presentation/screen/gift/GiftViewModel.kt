@@ -118,10 +118,10 @@ class GiftViewModel @Inject constructor(
         _uiState.update { it.copy(selectedImage = image) }
     }
 
-    fun pay(isFree: Boolean) {
-        if (isFree) {
-            val state = uiState.value
+    fun pay() {
+        val state = uiState.value
 
+        if (state.isFree) {
             giftRepository.sendFreeGift(
                 FreeGiftRequest(
                     amount = 0,

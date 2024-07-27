@@ -37,6 +37,8 @@ data class GiftUiState(
         get() = orderAgreed && senderName.isNotBlank() && senderContact.isNotBlank() &&
                 receiverName.isNotBlank() && receiverContact.isNotBlank()
 
+    val isFree = totalPrice == 0
+
     fun toggleAgreement(): GiftUiState =
         copy(
             orderAgreement = orderAgreement.map {

@@ -280,7 +280,7 @@ fun GiftScreen(
             ticketName = uiState.ticketName,
             ticketCount = uiState.ticketCount,
             totalPrice = uiState.totalPrice,
-            onClick = { viewModel.pay(uiState.totalPrice == 0) },
+            onClick = viewModel::pay,
             onDismiss = { showConfirmDialog = false },
         )
     }

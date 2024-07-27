@@ -10,11 +10,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -51,14 +52,17 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ReservationsScreen(
     onBackPressed: () -> Unit,
-    navigateToDetail: (reservationId: String) -> Unit,
+    navigateToDetail: (id: String, isGift: Boolean) -> Unit,
     viewModel: ReservationsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
-            BtBackAppBar(title = stringResource(id = R.string.my_ticketing_history), onClickBack = onBackPressed)
+            BtBackAppBar(
+                title = stringResource(id = R.string.my_ticketing_history),
+                onClickBack = onBackPressed
+            )
         }
     ) { innerPadding ->
         Box(
@@ -87,7 +91,7 @@ fun ReservationsScreen(
 @Composable
 private fun SuccessContent(
     modifier: Modifier = Modifier,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (id: String, isGift: Boolean) -> Unit,
     reservations: List<Reservation>,
 ) {
     if (reservations.isNotEmpty()) {
@@ -104,7 +108,7 @@ private fun SuccessContent(
 @Composable
 private fun ReservationsContent(
     reservations: List<Reservation>,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (id: String, isGift: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -114,9 +118,13 @@ private fun ReservationsContent(
         items(
             count = reservations.size,
             key = { reservations[it].id }) { index ->
+            val isGift = reservations[index].isGift
             ReservationItem(
                 reservation = reservations[index],
-                navigateToDetail = { navigateToDetail(reservations[index].id) },
+                navigateToDetail = {
+                    val id = if (isGift) reservations[index].giftId!! else reservations[index].id
+                    navigateToDetail(id, isGift)
+                },
             )
         }
     }
@@ -180,7 +188,25 @@ private fun ReservationItem(
                 tint = Grey50
             )
         }
-        Divider(thickness = 1.dp, color = Grey85)
+        HorizontalDivider(thickness = 1.dp, color = Grey85)
+        if (reservation.receiver != null) {
+            Row(
+                modifier = Modifier.height(34.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(R.drawable.ic_gift),
+                    contentDescription = null,
+                    tint = Grey50
+                )
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    text = "TO. ${reservation.receiver}",
+                    style = MaterialTheme.typography.titleSmall.copy(color = Grey30)
+                )
+            }
+        }
         Row(
             modifier = Modifier.padding(top = 12.dp, bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -198,7 +224,10 @@ private fun ReservationItem(
                 modifier = Modifier.padding(start = 16.dp),
                 verticalArrangement = Arrangement.Center,
             ) {
-                ReservationStateLabel(reservationState = reservation.reservationState)
+                ReservationStateLabel(
+                    isGift = reservation.isGift,
+                    reservationState = reservation.reservationState,
+                )
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = reservation.showName,
@@ -222,10 +251,11 @@ private fun ReservationItem(
 
 @Composable
 fun ReservationStateLabel(
-    modifier: Modifier = Modifier,
+    isGift: Boolean,
     reservationState: ReservationState,
+    modifier: Modifier = Modifier,
 ) {
-    val (stringId, color) = reservationState.toDescriptionAndColorPair()
+    val (stringId, color) = reservationState.toDescriptionAndColorPair(isGift)
 
     Text(
         modifier = modifier,

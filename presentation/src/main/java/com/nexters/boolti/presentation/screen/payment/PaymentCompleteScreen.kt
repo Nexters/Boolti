@@ -97,7 +97,7 @@ private fun PaymentCompleteScreen(
             InfoRow(
                 modifier = Modifier.padding(top = 16.dp),
                 label = stringResource(R.string.ticketing_ticket_holder_label),
-                value = slashFormat(reservation.ticketHolderName, reservation.ticketHolderPhoneNumber),
+                value = slashFormat(reservation.visitorName, reservation.visitorPhoneNumber),
             )
             if (!reservation.isInviteTicket && reservation.totalAmountPrice > 0) {
                 InfoRow(
@@ -255,8 +255,8 @@ private fun PaymentCompleteScreenPreview() {
                 totalAmountPrice = 3473,
                 reservationState = ReservationState.REFUNDING,
                 completedDateTime = null,
-                ticketHolderName = "Cedric Butler",
-                ticketHolderPhoneNumber = "(453) 355-6682",
+                visitorName = "Cedric Butler",
+                visitorPhoneNumber = "(453) 355-6682",
                 depositorName = "Dick Haley",
                 depositorPhoneNumber = "(869) 823-0418",
                 csReservationId = "mutat",

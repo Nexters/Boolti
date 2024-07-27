@@ -1,17 +1,14 @@
-package com.nexters.boolti.presentation.screen.reservations
+package com.nexters.boolti.presentation.reservationdetail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,8 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -31,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,18 +35,26 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.kakao.sdk.share.ShareClient
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
+import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
+import com.nexters.boolti.presentation.screen.giftcomplete.GiftPolicy
+import com.nexters.boolti.presentation.screen.giftcomplete.sendMessage
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -65,12 +69,13 @@ import java.time.LocalDateTime
 @Composable
 fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
-    navigateToRefund: (id: String) -> Unit,
+    navigateToRefund: (id: String, isGift: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
+    var showRefundDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchReservation()
@@ -99,7 +104,8 @@ fun ReservationDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                val (textId, textColor) = state.reservation.reservationState.toDescriptionAndColorPair()
+                val (textId, textColor) =
+                    state.reservation.reservationState.toDescriptionAndColorPair(state.reservation.isGift)
 
                 Text(
                     modifier = Modifier
@@ -129,15 +135,40 @@ fun ReservationDetailScreen(
                 RefundInfo(reservation = state.reservation)
             }
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
-            Spacer(modifier = Modifier.height(40.dp))
-            if (
-                state.reservation.reservationState == ReservationState.RESERVED &&
-                !state.reservation.isInviteTicket &&
-                state.reservation.salesEndDateTime >= LocalDateTime.now()
+            if (state.reservation.isRefundable) {
+                MainButton(
+                    modifier = modifier
+                        .padding(horizontal = marginHorizontal, vertical = 8.dp)
+                        .fillMaxWidth(),
+                    colors = MainButtonDefaults.buttonColors(
+                        containerColor = Grey20,
+                        contentColor = Grey90,
+                    ),
+                    label = stringResource(id = R.string.refund_button),
+                    onClick = {
+                        if (state.reservation.isGift) {
+                            showRefundDialog = true
+                        } else {
+                            navigateToRefund(state.reservation.id, false)
+                        }
+                    }
+                )
+            }
+        }
+
+        if (showRefundDialog) {
+            BTDialog(
+                onDismiss = { showRefundDialog = false },
+                positiveButtonLabel = stringResource(id = R.string.refund_button),
+                onClickPositiveButton = {
+                    showRefundDialog = false
+                    navigateToRefund(state.reservation.id, true)
+                }
             ) {
-                RefundButton(
-                    modifier = Modifier.padding(horizontal = marginHorizontal, vertical = 8.dp),
-                    onClick = { navigateToRefund(state.reservation.id) }
+                Text(
+                    text = stringResource(id = R.string.reservation_refund_gift_dialog),
+                    style = MaterialTheme.typography.titleLarge.copy(color = Grey15),
+                    textAlign = TextAlign.Center,
                 )
             }
         }
@@ -273,22 +304,52 @@ private fun TicketHolderInfo(
     reservation: ReservationDetail,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val isGift = reservation.isGift
+
     Section(
         modifier = modifier.padding(top = 12.dp),
         title = stringResource(id = R.string.ticketing_ticket_holder_label),
-        defaultExpanded = false,
+        defaultExpanded = isGift,
     ) {
         Column {
             NormalRow(
                 modifier = Modifier.padding(bottom = 8.dp),
                 key = stringResource(id = R.string.name_label),
-                value = reservation.ticketHolderName
+                value = reservation.visitorName
             )
             NormalRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
                 key = stringResource(id = R.string.contact_label),
-                value = reservation.ticketHolderPhoneNumber
+                value = reservation.visitorPhoneNumber
             )
+            if (isGift) {
+                val month = reservation.salesEndDateTime.month.value
+                val day = reservation.salesEndDateTime.dayOfMonth
+                val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
+                val buttonText = stringResource(id = R.string.gift_check)
+
+                ResendGiftButton(
+                    modifier = Modifier.padding(top = 6.dp),
+                    onClick = {
+                        if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
+                            sendMessage(
+                                context = context,
+                                giftUuid = reservation.giftUuid!!,
+                                receiverName = reservation.visitorName,
+                                image = reservation.giftInviteImage,
+                                dateText = dateText,
+                                buttonText = buttonText
+                            )
+                        } else {
+                            // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
+                        }
+                    })
+                GiftPolicy(
+                    modifier = Modifier.padding(top = 12.dp),
+                    giftPolicy = stringArrayResource(id = R.array.gift_information).toList()
+                )
+            }
         }
     }
 }
@@ -324,7 +385,7 @@ private fun RefundPolicy(
     refundPolicy: List<String>,
 ) {
     Section(
-        modifier = modifier.padding(top = 12.dp),
+        modifier = modifier.padding(vertical = 12.dp),
         title = stringResource(id = R.string.refund_policy_label),
         defaultExpanded = false,
     ) {
@@ -430,29 +491,5 @@ private fun Section(
         ) {
             content()
         }
-    }
-}
-
-
-@Composable
-private fun RefundButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Grey20,
-            contentColor = Grey90,
-        ),
-        shape = RoundedCornerShape(4.dp),
-        contentPadding = PaddingValues(12.dp),
-        interactionSource = remember { MutableInteractionSource() },
-    ) {
-        Text(
-            text = stringResource(id = R.string.refund_button),
-            style = MaterialTheme.typography.titleMedium
-        )
     }
 }

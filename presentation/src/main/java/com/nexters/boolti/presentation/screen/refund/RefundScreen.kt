@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RefundScreen(
+    isGift: Boolean,
     onBackPressed: () -> Unit,
     viewModel: RefundViewModel = hiltViewModel(),
 ) {
@@ -92,7 +93,7 @@ fun RefundScreen(
             state = pagerState,
             userScrollEnabled = false,
         ) { index ->
-            if (index == 0) {
+            if (index == 0 && !isGift) {
                 ReasonPage(
                     modifier = Modifier.padding(innerPadding),
                     onNextClick = {

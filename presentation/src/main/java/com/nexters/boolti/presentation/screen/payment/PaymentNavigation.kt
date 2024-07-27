@@ -25,7 +25,9 @@ fun NavGraphBuilder.PaymentCompleteScreen(
                     navigateTo("${MainDestination.ShowDetail.route}/$showId")
                 } ?: popBackStack()
             },
-            navigateToReservation = { reservation -> navigateTo("${MainDestination.ReservationDetail.route}/${reservation.id}") },
+            navigateToReservation = { reservation ->
+                navigateTo(MainDestination.ReservationDetail.createRoute(id = reservation.id))
+            },
             navigateToTicketDetail = { reservation -> navigateTo("${MainDestination.TicketDetail.route}/${reservation.id}") },
         )
     }

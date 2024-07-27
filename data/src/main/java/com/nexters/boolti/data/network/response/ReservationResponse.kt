@@ -10,15 +10,18 @@ internal data class ReservationResponse(
     val reservationId: String,
     val reservationStatus: String,
     val reservationDate: String,
+    val giftId: String?,
     val showName: String,
     val showImg: String,
     val salesTicketName: String,
     val ticketCount: Int,
     val ticketPrice: Int = 0,
+    val recipientName: String?,
 ) {
     fun toDomain(): Reservation {
         return Reservation(
             id = reservationId,
+            giftId = giftId,
             reservationState = reservationStatus.toReservationState(),
             reservationDateTime = reservationDate.toLocalDateTime(),
             showName = showName,
@@ -26,6 +29,7 @@ internal data class ReservationResponse(
             salesTicketName = salesTicketName,
             ticketCount = ticketCount,
             ticketPrice = ticketPrice,
+            receiver = recipientName,
         )
     }
 }

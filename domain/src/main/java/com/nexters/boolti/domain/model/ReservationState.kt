@@ -6,5 +6,6 @@ enum class ReservationState {
     RESERVED,
     REFUNDING,
     REFUNDED,
+    REGISTERING_GIFT,
     UNDEFINED,
 }

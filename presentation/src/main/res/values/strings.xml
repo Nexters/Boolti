@@ -20,6 +20,8 @@
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>
     <string name="error_ticket_not_found">존재하지 않는 티켓이에요</string>
 
+    <string name="kakao">카카오</string>
+
     <!-- 유효성 검사 -->
     <string name="validation_name">이름을 올바르게 입력해 주세요</string>
     <string name="validation_contact">연락처를 올바르게 입력해 주세요</string>
@@ -50,6 +52,7 @@
 
     <string name="btn_ok">확인</string>
     <string name="btn_goto_login">로그인 하러 가기</string>
+    <string name="login">로그인</string>
     <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
     <string name="copy">복사</string>
     <string name="next">다음</string>
@@ -72,21 +75,20 @@
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
     <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">불티 유저</string>
-    <string name="signout_cancelled_message">탈퇴 후 30일 이내에 로그인하여, 계정 삭제가 취소되었어요\n불티를 다시 찾아주셔서 감사해요!</string>
+    <string name="signout_cancelled_message">30일 내에 로그인하여 계정 삭제가 취소되었어요.\n불티를 다시 찾아주셔서 감사해요!</string>
+    <string name="user_code">식별 코드</string>
 
     <!-- 탈퇴 -->
-    <string name="signout">회원 탈퇴</string>
-    <string name="signout_button">탈퇴하기</string>
-    <string name="signout_dialog_title">탈퇴하시겠어요?</string>
-    <string name="signout_dialog_message">탈퇴일로부터 30일 이내로 로그인 시 계정 삭제를 취소할 수 있습니다. 30일이 지나면 계정 및 정보가 영구 삭제됩니다.</string>
-    <string name="signout_notice_title">탈퇴 전, 꼭 읽어보세요!</string>
+    <string name="signout">계정 삭제</string>
+    <string name="signout_button">삭제하기</string>
+    <string name="signout_notice_title">삭제 전, 꼭 읽어보세요!</string>
     <string-array name="signout_notice">
         <item>주최한 공연 정보는 사라지지 않아요</item>
         <item>예매한 티켓은 전부 사라지며 복구할 수 없어요</item>
-        <item>탈퇴 일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
+        <item>삭제일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
     </string-array>
-    <string name="signout_reason_title">탈퇴 이유를 입력해주세요</string>
-    <string name="signout_reason_placeholder">예) 계정 탈퇴 후 재가입할게요</string>
+    <string name="signout_reason_title">삭제 이유를 입력해주세요</string>
+    <string name="signout_reason_placeholder">예) 계정 삭제 후 재가입할게요</string>
 
     <string name="format_price">%,d원</string>
     <string name="format_total_price">총 %,d원</string>
@@ -214,13 +216,17 @@
     <string name="payment_failed_description">예매 진행 중 오류가 발생하였습니다.\n다시 시도해 주세요</string>
 
     <!-- 마이 -->
-    <string name="my_login">불티 로그인 하러가기</string>
+    <string name="my_login">로그인하고 이용해보세요</string>
     <string name="my_login_sub">원하는 공연 티켓을 예매해보세요!</string>
     <string name="my_logout">로그아웃</string>
     <string name="my_ticketing_history">결제 내역</string>
-    <string name="my_scan_qr">QR 스캔</string>
+    <string name="my_scan_qr">입장 확인</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
     <string name="my_register_show">공연 등록</string>
+    <string name="show_profile_button">프로필 보기</string>
+    <string name="account_setting">계정 설정</string>
+    <string name="my_show">내 공연</string>
+    <string name="sns_provider">연결 서비스</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

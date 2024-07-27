@@ -46,7 +46,7 @@ fun HomeScreen(
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
     onClickQrScan: () -> Unit,
-    onClickSignout: () -> Unit,
+    onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToBusiness: () -> Unit,
     requireLogin: () -> Unit,
@@ -123,9 +123,9 @@ fun HomeScreen(
                 MyScreen(
                     modifier = modifier.padding(innerPadding),
                     requireLogin = requireLogin,
+                    onClickAccountSetting = onClickAccountSetting,
                     navigateToReservations = navigateToReservations,
                     onClickQrScan = onClickQrScan,
-                    onClickSignout = onClickSignout,
                 )
             }
         }

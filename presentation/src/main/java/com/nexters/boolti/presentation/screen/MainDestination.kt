@@ -18,7 +18,8 @@ sealed class MainDestination(val route: String) {
         )
     }
 
-    data object Gift : MainDestination(route = "gift/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}") {
+    data object Gift :
+        MainDestination(route = "gift/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}") {
         val arguments = listOf(
             navArgument(showId) { type = NavType.StringType },
             navArgument(salesTicketId) { type = NavType.StringType },
@@ -86,6 +87,7 @@ sealed class MainDestination(val route: String) {
     data object SignOut : MainDestination(route = "signout")
     data object Login : MainDestination(route = "login")
     data object Business : MainDestination(route = "business")
+    data object AccountSetting : MainDestination(route = "accountSetting")
 }
 
 /**

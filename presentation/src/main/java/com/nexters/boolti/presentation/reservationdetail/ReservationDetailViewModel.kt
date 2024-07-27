@@ -25,8 +25,8 @@ class ReservationDetailViewModel @Inject constructor(
     private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val id: String = checkNotNull(savedStateHandle["reservationId"]) {
-        "id가 전달되어야 합니다."
+    private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
+        "reservationId가 전달되어야 합니다."
     }
 
     private val isGift: Boolean = savedStateHandle["isGift"] ?: false
@@ -44,9 +44,9 @@ class ReservationDetailViewModel @Inject constructor(
 
     fun fetchReservation() {
         val reservationFlow = if (isGift) {
-            giftRepository.getGiftPaymentInfo(id)
+            giftRepository.getGiftPaymentInfo(reservationId)
         } else {
-            reservationRepository.findReservationById(id)
+            reservationRepository.findReservationById(reservationId)
         }
 
         reservationFlow

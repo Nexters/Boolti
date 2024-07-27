@@ -12,10 +12,10 @@ fun NavGraphBuilder.RefundScreen(
         route = MainDestination.Refund.route,
         arguments = MainDestination.Refund.arguments,
     ) { entry ->
-        val isGift = entry.arguments!!.getBoolean("isGift")
+        val isGift = entry.arguments?.getBoolean("isGift")
 
         RefundScreen(
-            isGift = isGift,
+            isGift = isGift ?: false,
             onBackPressed = popBackStack,
         )
     }

@@ -135,7 +135,7 @@ fun ReservationDetailScreen(
                 RefundInfo(reservation = state.reservation)
             }
             if (!state.reservation.isInviteTicket) RefundPolicy(refundPolicy = refundPolicy)
-            if (isRefundable(isGift = state.reservation.isGift, reservation = state.reservation)) {
+            if (state.reservation.isRefundable) {
                 MainButton(
                     modifier = modifier
                         .padding(horizontal = marginHorizontal, vertical = 8.dp)
@@ -491,16 +491,5 @@ private fun Section(
         ) {
             content()
         }
-    }
-}
-
-fun isRefundable(isGift: Boolean, reservation: ReservationDetail): Boolean {
-    return if (isGift) {
-        reservation.reservationState == ReservationState.REGISTERING_GIFT &&
-                reservation.salesEndDateTime >= LocalDateTime.now()
-    } else {
-        reservation.reservationState == ReservationState.RESERVED &&
-                !reservation.isInviteTicket &&
-                reservation.salesEndDateTime >= LocalDateTime.now()
     }
 }

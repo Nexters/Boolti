@@ -30,6 +30,18 @@ data class ReservationDetail(
 ) {
     val isGift = giftUuid != null
 
+    val isRefundable: Boolean
+        get() {
+            return if (isGift) {
+                reservationState == ReservationState.REGISTERING_GIFT &&
+                        salesEndDateTime >= LocalDateTime.now()
+            } else {
+                reservationState == ReservationState.RESERVED &&
+                        !isInviteTicket &&
+                        salesEndDateTime >= LocalDateTime.now()
+            }
+        }
+
     /**
      * @param installmentPlanMonths 할부 개월 수. 0 이면 일시불
      * @param issuerCode 카드 발급사 [숫자 코드](https://docs.tosspayments.com/reference/codes#%EC%B9%B4%EB%93%9C%EC%82%AC-%EC%BD%94%EB%93%9C)

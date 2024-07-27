@@ -5,7 +5,7 @@ import java.time.LocalDate
 data class Gift(
     val id: String,
     val uuid: String,
-    val orderId: String,
+    val orderId: String?,
     val reservationId: String,
     val giftImgId: String,
     val imagePath: String,

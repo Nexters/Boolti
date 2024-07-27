@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApproveGiftPaymentResponse(
-    val orderId: String,
+    val orderId: String = "-1", // 무료 티켓일 경우 orderId가 null
     val reservationId: String,
     val giftId: String,
     val giftUuid: String,

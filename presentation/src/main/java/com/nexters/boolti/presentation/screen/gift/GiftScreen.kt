@@ -3,24 +3,15 @@ package com.nexters.boolti.presentation.screen.gift
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,26 +25,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Currency
-import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
@@ -67,8 +50,6 @@ import com.nexters.boolti.presentation.screen.ticketing.PaymentFailureDialog
 import com.nexters.boolti.presentation.screen.ticketing.RefundPolicySection
 import com.nexters.boolti.presentation.screen.ticketing.Section
 import com.nexters.boolti.presentation.screen.ticketing.TicketInfoSection
-import com.nexters.boolti.presentation.theme.BooltiTheme
-import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -115,7 +96,9 @@ fun GiftScreen(
         viewModel.events
             .collect { event ->
                 when (event) {
-                    is GiftEvent.GiftSuccess -> {}
+                    is GiftEvent.GiftSuccess -> {
+                        navigateToComplete(event.reservationId, event.giftUuid)
+                    }
 
                     is GiftEvent.ProgressPayment -> {
                         val selectedImage = uiState.selectedImage ?: return@collect
@@ -315,108 +298,6 @@ fun GiftScreen(
 }
 
 @Composable
-private fun CardSelection(
-    message: String,
-    onMessageChanged: (String) -> Unit,
-    images: List<ImagePair>,
-    selectedImage: ImagePair?,
-    onImageSelected: (ImagePair) -> Unit,
-) {
-    Column(
-        modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFFF5A14),
-                            Color(0xFFFFA883),
-                        )
-                    )
-                )
-                .border(
-                    width = 1.dp,
-                    color = Color(0xFFFFA883),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 20.dp, vertical = 32.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            val maximumLength = 40
-            val messageLengthUnit = stringResource(id = R.string.gift_message_length_unit)
-
-            BasicTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp),
-                value = message,
-                onValueChange = onMessageChanged,
-                textStyle = MaterialTheme.typography.titleLarge.copy(
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                ),
-                cursorBrush = SolidColor(Color.White)
-            )
-            Text(
-                modifier = Modifier.padding(top = 12.dp),
-                text = "${message.length}/${maximumLength}${messageLengthUnit}",
-                style = MaterialTheme.typography.labelMedium.copy(color = Grey10),
-            )
-
-            AsyncImage(
-                model = selectedImage?.originImage,
-                contentDescription = stringResource(id = R.string.gift_selected_image),
-                modifier = Modifier
-                    .padding(top = 28.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(3 / 2f)
-                    .background(Color.White),
-                contentScale = ContentScale.Crop,
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .padding(top = 44.dp)
-                .fillMaxWidth(),
-        ) {
-            LazyRow(
-                contentPadding = PaddingValues(start = 32.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(images) { image ->
-                    val modifier = if (image == selectedImage) {
-                        Modifier.border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                    } else {
-                        Modifier
-                    }
-
-                    AsyncImage(
-                        model = image.thumbnailImage,
-                        contentDescription = stringResource(id = R.string.gift_image),
-                        modifier = modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .clickable {
-                                onImageSelected(image)
-                            },
-                        contentScale = ContentScale.Crop,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun ContactInfo(
     sectionName: String,
     name: String,
@@ -461,25 +342,5 @@ private fun ContactInfo(
                 color = Grey40,
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun CardSelectionPreview() {
-    BooltiTheme {
-        CardSelection(
-            message = "공연에 초대합니다.",
-            onMessageChanged = {},
-            images = (1..10).map {
-                ImagePair(
-                    it.toString(),
-                    "https://picsum.photos/200",
-                    "https://picsum.photos/200"
-                )
-            },
-            selectedImage = ImagePair("", "", ""),
-            onImageSelected = {}
-        )
     }
 }

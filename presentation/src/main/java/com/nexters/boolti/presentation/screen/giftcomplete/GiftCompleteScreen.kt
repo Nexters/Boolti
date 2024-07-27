@@ -84,7 +84,7 @@ fun GiftCompleteScreen(
             val month = gift?.salesEndTime?.month?.value ?: 0
             val day = gift?.salesEndTime?.dayOfMonth ?: 0
             val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
-            val buttonsText = stringResource(id = R.string.gift_check)
+            val buttonText = stringResource(id = R.string.gift_check)
 
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
@@ -112,7 +112,7 @@ fun GiftCompleteScreen(
                 onClick = {
                     if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
                         gift?.let {
-                            sendMessage(context, it, dateText, buttonsText)
+                            sendMessage(context, it, dateText, buttonText)
                         }
                     } else {
                         // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
@@ -154,14 +154,25 @@ fun GiftCompleteScreen(
 }
 
 private fun sendMessage(context: Context, gift: Gift, dateText: String, buttonText: String) {
+    sendMessage(context, gift.uuid, gift.recipientName, gift.imagePath, dateText, buttonText)
+}
+
+fun sendMessage(
+    context: Context,
+    giftUuid: String,
+    receiverName: String,
+    image: String,
+    dateText: String,
+    buttonText: String
+) {
     val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
-    val giftUrl = "https://${subDomain}boolti.in/gift/${gift.uuid}"
+    val giftUrl = "https://${subDomain}boolti.in/gift/$giftUuid"
 
     val defaultFeed = FeedTemplate(
         content = Content(
-            title = "To. ${gift.recipientName}",
+            title = "To. $receiverName",
             description = dateText,
-            imageUrl = gift.imagePath,
+            imageUrl = image,
             link = Link(
                 webUrl = giftUrl,
                 mobileWebUrl = giftUrl
@@ -227,7 +238,7 @@ private fun InfoRow(
 }
 
 @Composable
-private fun GiftPolicy(
+fun GiftPolicy(
     modifier: Modifier = Modifier,
     giftPolicy: List<String>,
 ) {

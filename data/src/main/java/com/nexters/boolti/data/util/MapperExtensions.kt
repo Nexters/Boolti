@@ -19,6 +19,8 @@ internal fun String.toReservationState(): ReservationState {
         "RESERVATION_COMPLETED" -> ReservationState.RESERVED
         "WAITING_FOR_REFUND" -> ReservationState.REFUNDING
         "REFUND_COMPLETED" -> ReservationState.REFUNDED
+        "WAITING_FOR_GIFT_RECEIPT" -> ReservationState.REGISTERING_GIFT
+        // TODO: 선물 등록 완료 상태 추가
         else -> ReservationState.UNDEFINED
     }
 }

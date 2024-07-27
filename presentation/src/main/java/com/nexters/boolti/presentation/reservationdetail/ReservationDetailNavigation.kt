@@ -1,21 +1,22 @@
-package com.nexters.boolti.presentation.screen.reservations
+package com.nexters.boolti.presentation.reservationdetail
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.reservationId
 
 fun NavGraphBuilder.ReservationDetailScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
 ) {
     composable(
-        route = "${MainDestination.ReservationDetail.route}/{$reservationId}",
+        route = MainDestination.ReservationDetail.route,
         arguments = MainDestination.ReservationDetail.arguments,
     ) {
         ReservationDetailScreen(
             onBackPressed = popBackStack,
-            navigateToRefund = { id -> navigateTo("${MainDestination.Refund.route}/$id") },
+            navigateToRefund = { id, isGift ->
+                navigateTo(MainDestination.Refund.createRoute(id = id, isGift = isGift))
+            },
         )
     }
 }

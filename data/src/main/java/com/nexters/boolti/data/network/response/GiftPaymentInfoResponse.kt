@@ -1,76 +1,64 @@
 package com.nexters.boolti.data.network.response
 
+import com.nexters.boolti.data.network.response.ReservationDetailResponse.CardDetailResponse
+import com.nexters.boolti.data.network.response.ReservationDetailResponse.EasyPayDetailResponse
 import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.data.util.toPaymentType
 import com.nexters.boolti.data.util.toReservationState
 import com.nexters.boolti.domain.model.ReservationDetail
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ReservationDetailResponse(
-    val reservationId: String,
+internal data class GiftPaymentInfoResponse(
+    val csReservationId: String,
     val showImg: String,
     val showName: String,
     val showDate: String,
     val salesTicketName: String,
     val salesTicketType: String,
     val ticketCount: Int,
-    val bankName: String? = "",
-    val accountNumber: String? = "",
-    val accountHolder: String? = "",
     val salesEndTime: String,
     val meansType: String?,
     val totalAmountPrice: Int = 0,
     val reservationStatus: String,
-    val completedTimeStamp: String?,
-    val reservationName: String,
-    val reservationPhoneNumber: String,
-    val depositorName: String = "",
-    val depositorPhoneNumber: String = "",
-    val csReservationId: String,
+    val senderName: String,
+    val senderPhoneNumber: String,
+    val recipientName: String = "",
+    val recipientPhoneNumber: String = "",
+    val giftId: String,
+    val giftUuid: String,
+    val giftMessage: String,
+    val giftInvitePath: String,
     val cardDetail: CardDetailResponse? = null,
     val easyPayDetail: EasyPayDetailResponse? = null,
 ) {
     fun toDomain(): ReservationDetail {
         return ReservationDetail(
-            id = reservationId,
+            id = giftId,
+            giftUuid = giftUuid,
+            giftInviteImage = giftInvitePath,
             showImage = showImg,
             showName = showName,
             showDate = showDate.toLocalDateTime(),
             ticketName = salesTicketName,
-            isInviteTicket = salesTicketType == "INVITE",
+            isInviteTicket = false,
             ticketCount = ticketCount,
-            bankName = bankName ?: "",
-            accountNumber = accountNumber ?: "",
-            accountHolder = accountHolder ?: "",
+            bankName = "",
+            accountNumber = "",
+            accountHolder = "",
             salesEndDateTime = salesEndTime.toLocalDateTime(),
             paymentType = meansType.toPaymentType(),
             totalAmountPrice = totalAmountPrice,
             reservationState = reservationStatus.toReservationState(),
-            completedDateTime = completedTimeStamp?.toLocalDateTime(),
-            visitorName = reservationName,
-            visitorPhoneNumber = reservationPhoneNumber,
-            depositorName = depositorName,
-            depositorPhoneNumber = depositorPhoneNumber,
+            completedDateTime = null,
+            visitorName = recipientName,
+            visitorPhoneNumber = recipientPhoneNumber,
+            depositorName = senderName,
+            depositorPhoneNumber = senderPhoneNumber,
             csReservationId = csReservationId,
             cardDetail = cardDetail?.toDomain(),
             provider = easyPayDetail?.provider ?: ""
         )
     }
-
-    @Serializable
-    internal data class CardDetailResponse(
-        val installmentPlanMonths: Int,
-        val issuerCode: String,
-    ) {
-        fun toDomain(): ReservationDetail.CardDetail = ReservationDetail.CardDetail(
-            installmentPlanMonths = installmentPlanMonths,
-            issuerCode = issuerCode,
-        )
-    }
-
-    @Serializable
-    internal data class EasyPayDetailResponse(
-        val provider: String?,
-    )
 }

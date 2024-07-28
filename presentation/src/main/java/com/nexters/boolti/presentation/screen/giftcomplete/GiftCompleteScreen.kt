@@ -93,11 +93,12 @@ fun GiftCompleteScreen(
             )
             HorizontalDivider(color = Grey85)
             InfoRow(
-                modifier = Modifier.padding(top = 24.dp),
+                modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
                 label = stringResource(R.string.reservation_number),
                 value = reservation?.csReservationId ?: ""
             )
             InfoRow(
+                modifier = Modifier.padding(top = 8.dp),
                 label = stringResource(R.string.gift_receiver),
                 value = if (gift != null) "${gift?.recipientName} / ${gift?.recipientPhoneNumber}" else ""
             )
@@ -145,7 +146,6 @@ fun GiftCompleteScreen(
             HorizontalDivider(color = Grey85)
             reservation?.let {
                 ShowInformation(
-                    modifier = Modifier.padding(top = 24.dp),
                     reservation = it
                 )
             }
@@ -210,7 +210,7 @@ private fun InfoRow(
     value2: String? = null,
 ) {
     Column(
-        modifier = modifier.height(32.dp),
+        modifier = modifier.height(24.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -220,7 +220,7 @@ private fun InfoRow(
                 color = Grey30,
             )
             Text(
-                modifier = Modifier.padding(horizontal = 12.dp),
+                modifier = Modifier.padding(start = 12.dp),
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Grey15,
@@ -272,7 +272,7 @@ private fun PolicyLine(
 @Composable
 private fun ShowInformation(
     reservation: ReservationDetail,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -296,9 +296,11 @@ private fun ShowInformation(
         else -> null
     }
 
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         InfoRow(
-            modifier = modifier.padding(top = 24.dp),
+            modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
             label = stringResource(R.string.payment_amount_label),
             value = stringResource(
                 R.string.unit_won,
@@ -307,7 +309,7 @@ private fun ShowInformation(
             value2 = payment?.let { "($it)" },
         )
         InfoRow(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
             label = stringResource(R.string.reservation_ticket_type),
             value = "${reservation.ticketName} / ${
                 stringResource(
@@ -317,9 +319,7 @@ private fun ShowInformation(
             }",
         )
         TicketSummarySection(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
+            Modifier.fillMaxWidth(),
             poster = reservation.showImage,
             showName = reservation.showName,
             showDate = reservation.showDate,

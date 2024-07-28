@@ -188,6 +188,14 @@
         <item>마이 > 결제 내역 > 결제 내역 상세에서 선물을 취소할 수 있습니다.</item>
         <item>받는 분이 선물 거절 시 결제가 자동 취소됩니다.</item>
     </string-array>
+    <string name="gift_login">로그인하기</string>
+    <string name="gift_need_login">로그인 후 선물 등록이 가능합니다.\n로그인해 주세요.</string>
+    <string name="gift_register">등록하기</string>
+    <string name="gift_register_dialog">선물을 등록하면\n선물 취소 및 환불이 불가합니다.\n등록하시겠습니까?</string>
+    <string name="gift_self_dialog">본인이 결제한 선물입니다.\n선물을 등록하면 다른 분께 보낼 수 없습니다. 등록하시겠습니까?</string>
+    <string name="gift_registration_failed">선물 등록에 실패했어요</string>
+    <string name="gift_registration_failed_dialog">선물 등록 중 오류가 발생했습니다.\n웹 링크에서 선물 상태를 확인 후 다시 시도해 주세요</string>
+    <string name="cancel">취소하기</string>
 
     <!-- 공연 -->
     <string name="show_call_to_ask">전화 문의하기</string>

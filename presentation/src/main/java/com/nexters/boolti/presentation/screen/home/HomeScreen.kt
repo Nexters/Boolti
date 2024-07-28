@@ -19,7 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +36,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.screen.HomeViewModel
+import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
@@ -58,11 +62,36 @@ fun HomeScreen(
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    var dialog: GiftStatus? by rememberSaveable { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.event.collect { deepLink ->
-            navController.navigate(Uri.parse(deepLink))
+        viewModel.events.collect { event ->
+            when (event) {
+                is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
+                is HomeEvent.ShowMessage -> {
+                    dialog = event.status
+                }
+            }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        val intent = context.requireActivity().intent
+        intent.action?.let { _ ->
+            val deepLink = intent.data.toString()
+            intent.data = null
+            val regex = "^https://app.boolti.in/gift/([\\w-])+$".toRegex()
+            if (regex.matches(deepLink)) {
+                val giftUuid = deepLink.split("/").last()
+                viewModel.processGift(giftUuid)
+            }
+        }
+    }
+
+    LaunchedEffect(loggedIn) {
+        if (loggedIn == true) viewModel.processGift()
     }
 
     Scaffold(
@@ -86,6 +115,12 @@ fun HomeScreen(
         ) {
             composable(
                 route = Destination.Show.route,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "https://app.boolti.in/home/shows"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
             ) {
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
@@ -129,6 +164,25 @@ fun HomeScreen(
                 )
             }
         }
+    }
+
+    if (dialog != null) {
+        GiftDialog(
+            status = dialog!!,
+            onDismiss = {
+                dialog = null
+                viewModel.cancelGift()
+            },
+            receiveGift = viewModel::receiveGift,
+            requireLogin = {
+                dialog = null
+                requireLogin()
+            },
+            onFailed = {
+                dialog = GiftStatus.FAILED
+                viewModel.cancelGift()
+            }
+        )
     }
 }
 

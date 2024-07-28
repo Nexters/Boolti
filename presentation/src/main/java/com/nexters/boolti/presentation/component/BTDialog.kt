@@ -86,7 +86,7 @@ fun BTDialog(
                 content()
                 Spacer(modifier = Modifier.size(28.dp))
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(9.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (onClickNegativeButton != null) {
                         MainButton(

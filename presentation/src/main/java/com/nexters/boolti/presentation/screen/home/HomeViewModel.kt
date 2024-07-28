@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
             val senderId = giftRepository
                 .getGift(giftUuid)
                 .first()
-                .userId
+                .senderUserId
 
             val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
 

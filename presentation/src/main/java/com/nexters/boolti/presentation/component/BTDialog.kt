@@ -39,9 +39,8 @@ fun BTDialog(
     enableDismiss: Boolean = true,
     showCloseButton: Boolean = true,
     onDismiss: () -> Unit = {},
-    hasNegativeButton: Boolean = false,
     negativeButtonLabel: String = stringResource(R.string.cancel),
-    onClickNegativeButton: () -> Unit = {},
+    onClickNegativeButton: (() -> Unit)? = null,
     positiveButtonLabel: String = stringResource(R.string.btn_ok),
     positiveButtonEnabled: Boolean = true,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
@@ -89,7 +88,7 @@ fun BTDialog(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(9.dp)
                 ) {
-                    if (hasNegativeButton) {
+                    if (onClickNegativeButton != null) {
                         MainButton(
                             modifier = Modifier.weight(1f),
                             label = negativeButtonLabel,
@@ -130,7 +129,7 @@ fun BTDialogHavingNegativeButtonPreview() {
     BooltiTheme {
         Surface {
             BTDialog(
-                hasNegativeButton = true
+                onClickNegativeButton = {}
             ) {
                 Text(text = "관리자 코드로 입장 확인")
             }

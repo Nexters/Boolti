@@ -59,8 +59,7 @@ fun GiftDialog(
         onDismiss = onDismiss,
         onClickPositiveButton = action,
         positiveButtonLabel = stringResource(id = buttonTextRes),
-        hasNegativeButton = hasNegativeButton,
-        onClickNegativeButton = onFailed
+        onClickNegativeButton = if(hasNegativeButton) onFailed else null
     ) {
         Text(
             text = stringResource(id = textRes),

@@ -79,23 +79,3 @@ fun SwipeableImage(
         )
     }
 }
-
-@Composable
-private fun Indicator(
-    modifier: Modifier = Modifier,
-    position: Int,
-    size: Int,
-) {
-    Row(modifier = modifier) {
-        (0 until size).forEach { index ->
-            val opacity = if (index == position) 1f else 0.5f
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .size(7.dp)
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .background(Color.White.copy(alpha = opacity))
-            )
-        }
-    }
-}

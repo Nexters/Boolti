@@ -40,7 +40,6 @@ import com.kakao.sdk.template.model.Button
 import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
-import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.BuildConfig
@@ -66,7 +65,6 @@ fun GiftCompleteScreen(
     viewModel: GiftCompleteViewModel = hiltViewModel(),
 ) {
     val reservation by viewModel.reservation.collectAsStateWithLifecycle()
-    val gift by viewModel.gift.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     BackHandler(onBack = onClickClose)
@@ -81,8 +79,8 @@ fun GiftCompleteScreen(
                 .padding(innerPadding)
                 .padding(horizontal = marginHorizontal)
         ) {
-            val month = gift?.salesEndTime?.month?.value ?: 0
-            val day = gift?.salesEndTime?.dayOfMonth ?: 0
+            val month = reservation?.salesEndDateTime?.month?.value ?: 0
+            val day = reservation?.salesEndDateTime?.dayOfMonth ?: 0
             val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
             val buttonText = stringResource(id = R.string.gift_check)
 
@@ -100,7 +98,7 @@ fun GiftCompleteScreen(
             InfoRow(
                 modifier = Modifier.padding(top = 8.dp),
                 label = stringResource(R.string.gift_receiver),
-                value = if (gift != null) "${gift?.recipientName} / ${gift?.recipientPhoneNumber}" else ""
+                value = if (reservation != null) "${reservation?.visitorName} / ${reservation?.visitorPhoneNumber}" else ""
             )
             TextButton(
                 modifier = Modifier
@@ -112,7 +110,7 @@ fun GiftCompleteScreen(
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 onClick = {
                     if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
-                        gift?.let {
+                        reservation?.let {
                             sendMessage(context, it, dateText, buttonText)
                         }
                     } else {
@@ -153,8 +151,22 @@ fun GiftCompleteScreen(
     }
 }
 
-private fun sendMessage(context: Context, gift: Gift, dateText: String, buttonText: String) {
-    sendMessage(context, gift.uuid, gift.recipientName, gift.imagePath, dateText, buttonText)
+private fun sendMessage(
+    context: Context,
+    reservation: ReservationDetail,
+    dateText: String,
+    buttonText: String
+) {
+    reservation.giftUuid?.let { giftUuid ->
+        sendMessage(
+            context,
+            giftUuid,
+            reservation.visitorName,
+            reservation.giftInviteImage,
+            dateText,
+            buttonText
+        )
+    }
 }
 
 fun sendMessage(

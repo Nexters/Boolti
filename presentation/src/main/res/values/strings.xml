@@ -67,15 +67,14 @@
     <string name="stepper_plus_description">증가</string>
 
     <!-- 로그인 -->
-    <string name="catch_phrase">불티나게 팔리는 티켓, 불티</string>
-    <string name="catch_phrase_sub">지금 티켓을 예매하고 공연을 즐겨보세요!</string>
+    <string name="catch_phrase">지금 불티에 로그인하고\n당신의 공연을 시작해 보세요!</string>
     <string name="login_with_kakaotalk">카카오톡으로 시작하기</string>
     <string name="term_notice">원활한 이용을 위해 서비스 이용약관 확인 후\n동의해 주세요</string>
     <string name="term_notice_tag">서비스 이용약관</string>
     <string name="signup_with_agreement">약관 동의하고 시작하기</string>
     <string name="signup_greeting">불티를 찾아주셔서 감사합니다</string>
     <string name="nickname_default">불티 유저</string>
-    <string name="signout_cancelled_message">30일 내에 로그인하여 계정 삭제가 취소되었어요.\n불티를 다시 찾아주셔서 감사해요!</string>
+    <string name="signout_cancelled_message">30일 내에 로그인하여\n계정 삭제가 취소되었어요.\n불티를 다시 찾아주셔서 감사해요!</string>
     <string name="user_code">식별 코드</string>
 
     <!-- 탈퇴 -->
@@ -83,11 +82,11 @@
     <string name="signout_button">삭제하기</string>
     <string name="signout_notice_title">삭제 전, 꼭 읽어보세요!</string>
     <string-array name="signout_notice">
-        <item>주최한 공연 정보는 사라지지 않아요</item>
-        <item>예매한 티켓은 전부 사라지며 복구할 수 없어요</item>
-        <item>삭제일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요</item>
+        <item>주최한 공연 정보는 사라지지 않아요.</item>
+        <item>예매한 티켓은 전부 사라지며 복구할 수 없어요.</item>
+        <item>삭제일로부터 30일 이내 재 로그인 시 계정 삭제를 취소할 수 있어요.</item>
     </string-array>
-    <string name="signout_reason_title">삭제 이유를 입력해주세요</string>
+    <string name="signout_reason_title">삭제 이유를 입력해 주세요</string>
     <string name="signout_reason_placeholder">예) 계정 삭제 후 재가입할게요</string>
 
     <string name="format_price">%,d원</string>

@@ -5,12 +5,24 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.addGiftCompleteScreen(
+    navigateTo: (String) -> Unit,
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,
 ) {
     composable(
         route = MainDestination.GiftComplete.route,
     ) {
-        GiftCompleteScreen(onClickClose = popBackStack, onClickHome = navigateToHome)
+        GiftCompleteScreen(
+            onClickClose = popBackStack,
+            onClickHome = navigateToHome,
+            navigateToReservation = { reservation ->
+                navigateTo(
+                    MainDestination.ReservationDetail.createRoute(
+                        id = reservation.id,
+                        isGift = true,
+                    )
+                )
+            },
+        )
     }
 }

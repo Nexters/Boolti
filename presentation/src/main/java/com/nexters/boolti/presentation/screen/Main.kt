@@ -189,6 +189,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             navigateToHome = navController::navigateToHome,
         )
         addGiftCompleteScreen(
+            navigateTo = navController::navigateTo,
             navigateToHome = navController::navigateToHome,
             popBackStack = { navController.popBackStack(MainDestination.Gift.route, true)}
         )

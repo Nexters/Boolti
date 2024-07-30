@@ -37,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
@@ -58,11 +59,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
+    val snackbarController = LocalSnackbarController.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
     var dialog: GiftStatus? by rememberSaveable { mutableStateOf(null) }
 
@@ -70,8 +73,12 @@ fun HomeScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
-                is HomeEvent.ShowMessage -> {
+                is HomeEvent.GiftNotification -> {
                     dialog = event.status
+                }
+
+                is HomeEvent.GiftRegistered -> {
+                    snackbarController.showMessage(giftRegistrationMessage)
                 }
             }
         }

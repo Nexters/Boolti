@@ -5,7 +5,9 @@ sealed interface HomeEvent {
         val deepLink: String,
     ) : HomeEvent
 
-    data class ShowMessage(
+    data class GiftNotification(
         val status: GiftStatus
     ) : HomeEvent
+
+    data object GiftRegistered : HomeEvent
 }

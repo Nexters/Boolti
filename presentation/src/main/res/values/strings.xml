@@ -271,7 +271,7 @@
     <string name="reservation_breakdown_of_refund">환불 내역</string>
     <string name="reservation_price_of_refund">총 환불 금액</string>
     <string name="show_ticket">티켓 보기</string>
-    <string name="show_reservation">결제 내역보기</string>
+    <string name="show_reservation">결제 내역 보기</string>
     <string name="reservation_refund_gift_dialog">선물을 취소하면 받은 분의 초대장 화면에 취소 메세지가 노출되며 기존에 결제한 수단으로 환불이 진행됩니다. 선물을 취소하시겠습니까?</string>
 
     <!-- 환불 -->

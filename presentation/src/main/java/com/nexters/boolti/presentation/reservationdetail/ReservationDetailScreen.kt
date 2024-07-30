@@ -57,14 +57,12 @@ import com.nexters.boolti.presentation.screen.giftcomplete.GiftPolicy
 import com.nexters.boolti.presentation.screen.giftcomplete.sendMessage
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
-import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
-import java.time.LocalDateTime
 
 @Composable
 fun ReservationDetailScreen(
@@ -124,7 +122,9 @@ fun ReservationDetailScreen(
             }
             Header(reservation = state.reservation)
             TicketHolderInfo(reservation = state.reservation)
-            if (state.reservation.totalAmountPrice > 0) DepositorInfo(reservation = state.reservation)
+            if (state.reservation.totalAmountPrice > 0 || state.reservation.isGift) {
+                DepositorInfo(reservation = state.reservation)
+            }
             TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
             if (state.reservation.reservationState in listOf(
@@ -141,7 +141,7 @@ fun ReservationDetailScreen(
                         .padding(horizontal = marginHorizontal, vertical = 8.dp)
                         .fillMaxWidth(),
                     colors = MainButtonDefaults.buttonColors(
-                        containerColor = Grey20,
+                        containerColor = Grey15,
                         contentColor = Grey90,
                     ),
                     label = stringResource(id = R.string.refund_button),
@@ -323,7 +323,7 @@ private fun TicketHolderInfo(
                 key = stringResource(id = R.string.contact_label),
                 value = reservation.visitorPhoneNumber
             )
-            if (isGift) {
+            if (isGift && reservation.reservationState != ReservationState.CANCELED) {
                 val month = reservation.salesEndDateTime.month.value
                 val day = reservation.salesEndDateTime.dayOfMonth
                 val dateText = stringResource(id = R.string.gift_expiration_date, month, day)

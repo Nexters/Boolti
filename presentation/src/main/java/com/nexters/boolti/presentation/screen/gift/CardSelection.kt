@@ -66,7 +66,8 @@ fun CardSelection(
                     color = Color(0xFFFFA883),
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 20.dp, vertical = 32.dp)
+                .padding(top = 32.dp)
+                .padding(horizontal = 20.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -97,7 +98,6 @@ fun CardSelection(
                 modifier = Modifier
                     .padding(top = 28.dp)
                     .fillMaxWidth()
-                    .aspectRatio(3 / 2f)
                     .background(Color.White),
                 contentScale = ContentScale.Crop,
             )

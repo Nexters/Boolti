@@ -3,16 +3,20 @@ package com.nexters.boolti.presentation.screen.giftcomplete
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -40,11 +45,11 @@ import com.kakao.sdk.template.model.Button
 import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
-import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
 import com.nexters.boolti.presentation.screen.payment.TicketSummarySection
@@ -63,10 +68,10 @@ import timber.log.Timber
 fun GiftCompleteScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
+    navigateToReservation: (reservation: ReservationDetail) -> Unit,
     viewModel: GiftCompleteViewModel = hiltViewModel(),
 ) {
     val reservation by viewModel.reservation.collectAsStateWithLifecycle()
-    val gift by viewModel.gift.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     BackHandler(onBack = onClickClose)
@@ -76,85 +81,126 @@ fun GiftCompleteScreen(
             PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose)
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = marginHorizontal)
-        ) {
-            val month = gift?.salesEndTime?.month?.value ?: 0
-            val day = gift?.salesEndTime?.dayOfMonth ?: 0
-            val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
-            val buttonText = stringResource(id = R.string.gift_check)
-
-            Text(
-                modifier = Modifier.padding(vertical = 20.dp),
-                text = stringResource(id = R.string.gift_complete_note),
-                style = point4,
-            )
-            HorizontalDivider(color = Grey85)
-            InfoRow(
-                modifier = Modifier.padding(top = 24.dp),
-                label = stringResource(R.string.reservation_number),
-                value = reservation?.csReservationId ?: ""
-            )
-            InfoRow(
-                label = stringResource(R.string.gift_receiver),
-                value = if (gift != null) "${gift?.recipientName} / ${gift?.recipientPhoneNumber}" else ""
-            )
-            TextButton(
+        Box {
+            Column(
                 modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(4.dp),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = KakaoYellow),
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                onClick = {
-                    if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
-                        gift?.let {
-                            sendMessage(context, it, dateText, buttonText)
+                    .padding(innerPadding)
+                    .padding(horizontal = marginHorizontal)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                val month = reservation?.salesEndDateTime?.month?.value ?: 0
+                val day = reservation?.salesEndDateTime?.dayOfMonth ?: 0
+                val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
+                val buttonText = stringResource(id = R.string.gift_check)
+
+                Text(
+                    modifier = Modifier.padding(vertical = 20.dp),
+                    text = stringResource(id = R.string.gift_complete_note),
+                    style = point4,
+                )
+                HorizontalDivider(color = Grey85)
+                InfoRow(
+                    modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
+                    label = stringResource(R.string.reservation_number),
+                    value = reservation?.csReservationId ?: ""
+                )
+                InfoRow(
+                    modifier = Modifier.padding(top = 8.dp),
+                    label = stringResource(R.string.gift_receiver),
+                    value = if (reservation != null) "${reservation?.visitorName} / ${reservation?.visitorPhoneNumber}" else ""
+                )
+                TextButton(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(4.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(containerColor = KakaoYellow),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    onClick = {
+                        if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
+                            reservation?.let {
+                                sendMessage(context, it, dateText, buttonText)
+                            }
+                        } else {
+                            // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
                         }
-                    } else {
-                        // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_kakaotalk),
+                            contentDescription = null,
+                            modifier = Modifier.size(width = 20.dp, height = 20.dp),
+                            tint = Color.Black,
+                        )
+                        Text(
+                            stringResource(id = R.string.gift_select_receiver),
+                            modifier = Modifier.fillMaxWidth(),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Grey95,
+                            textAlign = TextAlign.Center,
+                        )
                     }
                 }
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_kakaotalk),
-                        contentDescription = null,
-                        modifier = Modifier.size(width = 20.dp, height = 20.dp),
-                        tint = Color.Black,
-                    )
-                    Text(
-                        stringResource(id = R.string.gift_select_receiver),
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Grey95,
-                        textAlign = TextAlign.Center,
+                GiftPolicy(
+                    modifier = Modifier.padding(top = 12.dp, bottom = 24.dp),
+                    giftPolicy = stringArrayResource(id = R.array.gift_information).toList()
+                )
+                HorizontalDivider(color = Grey85)
+                reservation?.let { reservation ->
+                    ShowInformation(
+                        reservation = reservation
                     )
                 }
+                Spacer(modifier = Modifier.height(88.dp))
             }
-            GiftPolicy(
-                modifier = Modifier.padding(top = 12.dp, bottom = 24.dp),
-                giftPolicy = stringArrayResource(id = R.array.gift_information).toList()
-            )
-            HorizontalDivider(color = Grey85)
-            reservation?.let {
-                ShowInformation(
-                    modifier = Modifier.padding(top = 24.dp),
-                    reservation = it
-                )
+            reservation?.let { reservation ->
+                Column(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(16.dp)
+                            .background(
+                                brush = Brush.verticalGradient(listOf(Color.Transparent, Grey95))
+                            )
+                    )
+                    SecondaryButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Grey95)
+                            .padding(horizontal = marginHorizontal, vertical = 8.dp),
+                        label = stringResource(R.string.show_reservation),
+                    ) {
+                        navigateToReservation(reservation)
+                    }
+                }
             }
         }
     }
 }
 
-private fun sendMessage(context: Context, gift: Gift, dateText: String, buttonText: String) {
-    sendMessage(context, gift.uuid, gift.recipientName, gift.imagePath, dateText, buttonText)
+private fun sendMessage(
+    context: Context,
+    reservation: ReservationDetail,
+    dateText: String,
+    buttonText: String
+) {
+    reservation.giftUuid?.let { giftUuid ->
+        sendMessage(
+            context,
+            giftUuid,
+            reservation.visitorName,
+            reservation.giftInviteImage,
+            dateText,
+            buttonText
+        )
+    }
 }
 
 fun sendMessage(
@@ -210,7 +256,7 @@ private fun InfoRow(
     value2: String? = null,
 ) {
     Column(
-        modifier = modifier.height(32.dp),
+        modifier = modifier.height(24.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -220,7 +266,7 @@ private fun InfoRow(
                 color = Grey30,
             )
             Text(
-                modifier = Modifier.padding(horizontal = 12.dp),
+                modifier = Modifier.padding(start = 12.dp),
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Grey15,
@@ -272,7 +318,7 @@ private fun PolicyLine(
 @Composable
 private fun ShowInformation(
     reservation: ReservationDetail,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -296,9 +342,11 @@ private fun ShowInformation(
         else -> null
     }
 
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         InfoRow(
-            modifier = modifier.padding(top = 24.dp),
+            modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
             label = stringResource(R.string.payment_amount_label),
             value = stringResource(
                 R.string.unit_won,
@@ -307,7 +355,7 @@ private fun ShowInformation(
             value2 = payment?.let { "($it)" },
         )
         InfoRow(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
             label = stringResource(R.string.reservation_ticket_type),
             value = "${reservation.ticketName} / ${
                 stringResource(
@@ -317,9 +365,7 @@ private fun ShowInformation(
             }",
         )
         TicketSummarySection(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
+            Modifier.fillMaxWidth(),
             poster = reservation.showImage,
             showName = reservation.showName,
             showDate = reservation.showDate,

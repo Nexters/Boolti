@@ -138,12 +138,7 @@ class GiftViewModel @Inject constructor(
             )
                 .onStart { _uiState.update { it.copy(loading = true) } }
                 .onEach { giftPayment ->
-                    sendEvent(
-                        GiftEvent.GiftSuccess(
-                            reservationId = giftPayment.reservationId,
-                            giftUuid = giftPayment.giftUuid
-                        )
-                    )
+                    sendEvent(GiftEvent.GiftSuccess(giftId = giftPayment.giftId))
                 }
                 .onCompletion { _uiState.update { it.copy(loading = false) } }
                 .launchIn(viewModelScope + recordExceptionHandler)

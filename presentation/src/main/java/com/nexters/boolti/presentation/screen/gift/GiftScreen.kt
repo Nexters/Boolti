@@ -62,7 +62,7 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESUL
 fun GiftScreen(
     popBackStack: () -> Unit,
     navigateToBusiness: () -> Unit,
-    navigateToComplete: (reservationId: String, giftUuid: String) -> Unit,
+    navigateToComplete: (giftId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GiftViewModel = hiltViewModel(),
 ) {
@@ -78,13 +78,10 @@ fun GiftScreen(
             when (result.resultCode) {
                 RESULT_SUCCESS -> {
                     val intent = result.data ?: return@rememberLauncherForActivityResult
-                    val reservationId =
-                        intent.getStringExtra("reservationId")
-                            ?: return@rememberLauncherForActivityResult
-                    val giftUuid = intent.getStringExtra("giftUuid")
+                    val giftId = intent.getStringExtra("giftId")
                         ?: return@rememberLauncherForActivityResult
 
-                    navigateToComplete(reservationId, giftUuid)
+                    navigateToComplete(giftId)
                 }
 
                 RESULT_SOLD_OUT -> showTicketSoldOutDialog = true
@@ -97,7 +94,7 @@ fun GiftScreen(
             .collect { event ->
                 when (event) {
                     is GiftEvent.GiftSuccess -> {
-                        navigateToComplete(event.reservationId, event.giftUuid)
+                        navigateToComplete(event.giftId)
                     }
 
                     is GiftEvent.ProgressPayment -> {

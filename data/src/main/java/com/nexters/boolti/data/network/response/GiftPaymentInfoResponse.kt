@@ -53,12 +53,21 @@ internal data class GiftPaymentInfoResponse(
             reservationState = reservationStatus.toReservationState(),
             completedDateTime = null,
             visitorName = recipientName,
-            visitorPhoneNumber = recipientPhoneNumber,
+            visitorPhoneNumber = recipientPhoneNumber.toDashedPhoneNumber(),
             depositorName = senderName,
-            depositorPhoneNumber = senderPhoneNumber,
+            depositorPhoneNumber = senderPhoneNumber.toDashedPhoneNumber(),
             csReservationId = csReservationId,
             cardDetail = cardDetail?.toDomain(),
             provider = easyPayDetail?.provider ?: ""
         )
     }
+
+    private fun String.toDashedPhoneNumber(): String {
+        if (!isPurePhoneNumber) return this
+
+        return slice(0..2) + "-" + slice(3..6) + "-" + slice(7..10)
+    }
+
+    private val String.isPurePhoneNumber
+        get() = "^\\d{11}$".toRegex().matches(this)
 }

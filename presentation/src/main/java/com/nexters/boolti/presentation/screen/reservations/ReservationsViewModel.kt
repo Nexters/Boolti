@@ -29,8 +29,6 @@ class ReservationsViewModel @Inject constructor(
                 _uiState.update { ReservationsUiState.Loading }
             }
             .onEach { reservations ->
-                if (uiState.value == reservations) return@onEach
-
                 _uiState.update { ReservationsUiState.Success(reservations) }
             }
             .catch {

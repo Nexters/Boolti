@@ -74,7 +74,7 @@ class HomeViewModel @Inject constructor(
 
         when (loggedIn.value) {
             true -> processGiftWhenLoggedIn(giftUuid)
-            false -> sendEvent(HomeEvent.ShowMessage(GiftStatus.NEED_LOGIN))
+            false -> sendEvent(HomeEvent.GiftNotification(GiftStatus.NEED_LOGIN))
             null -> Unit
         }
     }
@@ -89,9 +89,9 @@ class HomeViewModel @Inject constructor(
             val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
 
             if (senderId == myUserId) {
-                sendEvent(HomeEvent.ShowMessage(GiftStatus.SELF))
+                sendEvent(HomeEvent.GiftNotification(GiftStatus.SELF))
             } else {
-                sendEvent(HomeEvent.ShowMessage(GiftStatus.CAN_REGISTER))
+                sendEvent(HomeEvent.GiftNotification(GiftStatus.CAN_REGISTER))
             }
         }
     }
@@ -108,8 +108,10 @@ class HomeViewModel @Inject constructor(
 
         giftRepository.receiveGift(giftUuid)
             .onEach { isSuccessful ->
-                if (!isSuccessful) {
-                    sendEvent(HomeEvent.ShowMessage(GiftStatus.FAILED))
+                if (isSuccessful) {
+                    sendEvent(HomeEvent.GiftRegistered)
+                } else {
+                    sendEvent(HomeEvent.GiftNotification(GiftStatus.FAILED))
                 }
             }
             .launchIn(viewModelScope + recordExceptionHandler)

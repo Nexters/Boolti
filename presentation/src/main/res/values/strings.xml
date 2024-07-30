@@ -188,6 +188,7 @@
         <item>받는 분이 선물 거절 시 결제가 자동 취소됩니다.</item>
     </string-array>
     <string name="gift_login">로그인하기</string>
+    <string name="gift_successfully_registered">선물이 등록되었어요</string>
     <string name="gift_need_login">로그인 후 선물 등록이 가능합니다.\n로그인해 주세요.</string>
     <string name="gift_register">등록하기</string>
     <string name="gift_register_dialog">선물을 등록하면\n선물 취소 및 환불이 불가합니다.\n등록하시겠습니까?</string>

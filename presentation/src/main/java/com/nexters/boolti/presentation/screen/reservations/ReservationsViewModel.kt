@@ -23,16 +23,14 @@ class ReservationsViewModel @Inject constructor(
         MutableStateFlow(ReservationsUiState.Loading)
     val uiState: StateFlow<ReservationsUiState> = _uiState.asStateFlow()
 
-    init {
-        fetchReservations()
-    }
-
     fun fetchReservations() {
         reservationRepository.getReservations()
             .onStart {
                 _uiState.update { ReservationsUiState.Loading }
             }
             .onEach { reservations ->
+                if (uiState.value == reservations) return@onEach
+
                 _uiState.update { ReservationsUiState.Success(reservations) }
             }
             .catch {

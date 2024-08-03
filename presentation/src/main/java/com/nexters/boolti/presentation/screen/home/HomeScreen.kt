@@ -33,7 +33,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
@@ -45,6 +44,7 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
 
 @Composable
 fun HomeScreen(
@@ -58,7 +58,7 @@ fun HomeScreen(
     modifier: Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val navController = rememberNavController()
+    val navController = rememberNavControllerWithLog()
     val snackbarController = LocalSnackbarController.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route

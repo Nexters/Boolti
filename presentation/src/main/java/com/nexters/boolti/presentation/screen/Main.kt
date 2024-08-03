@@ -19,10 +19,10 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.reservationdetail.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.accountsetting.AccountSettingScreen
@@ -36,7 +36,6 @@ import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
 import com.nexters.boolti.presentation.screen.report.ReportScreen
-import com.nexters.boolti.presentation.reservationdetail.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
@@ -46,6 +45,7 @@ import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
+import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
 
 val LocalSnackbarController = staticCompositionLocalOf {
     SnackbarController(SnackbarHostState())
@@ -85,7 +85,7 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
 
 @Composable
 fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
-    val navController = rememberNavController()
+    val navController = rememberNavControllerWithLog()
 
     NavHost(
         navController = navController,

@@ -5,4 +5,5 @@ sealed interface LoginEvent {
     data object RequireSignUp : LoginEvent
     data object SignOutCancelled : LoginEvent
     data object Invalid : LoginEvent
+    data object SignupFailed : LoginEvent
 }

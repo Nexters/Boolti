@@ -38,12 +38,12 @@ class HomeViewModel @Inject constructor(
     private var pendingGiftUuid: String? = null
 
     init {
-        initUserInfo()
+        fetchUserInfo()
         sendFcmToken()
         collectDeepLinkEvent()
     }
 
-    private fun initUserInfo() {
+    private fun fetchUserInfo() {
         authRepository.getUserAndCache()
             .launchIn(viewModelScope + recordExceptionHandler)
     }

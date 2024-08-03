@@ -35,7 +35,9 @@ class GiftViewModel @Inject constructor(
     private val giftRepository: GiftRepository,
     private val getRefundPolicyUseCase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val userId = getUserUseCase().id
+    private val userId = checkNotNull(getUserUseCase()?.id) {
+        "[GiftViewModel] 사용자 정보가 없습니다."
+    }
     val showId: String = requireNotNull(savedStateHandle["showId"])
     val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1

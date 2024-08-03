@@ -54,10 +54,13 @@ internal class AuthRepositoryImpl @Inject constructor(
         authDataSource.localLogout()
     }
 
-    override fun getUserAndCache(): Flow<User> = flow {
+    override fun getUserAndCache(): Flow<User?> = flow {
         val response = userDateSource.getUser()
-        authDataSource.updateUser(response)
-        emit(response.toDomain())
+        response?.let {
+            authDataSource.updateUser(it)
+        }
+
+        emit(response?.toDomain())
     }
 
     override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()

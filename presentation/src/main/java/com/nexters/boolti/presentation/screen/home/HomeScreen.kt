@@ -132,7 +132,6 @@ fun HomeScreen(
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
                     onClickShowItem = onClickShowItem,
-                    navigateToReservations = navigateToReservations,
                     navigateToBusiness = navigateToBusiness,
                 )
             }

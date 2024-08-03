@@ -28,7 +28,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ShowViewModel @Inject constructor(
     private val showRepository: ShowRepository,
-    private val reservationRepository: ReservationRepository,
     authRepository: AuthRepository,
 ) : BaseViewModel() {
     val user: StateFlow<User?> = authRepository.cachedUser.stateIn(
@@ -66,18 +65,5 @@ class ShowViewModel @Inject constructor(
 
     fun updateKeyword(newKeyword: String) {
         _uiState.update { it.copy(keyword = newKeyword) }
-    }
-
-    fun fetchReservationInfo() {
-        reservationRepository.getReservations()
-            .map { reservations ->
-                reservations.firstOrNull { it.reservationState == ReservationState.DEPOSITING } != null
-            }
-            .onEach { hasPendingTicket ->
-                _uiState.update {
-                    it.copy(hasPendingTicket = hasPendingTicket)
-                }
-            }
-            .launchIn(viewModelScope + recordExceptionHandler)
     }
 }

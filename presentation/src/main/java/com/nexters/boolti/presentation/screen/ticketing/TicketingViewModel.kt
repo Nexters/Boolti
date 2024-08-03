@@ -42,7 +42,9 @@ class TicketingViewModel @Inject constructor(
     val showId: String = requireNotNull(savedStateHandle["showId"])
     val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
-    private val userId = getUserUsecase().id
+    private val userId = checkNotNull(getUserUsecase()?.id) {
+        "[TicketingViewModel] 사용자 정보가 없습니다."
+    }
 
     private val _uiState = MutableStateFlow(TicketingState())
     val uiState = _uiState.asStateFlow()

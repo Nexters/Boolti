@@ -39,6 +39,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtCloseableAppBar
 import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
@@ -49,10 +50,13 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
+    val snackbarController = LocalSnackbarController.current
+
     val sheetState = rememberModalBottomSheetState()
     var showSignOutCancelledDialog by remember { mutableStateOf(false) }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+    val loginFailedMessage = stringResource(id = R.string.login_failed)
+    val signupFailedMessage = stringResource(id = R.string.signup_failed)
 
     LaunchedEffect(Unit) {
         viewModel.event.collect {
@@ -60,7 +64,8 @@ fun LoginScreen(
                 LoginEvent.Success -> onBackPressed()
                 LoginEvent.RequireSignUp -> isSheetOpen = true
                 LoginEvent.SignOutCancelled -> showSignOutCancelledDialog = true
-                LoginEvent.Invalid -> Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show()
+                LoginEvent.Invalid -> snackbarController.showMessage(loginFailedMessage)
+                LoginEvent.SignupFailed -> snackbarController.showMessage(signupFailedMessage)
             }
         }
     }

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.OauthType
@@ -39,7 +40,7 @@ class LoginViewModel @Inject constructor(
                     else -> event(LoginEvent.Success)
                 }
             }.onFailure {
-                Timber.d("login failed: $it")
+                FirebaseCrashlytics.getInstance().setCustomKey("LOGIN", "FAILED")
                 event(LoginEvent.Invalid)
             }
         }
@@ -78,7 +79,8 @@ class LoginViewModel @Inject constructor(
             ).onSuccess {
                 event(LoginEvent.Success)
             }.onFailure {
-                // TODO 예외 처리
+                FirebaseCrashlytics.getInstance().setCustomKey("SIGNUP", "FAILED")
+                event(LoginEvent.SignupFailed)
             }
         }
     }

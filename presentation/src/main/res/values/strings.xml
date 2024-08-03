@@ -76,6 +76,8 @@
     <string name="nickname_default">불티 유저</string>
     <string name="signout_cancelled_message">30일 내에 로그인하여\n계정 삭제가 취소되었어요.\n불티를 다시 찾아주셔서 감사해요!</string>
     <string name="user_code">식별 코드</string>
+    <string name="login_failed">로그인 실패</string>
+    <string name="signup_failed">회원가입 실패</string>
 
     <!-- 탈퇴 -->
     <string name="signout">계정 삭제</string>

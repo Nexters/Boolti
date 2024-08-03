@@ -67,7 +67,6 @@ import com.nexters.boolti.presentation.theme.point4
 
 @Composable
 fun ShowScreen(
-    navigateToReservations: () -> Unit,
     navigateToBusiness: () -> Unit,
     onClickShowItem: (showId: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -78,7 +77,7 @@ fun ShowScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val lazyGridState = rememberLazyGridState()
-    val appbarHeight = if (uiState.hasPendingTicket) 196.dp + 52.dp else 196.dp
+    val appbarHeight = 196.dp
     val searchBarHeight = 80.dp
     val changeableAppBarHeightPx = (appbarHeight - searchBarHeight).toPx()
     var appbarOffsetHeightPx by rememberSaveable { mutableFloatStateOf(0f) }
@@ -102,7 +101,6 @@ fun ShowScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchReservationInfo()
         viewModel.events.collect { event ->
             when (event) {
                 ShowEvent.Search -> appbarOffsetHeightPx = 0f
@@ -152,8 +150,6 @@ fun ShowScreen(
                         y = appbarOffsetHeightPx.coerceAtLeast(-changeableAppBarHeightPx).toInt(),
                     )
                 },
-                navigateToReservations = navigateToReservations,
-                hasPendingTicket = uiState.hasPendingTicket,
                 nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
                 text = uiState.keyword,
                 onKeywordChanged = viewModel::updateKeyword,
@@ -166,8 +162,6 @@ fun ShowScreen(
 @Composable
 fun ShowAppBar(
     text: String,
-    hasPendingTicket: Boolean,
-    navigateToReservations: () -> Unit,
     nickname: String,
     onKeywordChanged: (keyword: String) -> Unit,
     search: () -> Unit,
@@ -180,10 +174,6 @@ fun ShowAppBar(
             .padding(horizontal = marginHorizontal)
     ) {
         Spacer(modifier = Modifier.height(20.dp))
-        if (hasPendingTicket) Banner(
-            modifier = Modifier.fillMaxWidth(),
-            navigateToReservations = navigateToReservations,
-        )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
             modifier = Modifier

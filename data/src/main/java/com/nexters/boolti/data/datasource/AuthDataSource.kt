@@ -2,6 +2,9 @@ package com.nexters.boolti.data.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import com.nexters.boolti.data.network.api.LoginService
@@ -46,6 +49,8 @@ internal class AuthDataSource @Inject constructor(
 
     suspend fun login(request: LoginRequest) = runCatching {
         loginService.kakaoLogin(request)
+    }.onSuccess {
+        Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
     }
 
     suspend fun logout(): Result<Unit> = runCatching {
@@ -67,6 +72,7 @@ internal class AuthDataSource @Inject constructor(
                 refreshToken = "",
             )
         }
+        Firebase.analytics.setUserId(null)
     }
 
     suspend fun refresh(): Result<SignUpResponse?> = runCatching {
@@ -84,6 +90,10 @@ internal class AuthDataSource @Inject constructor(
                 photo = user.imgPath,
                 userCode = user.userCode,
             )
+        }
+        Firebase.analytics.apply {
+            setUserId(user.id)
+            setUserProperty("nickname", user.nickname)
         }
     }
 }

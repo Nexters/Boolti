@@ -1,5 +1,7 @@
 package com.nexters.boolti.data.repository
 
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.nexters.boolti.data.datasource.GiftDataSource
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.toDomains
@@ -12,10 +14,11 @@ import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.GiftApproveRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class GiftRepositoryImpl @Inject constructor(
-    private val dataSource: GiftDataSource
+    private val dataSource: GiftDataSource,
 ) : GiftRepository {
     override fun receiveGift(giftUuid: String): Flow<Boolean> = flow {
         emit(dataSource.receiveGift(GiftReceiveRequest(giftUuid)))
@@ -38,7 +41,14 @@ internal class GiftRepositoryImpl @Inject constructor(
     }
 
     override fun getGiftPaymentInfo(giftId: String): Flow<ReservationDetail> = flow {
-        emit(dataSource.getGiftPaymentInfo(giftId).toDomain())
+        runCatching {
+            dataSource.getGiftPaymentInfo(giftId)
+        }.onSuccess {
+            emit(it.toDomain())
+        }.onFailure {
+            Firebase.crashlytics.recordException(it)
+            Timber.e(it)
+        }
     }
 
     override fun cancelGift(giftUuid: String): Flow<Boolean> = flow {

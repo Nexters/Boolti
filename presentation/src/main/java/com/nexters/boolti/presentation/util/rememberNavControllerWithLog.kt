@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.util
 
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavDestination
@@ -23,12 +22,12 @@ fun rememberNavControllerWithLog(
         navController.currentBackStackEntryFlow
             .collect {
                 val screenName = it.destination.route?.substringBefore('/') ?: ""
-                val args = it.arguments?.keySet()?.fold(Bundle()) { bundle, key ->
-                    if (key == "android-support-nav:controller:deepLinkIntent") return@fold bundle
-                    bundle.apply {
-                        it.arguments?.get(key)?.let { arg -> putString(key, arg.toString()) }
+                val args = it.arguments?.keySet()?.fold(mutableMapOf<String, String>()) { map, key ->
+                    if (key == "android-support-nav:controller:deepLinkIntent") return@fold map
+                    map.apply {
+                        it.arguments?.get(key)?.let { arg -> put(key, arg.toString()) }
                     }
-                }?.let { if (it.isEmpty) null else it }
+                }?.ifEmpty { null }?.entries?.joinToString()
 
                 Timber.tag("MANGBAAM-(rememberNavControllerWithLog)")
                     .d("screenName: $screenName, arguments: $args")
@@ -37,7 +36,7 @@ fun rememberNavControllerWithLog(
                     FirebaseAnalytics.Event.SCREEN_VIEW,
                 ) {
                     param(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
-                    args?.let { args -> param("arguments", args) }
+                    args?.let { param("arguments", args) }
                 }
             }
     }

@@ -185,6 +185,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
 
         PaymentCompleteScreen(
             navigateTo = navController::navigateTo,
+            navigateByDeepLink = navController::navigate,
             popBackStack = navController::popBackStack,
             popInclusiveBackStack = { route ->
                 navController.popBackStack(

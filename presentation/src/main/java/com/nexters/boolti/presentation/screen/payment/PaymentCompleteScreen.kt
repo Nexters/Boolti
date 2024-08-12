@@ -34,6 +34,7 @@ import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -169,12 +170,12 @@ private fun PaymentCompleteScreen(
             ) {
                 navigateToReservation(reservation)
             }
-            /*MainButton(
+            MainButton(
                 modifier = Modifier.weight(1f),
                 label = stringResource(R.string.show_ticket),
             ) {
                 navigateToTicketDetail(reservation)
-            }*/
+            }
         }
     }
 }

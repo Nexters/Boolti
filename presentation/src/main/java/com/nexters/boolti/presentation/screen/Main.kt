@@ -149,6 +149,12 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
 
         navigation(
             route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://app.boolti.in/tickets/{ticketId}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
             startDestination = "detail",
             arguments = MainDestination.TicketDetail.arguments,
         ) {

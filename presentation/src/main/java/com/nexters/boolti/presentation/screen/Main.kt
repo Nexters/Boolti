@@ -32,6 +32,7 @@ import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
+import com.nexters.boolti.presentation.screen.profile.ProfileScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
@@ -198,11 +199,15 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         addGiftCompleteScreen(
             navigateTo = navController::navigateTo,
             navigateToHome = navController::navigateToHome,
-            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true)}
+            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
         )
         BusinessScreen(popBackStack = navController::popBackStack)
         AccountSettingScreen(
             navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        ProfileScreen(
+            navigateToEditProfile = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
     }

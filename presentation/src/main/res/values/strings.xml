@@ -238,6 +238,9 @@
     <string name="my_show">내 공연</string>
     <string name="sns_provider">연결 서비스</string>
 
+    <string name="profile_title">내 프로필</string>
+    <string name="profile_edit_button_label">프로필 편집</string>
+
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>
     <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>

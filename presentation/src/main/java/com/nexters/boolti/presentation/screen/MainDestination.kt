@@ -46,7 +46,7 @@ sealed class MainDestination(val route: String) {
         )
 
         fun createRoute(
-            giftId: String
+            giftId: String,
         ): String = "giftComplete?giftId=${giftId}"
     }
 
@@ -87,6 +87,18 @@ sealed class MainDestination(val route: String) {
     data object Login : MainDestination(route = "login")
     data object Business : MainDestination(route = "business")
     data object AccountSetting : MainDestination(route = "accountSetting")
+    data object Profile : MainDestination(route = "profile/{id}") {
+        val arguments = listOf(navArgument("id") {
+            type = NavType.StringType
+            nullable = true
+            defaultValue = null
+        })
+
+        fun createRoute(id: String?): String =
+            StringBuilder("profile").apply {
+                id?.let { append("/$id") }
+            }.toString()
+    }
 }
 
 /**

@@ -58,6 +58,7 @@ fun MyScreen(
     requireLogin: () -> Unit,
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
+    navigateToProfile: () -> Unit,
     onClickQrScan: () -> Unit,
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
@@ -70,7 +71,7 @@ fun MyScreen(
     MyScreen(
         modifier = modifier,
         user = user,
-        onClickHeaderButton = if (user != null) requireLogin else requireLogin, // TODO 프로필 구현 후 프로필 화면 이동 연결
+        onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
         onClickRegisterShow = {
@@ -216,18 +217,16 @@ private fun MyHeader(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (user == null) { // TODO 프로필 기능 추가 후 조건문 제거
-            SmallButton(
-                modifier = Modifier.padding(start = 16.dp),
-                label = if (user != null) {
-                    stringResource(R.string.show_profile_button)
-                } else {
-                    stringResource(R.string.login)
-                },
-                backgroundColor = Grey80,
-                onClick = onClickButton,
-            )
-        }
+        SmallButton(
+            modifier = Modifier.padding(start = 16.dp),
+            label = if (user != null) {
+                stringResource(R.string.show_profile_button)
+            } else {
+                stringResource(R.string.login)
+            },
+            backgroundColor = Grey80,
+            onClick = onClickButton,
+        )
     }
 }
 

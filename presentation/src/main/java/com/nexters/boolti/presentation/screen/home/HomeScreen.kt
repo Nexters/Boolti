@@ -53,6 +53,7 @@ fun HomeScreen(
     onClickQrScan: () -> Unit,
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
+    navigateToProfile: () -> Unit,
     navigateToBusiness: () -> Unit,
     requireLogin: () -> Unit,
     modifier: Modifier,
@@ -166,6 +167,7 @@ fun HomeScreen(
                     requireLogin = requireLogin,
                     onClickAccountSetting = onClickAccountSetting,
                     navigateToReservations = navigateToReservations,
+                    navigateToProfile = navigateToProfile,
                     onClickQrScan = onClickQrScan,
                 )
             }

@@ -19,6 +19,7 @@ fun NavGraphBuilder.HomeScreen(
             onClickQrScan = { navigateTo(MainDestination.HostedShows.route) },
             onClickAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },
             navigateToReservations = { navigateTo(MainDestination.Reservations.route) },
+            navigateToProfile = { navigateTo(MainDestination.Profile.route) },
             navigateToBusiness = { navigateTo(MainDestination.Business.route) },
             requireLogin = { navigateTo(MainDestination.Login.route) },
         )

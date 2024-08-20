@@ -64,6 +64,7 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point4
+import kotlin.math.min
 
 @Composable
 fun ShowScreen(
@@ -125,12 +126,30 @@ fun ShowScreen(
                 contentPadding = PaddingValues(top = 12.dp + appbarHeight),
             ) {
                 items(
-                    count = uiState.shows.size,
+                    count = uiState.shows.size.coerceAtMost(4),
                     key = { index -> uiState.shows[index].id }) { index ->
                     ShowFeed(
                         show = uiState.shows[index],
                         modifier = Modifier
                             .clickable { onClickShowItem(uiState.shows[index].id) },
+                    )
+                }
+
+                // 4개의 공연 뒤 보이는 배너
+                item(
+                    span = { GridItemSpan(2) },
+                ) {
+                    Text("배너 자리")
+                }
+
+                // 나머지 공연 목록
+                items(
+                    count = (uiState.shows.size - 4).coerceAtLeast(0),
+                    key = { index -> uiState.shows[index + 4].id }) { index ->
+                    ShowFeed(
+                        show = uiState.shows[index + 4],
+                        modifier = Modifier
+                            .clickable { onClickShowItem(uiState.shows[index + 4].id) },
                     )
                 }
 

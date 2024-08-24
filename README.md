@@ -20,7 +20,7 @@
 
 ## Animations
 
-| Home | Ticktes |
+| Home | Tickets |
 | ------------- | ------------- |
 | <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/66c2ada2-7079-4704-b9a4-237b2c8e2769" /> | <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/37b8640a-38bb-4e03-adad-6931998082a4"/> |
 

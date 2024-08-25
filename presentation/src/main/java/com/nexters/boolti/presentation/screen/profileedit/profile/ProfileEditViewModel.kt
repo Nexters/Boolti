@@ -2,6 +2,9 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.request.EditProfileRequest
+import com.nexters.boolti.domain.request.toDto
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     getUserUseCase: GetUserUsecase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditState())
@@ -29,8 +33,8 @@ class ProfileEditViewModel @Inject constructor(
                 it.copy(
                     thumbnail = user.photo ?: "",
                     nickname = user.nickname,
-//                    introduction = "",
-//                    links = emptyList(),
+                    introduction = user.introduction,
+                    links = user.link,
                 )
             }
         }
@@ -67,7 +71,18 @@ class ProfileEditViewModel @Inject constructor(
     }
 
     fun completeEdits() {
-
+        viewModelScope.launch(recordExceptionHandler) {
+            authRepository.editProfile(
+                EditProfileRequest(
+                    nickname = uiState.value.nickname,
+                    profileImagePath = "",
+                    introduction = uiState.value.introduction,
+                    link = uiState.value.links.map { it.toDto() },
+                )
+            ).onSuccess {
+                event(ProfileEditEvent.OnSuccessEditProfile)
+            }
+        }
     }
 
     private fun event(event: ProfileEditEvent) {

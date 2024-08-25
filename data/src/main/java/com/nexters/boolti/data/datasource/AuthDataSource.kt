@@ -68,6 +68,8 @@ internal class AuthDataSource @Inject constructor(
                 phoneNumber = null,
                 photo = null,
                 userCode = null,
+                profileIntroduction = "",
+                profileLink = emptyList(),
                 accessToken = "",
                 refreshToken = "",
             )
@@ -89,6 +91,8 @@ internal class AuthDataSource @Inject constructor(
                 email = user.email,
                 photo = user.imgPath,
                 userCode = user.userCode,
+                profileIntroduction = user.introduction,
+                profileLink = user.link,
             )
         }
         Firebase.analytics.apply {

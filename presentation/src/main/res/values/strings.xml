@@ -250,6 +250,7 @@
     <string name="profile_edit_introduction_placeholder">예) 재즈와 펑크락을 좋아해요</string>
     <string name="remove_link_dialog_message">링크를 삭제하시겠어요?</string>
     <string name="change_thumbnail_description">썸네일 이미지 변경</string>
+    <string name="profile_edit_success_msg">프로필 편집을 완료했어요</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>

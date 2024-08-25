@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.response.UserResponse
+import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.SignoutRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,4 +16,9 @@ internal interface UserService {
     suspend fun signout(
         @Body request: SignoutRequest,
     )
+
+    @HTTP(method = "PATCH", path = "/app/api/v1/user", hasBody = true)
+    suspend fun editProfile(
+        @Body request: EditProfileRequest,
+    ): UserResponse
 }

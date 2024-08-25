@@ -116,21 +116,17 @@ fun ProfileEditScreen(
     val linkAddMsg = stringResource(R.string.link_add_msg)
     val linkEditMsg = stringResource(R.string.link_edit_msg)
     val linkRemoveMsg = stringResource(R.string.link_remove_msg)
+    val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
 
-    LaunchedEffect(event) {
-        event.collect {
-            when (it) {
-                ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
-                ProfileEditEvent.OnLinkEditted -> snackbarHostState.showMessage(linkEditMsg)
-                ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
-            }
-        }
-    }
     ObserveAsEvents(event) {
         when (it) {
             ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
             ProfileEditEvent.OnLinkEditted -> snackbarHostState.showMessage(linkEditMsg)
             ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
+            ProfileEditEvent.OnSuccessEditProfile -> {
+                snackbarHostState.showMessage(profileEditSuccessMsg)
+                onClickBack()
+            }
         }
     }
 

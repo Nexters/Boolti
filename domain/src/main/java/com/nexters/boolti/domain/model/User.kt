@@ -6,4 +6,6 @@ data class User(
     val email: String = "",
     val photo: String? = null,
     val userCode: String = "",
+    val introduction: String = "",
+    val link: List<Link> = emptyList(),
 )

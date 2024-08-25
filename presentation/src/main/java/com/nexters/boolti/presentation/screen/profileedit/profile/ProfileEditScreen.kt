@@ -63,6 +63,7 @@ fun ProfileEditScreen(
     navigateToLinkEdit: (Link?) -> Unit,
     newLinkCallback: Flow<Link>,
     editLinkCallback: Flow<Link>,
+    removeLinkCallback: Flow<String>,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -73,6 +74,9 @@ fun ProfileEditScreen(
     }
     LaunchedEffect(editLinkCallback) {
         editLinkCallback.collect(viewModel::onLinkEditted)
+    }
+    LaunchedEffect(removeLinkCallback) {
+        removeLinkCallback.collect(viewModel::onLinkRemoved)
     }
 
     ProfileEditScreen(

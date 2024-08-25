@@ -39,6 +39,7 @@ fun LinkEditScreen(
     modifier: Modifier = Modifier,
     onAddLink: (name: String, url: String) -> Unit,
     onEditLink: (id: String, name: String, url: String) -> Unit,
+    onRemoveLink: (id: String) -> Unit,
     navigateBack: () -> Unit = {},
     viewModel: LinkEditViewModel = hiltViewModel(),
 ) {
@@ -59,7 +60,7 @@ fun LinkEditScreen(
         },
         onChangeLinkName = viewModel::onChangeLinkName,
         onChangeLinkUrl = viewModel::onChangeLinkUrl,
-        requireRemove = viewModel::remove,
+        requireRemove = { if (viewModel.editLinkId.isNotBlank()) onRemoveLink(viewModel.editLinkId) },
     )
 }
 

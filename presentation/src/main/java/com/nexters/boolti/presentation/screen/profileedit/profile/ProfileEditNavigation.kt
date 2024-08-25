@@ -49,6 +49,12 @@ fun NavGraphBuilder.ProfileEditScreen(
             }
         }
 
+        val removeLinkId = backStackEntry.savedStateHandle
+            .getStateFlow<String?>("removeLinkId", null).filterNotNull()
+            .onEach {
+                backStackEntry.savedStateHandle.remove<String>("removeLinkId")
+            }
+
         ProfileEditScreen(
             modifier = modifier,
             navigateBack = popBackStack,
@@ -61,6 +67,7 @@ fun NavGraphBuilder.ProfileEditScreen(
             },
             newLinkCallback = newLink,
             editLinkCallback = editLink,
+            removeLinkCallback = removeLinkId,
         )
     }
 }

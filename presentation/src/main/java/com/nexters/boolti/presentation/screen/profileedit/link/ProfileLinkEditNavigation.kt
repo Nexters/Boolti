@@ -8,6 +8,7 @@ import com.nexters.boolti.presentation.screen.MainDestination
 fun NavGraphBuilder.ProfileLinkEditScreen(
     onAddLink: (linkName: String, url: String) -> Unit,
     onEditLink: (id: String, linkName: String, url: String) -> Unit,
+    onRemoveLink: (id: String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -16,6 +17,7 @@ fun NavGraphBuilder.ProfileLinkEditScreen(
             modifier = modifier,
             onAddLink = onAddLink,
             onEditLink = onEditLink,
+            onRemoveLink = onRemoveLink,
             navigateBack = popBackStack,
         )
     }

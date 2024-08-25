@@ -33,8 +33,4 @@ class LinkEditViewModel @Inject constructor(
     fun onChangeLinkUrl(url: String) {
         _uiState.update { it.copy(url = url) }
     }
-
-    fun remove() {
-
-    }
 }

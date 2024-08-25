@@ -243,6 +243,12 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                         }
                     navController.popBackStack()
                 },
+                onRemoveLink = { id ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("removeLinkId", id)
+                    navController.popBackStack()
+                },
                 popBackStack = navController::popBackStack,
             )
         }

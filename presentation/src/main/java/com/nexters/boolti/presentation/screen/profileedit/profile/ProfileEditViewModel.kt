@@ -58,6 +58,14 @@ class ProfileEditViewModel @Inject constructor(
         event(ProfileEditEvent.OnLinkEditted)
     }
 
+    fun onLinkRemoved(id: String) {
+        val newLinks = uiState.value.links.toMutableList().apply {
+            removeIf { it.id == id }
+        }
+        _uiState.update { it.copy(links = newLinks) }
+        event(ProfileEditEvent.OnLinkRemoved)
+    }
+
     fun completeEdits() {
 
     }

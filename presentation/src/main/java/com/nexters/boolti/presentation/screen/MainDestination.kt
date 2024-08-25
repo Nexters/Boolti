@@ -99,6 +99,26 @@ sealed class MainDestination(val route: String) {
                 id?.let { append("/$id") }
             }.toString()
     }
+
+    data object ProfileEdit : MainDestination(route = "profileEdit")
+    data object ProfileLinkEdit : MainDestination(route = "profileLinkEdit?title={$linkTitle}&url={$url}") {
+        val arguments = listOf(
+            navArgument(linkTitle) {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            },
+            navArgument(url) {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            },
+        )
+        fun createRoute(titleAndUrl: Pair<String, String>?): String =
+            StringBuilder("profileLinkEdit").apply {
+                titleAndUrl?.let { (title, url) -> append("title={$title}&url={$url}") }
+            }.toString()
+    }
 }
 
 /**
@@ -112,3 +132,5 @@ const val reservationId = "reservationId"
 const val salesTicketId = "salesTicketId"
 const val ticketCount = "ticketCount"
 const val isInviteTicket = "isInviteTicket"
+const val linkTitle = "linkTitle"
+const val url = "url"

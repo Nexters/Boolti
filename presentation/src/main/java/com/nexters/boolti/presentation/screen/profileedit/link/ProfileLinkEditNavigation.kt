@@ -1,20 +1,18 @@
-package com.nexters.boolti.presentation.screen.profile
+package com.nexters.boolti.presentation.screen.profileedit.link
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.ProfileScreen(
+fun NavGraphBuilder.ProfileLinkEditScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(route = MainDestination.Profile.route) {
-        ProfileScreen(
-            onClickBack = popBackStack,
+    composable(route = MainDestination.ProfileLinkEdit.route) {
+        LinkEditScreen(
             modifier = modifier,
-            navigateToProfileEdit = { navigateTo(MainDestination.ProfileEdit.route) },
         )
     }
 }

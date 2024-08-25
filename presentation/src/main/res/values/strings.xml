@@ -7,6 +7,7 @@
 
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
+    <string name="description_user_thumbnail">유저 섬네일</string>
     <string name="description_close_button">닫기</string>
     <string name="description_toolbar_home">홈으로 이동</string>
     <string name="description_more_menu">더보기 메뉴</string>
@@ -52,6 +53,7 @@
 
     <string name="btn_ok">확인</string>
     <string name="btn_goto_login">로그인 하러 가기</string>
+    <string name="btn_delete">삭제하기</string>
     <string name="login">로그인</string>
     <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
     <string name="copy">복사</string>
@@ -65,6 +67,8 @@
 
     <string name="stepper_minus_description">감소</string>
     <string name="stepper_plus_description">증가</string>
+
+    <string name="complete">완료</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">지금 불티에 로그인하고\n당신의 공연을 시작해 보세요!</string>
@@ -238,8 +242,18 @@
     <string name="my_show">내 공연</string>
     <string name="sns_provider">연결 서비스</string>
 
-    <string name="profile_title">내 프로필</string>
+    <!-- 프로필 & 프로필 편집 & 링크 편집 -->
+    <string name="profile_title">프로필</string>
+    <string name="profile_edit">프로필 편집</string>
     <string name="profile_edit_button_label">프로필 편집</string>
+    <string name="profile_edit_nickname_placeholder">닉네임을 입력해 주세요 (20자 이내)</string>
+    <string name="profile_edit_introduction_placeholder">예) 재즈와 펑크락을 좋아해요</string>
+    <string name="remove_link_dialog_message">링크를 삭제하시겠어요?</string>
+
+    <string name="label_nickname">닉네임</string>
+    <string name="label_introduction">소개</string>
+    <string name="label_links">링크</string>
+    <string name="link_add_btn">링크 추가</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

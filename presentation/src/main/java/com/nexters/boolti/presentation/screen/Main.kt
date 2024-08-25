@@ -33,6 +33,8 @@ import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
 import com.nexters.boolti.presentation.screen.profile.ProfileScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
@@ -207,9 +209,25 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             popBackStack = navController::popBackStack,
         )
         ProfileScreen(
-            navigateToEditProfile = navController::navigateTo,
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
+        navigation(
+            route = "profileEditNavigation",
+            startDestination = MainDestination.ProfileEdit.route,
+        ) {
+            ProfileEditScreen(
+                modifier = modifier,
+                navigateTo = navController::navigate,
+                popBackStack = navController::popBackStack,
+            )
+            ProfileLinkEditScreen(
+                modifier = modifier,
+                navigateTo = navController::navigate,
+                popBackStack = navController::popBackStack,
+            )
+        }
     }
 }
 

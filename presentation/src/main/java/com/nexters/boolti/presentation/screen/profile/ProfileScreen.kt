@@ -35,6 +35,7 @@ import com.nexters.boolti.presentation.theme.point3
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
+    navigateToProfileEdit: () -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
@@ -51,7 +52,7 @@ fun ProfileScreen(
         ) {
             ProfileHeader(
                 user = User("", "암표상인", "", "", ""),
-                onClickEdit = {},
+                onClickEdit = navigateToProfileEdit,
             )
 
             if (true) { // SNS 링크가 있으면

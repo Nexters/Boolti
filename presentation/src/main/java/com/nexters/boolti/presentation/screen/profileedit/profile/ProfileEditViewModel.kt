@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.toDto
 import com.nexters.boolti.domain.usecase.GetUserUsecase
@@ -14,11 +15,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val fileRepository: FileRepository,
     getUserUseCase: GetUserUsecase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditState())
@@ -70,12 +73,15 @@ class ProfileEditViewModel @Inject constructor(
         event(ProfileEditEvent.OnLinkRemoved)
     }
 
-    fun completeEdits() {
+    fun completeEdits(thumbnailRequestBody: RequestBody?) {
         viewModelScope.launch(recordExceptionHandler) {
+            val uploadUrl = thumbnailRequestBody?.let {
+                fileRepository.requestUrlForUpload(thumbnailRequestBody)
+            }?.getOrNull()
             authRepository.editProfile(
                 EditProfileRequest(
                     nickname = uiState.value.nickname,
-                    profileImagePath = "",
+                    profileImagePath = uploadUrl ?: "",
                     introduction = uiState.value.introduction,
                     link = uiState.value.links.map { it.toDto() },
                 )

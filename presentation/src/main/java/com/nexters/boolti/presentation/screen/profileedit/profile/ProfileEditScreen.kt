@@ -1,5 +1,10 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,11 +32,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -46,6 +56,8 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.extension.getFullPath
+import com.nexters.boolti.presentation.extension.toRequestBody
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -68,6 +80,7 @@ fun ProfileEditScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
+    val context = LocalContext.current
 
     LaunchedEffect(newLinkCallback) {
         newLinkCallback.collect(viewModel::onNewLinkAdded)
@@ -87,7 +100,11 @@ fun ProfileEditScreen(
         links = uiState.links.toImmutableList(),
         event = event,
         onClickBack = navigateBack,
-        onClickComplete = viewModel::completeEdits,
+        onClickComplete = {
+            val fullPath = it?.getFullPath(context)
+            Log.d("_MANGBAAM", "ProfileEditScreen: FullPath: $fullPath")
+            viewModel.completeEdits(it?.toRequestBody(context))
+        },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
         onClickAddLink = { navigateToLinkEdit(null) },
@@ -104,7 +121,7 @@ fun ProfileEditScreen(
     links: ImmutableList<Link>,
     event: Flow<ProfileEditEvent>,
     onClickBack: () -> Unit,
-    onClickComplete: () -> Unit,
+    onClickComplete: (uri: Uri?) -> Unit,
     onChangeNickname: (String) -> Unit,
     onChangeIntroduction: (String) -> Unit,
     onClickAddLink: () -> Unit,
@@ -117,6 +134,13 @@ fun ProfileEditScreen(
     val linkEditMsg = stringResource(R.string.link_edit_msg)
     val linkRemoveMsg = stringResource(R.string.link_remove_msg)
     val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
+
+    var selectedImage by remember { mutableStateOf<Uri?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> selectedImage = uri }
+    )
 
     ObserveAsEvents(event) {
         when (it) {
@@ -143,7 +167,7 @@ fun ProfileEditScreen(
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
-                        onClick = onClickComplete,
+                        onClick = { onClickComplete(selectedImage) },
                     )
                 },
                 title = stringResource(R.string.profile_edit),
@@ -171,7 +195,8 @@ fun ProfileEditScreen(
                         .size(100.dp)
                         .clip(CircleShape)
                         .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
-                    model = thumbnail,
+                    model = selectedImage ?: thumbnail,
+                    contentScale = ContentScale.Crop,
                     contentDescription = stringResource(R.string.description_user_thumbnail),
                 )
                 Surface(
@@ -184,6 +209,11 @@ fun ProfileEditScreen(
                     shape = CircleShape,
                     color = Color.White,
                     shadowElevation = 6.dp,
+                    onClick = {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
                 ) {
                     Image(
                         modifier = Modifier.padding(8.dp),

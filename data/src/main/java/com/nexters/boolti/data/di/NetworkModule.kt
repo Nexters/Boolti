@@ -2,14 +2,15 @@ package com.nexters.boolti.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.nexters.boolti.data.BuildConfig
-import com.nexters.boolti.data.datasource.TokenDataSource
-import com.nexters.boolti.data.network.api.LoginService
-import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.TokenDataSource
+import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
 import com.nexters.boolti.data.network.api.DeviceTokenService
+import com.nexters.boolti.data.network.api.FileService
 import com.nexters.boolti.data.network.api.GiftService
 import com.nexters.boolti.data.network.api.HostService
+import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.api.ReservationService
 import com.nexters.boolti.data.network.api.ShowService
 import com.nexters.boolti.data.network.api.SignUpService
@@ -111,6 +112,10 @@ internal object NetworkModule {
     @Singleton
     @Provides
     fun provideHostService(@Named("auth") retrofit: Retrofit): HostService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideFileService(retrofit: Retrofit): FileService = retrofit.create()
 
     @Singleton
     @Provides

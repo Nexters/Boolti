@@ -244,6 +244,7 @@
 
     <!-- 프로필 & 프로필 편집 & 링크 편집 -->
     <string name="profile_title">프로필</string>
+    <string name="profile_links_title">SNS 링크</string>
     <string name="profile_edit">프로필 편집</string>
     <string name="profile_edit_button_label">프로필 편집</string>
     <string name="profile_edit_nickname_placeholder">닉네임을 입력해 주세요 (20자 이내)</string>

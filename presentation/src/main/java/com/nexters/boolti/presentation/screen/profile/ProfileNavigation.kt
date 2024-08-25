@@ -10,10 +10,13 @@ fun NavGraphBuilder.ProfileScreen(
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(route = MainDestination.Profile.route) {
+    composable(
+        route = MainDestination.Profile.route,
+        arguments = MainDestination.Profile.arguments,
+    ) {
         ProfileScreen(
-            onClickBack = popBackStack,
             modifier = modifier,
+            onClickBack = popBackStack,
             navigateToProfileEdit = { navigateTo(MainDestination.ProfileEdit.route) },
         )
     }

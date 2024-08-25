@@ -12,7 +12,10 @@ fun NavGraphBuilder.ProfileLinkEditScreen(
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(route = MainDestination.ProfileLinkEdit.route) {
+    composable(
+        route = MainDestination.ProfileLinkEdit.route,
+        arguments = MainDestination.ProfileLinkEdit.arguments,
+    ) {
         LinkEditScreen(
             modifier = modifier,
             onAddLink = onAddLink,

@@ -34,11 +34,13 @@ internal class AuthDataSource @Inject constructor(
                     null
                 } else {
                     UserResponse(
-                        id = it.userId ?: "",
+                        id = it.userId,
                         nickname = it.nickname ?: "",
                         email = it.email ?: "",
                         imgPath = it.photo,
                         userCode = it.userCode,
+                        introduction = it.profileIntroduction,
+                        link = it.profileLink,
                     )
                 }
             }

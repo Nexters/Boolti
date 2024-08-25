@@ -88,16 +88,17 @@ sealed class MainDestination(val route: String) {
     data object Login : MainDestination(route = "login")
     data object Business : MainDestination(route = "business")
     data object AccountSetting : MainDestination(route = "accountSetting")
-    data object Profile : MainDestination(route = "profile/{id}") {
-        val arguments = listOf(navArgument("id") {
-            type = NavType.StringType
-            nullable = true
-            defaultValue = null
-        })
+    data object Profile : MainDestination(route = "profile?id={$userId}") {
+        val arguments = listOf(
+            navArgument(userId) {
+                type = NavType.StringType
+                nullable = true
+            },
+        )
 
-        fun createRoute(id: String?): String =
+        fun createRoute(id: String? = null): String =
             StringBuilder("profile").apply {
-                id?.let { append("/$id") }
+                id?.let { append("?id=$id") }
             }.toString()
     }
 
@@ -136,6 +137,7 @@ const val reservationId = "reservationId"
 const val salesTicketId = "salesTicketId"
 const val ticketCount = "ticketCount"
 const val isInviteTicket = "isInviteTicket"
+const val userId = "userId"
 const val linkId = "linkId"
 const val linkTitle = "linkTitle"
 const val url = "url"

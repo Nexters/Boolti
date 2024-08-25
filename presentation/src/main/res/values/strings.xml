@@ -262,6 +262,9 @@
     <string name="link_url">URL</string>
     <string name="link_name_placeholder">링크 이름을 입력해 주세요</string>
     <string name="link_url_placeholder">URL을 첨부해 주세요</string>
+    <string name="link_add_msg">링크를 추가했어요</string>
+    <string name="link_edit_msg">링크를 편집했어요</string>
+    <string name="link_remove_msg">링크를 삭제했어요</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

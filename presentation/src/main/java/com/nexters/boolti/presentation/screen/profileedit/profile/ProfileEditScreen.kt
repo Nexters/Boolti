@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,25 +41,39 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
-    navigateToLinkEdit: (Pair<String, String>?) -> Unit,
+    navigateToLinkEdit: (Link?) -> Unit,
+    newLinkCallback: Flow<Link>,
+    editLinkCallback: Flow<Link>,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event = viewModel.event
+
+    LaunchedEffect(newLinkCallback) {
+        newLinkCallback.collect(viewModel::onNewLinkAdded)
+    }
+    LaunchedEffect(editLinkCallback) {
+        editLinkCallback.collect(viewModel::onLinkEditted)
+    }
 
     ProfileEditScreen(
         modifier = modifier,
@@ -66,12 +81,13 @@ fun ProfileEditScreen(
         nickname = uiState.nickname,
         introduction = uiState.introduction,
         links = uiState.links.toImmutableList(),
+        event = event,
         onClickBack = navigateBack,
         onClickComplete = viewModel::completeEdits,
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
         onClickAddLink = { navigateToLinkEdit(null) },
-        onClickEditLink = { navigateToLinkEdit(uiState.links[it]) },
+        onClickEditLink = { link -> navigateToLinkEdit(link) },
     )
 }
 
@@ -81,15 +97,38 @@ fun ProfileEditScreen(
     thumbnail: String,
     nickname: String,
     introduction: String,
-    links: ImmutableList<Pair<String, String>>,
+    links: ImmutableList<Link>,
+    event: Flow<ProfileEditEvent>,
     onClickBack: () -> Unit,
     onClickComplete: () -> Unit,
     onChangeNickname: (String) -> Unit,
     onChangeIntroduction: (String) -> Unit,
     onClickAddLink: () -> Unit,
-    onClickEditLink: (index: Int) -> Unit,
+    onClickEditLink: (Link) -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val snackbarHostState = LocalSnackbarController.current
+
+    val linkAddMsg = stringResource(R.string.link_add_msg)
+    val linkEditMsg = stringResource(R.string.link_edit_msg)
+    val linkRemoveMsg = stringResource(R.string.link_remove_msg)
+
+    LaunchedEffect(event) {
+        event.collect {
+            when (it) {
+                ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
+                ProfileEditEvent.OnLinkEditted -> snackbarHostState.showMessage(linkEditMsg)
+                ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
+            }
+        }
+    }
+    ObserveAsEvents(event) {
+        when (it) {
+            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
+            ProfileEditEvent.OnLinkEditted -> snackbarHostState.showMessage(linkEditMsg)
+            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -190,12 +229,12 @@ fun ProfileEditScreen(
                         modifier = Modifier.padding(top = 4.dp),
                         onClick = onClickAddLink,
                     )
-                    links.forEachIndexed { i, (title, url) ->
+                    links.forEach { link ->
                         LinkItem(
                             modifier = Modifier.padding(top = 12.dp),
-                            title = title,
-                            url = url,
-                        ) { onClickEditLink(i) }
+                            title = link.name,
+                            url = link.url,
+                        ) { onClickEditLink(link) }
                     }
                 }
             }

@@ -143,8 +143,9 @@ object BtAppBarDefaults {
     fun AppBarTextButton(
         label: String,
         onClick: () -> Unit,
-        color: Color = MaterialTheme.colorScheme.onBackground,
         modifier: Modifier = Modifier,
+        color: Color = MaterialTheme.colorScheme.onBackground,
+        enabled: Boolean = true,
     ) {
         TextButton(
             onClick = onClick,
@@ -152,6 +153,7 @@ object BtAppBarDefaults {
             colors = ButtonDefaults.textButtonColors(
                 contentColor = color,
             ),
+            enabled = enabled,
         ) {
             Text(
                 text = label,

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.nexters.boolti.domain.model.Link
 
 sealed class MainDestination(val route: String) {
     data object Home : MainDestination(route = "home")
@@ -101,23 +102,26 @@ sealed class MainDestination(val route: String) {
     }
 
     data object ProfileEdit : MainDestination(route = "profileEdit")
-    data object ProfileLinkEdit : MainDestination(route = "profileLinkEdit?title={$linkTitle}&url={$url}") {
+    data object ProfileLinkEdit :
+        MainDestination(route = "profileLinkEdit?id={$linkId}&title={$linkTitle}&url={$url}") {
         val arguments = listOf(
+            navArgument(linkId) {
+                type = NavType.StringType
+                nullable = true
+            },
             navArgument(linkTitle) {
                 type = NavType.StringType
                 nullable = true
-                defaultValue = null
             },
             navArgument(url) {
                 type = NavType.StringType
                 nullable = true
-                defaultValue = null
             },
         )
-        fun createRoute(titleAndUrl: Pair<String, String>?): String =
-            StringBuilder("profileLinkEdit").apply {
-                titleAndUrl?.let { (title, url) -> append("?title={$title}&url={$url}") }
-            }.toString()
+
+        fun createRoute(): String = "profileLinkEdit"
+        fun createRoute(link: Link): String =
+            "profileLinkEdit?id=${link.id}&title=${link.name}&url=${link.url}"
     }
 }
 
@@ -132,5 +136,6 @@ const val reservationId = "reservationId"
 const val salesTicketId = "salesTicketId"
 const val ticketCount = "ticketCount"
 const val isInviteTicket = "isInviteTicket"
+const val linkId = "linkId"
 const val linkTitle = "linkTitle"
 const val url = "url"

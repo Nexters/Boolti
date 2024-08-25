@@ -224,7 +224,25 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             )
             ProfileLinkEditScreen(
                 modifier = modifier,
-                navigateTo = navController::navigate,
+                onAddLink = { linkName, url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("newLinkName", linkName)
+                            set("newLinkUrl", url)
+                        }
+                    navController.popBackStack()
+                },
+                onEditLink = { id, linkName, url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("editLinkId", id)
+                            set("editLinkName", linkName)
+                            set("editLinkUrl", url)
+                        }
+                    navController.popBackStack()
+                },
                 popBackStack = navController::popBackStack,
             )
         }

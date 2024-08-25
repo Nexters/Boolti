@@ -6,13 +6,17 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.ProfileLinkEditScreen(
-    navigateTo: (String) -> Unit,
+    onAddLink: (linkName: String, url: String) -> Unit,
+    onEditLink: (id: String, linkName: String, url: String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable(route = MainDestination.ProfileLinkEdit.route) {
         LinkEditScreen(
             modifier = modifier,
+            onAddLink = onAddLink,
+            onEditLink = onEditLink,
+            navigateBack = popBackStack,
         )
     }
 }

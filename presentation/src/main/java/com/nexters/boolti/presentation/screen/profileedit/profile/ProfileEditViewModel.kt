@@ -1,8 +1,9 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
     getUserUseCase: GetUserUsecase,
-) : ViewModel() {
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditState())
     val uiState = _uiState.asStateFlow()
 
@@ -41,6 +42,20 @@ class ProfileEditViewModel @Inject constructor(
 
     fun changeIntroduction(introduction: String) {
         _uiState.update { it.copy(introduction = introduction) }
+    }
+
+    fun onNewLinkAdded(newLink: Link) {
+        _uiState.update { it.copy(links = listOf(newLink) + it.links) }
+        event(ProfileEditEvent.OnLinkAdded)
+    }
+
+    fun onLinkEditted(link: Link) {
+        val newLinks = uiState.value.links.toMutableList().apply {
+            val index = indexOfFirst { it.id == link.id }
+            set(index, link)
+        }
+        _uiState.update { it.copy(links = newLinks) }
+        event(ProfileEditEvent.OnLinkEditted)
     }
 
     fun completeEdits() {

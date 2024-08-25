@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -19,7 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
@@ -31,11 +36,46 @@ import com.nexters.boolti.presentation.theme.Grey90
 
 @Composable
 fun LinkEditScreen(
-    onClickBack: () -> Unit = {},
-    onClickComplete: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    onAddLink: (name: String, url: String) -> Unit,
+    onEditLink: (id: String, name: String, url: String) -> Unit,
+    navigateBack: () -> Unit = {},
+    viewModel: LinkEditViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LinkEditScreen(
+        modifier = modifier,
+        isEditMode = uiState.isEditMode,
+        linkName = uiState.linkName,
+        linkUrl = uiState.url,
+        onClickBack = navigateBack,
+        onClickComplete = {
+            if (uiState.isEditMode) {
+                onEditLink(viewModel.editLinkId, uiState.linkName, uiState.url)
+            } else {
+                onAddLink(uiState.linkName, uiState.url)
+            }
+        },
+        onChangeLinkName = viewModel::onChangeLinkName,
+        onChangeLinkUrl = viewModel::onChangeLinkUrl,
+        requireRemove = viewModel::remove,
+    )
+}
+
+@Composable
+fun LinkEditScreen(
+    isEditMode: Boolean,
+    linkName: String,
+    linkUrl: String,
+    onClickBack: () -> Unit,
+    onClickComplete: () -> Unit,
+    onChangeLinkName: (String) -> Unit,
+    onChangeLinkUrl: (String) -> Unit,
+    requireRemove: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showLinkRemoveDialog by remember { mutableStateOf<Int?>(null) }
+    var showLinkRemoveDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -51,9 +91,10 @@ fun LinkEditScreen(
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
                         onClick = onClickComplete,
+                        enabled = linkName.isNotBlank() && linkUrl.isNotBlank(),
                     )
                 },
-                title = stringResource(R.string.link_add),
+                title = stringResource(if (isEditMode) R.string.link_edit else R.string.link_add),
             )
         },
     ) { innerPadding ->
@@ -75,9 +116,13 @@ fun LinkEditScreen(
                     )
                     BTTextField(
                         modifier = Modifier.padding(start = 12.dp),
-                        text = "",
+                        text = linkName,
                         placeholder = stringResource(R.string.link_name_placeholder),
-                        onValueChanged = {},
+                        singleLine = true,
+                        onValueChanged = onChangeLinkName,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                        ),
                     )
                 }
                 Row(
@@ -91,32 +136,43 @@ fun LinkEditScreen(
                     )
                     BTTextField(
                         modifier = Modifier.padding(start = 12.dp),
-                        text = "",
+                        text = linkUrl,
                         placeholder = stringResource(R.string.link_url_placeholder),
-                        onValueChanged = {},
+                        singleLine = true,
+                        onValueChanged = onChangeLinkUrl,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Uri,
+                            imeAction = ImeAction.Default,
+                        ),
                     )
                 }
             }
-            MainButton(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 20.dp, vertical = 8.dp)
-                    .fillMaxWidth(),
-                label = stringResource(R.string.link_remove),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    contentColor = Grey90,
-                ),
-            ) { }
+            if (isEditMode) {
+                MainButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .fillMaxWidth(),
+                    label = stringResource(R.string.link_remove),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        contentColor = Grey90,
+                    ),
+                    onClick = { showLinkRemoveDialog = true },
+                )
+            }
         }
 
-        showLinkRemoveDialog?.let { removeTargetIndex ->
+        if (showLinkRemoveDialog) {
             BTDialog(
                 positiveButtonLabel = stringResource(R.string.btn_delete),
                 negativeButtonLabel = stringResource(R.string.cancel),
-                onClickPositiveButton = {},
-                onClickNegativeButton = { showLinkRemoveDialog = null },
-                onDismiss = { showLinkRemoveDialog = null },
+                onClickPositiveButton = {
+                    requireRemove()
+                    showLinkRemoveDialog = false
+                },
+                onClickNegativeButton = { showLinkRemoveDialog = false },
+                onDismiss = { showLinkRemoveDialog = false },
             ) {
                 Text(stringResource(R.string.remove_link_dialog_message))
             }

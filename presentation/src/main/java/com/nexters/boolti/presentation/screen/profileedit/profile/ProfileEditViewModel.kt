@@ -28,8 +28,8 @@ class ProfileEditViewModel @Inject constructor(
                 it.copy(
                     thumbnail = user.photo ?: "",
                     nickname = user.nickname,
-                    introduction = "",
-                    links = emptyList(),
+//                    introduction = "",
+//                    links = emptyList(),
                 )
             }
         }

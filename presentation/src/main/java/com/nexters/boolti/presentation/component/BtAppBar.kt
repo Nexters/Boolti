@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -26,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
-import com.nexters.boolti.presentation.theme.Grey10
 
 @Composable
 fun BtAppBar(
@@ -69,6 +71,7 @@ fun BtAppBar(
         actionButtons?.let {
             CompositionLocalProvider(
                 LocalContentColor provides colors.actionIconColor,
+                LocalTextStyle provides MaterialTheme.typography.titleLarge.copy(color = colors.actionIconColor),
                 content = { it() },
             )
         }
@@ -137,11 +140,32 @@ object BtAppBarDefaults {
     }
 
     @Composable
+    fun AppBarTextButton(
+        label: String,
+        onClick: () -> Unit,
+        color: Color = MaterialTheme.colorScheme.onBackground,
+        modifier: Modifier = Modifier,
+    ) {
+        TextButton(
+            onClick = onClick,
+            modifier = modifier,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = color,
+            ),
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
+    }
+
+    @Composable
     fun appBarColors(
         containerColor: Color = MaterialTheme.colorScheme.background,
-        navigationIconColor: Color = Grey10,
-        titleColor: Color = Grey10,
-        actionIconColor: Color = Grey10,
+        navigationIconColor: Color = MaterialTheme.colorScheme.onBackground,
+        titleColor: Color = MaterialTheme.colorScheme.onBackground,
+        actionIconColor: Color = MaterialTheme.colorScheme.onBackground,
     ): BtAppBarColors = BtAppBarColors(
         containerColor = containerColor,
         navigationIconColor = navigationIconColor,

@@ -116,7 +116,7 @@ sealed class MainDestination(val route: String) {
         )
         fun createRoute(titleAndUrl: Pair<String, String>?): String =
             StringBuilder("profileLinkEdit").apply {
-                titleAndUrl?.let { (title, url) -> append("title={$title}&url={$url}") }
+                titleAndUrl?.let { (title, url) -> append("?title={$title}&url={$url}") }
             }.toString()
     }
 }

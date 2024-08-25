@@ -249,11 +249,19 @@
     <string name="profile_edit_nickname_placeholder">닉네임을 입력해 주세요 (20자 이내)</string>
     <string name="profile_edit_introduction_placeholder">예) 재즈와 펑크락을 좋아해요</string>
     <string name="remove_link_dialog_message">링크를 삭제하시겠어요?</string>
+    <string name="change_thumbnail_description">썸네일 이미지 변경</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>
     <string name="label_links">링크</string>
     <string name="link_add_btn">링크 추가</string>
+    <string name="link_add">링크 추가</string>
+    <string name="link_edit">링크 편집</string>
+    <string name="link_remove">링크 삭제</string>
+    <string name="link_name">링크 이름</string>
+    <string name="link_url">URL</string>
+    <string name="link_name_placeholder">링크 이름을 입력해 주세요</string>
+    <string name="link_url_placeholder">URL을 첨부해 주세요</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

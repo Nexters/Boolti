@@ -8,10 +8,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -58,6 +58,7 @@ fun BTTextField(
         disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
         errorBorderColor = Error,
     ),
+    supportingText: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val shape = RoundedCornerShape(4.dp)
@@ -102,6 +103,14 @@ fun BTTextField(
                         interactionSource = interactionSource,
                         colors = colors,
                     )
+                },
+                supportingText = supportingText?.let { text ->
+                    {
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 },
             )
         },

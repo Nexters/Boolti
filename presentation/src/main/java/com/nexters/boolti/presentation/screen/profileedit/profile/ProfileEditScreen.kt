@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -56,8 +56,6 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.extension.getFullPath
-import com.nexters.boolti.presentation.extension.toRequestBody
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -101,9 +99,7 @@ fun ProfileEditScreen(
         event = event,
         onClickBack = navigateBack,
         onClickComplete = {
-            val fullPath = it?.getFullPath(context)
-            Log.d("_MANGBAAM", "ProfileEditScreen: FullPath: $fullPath")
-            viewModel.completeEdits(it?.toRequestBody(context))
+            viewModel.completeEdits(it?.toFile())
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
@@ -234,6 +230,12 @@ fun ProfileEditScreen(
                         imeAction = ImeAction.Next,
                     ),
                     singleLine = true,
+                    isError = nickname.length !in  1 .. 20,
+                    supportingText = when {
+                        nickname.isBlank() -> stringResource(R.string.input_lower_limit_text, 1)
+                        nickname.length > 20 -> stringResource(R.string.input_upper_limit_text, 20)
+                        else -> null
+                    }
                 )
             }
             Section(

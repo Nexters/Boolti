@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.RequestBody
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -73,7 +73,7 @@ class ProfileEditViewModel @Inject constructor(
         event(ProfileEditEvent.OnLinkRemoved)
     }
 
-    fun completeEdits(thumbnailRequestBody: RequestBody?) {
+    fun completeEdits(thumbnailRequestBody: File?) {
         viewModelScope.launch(recordExceptionHandler) {
             val uploadUrl = thumbnailRequestBody?.let {
                 fileRepository.requestUrlForUpload(thumbnailRequestBody)

@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.login
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +24,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -37,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtCloseableAppBar
-import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey30
@@ -118,6 +115,13 @@ fun LoginScreen(
                         .padding(top = 48.dp)
                         .padding(horizontal = marginHorizontal),
                     onClick = viewModel::loginWithKaKao,
+                )
+
+                AppleLoginButton(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .padding(horizontal = marginHorizontal),
+                    onClick = { _, _ -> TODO("") },
                 )
             }
         }

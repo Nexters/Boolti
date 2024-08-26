@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.component
+package com.nexters.boolti.presentation.screen.login
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -73,7 +73,7 @@ fun KakaoLoginButton(
                 stringResource(id = R.string.login_with_kakaotalk),
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium,
-                color = Grey95,
+                color = Color.Black,
                 textAlign = TextAlign.Center,
             )
         }

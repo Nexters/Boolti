@@ -305,6 +305,7 @@ private fun Banner(
                     style = MaterialTheme.typography.labelMedium.copy(color = Grey05),
                 )
                 Text(
+                    modifier = Modifier.padding(top = 4.dp),
                     text = "공연 등록하러 가기",
                     style = point1.copy(
                         color = Grey05,

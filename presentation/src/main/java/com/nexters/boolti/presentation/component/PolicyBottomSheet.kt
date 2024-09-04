@@ -11,12 +11,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey85
 
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,14 +27,16 @@ fun PolicyBottomSheet(
     url: String,
 ) {
     ModalBottomSheet(
+        containerColor = Grey85,
         onDismissRequest = onDismissRequest,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         dragHandle = {
             Box(
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .size(45.dp, 4.dp)
                     .clip(CircleShape)
-                    .background(Grey70),
+                    .background(Grey85),
             )
         },
     ) {
@@ -42,7 +45,7 @@ fun PolicyBottomSheet(
                 WebView(context).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
+                        ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                     webViewClient = WebViewClient()
                     settings.javaScriptEnabled = true

@@ -24,6 +24,8 @@ class ProfileEditViewModel @Inject constructor(
     private val fileRepository: FileRepository,
     getUserUseCase: GetUserUsecase,
 ) : BaseViewModel() {
+    private var initialState = ProfileEditState()
+
     private val _uiState = MutableStateFlow(ProfileEditState())
     val uiState = _uiState.asStateFlow()
 
@@ -32,6 +34,12 @@ class ProfileEditViewModel @Inject constructor(
 
     init {
         getUserUseCase()?.let { user ->
+            initialState = ProfileEditState(
+                thumbnail = user.photo ?: "",
+                nickname = user.nickname,
+                introduction = user.introduction,
+                links = user.link,
+            )
             _uiState.update {
                 it.copy(
                     thumbnail = user.photo ?: "",

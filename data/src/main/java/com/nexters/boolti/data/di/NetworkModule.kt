@@ -115,7 +115,7 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideFileService(retrofit: Retrofit): FileService = retrofit.create()
+    fun provideFileService(@Named("auth") retrofit: Retrofit): FileService = retrofit.create()
 
     @Singleton
     @Provides

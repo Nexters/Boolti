@@ -47,7 +47,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -65,6 +64,9 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @Composable
 fun ProfileEditScreen(
@@ -94,12 +96,25 @@ fun ProfileEditScreen(
         modifier = modifier,
         thumbnail = uiState.thumbnail,
         nickname = uiState.nickname,
+        nicknameError = uiState.nicknameError,
         introduction = uiState.introduction,
         links = uiState.links.toImmutableList(),
         event = event,
         onClickBack = navigateBack,
         onClickComplete = {
-            viewModel.completeEdits(it?.toFile())
+            it?.let { uri ->
+                val file = File(context.cacheDir, "temp_profile_image.jpg")
+                try {
+                    context.contentResolver.openInputStream(uri).use { inputStream ->
+                        FileOutputStream(file).use { outputStream ->
+                            inputStream?.copyTo(outputStream)
+                        }
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                viewModel.completeEdits(file)
+            }
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
@@ -113,6 +128,7 @@ fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     thumbnail: String,
     nickname: String,
+    nicknameError: NicknameError? = null,
     introduction: String,
     links: ImmutableList<Link>,
     event: Flow<ProfileEditEvent>,
@@ -230,12 +246,13 @@ fun ProfileEditScreen(
                         imeAction = ImeAction.Next,
                     ),
                     singleLine = true,
-                    isError = nickname.length !in  1 .. 20,
-                    supportingText = when {
-                        nickname.isBlank() -> stringResource(R.string.input_lower_limit_text, 1)
-                        nickname.length > 20 -> stringResource(R.string.input_upper_limit_text, 20)
-                        else -> null
-                    }
+                    isError = nicknameError != null,
+                    supportingText = nicknameError?.let {
+                        when (it) {
+                            NicknameError.MinLength -> stringResource(R.string.error_min_length, 1)
+                            NicknameError.Invalid -> stringResource(R.string.error_invalid_nickname)
+                        }
+                    },
                 )
             }
             Section(

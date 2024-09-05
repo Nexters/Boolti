@@ -2,6 +2,10 @@ package com.nexters.boolti.data.util
 
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationState
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -34,3 +38,9 @@ internal fun String?.toPaymentType(): PaymentType {
         else -> PaymentType.UNDEFINED
     }
 }
+
+internal fun File.toImageMultipartBody(): MultipartBody.Part = MultipartBody.Part.createFormData(
+    name = "image",
+    filename = name,
+    body = asRequestBody("image/*".toMediaType())
+)

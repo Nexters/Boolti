@@ -271,6 +271,9 @@
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
 
+    <string name="error_min_length">%d자 이상 입력해 주세요</string>
+    <string name="error_invalid_nickname">앞뒤 공백 없이 숫자, 한글, 영문 20자 이내로 입력해 주세요</string>
+
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>
     <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>

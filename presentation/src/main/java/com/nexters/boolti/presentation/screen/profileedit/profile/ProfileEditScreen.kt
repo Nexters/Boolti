@@ -96,6 +96,7 @@ fun ProfileEditScreen(
         modifier = modifier,
         thumbnail = uiState.thumbnail,
         nickname = uiState.nickname,
+        nicknameError = uiState.nicknameError,
         introduction = uiState.introduction,
         links = uiState.links.toImmutableList(),
         event = event,
@@ -127,6 +128,7 @@ fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     thumbnail: String,
     nickname: String,
+    nicknameError: NicknameError? = null,
     introduction: String,
     links: ImmutableList<Link>,
     event: Flow<ProfileEditEvent>,
@@ -244,6 +246,13 @@ fun ProfileEditScreen(
                         imeAction = ImeAction.Next,
                     ),
                     singleLine = true,
+                    isError = nicknameError != null,
+                    supportingText = nicknameError?.let {
+                        when (it) {
+                            NicknameError.MinLength -> stringResource(R.string.error_min_length, 1)
+                            NicknameError.Invalid -> stringResource(R.string.error_invalid_nickname)
+                        }
+                    },
                 )
             }
             Section(

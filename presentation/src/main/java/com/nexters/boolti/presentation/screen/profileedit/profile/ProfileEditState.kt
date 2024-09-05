@@ -8,4 +8,19 @@ data class ProfileEditState(
     val nickname: String = "",
     val introduction: String = "",
     val links: List<Link> = emptyList(),
-)
+) {
+    val nicknameError: NicknameError?
+        get() = when {
+            nickname.isEmpty() -> NicknameError.MinLength
+            !NicknameError.InvalidRegex.matches(nickname) -> NicknameError.Invalid
+            else -> null
+        }
+}
+
+enum class NicknameError {
+    MinLength, Invalid;
+
+    companion object {
+        val InvalidRegex = Regex("^[0-9a-zA-Z가-힣ㄱ-ㅎ]{1,20}$")
+    }
+}

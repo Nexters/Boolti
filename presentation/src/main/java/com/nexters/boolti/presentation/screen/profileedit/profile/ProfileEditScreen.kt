@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,8 +55,6 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.extension.getFullPath
-import com.nexters.boolti.presentation.extension.toRequestBody
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -67,6 +64,9 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @Composable
 fun ProfileEditScreen(
@@ -101,9 +101,19 @@ fun ProfileEditScreen(
         event = event,
         onClickBack = navigateBack,
         onClickComplete = {
-            val fullPath = it?.getFullPath(context)
-            Log.d("_MANGBAAM", "ProfileEditScreen: FullPath: $fullPath")
-            viewModel.completeEdits(it?.toRequestBody(context))
+            it?.let { uri ->
+                val file = File(context.cacheDir, "temp_profile_image.jpg")
+                try {
+                    context.contentResolver.openInputStream(uri).use { inputStream ->
+                        FileOutputStream(file).use { outputStream ->
+                            inputStream?.copyTo(outputStream)
+                        }
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                viewModel.completeEdits(file)
+            }
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,

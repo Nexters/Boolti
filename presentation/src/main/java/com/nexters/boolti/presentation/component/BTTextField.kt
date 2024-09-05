@@ -78,7 +78,6 @@ fun BTTextField(
         errorBorderColor = Error,
         errorLabelColor = Error,
     ),
-    supportingText: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val shape = RoundedCornerShape(4.dp)
@@ -136,14 +135,6 @@ fun BTTextField(
                             )
                         },
                     )
-                },
-                supportingText = supportingText?.let { text ->
-                    {
-                        Text(
-                            text = text,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
                 },
             )
             supportingText?.let {

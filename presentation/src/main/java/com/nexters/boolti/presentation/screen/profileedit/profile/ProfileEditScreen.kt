@@ -180,6 +180,7 @@ fun ProfileEditScreen(
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
                         onClick = { onClickComplete(selectedImage) },
+                        enabled = nicknameError == null,
                     )
                 },
                 title = stringResource(R.string.profile_edit),

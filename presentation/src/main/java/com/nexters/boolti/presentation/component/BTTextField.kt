@@ -24,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -34,12 +36,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey70
+import okio.utf8Size
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,9 +55,11 @@ fun BTTextField(
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     supportingText: String? = null,
+    bottomEndText: String? = null,
     enabled: Boolean = true,
     isError: Boolean = false,
     readOnly: Boolean = false,
+    minHeight: Dp = 48.dp,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -88,12 +96,15 @@ fun BTTextField(
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
     CompositionLocalProvider(LocalTextSelectionColors provides colors.textSelectionColors) {
         ConstraintLayout(modifier = modifier.defaultMinSize(minWidth = OutlinedTextFieldDefaults.MinWidth)) {
-            val (textFieldRef, supportingTextRef) = createRefs()
+            val (textFieldRef, bottomEndTextRef, supportingTextRef) = createRefs()
             BasicTextField(
                 value = text,
                 onValueChange = onValueChanged,
                 modifier = Modifier
-                    .defaultMinSize(minHeight = 48.dp, minWidth = OutlinedTextFieldDefaults.MinWidth)
+                    .defaultMinSize(
+                        minHeight = minHeight.coerceAtLeast(48.dp),
+                        minWidth = OutlinedTextFieldDefaults.MinWidth
+                    )
                     .constrainAs(textFieldRef) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
@@ -124,7 +135,11 @@ fun BTTextField(
                         isError = isError,
                         interactionSource = interactionSource,
                         colors = colors,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
+                        contentPadding = if (bottomEndText != null) {
+                            PaddingValues(start = 12.dp, end = 12.dp, top = 12.dp, bottom = (12 + 18 + 8).dp)
+                        } else {
+                            PaddingValues(horizontal = 12.dp, vertical = 12.dp)
+                        },
                         container = {
                             OutlinedTextFieldDefaults.ContainerBox(
                                 shape = shape,
@@ -137,6 +152,19 @@ fun BTTextField(
                     )
                 },
             )
+            bottomEndText?.let {
+                Text(
+                    modifier = Modifier
+                        .padding(top = 8.dp, start = 12.dp, end = 12.dp, bottom = 12.dp)
+                        .constrainAs(bottomEndTextRef) {
+                            end.linkTo(textFieldRef.end)
+                            bottom.linkTo(textFieldRef.bottom)
+                        },
+                    text = it,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Grey70,
+                )
+            }
             supportingText?.let {
                 val supportingTextColor =
                     colors.supportingTextColor(enabled, isError, interactionSource).value
@@ -162,7 +190,7 @@ fun BTTextField(
 private fun TextFieldColors.textColor(
     enabled: Boolean,
     isError: Boolean,
-    interactionSource: InteractionSource
+    interactionSource: InteractionSource,
 ): State<Color> {
     val focused by interactionSource.collectIsFocusedAsState()
 
@@ -179,7 +207,7 @@ private fun TextFieldColors.textColor(
 private fun TextFieldColors.supportingTextColor(
     enabled: Boolean,
     isError: Boolean,
-    interactionSource: InteractionSource
+    interactionSource: InteractionSource,
 ): State<Color> {
     val focused by interactionSource.collectIsFocusedAsState()
 
@@ -204,17 +232,30 @@ fun BTTextFieldPreview() {
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                var text by remember { mutableStateOf("") }
+
                 BTTextField(
-                    text = "테스트",
+                    text = text,
                     placeholder = "예매) 불티",
-                    onValueChanged = {}
+                    onValueChanged = { text = it },
                 )
                 BTTextField(
-                    text = "테스트",
+                    text = text,
                     placeholder = "예매) 불티",
                     isError = true,
                     supportingText = "에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!",
-                    onValueChanged = {}
+                    onValueChanged = { text = it },
+                )
+
+                val maxLength = 3
+                BTTextField(
+                    text = text.takeForUnicode(maxLength),
+                    placeholder = "예) 재즈와 펑크락을 좋아해요",
+                    minHeight = 72.dp,
+                    bottomEndText = "${text.utf8Size()}/${maxLength}자",
+                    onValueChanged = {
+                        text = it.takeForUnicode(maxLength)
+                    },
                 )
             }
         }

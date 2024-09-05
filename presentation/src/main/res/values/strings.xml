@@ -27,6 +27,8 @@
     <string name="validation_name">이름을 올바르게 입력해 주세요</string>
     <string name="validation_contact">연락처를 올바르게 입력해 주세요</string>
     <string name="validation_account">계좌번호 확인 후 다시 입력해 주세요</string>
+    <string name="validate_min_length">%d자 이상 입력해 주세요</string>
+    <string name="validate_edit_nickname">앞뒤 공백 없이 숫자, 한글, 영문 20자 이내로 입력해 주세요</string>
 
     <!-- 홈(Show) -->
     <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
@@ -72,6 +74,8 @@
 
     <string name="input_lower_limit_text">%d자 이상 입력해 주세요</string>
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>
+
+    <string name="input_limit">%d/%d자</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">지금 불티에 로그인하고\n당신의 공연을 시작해 보세요!</string>
@@ -270,9 +274,6 @@
     <string name="link_add_msg">링크를 추가했어요</string>
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
-
-    <string name="error_min_length">%d자 이상 입력해 주세요</string>
-    <string name="error_invalid_nickname">앞뒤 공백 없이 숫자, 한글, 영문 20자 이내로 입력해 주세요</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

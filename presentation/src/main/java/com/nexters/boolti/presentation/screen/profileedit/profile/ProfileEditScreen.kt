@@ -55,6 +55,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -250,8 +251,8 @@ fun ProfileEditScreen(
                     isError = nicknameError != null,
                     supportingText = nicknameError?.let {
                         when (it) {
-                            NicknameError.MinLength -> stringResource(R.string.error_min_length, 1)
-                            NicknameError.Invalid -> stringResource(R.string.error_invalid_nickname)
+                            NicknameError.MinLength -> stringResource(R.string.validate_min_length, 1)
+                            NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
                         }
                     },
                 )
@@ -260,14 +261,18 @@ fun ProfileEditScreen(
                 modifier = Modifier.padding(top = 12.dp),
                 title = stringResource(R.string.label_introduction)
             ) {
+                val maxIntroduceLength = 60
+
                 BTTextField(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
                         .fillMaxWidth()
                         .height(122.dp),
-                    text = introduction,
+                    text = introduction.takeForUnicode(maxIntroduceLength),
                     placeholder = stringResource(R.string.profile_edit_introduction_placeholder),
-                    onValueChanged = onChangeIntroduction,
+                    minHeight = 122.dp,
+                    bottomEndText = stringResource(R.string.input_limit, introduction.length, maxIntroduceLength),
+                    onValueChanged = { onChangeIntroduction(it.takeForUnicode(maxIntroduceLength)) },
                 )
             }
             Section(

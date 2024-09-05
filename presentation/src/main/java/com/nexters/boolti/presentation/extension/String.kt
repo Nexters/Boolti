@@ -2,7 +2,7 @@ package com.nexters.boolti.presentation.extension
 
 import android.content.Context
 import com.nexters.boolti.presentation.R
-import java.lang.StringBuilder
+import java.text.BreakIterator
 
 fun String.filterToPhoneNumber(): String = filter { it.isDigit() }.run {
     substring(0..minOf(10, lastIndex))
@@ -51,3 +51,17 @@ fun String.cardCodeToCompanyName(context: Context): String = when (this) {
     "34" -> R.string.card_suhyeop
     else -> R.string.blank
 }.run { context.getString(this) }
+
+fun String.takeForUnicode(n: Int): String {
+    val iterator = BreakIterator.getCharacterInstance().apply { setText(this@takeForUnicode) }
+
+    var endIndex = 0
+
+    while (true) {
+        val end = iterator.next()
+        if (end == BreakIterator.DONE || end > n) break
+        endIndex = end
+    }
+
+    return substring(0, endIndex)
+}

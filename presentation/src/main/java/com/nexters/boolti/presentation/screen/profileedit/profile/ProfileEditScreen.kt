@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -52,6 +54,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -101,7 +104,8 @@ fun ProfileEditScreen(
         introduction = uiState.introduction,
         links = uiState.links.toImmutableList(),
         event = event,
-        onClickBack = navigateBack,
+        checkDataChanged = { viewModel.isDataChanged },
+        navigateBack = navigateBack,
         onClickComplete = {
             it?.let { uri ->
                 val file = File(context.cacheDir, "temp_profile_image.jpg")
@@ -133,7 +137,8 @@ fun ProfileEditScreen(
     introduction: String,
     links: ImmutableList<Link>,
     event: Flow<ProfileEditEvent>,
-    onClickBack: () -> Unit,
+    checkDataChanged: () -> Boolean,
+    navigateBack: () -> Unit,
     onClickComplete: (uri: Uri?) -> Unit,
     onChangeNickname: (String) -> Unit,
     onChangeIntroduction: (String) -> Unit,
@@ -155,6 +160,14 @@ fun ProfileEditScreen(
         onResult = { uri -> selectedImage = uri }
     )
 
+    var showExitAlertDialog by remember { mutableStateOf(false) }
+
+    fun tryBack() {
+        if (checkDataChanged()) showExitAlertDialog = true else navigateBack()
+    }
+
+    BackHandler { tryBack() }
+
     ObserveAsEvents(event) {
         when (it) {
             ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
@@ -162,7 +175,7 @@ fun ProfileEditScreen(
             ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
             ProfileEditEvent.OnSuccessEditProfile -> {
                 snackbarHostState.showMessage(profileEditSuccessMsg)
-                onClickBack()
+                navigateBack()
             }
         }
     }
@@ -173,7 +186,7 @@ fun ProfileEditScreen(
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = onClickBack,
+                        onClick = ::tryBack,
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
@@ -293,6 +306,23 @@ fun ProfileEditScreen(
                     }
                 }
             }
+        }
+        if (showExitAlertDialog) {
+            BTDialog(
+                content = {
+                    Text(
+                        text = stringResource(R.string.profile_edit_alert_exit),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                showCloseButton = false,
+                positiveButtonLabel = stringResource(R.string.save),
+                negativeButtonLabel = stringResource(R.string.cancel),
+                onClickPositiveButton = { onClickComplete(selectedImage) },
+                onClickNegativeButton = navigateBack,
+                onDismiss = { showExitAlertDialog = false },
+            )
         }
     }
 }

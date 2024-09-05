@@ -25,6 +25,11 @@ class ProfileEditViewModel @Inject constructor(
     getUserUseCase: GetUserUsecase,
 ) : BaseViewModel() {
     private var initialState = ProfileEditState()
+    val isDataChanged: Boolean
+        get() = initialState.nickname != uiState.value.nickname ||
+                initialState.introduction != uiState.value.introduction ||
+                initialState.thumbnail != uiState.value.thumbnail ||
+                initialState.links != uiState.value.links
 
     private val _uiState = MutableStateFlow(ProfileEditState())
     val uiState = _uiState.asStateFlow()

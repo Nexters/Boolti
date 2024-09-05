@@ -208,6 +208,7 @@
     <string name="gift_self_dialog">본인이 결제한 선물입니다.\n선물을 등록하면 다른 분께 보낼 수 없습니다. 등록하시겠습니까?</string>
     <string name="gift_registration_failed">선물 등록에 실패했어요</string>
     <string name="gift_registration_failed_dialog">선물 등록 중 오류가 발생했습니다.\n웹 링크에서 선물 상태를 확인 후 다시 시도해 주세요</string>
+    <string name="save">저장하기</string>
     <string name="cancel">취소하기</string>
 
     <!-- 공연 -->
@@ -259,6 +260,7 @@
     <string name="remove_link_dialog_message">링크를 삭제하시겠어요?</string>
     <string name="change_thumbnail_description">썸네일 이미지 변경</string>
     <string name="profile_edit_success_msg">프로필 편집을 완료했어요</string>
+    <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>

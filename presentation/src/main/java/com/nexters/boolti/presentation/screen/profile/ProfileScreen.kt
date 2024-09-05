@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.profile
 
+import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -36,6 +38,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
@@ -66,6 +69,10 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
 ) {
+    val uriHandler = LocalUriHandler.current
+    val snackbarHostState = LocalSnackbarController.current
+    val invalidUrlMsg = stringResource(R.string.invalid_link)
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -98,9 +105,14 @@ fun ProfileScreen(
                         SnsLink(
                             modifier = Modifier.padding(top = 16.dp),
                             link = link,
-                        ) {
-                            // TODO Open Link
-                        }
+                            onClick = {
+                                try {
+                                    uriHandler.openUri(link.url)
+                                } catch (e: ActivityNotFoundException) {
+                                    snackbarHostState.showMessage(invalidUrlMsg)
+                                }
+                            },
+                        )
                     }
                 }
             }

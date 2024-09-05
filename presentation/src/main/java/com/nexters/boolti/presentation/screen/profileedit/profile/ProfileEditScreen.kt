@@ -114,8 +114,8 @@ fun ProfileEditScreen(
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                viewModel.completeEdits(file)
             }
+            viewModel.completeEdits(null)
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,

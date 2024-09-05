@@ -274,6 +274,7 @@
     <string name="link_add_msg">링크를 추가했어요</string>
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
+    <string name="invalid_link">링크를 열 수 없습니다</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

@@ -83,13 +83,13 @@ class ProfileEditViewModel @Inject constructor(
 
     fun completeEdits(thumbnailRequestBody: File?) {
         viewModelScope.launch(recordExceptionHandler) {
-            val uploadUrl = thumbnailRequestBody?.let {
+            /*val uploadUrl = thumbnailRequestBody?.let {
                 fileRepository.requestUrlForUpload(thumbnailRequestBody)
-            }?.getOrNull()
+            }?.getOrNull()*/
             authRepository.editProfile(
                 EditProfileRequest(
                     nickname = uiState.value.nickname,
-                    profileImagePath = uploadUrl ?: "",
+                    profileImagePath = "", // uploadUrl ?: "",
                     introduction = uiState.value.introduction,
                     link = uiState.value.links.map { it.toDto() },
                 )

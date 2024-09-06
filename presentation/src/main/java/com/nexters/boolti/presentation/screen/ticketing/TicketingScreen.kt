@@ -73,6 +73,7 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.PolicyBottomSheet
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
@@ -110,8 +111,8 @@ fun TicketingScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showPaymentFailureDialog by remember { mutableStateOf(false) }
     var showTicketSoldOutDialog by remember { mutableStateOf(false) }
+    var policyPageUrl: String? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    val uriHandler = LocalUriHandler.current
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -244,12 +245,10 @@ fun TicketingScreen(
                     agreement = uiState.orderAgreement,
                     onClickTotalAgree = viewModel::toggleAgreement,
                     onClickShow = {
-                        val url = when (it) {
-                            0 -> "https://boolti.notion.site/00259d85983c4ba8a987a374e2615396?pvs=4"
-                            1 -> "https://boolti.notion.site/3-354880c7d75e424486b7974e5cc8bcad?pvs=4"
-                            else -> return@OrderAgreementSection
+                        when (it) {
+                            0 -> policyPageUrl = "https://boolti.in/site-policy/privacy"
+                            1 -> policyPageUrl = "https://boolti.in/site-policy/consent"
                         }
-                        uriHandler.openUri(url)
                     },
                 )
 
@@ -327,6 +326,11 @@ fun TicketingScreen(
                 showTicketSoldOutDialog = false
                 onBackClicked()
             }
+        }
+        policyPageUrl?.let { url ->
+            PolicyBottomSheet(onDismissRequest = {
+                policyPageUrl = null
+            }, url = url)
         }
     }
 }

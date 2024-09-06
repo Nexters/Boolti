@@ -1,5 +1,9 @@
 package com.nexters.boolti.presentation.screen.gift
 
+import android.annotation.SuppressLint
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -12,9 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,15 +32,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Currency
@@ -43,6 +51,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.PolicyBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.Header
 import com.nexters.boolti.presentation.screen.ticketing.InputRow
 import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
@@ -58,6 +67,7 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESUL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GiftScreen(
     popBackStack: () -> Unit,
@@ -67,11 +77,11 @@ fun GiftScreen(
     viewModel: GiftViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showTicketSoldOutDialog by remember { mutableStateOf(false) }
     var showPaymentFailureDialog by remember { mutableStateOf(false) }
+    var policyPageUrl: String? by remember { mutableStateOf(null) }
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -207,12 +217,10 @@ fun GiftScreen(
                     agreement = uiState.orderAgreement,
                     onClickTotalAgree = viewModel::toggleAgreement,
                     onClickShow = {
-                        val url = when (it) {
-                            0 -> "https://boolti.notion.site/00259d85983c4ba8a987a374e2615396?pvs=4"
-                            1 -> "https://boolti.notion.site/3-354880c7d75e424486b7974e5cc8bcad?pvs=4"
-                            else -> return@OrderAgreementSection
+                        when (it) {
+                            0 -> policyPageUrl = "https://boolti.in/site-policy/privacy"
+                            1 -> policyPageUrl = "https://boolti.in/site-policy/consent"
                         }
-                        uriHandler.openUri(url)
                     },
                 )
 
@@ -291,6 +299,12 @@ fun GiftScreen(
             showTicketSoldOutDialog = false
             popBackStack()
         }
+    }
+
+    policyPageUrl?.let { url ->
+        PolicyBottomSheet(onDismissRequest = {
+            policyPageUrl = null
+        }, url = url)
     }
 }
 

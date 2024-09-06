@@ -58,6 +58,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
@@ -103,11 +104,12 @@ fun ProfileEditScreen(
         nicknameError = uiState.nicknameError,
         introduction = uiState.introduction,
         links = uiState.links.toImmutableList(),
+        saving = uiState.saving,
         event = event,
         checkDataChanged = { viewModel.isDataChanged },
         navigateBack = navigateBack,
         onClickComplete = {
-            it?.let { uri ->
+            val file = it?.let { uri ->
                 val file = File(context.cacheDir, "temp_profile_image.jpg")
                 try {
                     context.contentResolver.openInputStream(uri).use { inputStream ->
@@ -118,8 +120,9 @@ fun ProfileEditScreen(
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
+                file
             }
-            viewModel.completeEdits(null)
+            viewModel.completeEdits(file)
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
@@ -136,6 +139,7 @@ fun ProfileEditScreen(
     nicknameError: NicknameError? = null,
     introduction: String,
     links: ImmutableList<Link>,
+    saving: Boolean,
     event: Flow<ProfileEditEvent>,
     checkDataChanged: () -> Boolean,
     navigateBack: () -> Unit,
@@ -194,7 +198,7 @@ fun ProfileEditScreen(
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
                         onClick = { onClickComplete(selectedImage) },
-                        enabled = nicknameError == null,
+                        enabled = !saving && nicknameError == null,
                     )
                 },
                 title = stringResource(R.string.profile_edit),
@@ -202,110 +206,119 @@ fun ProfileEditScreen(
             )
         },
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-                .verticalScroll(scrollState),
+                .fillMaxSize()
+                .padding(innerPadding),
         ) {
-            ConstraintLayout(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
+                    .verticalScroll(scrollState),
             ) {
-                val (thumbnailImg, cameraIcon) = createRefs()
-                AsyncImage(
+                ConstraintLayout(
                     modifier = Modifier
-                        .constrainAs(thumbnailImg) {
-                            centerTo(parent)
-                        }
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
-                    model = selectedImage ?: thumbnail,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = stringResource(R.string.description_user_thumbnail),
-                )
-                Surface(
-                    modifier = Modifier
-                        .constrainAs(cameraIcon) {
-                            end.linkTo(thumbnailImg.end, margin = (-7.5).dp)
-                            bottom.linkTo(thumbnailImg.bottom)
-                        }
-                        .size(40.dp),
-                    shape = CircleShape,
-                    color = Color.White,
-                    shadowElevation = 6.dp,
-                    onClick = {
-                        photoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    },
+                        .fillMaxWidth()
+                        .height(180.dp),
                 ) {
-                    Image(
-                        modifier = Modifier.padding(8.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_camera),
-                        contentDescription = stringResource(R.string.change_thumbnail_description),
+                    val (thumbnailImg, cameraIcon) = createRefs()
+                    AsyncImage(
+                        modifier = Modifier
+                            .constrainAs(thumbnailImg) {
+                                centerTo(parent)
+                            }
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                        model = selectedImage ?: thumbnail,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = stringResource(R.string.description_user_thumbnail),
+                    )
+                    Surface(
+                        modifier = Modifier
+                            .constrainAs(cameraIcon) {
+                                end.linkTo(thumbnailImg.end, margin = (-7.5).dp)
+                                bottom.linkTo(thumbnailImg.bottom)
+                            }
+                            .size(40.dp),
+                        shape = CircleShape,
+                        color = Color.White,
+                        shadowElevation = 6.dp,
+                        onClick = {
+                            if (!saving) photoPickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                    ) {
+                        Image(
+                            modifier = Modifier.padding(8.dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_camera),
+                            contentDescription = stringResource(R.string.change_thumbnail_description),
+                        )
+                    }
+                }
+                Section(title = stringResource(R.string.label_nickname)) {
+                    BTTextField(
+                        modifier = Modifier
+                            .padding(horizontal = marginHorizontal)
+                            .fillMaxWidth(),
+                        text = nickname,
+                        placeholder = stringResource(R.string.profile_edit_nickname_placeholder),
+                        onValueChanged = onChangeNickname,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                        ),
+                        singleLine = true,
+                        isError = nicknameError != null,
+                        supportingText = nicknameError?.let {
+                            when (it) {
+                                NicknameError.MinLength -> stringResource(R.string.validate_min_length, 1)
+                                NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
+                            }
+                        },
+                        enabled = !saving,
                     )
                 }
-            }
-            Section(title = stringResource(R.string.label_nickname)) {
-                BTTextField(
-                    modifier = Modifier
-                        .padding(horizontal = marginHorizontal)
-                        .fillMaxWidth(),
-                    text = nickname,
-                    placeholder = stringResource(R.string.profile_edit_nickname_placeholder),
-                    onValueChanged = onChangeNickname,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                    ),
-                    singleLine = true,
-                    isError = nicknameError != null,
-                    supportingText = nicknameError?.let {
-                        when (it) {
-                            NicknameError.MinLength -> stringResource(R.string.validate_min_length, 1)
-                            NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
-                        }
-                    },
-                )
-            }
-            Section(
-                modifier = Modifier.padding(top = 12.dp),
-                title = stringResource(R.string.label_introduction)
-            ) {
-                val maxIntroduceLength = 60
+                Section(
+                    modifier = Modifier.padding(top = 12.dp),
+                    title = stringResource(R.string.label_introduction)
+                ) {
+                    val maxIntroduceLength = 60
 
-                BTTextField(
-                    modifier = Modifier
-                        .padding(horizontal = marginHorizontal)
-                        .fillMaxWidth()
-                        .height(122.dp),
-                    text = introduction.takeForUnicode(maxIntroduceLength),
-                    placeholder = stringResource(R.string.profile_edit_introduction_placeholder),
-                    minHeight = 122.dp,
-                    bottomEndText = stringResource(R.string.input_limit, introduction.length, maxIntroduceLength),
-                    onValueChanged = { onChangeIntroduction(it.takeForUnicode(maxIntroduceLength)) },
-                )
-            }
-            Section(
-                modifier = Modifier.padding(top = 12.dp),
-                title = stringResource(R.string.label_links),
-            ) {
-                Column {
-                    LinkAddButton(
-                        modifier = Modifier.padding(top = 4.dp),
-                        onClick = onClickAddLink,
+                    BTTextField(
+                        modifier = Modifier
+                            .padding(horizontal = marginHorizontal)
+                            .fillMaxWidth()
+                            .height(122.dp),
+                        text = introduction.takeForUnicode(maxIntroduceLength),
+                        placeholder = stringResource(R.string.profile_edit_introduction_placeholder),
+                        minHeight = 122.dp,
+                        bottomEndText = stringResource(R.string.input_limit, introduction.length, maxIntroduceLength),
+                        onValueChanged = { onChangeIntroduction(it.takeForUnicode(maxIntroduceLength)) },
+                        enabled = !saving,
                     )
-                    links.forEach { link ->
-                        LinkItem(
-                            modifier = Modifier.padding(top = 12.dp),
-                            title = link.name,
-                            url = link.url,
-                        ) { onClickEditLink(link) }
+                }
+                Section(
+                    modifier = Modifier.padding(top = 12.dp),
+                    title = stringResource(R.string.label_links),
+                ) {
+                    Column {
+                        LinkAddButton(
+                            modifier = Modifier.padding(top = 4.dp),
+                            onClick = onClickAddLink,
+                            enabled = !saving,
+                        )
+                        links.forEach { link ->
+                            LinkItem(
+                                modifier = Modifier.padding(top = 12.dp),
+                                title = link.name,
+                                url = link.url,
+                            ) { if (!saving) onClickEditLink(link) }
+                        }
                     }
                 }
             }
+            if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
         if (showExitAlertDialog) {
             BTDialog(
@@ -331,11 +344,12 @@ fun ProfileEditScreen(
 private fun LinkAddButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 10.dp, horizontal = marginHorizontal),
         verticalAlignment = Alignment.CenterVertically,
     ) {

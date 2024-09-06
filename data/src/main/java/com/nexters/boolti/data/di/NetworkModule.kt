@@ -113,7 +113,6 @@ internal object NetworkModule {
     @Provides
     fun provideHostService(@Named("auth") retrofit: Retrofit): HostService = retrofit.create()
 
-    @Singleton
     @Provides
     fun provideFileService(@Named("auth") retrofit: Retrofit): FileService = retrofit.create()
 

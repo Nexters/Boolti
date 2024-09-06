@@ -86,21 +86,25 @@ class ProfileEditViewModel @Inject constructor(
         event(ProfileEditEvent.OnLinkRemoved)
     }
 
-    fun completeEdits(thumbnailRequestBody: File?) {
+    fun completeEdits(thumbnailFile: File?) {
         viewModelScope.launch(recordExceptionHandler) {
-            /*val uploadUrl = thumbnailRequestBody?.let {
-                fileRepository.requestUrlForUpload(thumbnailRequestBody)
-            }?.getOrNull()*/
+            _uiState.update { it.copy(saving = true) }
+
+            val newThumbnailUrl = thumbnailFile?.let { file ->
+                fileRepository.requestUrlForUpload(file).getOrNull()
+            }
+
             authRepository.editProfile(
                 EditProfileRequest(
                     nickname = uiState.value.nickname,
-                    profileImagePath = "", // uploadUrl ?: "",
+                    profileImagePath = newThumbnailUrl ?: uiState.value.thumbnail,
                     introduction = uiState.value.introduction,
                     link = uiState.value.links.map { it.toDto() },
                 )
             ).onSuccess {
                 event(ProfileEditEvent.OnSuccessEditProfile)
             }
+            _uiState.update { it.copy(saving = false) }
         }
     }
 

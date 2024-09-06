@@ -10,7 +10,6 @@ import retrofit2.http.Url
 
 internal interface FileService {
     @POST("/app/api/v1/user/profile-images/upload-urls")
-
     suspend fun requestUploadUrls(): UploadUrlsDto
 
     @Multipart

@@ -4,6 +4,7 @@ import com.nexters.boolti.domain.model.Link
 
 data class ProfileEditState(
     val loading: Boolean = false,
+    val saving: Boolean = false,
     val thumbnail: String = "",
     val nickname: String = "",
     val introduction: String = "",

@@ -329,7 +329,6 @@ fun ProfileEditScreen(
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
-                showCloseButton = false,
                 positiveButtonLabel = stringResource(R.string.save),
                 negativeButtonLabel = stringResource(R.string.cancel),
                 onClickPositiveButton = { onClickComplete(selectedImage) },

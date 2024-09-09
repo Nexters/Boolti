@@ -41,6 +41,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -114,7 +115,7 @@ fun ProfileScreen(
                             link = link,
                             onClick = {
                                 try {
-                                    uriHandler.openUri(link.url)
+                                    uriHandler.openUri(link.url.toValidUrlString())
                                 } catch (e: ActivityNotFoundException) {
                                     snackbarHostState.showMessage(invalidUrlMsg)
                                 }

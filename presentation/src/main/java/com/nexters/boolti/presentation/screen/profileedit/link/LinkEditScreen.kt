@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.profileedit.link
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -78,6 +80,10 @@ fun LinkEditScreen(
     modifier: Modifier = Modifier,
 ) {
     var showLinkRemoveDialog by remember { mutableStateOf(false) }
+    val linkNameInteractionSource = remember { MutableInteractionSource() }
+    val linkUrlInteractionSource = remember { MutableInteractionSource() }
+    val linkNameFocused by linkNameInteractionSource.collectIsFocusedAsState()
+    val linkUrlFocused by linkUrlInteractionSource.collectIsFocusedAsState()
 
     Scaffold(
         modifier = modifier,
@@ -125,11 +131,12 @@ fun LinkEditScreen(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                         ),
-                        trailingIcon = if (linkName.isNotEmpty()) {
+                        trailingIcon = if (linkNameFocused && linkName.isNotEmpty()) {
                             { BTTextFieldDefaults.ClearButton(onClick = { onChangeLinkName("") }) }
                         } else {
                             null
                         },
+                        interactionSource = linkNameInteractionSource,
                     )
                 }
                 Row(
@@ -151,11 +158,12 @@ fun LinkEditScreen(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
                         ),
-                        trailingIcon = if (linkUrl.isNotEmpty()) {
+                        trailingIcon = if (linkUrlFocused && linkUrl.isNotEmpty()) {
                             { BTTextFieldDefaults.ClearButton(onClick = { onChangeLinkUrl("") }) }
                         } else {
                             null
                         },
+                        interactionSource = linkUrlInteractionSource,
                     )
                 }
             }

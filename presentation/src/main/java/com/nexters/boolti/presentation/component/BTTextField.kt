@@ -97,8 +97,8 @@ fun BTTextField(
         errorBorderColor = Error,
         errorLabelColor = Error,
     ),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
     val shape = RoundedCornerShape(4.dp)
 
     val textColor = textStyle.color.takeOrElse {

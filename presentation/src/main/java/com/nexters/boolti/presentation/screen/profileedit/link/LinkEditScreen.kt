@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
+import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
@@ -124,6 +125,11 @@ fun LinkEditScreen(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                         ),
+                        trailingIcon = if (linkName.isNotEmpty()) {
+                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeLinkName("") }) }
+                        } else {
+                            null
+                        },
                     )
                 }
                 Row(
@@ -145,6 +151,11 @@ fun LinkEditScreen(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
                         ),
+                        trailingIcon = if (linkUrl.isNotEmpty()) {
+                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeLinkUrl("") }) }
+                        } else {
+                            null
+                        },
                     )
                 }
             }

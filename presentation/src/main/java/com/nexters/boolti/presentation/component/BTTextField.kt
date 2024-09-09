@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -9,12 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -29,9 +34,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -41,10 +48,13 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
+import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey80
 import okio.utf8Size
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +65,7 @@ fun BTTextField(
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     supportingText: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     bottomEndText: String? = null,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -136,10 +147,16 @@ fun BTTextField(
                         interactionSource = interactionSource,
                         colors = colors,
                         contentPadding = if (bottomEndText != null) {
-                            PaddingValues(start = 12.dp, end = 12.dp, top = 12.dp, bottom = (12 + 18 + 8).dp)
+                            PaddingValues(
+                                start = 12.dp,
+                                end = 12.dp,
+                                top = 12.dp,
+                                bottom = (12 + 18 + 8).dp
+                            )
                         } else {
                             PaddingValues(horizontal = 12.dp, vertical = 12.dp)
                         },
+                        trailingIcon = trailingIcon,
                         container = {
                             OutlinedTextFieldDefaults.ContainerBox(
                                 shape = shape,
@@ -183,6 +200,29 @@ fun BTTextField(
                 )
             }
         }
+    }
+}
+
+object BTTextFieldDefaults {
+    @Composable
+    fun ClearButton(
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        iconColor: Color = Grey80,
+        bgColor: Color = Grey30,
+    ) {
+        Icon(
+            modifier = modifier
+                .size(20.dp)
+                .drawBehind {
+                    drawCircle(color = bgColor)
+                }
+                .padding(4.dp)
+                .clickable(onClick = onClick),
+            imageVector = Icons.Rounded.Clear,
+            tint = iconColor,
+            contentDescription = stringResource(R.string.description_clear_button),
+        )
     }
 }
 
@@ -255,6 +295,14 @@ fun BTTextFieldPreview() {
                     bottomEndText = "${text.utf8Size()}/${maxLength}자",
                     onValueChanged = {
                         text = it.takeForUnicode(maxLength)
+                    },
+                )
+                BTTextField(
+                    text = text.takeForUnicode(maxLength),
+                    placeholder = "예) 재즈와 펑크락을 좋아해요",
+                    onValueChanged = { text = it.takeForUnicode(maxLength) },
+                    trailingIcon = {
+                        BTTextFieldDefaults.ClearButton(onClick = { /*TODO*/ },)
                     },
                 )
             }

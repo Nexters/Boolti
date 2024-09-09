@@ -272,7 +272,11 @@ fun ProfileEditScreen(
                         isError = nicknameError != null,
                         supportingText = nicknameError?.let {
                             when (it) {
-                                NicknameError.MinLength -> stringResource(R.string.validate_min_length, 1)
+                                NicknameError.MinLength -> stringResource(
+                                    R.string.validate_min_length,
+                                    1
+                                )
+
                                 NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
                             }
                         },
@@ -293,7 +297,11 @@ fun ProfileEditScreen(
                         text = introduction.takeForUnicode(maxIntroduceLength),
                         placeholder = stringResource(R.string.profile_edit_introduction_placeholder),
                         minHeight = 122.dp,
-                        bottomEndText = stringResource(R.string.input_limit, introduction.length, maxIntroduceLength),
+                        bottomEndText = stringResource(
+                            R.string.input_limit,
+                            introduction.length,
+                            maxIntroduceLength
+                        ),
                         onValueChanged = { onChangeIntroduction(it.takeForUnicode(maxIntroduceLength)) },
                         enabled = !saving,
                     )
@@ -408,7 +416,9 @@ private fun LinkItem(
             )
         }
         Icon(
-            modifier = Modifier.padding(start = 20.dp),
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .size(20.dp),
             imageVector = ImageVector.vectorResource(R.drawable.ic_edit_pen),
             tint = Grey50,
             contentDescription = stringResource(R.string.link_edit),

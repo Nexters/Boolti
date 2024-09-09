@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -206,6 +207,7 @@ private fun MyHeader(
                 contentDescription = null,
                 placeholder = painterResource(id = R.drawable.ic_fallback_profile),
                 fallback = painterResource(id = R.drawable.ic_fallback_profile),
+                contentScale = ContentScale.Crop,
             )
         }
         Text(

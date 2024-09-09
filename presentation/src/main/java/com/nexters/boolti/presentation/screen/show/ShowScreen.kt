@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.show
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -38,31 +39,35 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey60
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
 
 @Composable
@@ -125,12 +130,32 @@ fun ShowScreen(
                 contentPadding = PaddingValues(top = 12.dp + appbarHeight),
             ) {
                 items(
-                    count = uiState.shows.size,
+                    count = uiState.shows.size.coerceAtMost(4),
                     key = { index -> uiState.shows[index].id }) { index ->
                     ShowFeed(
                         show = uiState.shows[index],
                         modifier = Modifier
                             .clickable { onClickShowItem(uiState.shows[index].id) },
+                    )
+                }
+
+                // 4개의 공연 뒤 보이는 배너
+                item(
+                    span = { GridItemSpan(2) },
+                ) {
+                    Banner(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                // 나머지 공연 목록
+                items(
+                    count = (uiState.shows.size - 4).coerceAtLeast(0),
+                    key = { index -> uiState.shows[index + 4].id }) { index ->
+                    ShowFeed(
+                        show = uiState.shows[index + 4],
+                        modifier = Modifier
+                            .clickable { onClickShowItem(uiState.shows[index + 4].id) },
                     )
                 }
 
@@ -173,8 +198,7 @@ fun ShowAppBar(
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = marginHorizontal)
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(40.dp))
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -250,27 +274,53 @@ fun SearchBar(
 
 @Composable
 private fun Banner(
-    navigateToReservations: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    val uriHandler = LocalUriHandler.current
+
+    Box(
         modifier = modifier
-            .height(52.dp)
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(MaterialTheme.colorScheme.primary, Color(0xFFEB955B))
-                ),
-                shape = RoundedCornerShape(4.dp),
-            )
-            .clickable(onClick = navigateToReservations)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .clickable {
+                uriHandler.openUri("https://boolti.in/login")
+            },
     ) {
-        Text(
-            text = stringResource(R.string.has_pending_ticket),
-            style = MaterialTheme.typography.bodyLarge,
+        Image(
+            modifier = Modifier
+                .height(80.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(id = R.drawable.background_banner),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
         )
-        Icon(painter = painterResource(id = R.drawable.ic_arrow_right), contentDescription = null)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.padding(start = 24.dp)
+            ) {
+                Text(
+                    text = "지금 공연의 불을 지펴보세요!",
+                    style = MaterialTheme.typography.labelMedium.copy(color = Grey05),
+                )
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = "공연 등록하러 가기",
+                    style = point1.copy(
+                        color = Grey05,
+                        lineHeight = 20.sp,
+                    ),
+                )
+            }
+            Image(
+                modifier = Modifier
+                    .padding(end = 24.dp)
+                    .size(80.dp),
+                painter = painterResource(id = R.drawable.fire),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+        }
     }
 }

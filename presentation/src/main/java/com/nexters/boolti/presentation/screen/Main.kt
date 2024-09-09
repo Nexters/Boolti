@@ -32,6 +32,9 @@ import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
+import com.nexters.boolti.presentation.screen.profile.ProfileScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
@@ -198,13 +201,57 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         addGiftCompleteScreen(
             navigateTo = navController::navigateTo,
             navigateToHome = navController::navigateToHome,
-            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true)}
+            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
         )
         BusinessScreen(popBackStack = navController::popBackStack)
         AccountSettingScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
+        ProfileScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        navigation(
+            route = "profileEditNavigation",
+            startDestination = MainDestination.ProfileEdit.route,
+        ) {
+            ProfileEditScreen(
+                modifier = modifier,
+                navigateTo = navController::navigate,
+                popBackStack = navController::popBackStack,
+            )
+            ProfileLinkEditScreen(
+                modifier = modifier,
+                onAddLink = { linkName, url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("newLinkName", linkName)
+                            set("newLinkUrl", url)
+                        }
+                    navController.popBackStack()
+                },
+                onEditLink = { id, linkName, url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("editLinkId", id)
+                            set("editLinkName", linkName)
+                            set("editLinkUrl", url)
+                        }
+                    navController.popBackStack()
+                },
+                onRemoveLink = { id ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("removeLinkId", id)
+                    navController.popBackStack()
+                },
+                popBackStack = navController::popBackStack,
+            )
+        }
     }
 }
 

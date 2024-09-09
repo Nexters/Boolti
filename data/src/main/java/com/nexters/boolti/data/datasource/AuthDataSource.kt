@@ -34,11 +34,13 @@ internal class AuthDataSource @Inject constructor(
                     null
                 } else {
                     UserResponse(
-                        id = it.userId ?: "",
+                        id = it.userId,
                         nickname = it.nickname ?: "",
                         email = it.email ?: "",
                         imgPath = it.photo,
                         userCode = it.userCode,
+                        introduction = it.profileIntroduction,
+                        link = it.profileLink,
                     )
                 }
             }
@@ -68,6 +70,8 @@ internal class AuthDataSource @Inject constructor(
                 phoneNumber = null,
                 photo = null,
                 userCode = null,
+                profileIntroduction = "",
+                profileLink = emptyList(),
                 accessToken = "",
                 refreshToken = "",
             )
@@ -89,6 +93,8 @@ internal class AuthDataSource @Inject constructor(
                 email = user.email,
                 photo = user.imgPath,
                 userCode = user.userCode,
+                profileIntroduction = user.introduction,
+                profileLink = user.link,
             )
         }
         Firebase.analytics.apply {

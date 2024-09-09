@@ -9,6 +9,7 @@ import com.nexters.boolti.data.network.response.LoginResponse
 import com.nexters.boolti.domain.model.LoginUserState
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import com.nexters.boolti.domain.request.SignoutRequest
@@ -64,4 +65,9 @@ internal class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()
+
+    override suspend fun editProfile(editProfileRequest: EditProfileRequest) =
+        runCatching { userDateSource.edit(editProfileRequest) }
+            .onSuccess { authDataSource.updateUser(it) }
+            .mapCatching {}
 }

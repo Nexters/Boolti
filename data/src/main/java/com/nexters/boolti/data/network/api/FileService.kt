@@ -1,21 +1,16 @@
 package com.nexters.boolti.data.network.api
 
-import com.nexters.boolti.data.network.response.UploadUrlsDto
-import okhttp3.MultipartBody
-import retrofit2.http.Multipart
-import retrofit2.http.POST
+import okhttp3.RequestBody
+import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.PUT
-import retrofit2.http.Part
 import retrofit2.http.Url
 
 internal interface FileService {
-    @POST("/app/api/v1/user/profile-images/upload-urls")
-    suspend fun requestUploadUrls(): UploadUrlsDto
-
-    @Multipart
     @PUT
     suspend fun requestUploadImage(
+        @Header("Content-Type") contentType: String,
         @Url url: String,
-        @Part file: MultipartBody.Part,
-    ): String
+        @Body file: RequestBody,
+    )
 }

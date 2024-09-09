@@ -6,6 +6,7 @@ import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
+import com.nexters.boolti.data.network.api.AuthFileService
 import com.nexters.boolti.data.network.api.DeviceTokenService
 import com.nexters.boolti.data.network.api.FileService
 import com.nexters.boolti.data.network.api.GiftService
@@ -38,6 +39,23 @@ internal object NetworkModule {
     @Provides
     @Named("auth")
     fun provideAuthRetrofit(@Named("auth") okHttpClient: OkHttpClient): Retrofit {
+        val json = Json {
+            isLenient = true
+            prettyPrint = true
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("non-auth")
+    fun provideNonAuthRetrofit(@Named("non-auth") okHttpClient: OkHttpClient): Retrofit {
         val json = Json {
             isLenient = true
             prettyPrint = true
@@ -113,8 +131,13 @@ internal object NetworkModule {
     @Provides
     fun provideHostService(@Named("auth") retrofit: Retrofit): HostService = retrofit.create()
 
+    @Singleton
     @Provides
-    fun provideFileService(@Named("auth") retrofit: Retrofit): FileService = retrofit.create()
+    fun provideAuthFileService(@Named("auth") retrofit: Retrofit): AuthFileService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideFileService(@Named("non-auth") retrofit: Retrofit): FileService = retrofit.create()
 
     @Singleton
     @Provides
@@ -150,6 +173,24 @@ internal object NetworkModule {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(interceptor)
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @Named("non-auth")
+    fun provideNoneAuthOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+        return OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
             .build()
     }

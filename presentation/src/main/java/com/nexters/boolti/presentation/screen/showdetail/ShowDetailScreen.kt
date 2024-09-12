@@ -51,18 +51,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.firebase.Firebase
-import com.google.firebase.dynamiclinks.androidParameters
-import com.google.firebase.dynamiclinks.dynamicLinks
-import com.google.firebase.dynamiclinks.iosParameters
-import com.google.firebase.dynamiclinks.shortLinkAsync
 import com.nexters.boolti.domain.model.ShowDetail
-import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.extension.requireActivity
@@ -250,34 +242,17 @@ private fun ShowDetailAppBar(
                 iconRes = R.drawable.ic_share,
                 description = stringResource(id = R.string.ticketing_share),
                 onClick = {
-                    Firebase.dynamicLinks.shortLinkAsync {
-                        val uri = Uri.parse("https://preview.boolti.in/show/$showId")
-                        link = uri
-                        domainUriPrefix = "https://boolti.page.link"
-
-                        androidParameters {
-                            fallbackUrl = uri
-                        }
-                        iosParameters("com.nexters.boolti") {
-                            setFallbackUrl(uri)
-                        }
-                    }.addOnSuccessListener {
-                        it.shortLink?.let { link ->
-                            println(link)
-
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    link.toString()
-                                )
-                                type = "text/plain"
-                            }
-
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            context.startActivity(shareIntent)
-                        }
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(
+                            Intent.EXTRA_TEXT,
+                            "https://preview.boolti.in/show/$showId"
+                        )
+                        type = "text/plain"
                     }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+
+                    context.startActivity(shareIntent)
                 },
             )
             BtAppBarDefaults.AppBarIconButton(

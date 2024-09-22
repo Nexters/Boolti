@@ -140,7 +140,7 @@ fun ShowScreen(
                 }
 
                 // 4개의 공연 뒤 보이는 배너
-                item(
+                if (uiState.shows.isNotEmpty()) item(
                     span = { GridItemSpan(2) },
                 ) {
                     Banner(

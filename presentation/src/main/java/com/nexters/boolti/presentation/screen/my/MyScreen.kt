@@ -195,7 +195,7 @@ private fun MyHeader(
             UserThumbnail(
                 modifier = Modifier.padding(end = 12.dp),
                 size = 36.dp,
-                thumbnailUrl = user.photo,
+                model = user.photo,
             )
         }
         Text(

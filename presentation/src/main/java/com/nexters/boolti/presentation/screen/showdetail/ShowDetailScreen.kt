@@ -654,7 +654,7 @@ private fun Cast(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         UserThumbnail(
-            thumbnailUrl = member.photo,
+            model = member.photo,
             size = 46.dp,
             contentDescription = member.nickname,
         )

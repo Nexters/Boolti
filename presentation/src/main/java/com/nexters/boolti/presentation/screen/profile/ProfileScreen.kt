@@ -147,7 +147,7 @@ private fun ProfileHeader(
         UserThumbnail(
             modifier = Modifier.padding(top = 40.dp),
             size = 70.dp,
-            thumbnailUrl = user.photo,
+            model = user.photo,
         )
         Text(
             modifier = Modifier.padding(top = 20.dp),

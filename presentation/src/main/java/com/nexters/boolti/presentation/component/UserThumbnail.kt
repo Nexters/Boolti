@@ -18,7 +18,7 @@ import com.nexters.boolti.presentation.R
 @Composable
 fun UserThumbnail(
     size: Dp,
-    thumbnailUrl: String?,
+    model: Any?,
     modifier: Modifier = Modifier,
     defaultImage: Int = R.drawable.ic_fallback_profile,
     outlineColor: Color = MaterialTheme.colorScheme.outline,
@@ -33,7 +33,7 @@ fun UserThumbnail(
                 color = outlineColor,
                 shape = CircleShape,
             ),
-        model = thumbnailUrl,
+        model = model,
         contentDescription = contentDescription,
         placeholder = painterResource(id = defaultImage),
         fallback = painterResource(id = defaultImage),

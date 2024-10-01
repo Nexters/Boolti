@@ -512,7 +512,8 @@ fun LazyListScope.CastTab(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 117.dp),
+                    .height(290.dp),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(

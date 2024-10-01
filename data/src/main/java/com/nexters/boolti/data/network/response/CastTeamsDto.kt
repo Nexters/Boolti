@@ -1,6 +1,5 @@
 package com.nexters.boolti.data.network.response
 
-import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import kotlinx.serialization.Serializable
@@ -12,15 +11,11 @@ data class CastTeamsDto(
     val id: String = "",
     val name: String = "",
     val members: List<CastDto> = emptyList(),
-    val createdAt: String = LocalDateTime.MIN.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-    val modifiedAt: String? = null,
 ) {
     fun toDomain(): CastTeams = CastTeams(
         id = id,
         teamName = name,
         members = members.map(CastDto::toDomain),
-        createdAt = createdAt.toLocalDateTime(),
-        modifiedAt = modifiedAt?.toLocalDateTime(),
     )
 
     @Serializable
@@ -39,8 +34,6 @@ data class CastTeamsDto(
             photo = userImgPath,
             nickname = userNickname,
             roleName = roleName,
-            createdAt = createdAt.toLocalDateTime(),
-            modifiedAt = modifiedAt?.toLocalDateTime(),
         )
     }
 }

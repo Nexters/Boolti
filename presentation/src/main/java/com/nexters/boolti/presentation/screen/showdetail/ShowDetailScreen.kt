@@ -16,11 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -144,40 +145,48 @@ fun ShowDetailScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            val scrollState = rememberScrollState()
-            Column(
-                modifier = Modifier.verticalScroll(scrollState),
+
+            val host = stringResource(
+                id = R.string.ticketing_host_format,
+                uiState.showDetail.hostName,
+                uiState.showDetail.hostPhoneNumber,
+            )
+            LazyColumn(
+                modifier = Modifier,
             ) {
-                Poster(
-                    modifier = modifier.fillMaxWidth(),
-                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-                    title = uiState.showDetail.name,
-                    images = uiState.showDetail.images.map { it.originImage }
-                )
+                item {
+                    Poster(
+                        modifier = modifier.fillMaxWidth(),
+                        navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                        title = uiState.showDetail.name,
+                        images = uiState.showDetail.images.map { it.originImage }
+                    )
+                }
 
-                TicketReservationPeriod(
-                    modifier = Modifier.padding(vertical = 40.dp, horizontal = 20.dp),
-                    startDate = uiState.showDetail.salesStartDate,
-                    endDate = uiState.showDetail.salesEndDate,
-                )
+                item {
+                    TicketReservationPeriod(
+                        modifier = Modifier.padding(vertical = 40.dp, horizontal = 20.dp),
+                        startDate = uiState.showDetail.salesStartDate,
+                        endDate = uiState.showDetail.salesEndDate,
+                    )
+                }
+                item {
+                    ContentTabRow(
+                        selectedTabIndex = uiState.selectedTab,
+                        onSelectTab = viewModel::selectTab,
+                    )
+                }
 
-                ContentTabRow(
-                    selectedTabIndex = uiState.selectedTab,
-                    onSelectTab = viewModel::selectTab,
-                )
+                when (uiState.selectedTab) {
+                    0 -> ShowInfoTab(
+                        showDetail = uiState.showDetail,
+                        host = host,
+                        onClickContent = onClickContent,
+                    )
+                    1 -> Unit // TODO 출연진 탭 구현
+                }
 
-                ContentScaffold(
-                    modifier = Modifier
-                        .padding(horizontal = marginHorizontal)
-                        .padding(bottom = 114.dp),
-                    showDetail = uiState.showDetail,
-                    host = stringResource(
-                        id = R.string.ticketing_host_format,
-                        uiState.showDetail.hostName,
-                        uiState.showDetail.hostPhoneNumber,
-                    ),
-                    onClickContent = onClickContent,
-                )
+                item { Spacer(modifier = Modifier.size(114.dp)) }
             }
 
             val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
@@ -326,7 +335,7 @@ private fun ContentTabRow(
         TabRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = marginHorizontal),
             selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
             indicator = { tabPositions ->
@@ -375,20 +384,15 @@ private fun ContentTab(
     )
 }
 
-@Composable
-private fun ContentScaffold(
+@Suppress("FunctionName")
+private fun LazyListScope.ShowInfoTab(
     showDetail: ShowDetail,
     host: String,
     onClickContent: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val snackbarController = LocalSnackbarController.current
+    val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
 
-    Column(
-        modifier = modifier,
-    ) {
-
-
+    item {
         // 일시
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
         val indexOfDay = showDetail.date.dayOfWeek.value - 1
@@ -397,19 +401,26 @@ private fun ContentScaffold(
         val formatter =
             DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
         Section(
+            modifier = paddingModifier,
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = { SectionContent(text = showDetail.date.format(formatter)) },
         )
-        Divider()
+    }
 
-        // 장소
+    item { Divider() }
+
+    // 장소
+    item {
+        val snackbarController = LocalSnackbarController.current
+
         Section(
+            modifier = paddingModifier,
             title = {
                 Row(
                     modifier = Modifier.height(30.dp)
                 ) {
                     SectionTitle(stringResource(id = R.string.ticketing_place))
-                    Spacer(modifier = modifier.weight(1.0f))
+                    Spacer(modifier = Modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current
                     val copiedMessage =
                         stringResource(id = R.string.ticketing_address_copied_message)
@@ -435,10 +446,13 @@ private fun ContentScaffold(
                 }
             },
         )
-        Divider()
+    }
+    item { Divider() }
 
-        // 공연 내용
+    // 공연 내용
+    item {
         Section(
+            modifier = paddingModifier,
             title = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -459,10 +473,13 @@ private fun ContentScaffold(
                 )
             },
         )
-        Divider()
+    }
+    item { Divider() }
 
-        // 주최자
+    // 주최자
+    item {
         Section(
+            modifier = paddingModifier,
             title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
             content = {
                 ShowInquiry(

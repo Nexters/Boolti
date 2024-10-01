@@ -2,7 +2,6 @@ package com.nexters.boolti.presentation.screen.profile
 
 import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -24,9 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,13 +30,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey30
@@ -148,21 +144,10 @@ private fun ProfileHeader(
             .padding(horizontal = marginHorizontal)
             .padding(bottom = 32.dp),
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .size(70.dp)
-                .clip(shape = CircleShape)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = CircleShape,
-                ),
-            model = user.photo,
-            contentDescription = null,
-            placeholder = painterResource(id = R.drawable.ic_fallback_profile),
-            fallback = painterResource(id = R.drawable.ic_fallback_profile),
-            contentScale = ContentScale.Crop,
+        UserThumbnail(
+            modifier = Modifier.padding(top = 40.dp),
+            size = 70.dp,
+            thumbnailUrl = user.photo,
         )
         Text(
             modifier = Modifier.padding(top = 20.dp),

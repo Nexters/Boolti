@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,7 +66,6 @@ class ShowDetailViewModel @Inject constructor(
             showRepository.requestCastTeams(showId = showId)
                 .onSuccess { newCastTeams ->
                     _uiState.update { it.copy(castTeams = newCastTeams) }
-                    Log.d("[MANGBAAM]ShowDetailViewModel", "fetchCastTeams: $newCastTeams")
                 }
                 .onFailure {
                     Firebase.crashlytics.recordException(it)

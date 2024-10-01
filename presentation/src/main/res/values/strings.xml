@@ -217,6 +217,8 @@
     <string name="show_text_to_ask">문자 문의하기</string>
     <string name="show_tab_info">공연 정보</string>
     <string name="show_tab_cast">출연진</string>
+    <string name="empty_cast_title">COMING SOON</string>
+    <string name="empty_cast_desc">조금만 기다려주세요!</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>

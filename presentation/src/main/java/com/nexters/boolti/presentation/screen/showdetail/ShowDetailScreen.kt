@@ -20,6 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
@@ -52,15 +56,19 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.Cast
+import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
@@ -72,6 +80,7 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
@@ -183,7 +192,8 @@ fun ShowDetailScreen(
                         host = host,
                         onClickContent = onClickContent,
                     )
-                    1 -> Unit // TODO 출연진 탭 구현
+
+                    1 -> CastTab(teams = uiState.castTeams)
                 }
 
                 item { Spacer(modifier = Modifier.size(114.dp)) }
@@ -407,7 +417,7 @@ private fun LazyListScope.ShowInfoTab(
         )
     }
 
-    item { Divider() }
+    item { Divider(paddingModifier) }
 
     // 장소
     item {
@@ -447,7 +457,7 @@ private fun LazyListScope.ShowInfoTab(
             },
         )
     }
-    item { Divider() }
+    item { Divider(paddingModifier) }
 
     // 공연 내용
     item {
@@ -474,7 +484,7 @@ private fun LazyListScope.ShowInfoTab(
             },
         )
     }
-    item { Divider() }
+    item { Divider(paddingModifier) }
 
     // 주최자
     item {
@@ -488,6 +498,66 @@ private fun LazyListScope.ShowInfoTab(
                 )
             },
         )
+    }
+}
+
+@Suppress("FunctionName")
+fun LazyListScope.CastTab(
+    teams: List<CastTeams>,
+) {
+    val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
+
+    if (teams.isEmpty()) {
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 117.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.empty_cast_title),
+                    style = point2,
+                    color = Grey20,
+                )
+                Text(
+                    modifier = Modifier.padding(top = 2.dp),
+                    text = stringResource(R.string.empty_cast_desc),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Grey30,
+                )
+            }
+        }
+    } else {
+        itemsIndexed(teams) { index, team ->
+            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
+            Section(
+                modifier = paddingModifier,
+                title = { SectionTitle(title = team.teamName) },
+                space = 20.dp,
+                content = {
+                    val spacedBySize = 20.dp
+                    val memberHeight = 46.dp
+                    val spanCount = 2
+                    val rows = team.members.size / spanCount
+
+                    /**
+                     * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요
+                     */
+                    val gridHeight = memberHeight * rows + spacedBySize * (rows - 1)
+                    LazyVerticalGrid(
+                        modifier = Modifier.height(gridHeight),
+                        columns = GridCells.Fixed(spanCount),
+                        verticalArrangement = Arrangement.spacedBy(spacedBySize),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        items(team.members) { member ->
+                            Cast(memberHeight, member)
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -523,11 +593,14 @@ private fun Poster(
 
 @Composable
 private fun Section(
-    title: @Composable () -> Unit, content: @Composable () -> Unit, modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    space: Dp = 16.dp,
 ) {
     Column(modifier.padding(top = 40.dp, bottom = 32.dp)) {
         title()
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(space))
         content()
     }
 }
@@ -571,6 +644,40 @@ private fun SectionContent(
 }
 
 @Composable
-private fun Divider() {
-    HorizontalDivider(color = Grey85)
+private fun Cast(
+    memberHeight: Dp,
+    member: Cast,
+    onClick: () -> Unit = {},
+) {
+    Row(
+        modifier = Modifier.height(memberHeight).clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        UserThumbnail(
+            thumbnailUrl = member.photo,
+            size = 46.dp,
+            contentDescription = member.nickname,
+        )
+        Column(
+            modifier = Modifier.padding(start = 8.dp),
+        ) {
+            Text(
+                text = member.nickname,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                text = member.roleName,
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey50,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun Divider(modifier: Modifier = Modifier) {
+    HorizontalDivider(modifier = modifier, color = Grey85)
 }

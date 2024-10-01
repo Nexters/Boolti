@@ -2,6 +2,7 @@ package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.ShowDataSource
 import com.nexters.boolti.data.network.response.toDomains
+import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.domain.repository.ShowRepository
@@ -19,6 +20,12 @@ internal class ShowRepositoryImpl @Inject constructor(
     override suspend fun searchById(id: String): Result<ShowDetail> {
         return showDateSource.findShowById(id = id).map {
             it.toDomain()
+        }
+    }
+
+    override suspend fun requestCastTeams(id: String): Result<List<CastTeams>> {
+        return showDateSource.requestCastTeams(id).map {
+            it.map { it.toDomain() }
         }
     }
 }

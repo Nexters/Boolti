@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,6 +44,7 @@ class ShowDetailViewModel @Inject constructor(
 
     init {
         fetchShowDetail()
+        fetchCastTeams()
     }
 
     fun sendEvent(event: ShowDetailEvent) = viewModelScope.launch { _events.send(event) }
@@ -58,6 +60,24 @@ class ShowDetailViewModel @Inject constructor(
                     Timber.e(it)
                 }
         }
+    }
+
+    private fun fetchCastTeams() {
+        viewModelScope.launch {
+            showRepository.requestCastTeams(showId = showId)
+                .onSuccess { newCastTeams ->
+                    _uiState.update { it.copy(castTeams = newCastTeams) }
+                    Log.d("[MANGBAAM]ShowDetailViewModel", "fetchCastTeams: $newCastTeams")
+                }
+                .onFailure {
+                    Firebase.crashlytics.recordException(it)
+                    Timber.e(it)
+                }
+        }
+    }
+
+    fun selectTab(index: Int) {
+        _uiState.update { it.copy(selectedTab = index.coerceIn(0 .. 1)) }
     }
 
     fun preventEvents() {

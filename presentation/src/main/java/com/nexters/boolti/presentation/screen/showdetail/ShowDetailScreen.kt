@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -22,9 +21,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -318,7 +317,7 @@ private fun ContentScaffold(
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = { SectionContent(text = showDetail.date.format(formatter)) },
         )
-        Divider(color = Grey85)
+        Divider()
 
         // 장소
         Section(
@@ -353,7 +352,7 @@ private fun ContentScaffold(
                 }
             },
         )
-        Divider(color = Grey85)
+        Divider()
 
         // 공연 내용
         Section(
@@ -377,7 +376,7 @@ private fun ContentScaffold(
                 )
             },
         )
-        Divider(color = Grey85)
+        Divider()
 
         // 주최자
         Section(
@@ -469,4 +468,9 @@ private fun SectionContent(
 
         uriHandler.openUri(url)
     }
+}
+
+@Composable
+private fun Divider() {
+    HorizontalDivider(color = Grey85)
 }

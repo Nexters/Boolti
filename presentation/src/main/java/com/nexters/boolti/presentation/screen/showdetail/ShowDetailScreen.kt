@@ -26,6 +26,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,6 +67,7 @@ import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -149,6 +154,18 @@ fun ShowDetailScreen(
                     title = uiState.showDetail.name,
                     images = uiState.showDetail.images.map { it.originImage }
                 )
+
+                TicketReservationPeriod(
+                    modifier = Modifier.padding(vertical = 40.dp, horizontal = 20.dp),
+                    startDate = uiState.showDetail.salesStartDate,
+                    endDate = uiState.showDetail.salesEndDate,
+                )
+
+                ContentTabRow(
+                    selectedTabIndex = uiState.selectedTab,
+                    onSelectTab = viewModel::selectTab,
+                )
+
                 ContentScaffold(
                     modifier = Modifier
                         .padding(horizontal = marginHorizontal)
@@ -289,6 +306,76 @@ private fun ShowDetailAppBar(
 }
 
 @Composable
+private fun ContentTabRow(
+    modifier: Modifier = Modifier,
+    selectedTabIndex: Int = 0,
+    onSelectTab: (index: Int) -> Unit = {},
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
+        HorizontalDivider(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth(),
+            thickness = 1.dp,
+            color = Grey85,
+        )
+        TabRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            selectedTabIndex = selectedTabIndex,
+            containerColor = Color.Transparent,
+            indicator = { tabPositions ->
+                if (selectedTabIndex < tabPositions.size) {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            },
+            divider = {},
+        ) {
+            ContentTab(
+                selected = selectedTabIndex == 0,
+                label = stringResource(R.string.show_tab_info),
+                onSelect = { onSelectTab(0) },
+            )
+            ContentTab(
+                selected = selectedTabIndex == 1,
+                label = stringResource(R.string.show_tab_cast),
+                onSelect = { onSelectTab(1) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ContentTab(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    label: String,
+    onSelect: () -> Unit,
+) {
+    Tab(
+        modifier = modifier,
+        selected = selected,
+        selectedContentColor = MaterialTheme.colorScheme.onSurface,
+        unselectedContentColor = Grey70,
+        text = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        },
+        onClick = onSelect,
+    )
+}
+
+@Composable
 private fun ContentScaffold(
     showDetail: ShowDetail,
     host: String,
@@ -300,11 +387,7 @@ private fun ContentScaffold(
     Column(
         modifier = modifier,
     ) {
-        TicketReservationPeriod(
-            modifier = Modifier.padding(top = 40.dp),
-            startDate = showDetail.salesStartDate,
-            endDate = showDetail.salesEndDate,
-        )
+
 
         // 일시
         val daysOfWeek = stringArrayResource(id = R.array.days_of_week)

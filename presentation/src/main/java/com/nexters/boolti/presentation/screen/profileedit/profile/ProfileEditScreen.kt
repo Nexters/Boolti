@@ -40,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -51,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -59,6 +57,7 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
+import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
@@ -222,16 +221,10 @@ fun ProfileEditScreen(
                         .height(180.dp),
                 ) {
                     val (thumbnailImg, cameraIcon) = createRefs()
-                    AsyncImage(
-                        modifier = Modifier
-                            .constrainAs(thumbnailImg) {
-                                centerTo(parent)
-                            }
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                    UserThumbnail(
+                        modifier = Modifier.constrainAs(thumbnailImg) { centerTo(parent) },
+                        size = 100.dp,
                         model = selectedImage ?: thumbnail,
-                        contentScale = ContentScale.Crop,
                         contentDescription = stringResource(R.string.description_user_thumbnail),
                     )
                     Surface(

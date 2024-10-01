@@ -43,6 +43,7 @@ class ShowDetailViewModel @Inject constructor(
 
     init {
         fetchShowDetail()
+        fetchCastTeams()
     }
 
     fun sendEvent(event: ShowDetailEvent) = viewModelScope.launch { _events.send(event) }
@@ -58,6 +59,23 @@ class ShowDetailViewModel @Inject constructor(
                     Timber.e(it)
                 }
         }
+    }
+
+    private fun fetchCastTeams() {
+        viewModelScope.launch {
+            showRepository.requestCastTeams(showId = showId)
+                .onSuccess { newCastTeams ->
+                    _uiState.update { it.copy(castTeams = newCastTeams) }
+                }
+                .onFailure {
+                    Firebase.crashlytics.recordException(it)
+                    Timber.e(it)
+                }
+        }
+    }
+
+    fun selectTab(index: Int) {
+        _uiState.update { it.copy(selectedTab = index.coerceIn(0 .. 1)) }
     }
 
     fun preventEvents() {

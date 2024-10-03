@@ -125,14 +125,7 @@ sealed class MainDestination(val route: String) {
             "profileLinkEdit?id=${link.id}&title=${link.name}&url=${link.url}"
     }
 
-    data object WebView : MainDestination(route = "webView?url={url}") { // TODO : 쿠키 정보 추가
-        val arguments = listOf(
-            navArgument("url") {
-                type = NavType.StringType
-            },
-        )
-        fun createRoute(url: String): String = "webView?url=${url}"
-    }
+    data object ShowRegistration : MainDestination(route = "webView")
 }
 
 /**

@@ -103,15 +103,14 @@ fun CardSelection(
             )
         }
 
-        // TODO: 현재 선택 가능한 카드가 1개, 이후 카드 개수가 추가되면 주석 풀기!
-//        CardCarousel(
-//            modifier = Modifier
-//                .padding(top = 44.dp)
-//                .fillMaxWidth(),
-//            images = images,
-//            selectedImage = selectedImage,
-//            onImageSelected = onImageSelected,
-//        )
+        CardCarousel(
+            modifier = Modifier
+                .padding(top = 32.dp)
+                .fillMaxWidth(),
+            images = images,
+            selectedImage = selectedImage,
+            onImageSelected = onImageSelected,
+        )
     }
 }
 

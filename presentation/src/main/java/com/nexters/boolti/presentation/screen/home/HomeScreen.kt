@@ -170,6 +170,7 @@ fun HomeScreen(
                     onClickAccountSetting = onClickAccountSetting,
                     navigateToReservations = navigateToReservations,
                     navigateToProfile = navigateToProfile,
+                    navigateToShowRegistration = navigateToShowRegistration,
                     onClickQrScan = onClickQrScan,
                 )
             }

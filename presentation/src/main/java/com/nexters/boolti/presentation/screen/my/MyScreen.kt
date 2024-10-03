@@ -60,6 +60,7 @@ fun MyScreen(
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
+    navigateToShowRegistration: () -> Unit,
     onClickQrScan: () -> Unit,
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
@@ -75,10 +76,7 @@ fun MyScreen(
         onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
-        onClickRegisterShow = {
-            val url = if (user != null) "https://boolti.in/home" else "https://boolti.in/login"
-            uriHandler.openUri(url)
-        },
+        onClickRegisterShow = navigateToShowRegistration,
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }

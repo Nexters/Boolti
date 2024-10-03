@@ -102,4 +102,9 @@ internal class AuthDataSource @Inject constructor(
             setUserProperty("nickname", user.nickname)
         }
     }
+
+    /**
+     * @return [accessToken, refreshToken]
+     */
+    fun getTokens(): Flow<Pair<String, String>> = data.map { it.accessToken to it.refreshToken }
 }

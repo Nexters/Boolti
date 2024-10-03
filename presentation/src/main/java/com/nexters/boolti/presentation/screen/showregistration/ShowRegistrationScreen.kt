@@ -24,12 +24,14 @@ fun ShowRegistrationScreen(
 
     LaunchedEffect(Unit) {
         viewModel.tokens.collect { tokens ->
-            if(tokens == null) return@collect
+            if(tokens == null || !tokens.isLoggedIn) return@collect
 
-            CookieManager.getInstance().setAcceptCookie(true)
-            CookieManager.getInstance().setCookie(url, "x-access-token=${tokens.accessToken}")
-            CookieManager.getInstance().setCookie(url, "x-refresh-token=${tokens.refreshToken}")
-            CookieManager.getInstance().flush()
+            with(CookieManager.getInstance()) {
+                setAcceptCookie(true)
+                setCookie(url, "x-access-token=${tokens.accessToken}")
+                setCookie(url, "x-refresh-token=${tokens.refreshToken}")
+                flush()
+            }
         }
     }
 

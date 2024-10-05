@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class MemberResponse(
-    val nickname: String,
-    val userCode: String,
-    val imgPath: String,
-    val introduction: String,
-    val link: List<EditProfileRequest.LinkDto>,
+    val nickname: String = "",
+    val userCode: String = "",
+    val imgPath: String = "",
+    val introduction: String = "",
+    val link: List<EditProfileRequest.LinkDto> = emptyList(),
 ) {
     fun toDomain(): User.Others = User.Others(
         nickname = nickname,

@@ -17,7 +17,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.SmallButton
@@ -42,6 +47,8 @@ import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(
@@ -51,11 +58,13 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event = viewModel.event
 
     ProfileScreen(
         modifier = modifier,
         user = uiState.user,
         isMine = uiState.isMine,
+        event = event,
         onClickBack = onClickBack,
         navigateToProfileEdit = navigateToProfileEdit,
     )
@@ -66,6 +75,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     user: User,
     isMine: Boolean,
+    event: Flow<ProfileEvent>,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
 ) {
@@ -74,6 +84,19 @@ fun ProfileScreen(
     val invalidUrlMsg = stringResource(R.string.invalid_link)
 
     val scrollState = rememberScrollState()
+
+    var backDialogMessage by rememberSaveable { mutableStateOf<String?>(null) }
+    val invalidUserMessage = stringResource(R.string.profile_invalid_user_message)
+    val withdrawUserMessage = stringResource(R.string.profile_withdraw_user_message)
+
+    LaunchedEffect(event) {
+        event.collectLatest {
+            when (it) {
+                ProfileEvent.Invalid -> backDialogMessage = invalidUserMessage
+                ProfileEvent.WithdrawUser -> backDialogMessage = withdrawUserMessage
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -119,6 +142,28 @@ fun ProfileScreen(
                         )
                     }
                 }
+            }
+        }
+
+        backDialogMessage?.let { msg ->
+            BTDialog(
+                enableDismiss = false,
+                showCloseButton = false,
+                positiveButtonLabel = stringResource(R.string.btn_exit),
+                onClickPositiveButton = {
+                    onClickBack()
+                    backDialogMessage = null
+                },
+                onDismiss = {
+                    onClickBack()
+                    backDialogMessage = null
+                },
+            ) {
+                Text(
+                    text = msg,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }

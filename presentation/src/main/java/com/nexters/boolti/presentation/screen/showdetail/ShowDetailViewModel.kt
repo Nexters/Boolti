@@ -75,9 +75,19 @@ class ShowDetailViewModel @Inject constructor(
                                     members = listOf(
                                         Cast(
                                             userCode = "3ZZ0GKQZ",
-                                            nickname = "박명범",
-                                            roleName = "안드로이드, 기타, 통기타"
-                                        )
+                                            nickname = "정상박명범",
+                                            roleName = "안드로이드, 기타, 통기타",
+                                        ),
+                                        Cast(
+                                            userCode = "3ZZ0GKQZ_",
+                                            nickname = "비정상박명범",
+                                            roleName = "안드로이드, 기타, 통기타",
+                                        ),
+                                        Cast(
+                                            userCode = "FLHRNVYB",
+                                            nickname = "김민슈",
+                                            roleName = "FE, 기타",
+                                        ),
                                     ),
                                 )
                             )

@@ -9,11 +9,13 @@ import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.userCode
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,16 +38,28 @@ class ProfileViewModel @Inject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    private val _event = Channel<ProfileEvent>()
+    val event = _event.receiveAsFlow()
+
     init {
         _userCode?.let { userCode ->
             viewModelScope.launch {
                 memberRepository.getMember(userCode).onSuccess { user ->
                     _uiState.update { it.copy(user = user) }
+                }.onFailure {
+                    it.printStackTrace()
+                    event(ProfileEvent.Invalid)
                 }
             }
         } ?: authRepository.cachedUser
             .filterNotNull()
             .onEach { user -> _uiState.update { it.copy(user = user) } }
             .launchIn(viewModelScope)
+    }
+
+    private fun event(event: ProfileEvent) {
+        viewModelScope.launch {
+            _event.send(event)
+        }
     }
 }

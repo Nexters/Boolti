@@ -1,10 +1,8 @@
 package com.nexters.boolti.data.network.response
 
-import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.request.EditProfileRequest
 import kotlinx.serialization.Serializable
-import java.util.UUID
 
 @Serializable
 internal data class UserResponse(
@@ -16,15 +14,15 @@ internal data class UserResponse(
     val introduction: String = "",
     val link: List<EditProfileRequest.LinkDto> = emptyList(),
 ) {
-    fun toDomain(): User {
-        return User(
+    fun toDomain(): User.My {
+        return User.My(
             id = id,
             nickname = nickname ?: "",
             email = email ?: "",
             photo = imgPath,
             userCode = userCode ?: "",
             introduction = introduction,
-            link = link.map { Link(id = UUID.randomUUID().toString(), it.title, it.link) },
+            link = link.map { it.toDomain() },
         )
     }
 }

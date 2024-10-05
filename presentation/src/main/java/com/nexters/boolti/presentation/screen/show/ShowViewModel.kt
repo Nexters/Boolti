@@ -1,10 +1,8 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
-import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,13 +13,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,7 +24,7 @@ class ShowViewModel @Inject constructor(
     private val showRepository: ShowRepository,
     authRepository: AuthRepository,
 ) : BaseViewModel() {
-    val user: StateFlow<User?> = authRepository.cachedUser.stateIn(
+    val user: StateFlow<User.My?> = authRepository.cachedUser.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null,

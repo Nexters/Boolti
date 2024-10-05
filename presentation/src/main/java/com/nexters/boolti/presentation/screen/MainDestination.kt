@@ -88,9 +88,9 @@ sealed class MainDestination(val route: String) {
     data object Login : MainDestination(route = "login")
     data object Business : MainDestination(route = "business")
     data object AccountSetting : MainDestination(route = "accountSetting")
-    data object Profile : MainDestination(route = "profile?id={$userId}") {
+    data object Profile : MainDestination(route = "profile?userCode={$userCode}") {
         val arguments = listOf(
-            navArgument(userId) {
+            navArgument(userCode) {
                 type = NavType.StringType
                 nullable = true
             },
@@ -137,7 +137,7 @@ const val reservationId = "reservationId"
 const val salesTicketId = "salesTicketId"
 const val ticketCount = "ticketCount"
 const val isInviteTicket = "isInviteTicket"
-const val userId = "userId"
+const val userCode = "userCode"
 const val linkId = "linkId"
 const val linkTitle = "linkTitle"
 const val url = "url"

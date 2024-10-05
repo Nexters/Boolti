@@ -21,11 +21,11 @@ interface AuthRepository {
     suspend fun logout(): Result<Unit>
     suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit>
     suspend fun signout(request: SignoutRequest): Result<Unit>
-    fun getUserAndCache(): Flow<User?>
+    fun getUserAndCache(): Flow<User.My?>
     suspend fun sendFcmToken(): Result<Unit>
 
     val loggedIn: Flow<Boolean>
-    val cachedUser: Flow<User?>
+    val cachedUser: Flow<User.My?>
 
     suspend fun editProfile(editProfileRequest: EditProfileRequest): Result<Unit>
 }

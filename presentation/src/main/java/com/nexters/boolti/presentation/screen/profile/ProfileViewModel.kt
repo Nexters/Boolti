@@ -4,9 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
-import com.nexters.boolti.presentation.screen.userId
+import com.nexters.boolti.presentation.screen.userCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,30 +15,34 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getUserUsecase: GetUserUsecase,
+    memberRepository: MemberRepository,
     authRepository: AuthRepository,
 ) : BaseViewModel() {
-    private val id: String? = savedStateHandle[userId]
+    private val _userCode: String? = savedStateHandle[userCode]
 
     private val _uiState = MutableStateFlow(
         ProfileState(
-            user = if (id == null) (getUserUsecase() ?: User("")) else User(""),
-            isMine = id == null,
+            isMine = _userCode == null,
+            user = if (_userCode == null) getUserUsecase() ?: User.My("") else User.My(""),
         )
     )
     val uiState = _uiState.asStateFlow()
 
     init {
-        if (uiState.value.isMine) {
-            authRepository.cachedUser
-                .filterNotNull()
-                .onEach { user -> _uiState.update { it.copy(user = user) } }
-                .launchIn(viewModelScope)
-        }
+        _userCode?.let { userCode ->
+            viewModelScope.launch {
+                _uiState.update { it.copy(user = memberRepository.getMember(userCode)) }
+            }
+        } ?: authRepository.cachedUser
+            .filterNotNull()
+            .onEach { user -> _uiState.update { it.copy(user = user) } }
+            .launchIn(viewModelScope)
     }
 }

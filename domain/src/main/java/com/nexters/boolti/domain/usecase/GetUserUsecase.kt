@@ -9,5 +9,5 @@ import javax.inject.Inject
 class GetUserUsecase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    operator fun invoke(): User? = runBlocking { authRepository.getUserAndCache().first() }
+    operator fun invoke(): User.My? = runBlocking { authRepository.getUserAndCache().first() }
 }

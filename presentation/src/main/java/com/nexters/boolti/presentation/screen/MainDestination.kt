@@ -96,9 +96,9 @@ sealed class MainDestination(val route: String) {
             },
         )
 
-        fun createRoute(id: String? = null): String =
+        fun createRoute(userCode: String? = null): String =
             StringBuilder("profile").apply {
-                id?.let { append("?id=$id") }
+                userCode?.let { append("?userCode=$it") }
             }.toString()
     }
 

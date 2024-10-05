@@ -26,11 +26,12 @@ class ProfileViewModel @Inject constructor(
     authRepository: AuthRepository,
 ) : BaseViewModel() {
     private val _userCode: String? = savedStateHandle[userCode]
+    private val myProfile: User.My? = getUserUsecase()
 
     private val _uiState = MutableStateFlow(
         ProfileState(
-            isMine = _userCode == null,
-            user = if (_userCode == null) getUserUsecase() ?: User.My("") else User.My(""),
+            isMine = _userCode == null || myProfile?.userCode == _userCode,
+            user = if (_userCode == null) myProfile ?: User.My("") else User.My(""),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -38,7 +39,9 @@ class ProfileViewModel @Inject constructor(
     init {
         _userCode?.let { userCode ->
             viewModelScope.launch {
-                _uiState.update { it.copy(user = memberRepository.getMember(userCode)) }
+                memberRepository.getMember(userCode).onSuccess { user ->
+                    _uiState.update { it.copy(user = user) }
+                }
             }
         } ?: authRepository.cachedUser
             .filterNotNull()

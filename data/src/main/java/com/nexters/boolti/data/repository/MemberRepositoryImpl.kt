@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal class MemberRepositoryImpl @Inject constructor(
     private val memberDataSource: MemberDataSource,
 ) : MemberRepository {
-    override suspend fun getMember(userCode: String): User.Others {
-        return memberDataSource.getMember(userCode).toDomain()
+    override suspend fun getMember(userCode: String): Result<User.Others> = runCatching {
+        memberDataSource.getMember(userCode).toDomain()
     }
 }

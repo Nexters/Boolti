@@ -86,6 +86,7 @@ import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
+import kotlin.math.roundToInt
 
 @Composable
 fun ShowDetailScreen(
@@ -540,7 +541,7 @@ fun LazyListScope.CastTab(
                     val spacedBySize = 20.dp
                     val memberHeight = 46.dp
                     val spanCount = 2
-                    val rows = team.members.size / spanCount
+                    val rows = (team.members.size / spanCount.toFloat()).roundToInt()
 
                     /**
                      * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요

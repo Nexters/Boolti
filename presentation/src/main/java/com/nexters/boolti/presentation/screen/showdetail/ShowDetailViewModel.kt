@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.nexters.boolti.domain.model.Cast
+import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,7 +67,22 @@ class ShowDetailViewModel @Inject constructor(
         viewModelScope.launch {
             showRepository.requestCastTeams(showId = showId)
                 .onSuccess { newCastTeams ->
-                    _uiState.update { it.copy(castTeams = newCastTeams) }
+                    _uiState.update {
+                        it.copy(
+                            castTeams = newCastTeams + listOf(
+                                CastTeams(
+                                    teamName = "명범 팀",
+                                    members = listOf(
+                                        Cast(
+                                            userCode = "3ZZ0GKQZ",
+                                            nickname = "박명범",
+                                            roleName = "안드로이드, 기타, 통기타"
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
                 }
                 .onFailure {
                     Firebase.crashlytics.recordException(it)
@@ -75,7 +92,7 @@ class ShowDetailViewModel @Inject constructor(
     }
 
     fun selectTab(index: Int) {
-        _uiState.update { it.copy(selectedTab = index.coerceIn(0 .. 1)) }
+        _uiState.update { it.copy(selectedTab = index.coerceIn(0..1)) }
     }
 
     fun preventEvents() {

@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.nexters.boolti.domain.model.Cast
-import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,30 +66,7 @@ class ShowDetailViewModel @Inject constructor(
             showRepository.requestCastTeams(showId = showId)
                 .onSuccess { newCastTeams ->
                     _uiState.update {
-                        it.copy(
-                            castTeams = newCastTeams + listOf(
-                                CastTeams(
-                                    teamName = "명범 팀",
-                                    members = listOf(
-                                        Cast(
-                                            userCode = "3ZZ0GKQZ",
-                                            nickname = "정상박명범",
-                                            roleName = "안드로이드, 기타, 통기타",
-                                        ),
-                                        Cast(
-                                            userCode = "3ZZ0GKQZ_",
-                                            nickname = "비정상박명범",
-                                            roleName = "안드로이드, 기타, 통기타",
-                                        ),
-                                        Cast(
-                                            userCode = "FLHRNVYB",
-                                            nickname = "김민슈",
-                                            roleName = "FE, 기타",
-                                        ),
-                                    ),
-                                )
-                            )
-                        )
+                        it.copy(castTeams = newCastTeams)
                     }
                 }
                 .onFailure {

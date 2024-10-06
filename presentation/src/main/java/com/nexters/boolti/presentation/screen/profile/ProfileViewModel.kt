@@ -24,8 +24,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getUserUsecase: GetUserUsecase,
-    memberRepository: MemberRepository,
-    authRepository: AuthRepository,
+    private val memberRepository: MemberRepository,
+    private val authRepository: AuthRepository,
 ) : BaseViewModel() {
     private val _userCode: String? = savedStateHandle[userCode]
     private val myProfile: User.My? = getUserUsecase()
@@ -42,24 +42,34 @@ class ProfileViewModel @Inject constructor(
     val event = _event.receiveAsFlow()
 
     init {
-        _userCode?.let { userCode ->
-            viewModelScope.launch {
-                memberRepository.getMember(userCode).onSuccess { user ->
-                    _uiState.update { it.copy(user = user) }
-                }.onFailure {
-                    it.printStackTrace()
-                    event(ProfileEvent.Invalid)
-                }
-            }
-        } ?: authRepository.cachedUser
-            .filterNotNull()
-            .onEach { user -> _uiState.update { it.copy(user = user) } }
-            .launchIn(viewModelScope)
+        if (_userCode != null) {
+            fetchOthersProfile(_userCode)
+        } else {
+            collectMyProfile()
+        }
     }
 
     private fun event(event: ProfileEvent) {
         viewModelScope.launch {
             _event.send(event)
+        }
+    }
+
+    private fun collectMyProfile() {
+        authRepository.cachedUser
+            .filterNotNull()
+            .onEach { user -> _uiState.update { it.copy(user = user) } }
+            .launchIn(viewModelScope)
+    }
+
+    private fun fetchOthersProfile(userCode: String) {
+        viewModelScope.launch {
+            memberRepository.getMember(userCode).onSuccess { user ->
+                _uiState.update { it.copy(user = user) }
+            }.onFailure {
+                it.printStackTrace()
+                event(ProfileEvent.Invalid)
+            }
         }
     }
 }

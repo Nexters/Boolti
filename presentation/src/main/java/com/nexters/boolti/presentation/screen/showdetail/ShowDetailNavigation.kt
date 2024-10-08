@@ -42,7 +42,10 @@ fun NavGraphBuilder.ShowDetailScreen(
             navigateToReport = {
                 val showId = entry.arguments?.getString("showId")
                 navigateTo("report/$showId")
-            }
+            },
+            navigateToProfile = { userCode ->
+                navigateTo(MainDestination.Profile.createRoute(userCode))
+            },
         )
     }
 }

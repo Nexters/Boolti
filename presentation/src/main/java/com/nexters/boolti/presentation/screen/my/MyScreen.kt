@@ -82,7 +82,7 @@ fun MyScreen(
 @Composable
 fun MyScreen(
     modifier: Modifier = Modifier,
-    user: User? = null,
+    user: User.My? = null,
     onClickHeaderButton: () -> Unit = {},
     onClickAccountSetting: () -> Unit = {},
     onClickReservations: () -> Unit = {},
@@ -176,7 +176,7 @@ fun MyScreen(
 @Composable
 private fun MyHeader(
     modifier: Modifier = Modifier,
-    user: User? = null,
+    user: User.My? = null,
     onClickButton: () -> Unit,
 ) {
     val shape = RoundedCornerShape(
@@ -255,7 +255,7 @@ private fun MyMenu(
 @Preview("로그인 한 유저 헤더")
 @Composable
 private fun MyHeaderUserPreview() {
-    val user = User(
+    val user = User.My(
         id = "",
         nickname = "일이삼사오육칠팔구십",
         email = "boolti@gmail.com",
@@ -278,7 +278,7 @@ private fun MyHeaderGuestPreview() {
 @Preview
 @Composable
 private fun MyScreenPreview() {
-    val user = User(
+    val user = User.My(
         id = "",
         nickname = "불티유저",
         email = "boolti@gmail.com",
@@ -295,7 +295,7 @@ private fun MyScreenPreview() {
 @Preview(device = "spec:parent=pixel_5,orientation=landscape")
 @Composable
 private fun MyScreenLandscapePreview() {
-    val user = User(
+    val user = User.My(
         id = "",
         nickname = "불티유저",
         email = "boolti@gmail.com",

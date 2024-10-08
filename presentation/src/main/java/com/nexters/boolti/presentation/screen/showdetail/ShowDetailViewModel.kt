@@ -65,7 +65,9 @@ class ShowDetailViewModel @Inject constructor(
         viewModelScope.launch {
             showRepository.requestCastTeams(showId = showId)
                 .onSuccess { newCastTeams ->
-                    _uiState.update { it.copy(castTeams = newCastTeams) }
+                    _uiState.update {
+                        it.copy(castTeams = newCastTeams)
+                    }
                 }
                 .onFailure {
                     Firebase.crashlytics.recordException(it)
@@ -75,7 +77,7 @@ class ShowDetailViewModel @Inject constructor(
     }
 
     fun selectTab(index: Int) {
-        _uiState.update { it.copy(selectedTab = index.coerceIn(0 .. 1)) }
+        _uiState.update { it.copy(selectedTab = index.coerceIn(0..1)) }
     }
 
     fun preventEvents() {

@@ -4,6 +4,6 @@ import com.nexters.boolti.domain.model.User
 
 data class ProfileState(
     val loading: Boolean = false,
-    val user: User = User(""),
+    val user: User = User.My(""),
     val isMine: Boolean = false,
 )

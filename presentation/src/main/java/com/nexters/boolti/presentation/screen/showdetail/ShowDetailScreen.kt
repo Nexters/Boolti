@@ -86,6 +86,7 @@ import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
+import kotlin.math.ceil
 
 @Composable
 fun ShowDetailScreen(
@@ -106,6 +107,7 @@ fun ShowDetailScreen(
         ticketCount: Int,
     ) -> Unit,
     navigateToReport: () -> Unit,
+    navigateToProfile: (userCode: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
@@ -193,7 +195,10 @@ fun ShowDetailScreen(
                         onClickContent = onClickContent,
                     )
 
-                    1 -> CastTab(teams = uiState.castTeams)
+                    1 -> CastTab(
+                        teams = uiState.castTeams,
+                        onClickMember = navigateToProfile,
+                    )
                 }
 
                 item { Spacer(modifier = Modifier.size(114.dp)) }
@@ -504,6 +509,7 @@ private fun LazyListScope.ShowInfoTab(
 @Suppress("FunctionName")
 fun LazyListScope.CastTab(
     teams: List<CastTeams>,
+    onClickMember: (userCode: String) -> Unit,
 ) {
     val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
 
@@ -540,7 +546,7 @@ fun LazyListScope.CastTab(
                     val spacedBySize = 20.dp
                     val memberHeight = 46.dp
                     val spanCount = 2
-                    val rows = team.members.size / spanCount
+                    val rows = ceil(team.members.size / spanCount.toFloat())
 
                     /**
                      * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요
@@ -553,7 +559,7 @@ fun LazyListScope.CastTab(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         items(team.members) { member ->
-                            Cast(memberHeight, member)
+                            Cast(memberHeight, member, onClick = { onClickMember(member.userCode) })
                         }
                     }
                 }
@@ -651,7 +657,9 @@ private fun Cast(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = Modifier.height(memberHeight).clickable(onClick = onClick),
+        modifier = Modifier
+            .height(memberHeight)
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         UserThumbnail(

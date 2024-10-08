@@ -1,8 +1,12 @@
 package com.nexters.boolti.presentation.screen.showregistration
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.view.ViewGroup
 import android.webkit.CookieManager
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
@@ -24,10 +28,12 @@ fun ShowRegistrationScreen(
 
     LaunchedEffect(Unit) {
         viewModel.tokens.collect { tokens ->
+            CookieManager.getInstance().removeAllCookies(null)
+            WebStorage.getInstance().deleteAllData()
+
             if(tokens == null || !tokens.isLoggedIn) return@collect
 
             with(CookieManager.getInstance()) {
-                setAcceptCookie(true)
                 setCookie(url, "x-access-token=${tokens.accessToken}")
                 setCookie(url, "x-refresh-token=${tokens.refreshToken}")
                 flush()

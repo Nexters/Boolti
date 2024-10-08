@@ -63,11 +63,10 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun fetchOthersProfile(userCode: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             memberRepository.getMember(userCode).onSuccess { user ->
                 _uiState.update { it.copy(user = user) }
             }.onFailure {
-                it.printStackTrace()
                 event(ProfileEvent.Invalid)
             }
         }

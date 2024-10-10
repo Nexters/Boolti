@@ -33,8 +33,8 @@ fun ShowRegistrationScreen(
             Timber.d("선택한 파일 uri 목록 : $uris")
             filePathCallback?.onReceiveValue(uris.toTypedArray())
         }
-    val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
-    val url = "https://${subDomain}boolti.in/show/add"
+    val domain = BuildConfig.DOMAIN
+    val url = "https://${domain}/show/add"
 
     LaunchedEffect(Unit) {
         CookieManager.getInstance().removeAllCookies(null)

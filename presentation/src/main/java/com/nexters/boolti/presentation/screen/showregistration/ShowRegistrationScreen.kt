@@ -9,12 +9,16 @@ import android.webkit.WebChromeClient
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.BuildConfig
+import com.nexters.boolti.presentation.util.BtWebChromeClient
 import timber.log.Timber
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -23,14 +27,15 @@ fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
+    val scope = rememberCoroutineScope()
     val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
     val url = "https://${subDomain}boolti.in/show/add"
 
     LaunchedEffect(Unit) {
-        viewModel.tokens.collect { tokens ->
-            CookieManager.getInstance().removeAllCookies(null)
-            WebStorage.getInstance().deleteAllData()
+        CookieManager.getInstance().removeAllCookies(null)
+        WebStorage.getInstance().deleteAllData()
 
+        viewModel.tokens.collect { tokens ->
             if(tokens == null || !tokens.isLoggedIn) return@collect
 
             with(CookieManager.getInstance()) {
@@ -51,6 +56,7 @@ fun ShowRegistrationScreen(
                 )
 
                 webViewClient = WebViewClient()
+                webChromeClient = BtWebChromeClient(context, scope)
 
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true

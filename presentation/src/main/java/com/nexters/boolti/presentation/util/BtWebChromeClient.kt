@@ -1,30 +1,24 @@
 package com.nexters.boolti.presentation.util
 
-import android.content.Context
 import android.net.Uri
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class BtWebChromeClient(
-    context: Context,
-    private val coroutineScope: CoroutineScope,
+    private val launchActivity: () -> Unit,
+    private val setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
 ) : WebChromeClient() {
-    private val fileChooser = FileChooser(context)
-
     override fun onShowFileChooser(
-        webView: WebView?,
+        webView: WebView,
         filePathCallback: ValueCallback<Array<Uri>>?,
-        fileChooserParams: FileChooserParams?
+        fileChooserParams: FileChooserParams
     ): Boolean {
         if (filePathCallback == null) return false
+        setFilePathCallback(filePathCallback)
 
-        coroutineScope.launch {
-            fileChooser.show()
-        }
+        launchActivity()
 
-        return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
+        return true
     }
 }

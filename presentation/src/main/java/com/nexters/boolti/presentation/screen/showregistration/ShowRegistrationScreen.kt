@@ -27,7 +27,12 @@ fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
-    val scope = rememberCoroutineScope()
+    var filePathCallback: ValueCallback<Array<Uri>>? = null
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            Timber.d("선택한 파일 uri 목록 : $uris")
+            filePathCallback?.onReceiveValue(uris.toTypedArray())
+        }
     val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
     val url = "https://${subDomain}boolti.in/show/add"
 
@@ -36,7 +41,7 @@ fun ShowRegistrationScreen(
         WebStorage.getInstance().deleteAllData()
 
         viewModel.tokens.collect { tokens ->
-            if(tokens == null || !tokens.isLoggedIn) return@collect
+            if (tokens == null || !tokens.isLoggedIn) return@collect
 
             with(CookieManager.getInstance()) {
                 setCookie(url, "x-access-token=${tokens.accessToken}")
@@ -56,7 +61,11 @@ fun ShowRegistrationScreen(
                 )
 
                 webViewClient = WebViewClient()
-                webChromeClient = BtWebChromeClient(context, scope)
+                webChromeClient = BtWebChromeClient(launchActivity = {
+                    launcher.launch(arrayOf("image/*"))
+                }) { callback ->
+                    filePathCallback = callback
+                }
 
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true

@@ -416,7 +416,7 @@ private fun LazyListScope.ShowInfoTab(
         val formatter =
             DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
         Section(
-            modifier = paddingModifier,
+            modifier = paddingModifier.padding(top = 8.dp),
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = { SectionContent(text = showDetail.date.format(formatter)) },
         )
@@ -537,11 +537,12 @@ fun LazyListScope.CastTab(
         }
     } else {
         itemsIndexed(teams) { index, team ->
-            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
+            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(16.dp))
             Section(
                 modifier = paddingModifier,
                 title = { SectionTitle(title = team.teamName) },
-                space = 20.dp,
+                space = if (team.members.isNotEmpty()) 20.dp else 0.dp,
+                paddingVertical = 24.dp,
                 content = {
                     val spacedBySize = 20.dp
                     val memberHeight = 46.dp
@@ -603,9 +604,10 @@ private fun Section(
     title: @Composable () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    paddingVertical: Dp = 32.dp,
     space: Dp = 16.dp,
 ) {
-    Column(modifier.padding(top = 40.dp, bottom = 32.dp)) {
+    Column(modifier.padding(vertical = paddingVertical)) {
         title()
         Spacer(modifier = Modifier.height(space))
         content()

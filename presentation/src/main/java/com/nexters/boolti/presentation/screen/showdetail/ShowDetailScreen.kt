@@ -674,6 +674,8 @@ private fun Cast(
                 text = member.nickname,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = member.roleName,

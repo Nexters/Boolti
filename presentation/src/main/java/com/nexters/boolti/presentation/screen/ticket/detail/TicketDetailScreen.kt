@@ -123,7 +123,6 @@ fun NavGraphBuilder.TicketDetailScreen(
 ) {
     composable(
         route = "detail",
-        arguments = MainDestination.TicketDetail.arguments,
     ) { entry ->
         TicketDetailScreen(
             modifier = modifier,

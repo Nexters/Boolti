@@ -13,12 +13,18 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.util.BtWebChromeClient
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import timber.log.Timber
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -27,7 +33,7 @@ fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
-    var filePathCallback: ValueCallback<Array<Uri>>? = null
+    var filePathCallback: ValueCallback<Array<Uri>>? by remember { mutableStateOf(null) }
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
             Timber.d("선택한 파일 uri 목록 : $uris")
@@ -40,15 +46,16 @@ fun ShowRegistrationScreen(
         CookieManager.getInstance().removeAllCookies(null)
         WebStorage.getInstance().deleteAllData()
 
-        viewModel.tokens.collect { tokens ->
-            if (tokens == null || !tokens.isLoggedIn) return@collect
-
-            with(CookieManager.getInstance()) {
-                setCookie(url, "x-access-token=${tokens.accessToken}")
-                setCookie(url, "x-refresh-token=${tokens.refreshToken}")
-                flush()
+        viewModel.tokens
+            .filterNotNull()
+            .filter { it.isLoggedIn }
+            .collect { tokens ->
+                with(CookieManager.getInstance()) {
+                    setCookie(url, "x-access-token=${tokens.accessToken}")
+                    setCookie(url, "x-refresh-token=${tokens.refreshToken}")
+                    flush()
+                }
             }
-        }
     }
 
     AndroidView(

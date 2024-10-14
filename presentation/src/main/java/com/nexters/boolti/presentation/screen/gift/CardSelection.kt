@@ -1,12 +1,11 @@
 package com.nexters.boolti.presentation.screen.gift
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -49,58 +47,52 @@ fun CardSelection(
     Column(
         modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
     ) {
-        Column(
+        // 이미지 영역
+        Box(
             modifier = Modifier
                 .padding(horizontal = 32.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFFF5A14),
-                            Color(0xFFFFA883),
-                        )
-                    )
-                )
                 .border(
                     width = 1.dp,
-                    color = Color(0xFFFFA883),
+                    color = Color.White.copy(alpha = 0.4f),
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(top = 32.dp)
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val maximumLength = 40
-            val messageLengthUnit = stringResource(id = R.string.gift_message_length_unit)
-
-            BasicTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp),
-                value = message,
-                onValueChange = onMessageChanged,
-                textStyle = MaterialTheme.typography.titleLarge.copy(
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                ),
-                cursorBrush = SolidColor(Color.White)
-            )
-            Text(
-                modifier = Modifier.padding(top = 12.dp),
-                text = "${message.length}/${maximumLength}${messageLengthUnit}",
-                style = MaterialTheme.typography.labelMedium.copy(color = Grey10),
-            )
-
             AsyncImage(
                 model = selectedImage?.originImage,
                 contentDescription = stringResource(id = R.string.gift_selected_image),
-                modifier = Modifier
-                    .padding(top = 28.dp)
-                    .fillMaxWidth()
-                    .background(Color.White),
+                modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )
+
+            Column(
+                modifier = Modifier
+                    .padding(top = 32.dp)
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                val maximumLength = 40
+                val messageLengthUnit = stringResource(id = R.string.gift_message_length_unit)
+
+                BasicTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    value = message,
+                    onValueChange = onMessageChanged,
+                    textStyle = MaterialTheme.typography.titleLarge.copy(
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    ),
+                    cursorBrush = SolidColor(Color.White)
+                )
+                Text(
+                    modifier = Modifier.padding(top = 12.dp),
+                    text = "${message.length}/${maximumLength}${messageLengthUnit}",
+                    style = MaterialTheme.typography.labelMedium.copy(color = Grey10),
+                )
+            }
         }
 
         CardCarousel(

@@ -67,7 +67,6 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESUL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GiftScreen(
     popBackStack: () -> Unit,

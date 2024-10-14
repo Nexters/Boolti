@@ -7,6 +7,7 @@ import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.LoginResponse
 import com.nexters.boolti.domain.model.LoginUserState
+import com.nexters.boolti.domain.model.TokenPair
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.EditProfileRequest
@@ -70,4 +71,8 @@ internal class AuthRepositoryImpl @Inject constructor(
         runCatching { userDateSource.edit(editProfileRequest) }
             .onSuccess { authDataSource.updateUser(it) }
             .mapCatching {}
+
+    override fun getTokens(): Flow<TokenPair> = authDataSource.getTokens().map {
+        TokenPair(it.first, it.second)
+    }
 }

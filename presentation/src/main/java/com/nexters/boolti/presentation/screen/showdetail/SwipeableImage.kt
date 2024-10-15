@@ -1,16 +1,13 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +24,6 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.constants.posterRatio
 import com.nexters.boolti.presentation.theme.Grey95
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SwipeableImage(
     models: List<String>,
@@ -72,10 +68,12 @@ fun SwipeableImage(
                     )
                 )
         )
-        Indicator(
-            modifier = Modifier.padding(bottom = 14.dp),
-            position = pageState.currentPage,
-            size = models.size
-        )
+        if (models.size > 1) {
+            Indicator(
+                modifier = Modifier.padding(bottom = 14.dp),
+                position = pageState.currentPage,
+                size = models.size
+            )
+        }
     }
 }

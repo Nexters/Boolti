@@ -14,12 +14,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Indicator(
-    modifier: Modifier = Modifier,
     position: Int,
     size: Int,
+    modifier: Modifier = Modifier,
 ) {
-    if (size == 1) return
-
     Row(modifier = modifier) {
         (0 until size).forEach { index ->
             val opacity = if (index == position) 1f else 0.5f

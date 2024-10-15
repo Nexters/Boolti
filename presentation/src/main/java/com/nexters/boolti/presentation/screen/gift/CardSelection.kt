@@ -1,11 +1,14 @@
 package com.nexters.boolti.presentation.screen.gift
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -59,9 +62,9 @@ fun CardSelection(
                 )
         ) {
             AsyncImage(
+                modifier = Modifier.aspectRatio(311 / 394f), // 선물 이미지 사이즈
                 model = selectedImage?.originImage,
                 contentDescription = stringResource(id = R.string.gift_selected_image),
-                modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Crop,
             )
 
@@ -115,31 +118,40 @@ private fun CardCarousel(
 ) {
     LazyRow(
         modifier = modifier,
-        contentPadding = PaddingValues(start = 32.dp),
+        contentPadding = PaddingValues(horizontal = 32.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(images) { image ->
-            val cardModifier = if (image == selectedImage) {
-                Modifier.border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(4.dp)
-                )
-            } else {
-                Modifier
-            }
-
-            AsyncImage(
-                model = image.thumbnailImage,
-                contentDescription = stringResource(id = R.string.gift_image),
-                modifier = cardModifier
+            Box(
+                modifier = Modifier
                     .size(52.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .clickable {
                         onImageSelected(image)
-                    },
-                contentScale = ContentScale.Crop,
-            )
+                    }
+            ) {
+                AsyncImage(
+                    model = image.thumbnailImage,
+                    contentDescription = stringResource(id = R.string.gift_image),
+                    contentScale = ContentScale.Crop,
+                )
+
+                if (image == selectedImage) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .background(
+                                color = Color.Black.copy(alpha = 0.45f),
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                    )
+                }
+            }
         }
     }
 }

@@ -90,6 +90,7 @@ fun GiftCompleteScreen(
             ) {
                 val month = reservation?.salesEndDateTime?.month?.value ?: 0
                 val day = reservation?.salesEndDateTime?.dayOfMonth ?: 0
+                val senderText = stringResource(id = R.string.gift_sender_description, reservation?.depositorName ?: "")
                 val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
                 val buttonText = stringResource(id = R.string.gift_check)
 
@@ -120,7 +121,7 @@ fun GiftCompleteScreen(
                     onClick = {
                         if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
                             reservation?.let {
-                                sendMessage(context, it, dateText, buttonText)
+                                sendMessage(context, it, senderText, dateText, buttonText)
                             }
                         } else {
                             // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
@@ -188,6 +189,7 @@ fun GiftCompleteScreen(
 private fun sendMessage(
     context: Context,
     reservation: ReservationDetail,
+    senderText: String,
     dateText: String,
     buttonText: String
 ) {
@@ -195,7 +197,7 @@ private fun sendMessage(
         sendMessage(
             context,
             giftUuid,
-            reservation.visitorName,
+            senderText,
             reservation.giftInviteImage,
             dateText,
             buttonText
@@ -206,7 +208,7 @@ private fun sendMessage(
 fun sendMessage(
     context: Context,
     giftUuid: String,
-    receiverName: String,
+    senderText: String,
     image: String,
     dateText: String,
     buttonText: String
@@ -216,7 +218,7 @@ fun sendMessage(
 
     val defaultFeed = FeedTemplate(
         content = Content(
-            title = "To. $receiverName",
+            title = senderText,
             description = dateText,
             imageUrl = image,
             link = Link(

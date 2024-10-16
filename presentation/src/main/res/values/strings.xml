@@ -194,6 +194,7 @@
     <string name="gift_select_receiver">받는 분 선택하기</string>
     <string name="gift_selected_image">선택된 선물 이미지</string>
     <string name="gift_image">선물 편지에 포함될 이미지</string>
+    <string name="gift_sender_description">%s님이 보낸 선물이 도착했어요.</string>
     <string name="gift_expiration_date">%d월 %d일까지 불티앱에서 선물을 등록해주세요.</string>
     <string name="gift_check">선물 확인하기</string>
     <string name="gift_resend_message">선물 링크 다시 보내기</string>

@@ -2,8 +2,6 @@ package com.nexters.boolti.presentation.screen.home
 
 import android.content.Intent
 import android.net.Uri
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,9 +15,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -32,12 +30,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.MyScreen
+import com.nexters.boolti.presentation.screen.navigation.HomeRoute
+import com.nexters.boolti.presentation.screen.navigation.homeRoutes
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketScreen
@@ -61,8 +60,7 @@ fun HomeScreen(
 ) {
     val navController = rememberNavControllerWithLog()
     val snackbarController = LocalSnackbarController.current
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
+    var currentRoute: HomeRoute by remember { mutableStateOf(HomeRoute.Show) }
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -105,9 +103,9 @@ fun HomeScreen(
     Scaffold(
         bottomBar = {
             HomeNavigationBar(
-                currentDestination = currentDestination,
-                onDestinationChanged = {
-                    navController.navigate(it.route) {
+                currentDestination = currentRoute,
+                onDestinationChanged = { dest ->
+                    navController.navigate(dest) {
                         popUpTo(navController.graph.findStartDestination().id)
                         launchSingleTop = true
                         restoreState = true
@@ -118,11 +116,10 @@ fun HomeScreen(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Destination.Show.route,
+            startDestination = HomeRoute.Show,
             modifier = modifier,
         ) {
-            composable(
-                route = Destination.Show.route,
+            composable<HomeRoute.Show>(
                 deepLinks = listOf(
                     navDeepLink {
                         uriPattern = "https://app.boolti.in/home/shows"
@@ -130,14 +127,17 @@ fun HomeScreen(
                     }
                 )
             ) {
+                LaunchedEffect(Unit) {
+                    currentRoute = HomeRoute.Show
+                }
+
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
                     onClickShowItem = onClickShowItem,
                     navigateToBusiness = navigateToBusiness,
                 )
             }
-            composable(
-                route = Destination.Ticket.route,
+            composable<HomeRoute.Ticket>(
                 deepLinks = listOf(
                     navDeepLink {
                         uriPattern = "https://app.boolti.in/home/tickets"
@@ -145,6 +145,10 @@ fun HomeScreen(
                     }
                 )
             ) {
+                LaunchedEffect(Unit) {
+                    currentRoute = HomeRoute.Ticket
+                }
+
                 when (loggedIn) {
                     true -> TicketScreen(
                         onClickTicket = onClickTicket,
@@ -159,9 +163,11 @@ fun HomeScreen(
                     else -> Unit // 로그인 여부를 불러오는 중
                 }
             }
-            composable(
-                route = Destination.My.route,
-            ) {
+            composable<HomeRoute.My> {
+                LaunchedEffect(Unit) {
+                    currentRoute = HomeRoute.My
+                }
+
                 MyScreen(
                     modifier = modifier.padding(innerPadding),
                     requireLogin = requireLogin,
@@ -194,21 +200,10 @@ fun HomeScreen(
     }
 }
 
-@Stable
-private enum class Destination(
-    val route: String,
-    @StringRes val label: Int,
-    @DrawableRes val icon: Int,
-) {
-    Show(route = "show", label = R.string.menu_show, icon = R.drawable.ic_home),
-    Ticket(route = "tickets", label = R.string.menu_tickets, R.drawable.ic_ticket),
-    My(route = "my", label = R.string.menu_my, icon = R.drawable.ic_person)
-}
-
 @Composable
 private fun HomeNavigationBar(
-    currentDestination: String,
-    onDestinationChanged: (Destination) -> Unit,
+    currentDestination: HomeRoute,
+    onDestinationChanged: (HomeRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -221,8 +216,8 @@ private fun HomeNavigationBar(
             modifier = modifier,
             containerColor = MaterialTheme.colorScheme.background,
         ) {
-            Destination.entries.forEach { dest ->
-                val selected = currentDestination == dest.route
+            homeRoutes.forEach { dest ->
+                val selected = currentDestination == dest
                 val label = stringResource(dest.label)
                 NavigationBarItem(
                     selected = selected,

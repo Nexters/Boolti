@@ -115,9 +115,9 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         NavHost(
+            modifier = modifier.padding(innerPadding),
             navController = navController,
             startDestination = HomeRoute.Show,
-            modifier = modifier,
         ) {
             composable<HomeRoute.Show>(
                 deepLinks = listOf(
@@ -132,7 +132,6 @@ fun HomeScreen(
                 }
 
                 ShowScreen(
-                    modifier = modifier.padding(innerPadding),
                     onClickShowItem = onClickShowItem,
                     navigateToBusiness = navigateToBusiness,
                 )
@@ -152,7 +151,6 @@ fun HomeScreen(
                 when (loggedIn) {
                     true -> TicketScreen(
                         onClickTicket = onClickTicket,
-                        modifier = modifier.padding(innerPadding),
                     )
 
                     false -> TicketLoginScreen(
@@ -169,7 +167,6 @@ fun HomeScreen(
                 }
 
                 MyScreen(
-                    modifier = modifier.padding(innerPadding),
                     requireLogin = requireLogin,
                     onClickAccountSetting = onClickAccountSetting,
                     navigateToReservations = navigateToReservations,

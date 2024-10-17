@@ -71,7 +71,9 @@ fun CardSelection(
                 )
         ) {
             AsyncImage(
-                modifier = Modifier.aspectRatio(311 / 394f), // 선물 이미지 사이즈
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(311 / 394f), // 선물 이미지 사이즈
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(selectedImage?.originImage)
                     .crossfade(true)

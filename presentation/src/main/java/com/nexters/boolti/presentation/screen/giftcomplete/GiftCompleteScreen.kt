@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -48,6 +49,7 @@ import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.component.dummyReservationDetail
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
@@ -72,14 +74,24 @@ fun GiftCompleteScreen(
     navigateToReservation: (reservation: ReservationDetail) -> Unit,
     viewModel: GiftCompleteViewModel = hiltViewModel(),
 )  {
-    val reservation by viewModel.reservation.collectAsStateWithLifecycle()
+    val reservationState by viewModel.reservation.collectAsStateWithLifecycle()
+    val reservation = reservationState
 
-    GiftCompleteScreen(
-        onClickHome = onClickHome,
-        onClickClose = onClickClose,
-        navigateToReservation = navigateToReservation,
-        reservation = reservation,
-    )
+    if (reservation == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            BtCircularProgressIndicator()
+        }
+    } else {
+        GiftCompleteScreen(
+            onClickHome = onClickHome,
+            onClickClose = onClickClose,
+            navigateToReservation = navigateToReservation,
+            reservation = reservation,
+        )
+    }
 }
 
 @Composable
@@ -87,7 +99,7 @@ fun GiftCompleteScreen(
     onClickHome: () -> Unit,
     onClickClose: () -> Unit,
     navigateToReservation: (reservation: ReservationDetail) -> Unit,
-    reservation: ReservationDetail?,
+    reservation: ReservationDetail,
 ) {
     val context = LocalContext.current
 
@@ -105,11 +117,11 @@ fun GiftCompleteScreen(
                     .padding(horizontal = marginHorizontal)
                     .verticalScroll(rememberScrollState())
             ) {
-                val month = reservation?.salesEndDateTime?.month?.value ?: 0
-                val day = reservation?.salesEndDateTime?.dayOfMonth ?: 0
+                val month = reservation.salesEndDateTime.month.value
+                val day = reservation.salesEndDateTime.dayOfMonth
                 val senderText = stringResource(
                     id = R.string.gift_sender_description,
-                    reservation?.depositorName ?: ""
+                    reservation.depositorName
                 )
                 val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
                 val buttonText = stringResource(id = R.string.gift_check)
@@ -123,12 +135,12 @@ fun GiftCompleteScreen(
                 InfoRow(
                     modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
                     label = stringResource(R.string.reservation_number),
-                    value = reservation?.csReservationId ?: ""
+                    value = reservation.csReservationId
                 )
                 InfoRow(
                     modifier = Modifier.padding(top = 8.dp),
                     label = stringResource(R.string.gift_receiver),
-                    value = if (reservation != null) "${reservation?.visitorName} / ${reservation?.visitorPhoneNumber}" else ""
+                    value = "${reservation.visitorName} / ${reservation.visitorPhoneNumber}"
                 )
                 TextButton(
                     modifier = Modifier
@@ -140,9 +152,7 @@ fun GiftCompleteScreen(
                     contentPadding = PaddingValues(horizontal = 20.dp),
                     onClick = {
                         if (ShareClient.instance.isKakaoTalkSharingAvailable(context)) {
-                            reservation?.let {
-                                sendMessage(context, it, senderText, dateText, buttonText)
-                            }
+                            sendMessage(context, reservation, senderText, dateText, buttonText)
                         } else {
                             // TODO: 카카오톡 미설치 케이스 (아직은 고려 X)
                         }
@@ -172,19 +182,17 @@ fun GiftCompleteScreen(
                     giftPolicy = stringArrayResource(id = R.array.gift_information).toList()
                 )
                 HorizontalDivider(color = Grey85)
-                reservation?.let { reservation ->
-                    ShowInformation(
-                        reservation = reservation
-                    )
-                    SecondaryButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                            .padding(vertical = 8.dp),
-                        label = stringResource(R.string.show_reservation),
-                    ) {
-                        navigateToReservation(reservation)
-                    }
+                ShowInformation(
+                    reservation = reservation
+                )
+                SecondaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .padding(vertical = 8.dp),
+                    label = stringResource(R.string.show_reservation),
+                ) {
+                    navigateToReservation(reservation)
                 }
             }
         }

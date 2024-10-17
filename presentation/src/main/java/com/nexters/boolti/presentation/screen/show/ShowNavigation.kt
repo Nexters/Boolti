@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.show
 
 import android.content.Intent
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -10,7 +9,7 @@ import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
 fun NavGraphBuilder.addShow(
     updateRoute: () -> Unit,
-    onClickShowItem: (showId: String) -> Unit,
+    navigateToShowDetail: (showId: String) -> Unit,
     navigateToBusiness: () -> Unit,
 ) {
     composable<HomeRoute.Show>(
@@ -26,7 +25,7 @@ fun NavGraphBuilder.addShow(
         }
 
         ShowScreen(
-            onClickShowItem = onClickShowItem,
+            onClickShowItem = navigateToShowDetail,
             navigateToBusiness = navigateToBusiness,
         )
     }

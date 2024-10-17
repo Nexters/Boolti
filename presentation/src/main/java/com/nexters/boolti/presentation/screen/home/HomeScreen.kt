@@ -28,11 +28,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.my.addMy
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 import com.nexters.boolti.presentation.screen.navigation.homeRoutes
@@ -45,22 +43,22 @@ import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
 
 @Composable
 fun HomeScreen(
-    onClickShowItem: (showId: String) -> Unit,
-    onClickTicket: (ticketId: String) -> Unit,
-    onClickQrScan: () -> Unit,
-    onClickAccountSetting: () -> Unit,
+    navigateToShowDetail: (showId: String) -> Unit,
+    navigateToTicketDetail: (ticketId: String) -> Unit,
+    navigateToQrScan: () -> Unit,
+    navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToBusiness: () -> Unit,
-    requireLogin: () -> Unit,
-    modifier: Modifier,
+    navigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavControllerWithLog()
     val snackbarController = LocalSnackbarController.current
     var currentRoute: HomeRoute by remember { mutableStateOf(HomeRoute.Show) }
 
-    val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+    val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
@@ -94,8 +92,8 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(loggedIn) {
-        if (loggedIn == true) viewModel.processGift()
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn == true) viewModel.processGift()
     }
 
     Scaffold(
@@ -119,24 +117,24 @@ fun HomeScreen(
         ) {
             addShow(
                 updateRoute = { currentRoute = HomeRoute.Show },
-                onClickShowItem = onClickShowItem,
+                navigateToShowDetail = navigateToShowDetail,
                 navigateToBusiness = navigateToBusiness,
             )
 
             addTicket(
                 updateRoute = { currentRoute = HomeRoute.Ticket },
-                loggedIn = loggedIn,
-                onLoginClick = requireLogin,
-                onClickTicket = onClickTicket,
+                isLoggedIn = isLoggedIn,
+                navigateToLogin = navigateToLogin,
+                navigateToTicketDetail = navigateToTicketDetail,
             )
 
             addMy(
                 updateRoute = { currentRoute = HomeRoute.My },
-                requireLogin = requireLogin,
-                onClickAccountSetting = onClickAccountSetting,
+                navigateToLogin = navigateToLogin,
+                navigateToAccountSetting = navigateToAccountSetting,
                 navigateToReservations = navigateToReservations,
                 navigateToProfile = navigateToProfile,
-                onClickQrScan = onClickQrScan,
+                navigateToQrScan = navigateToQrScan,
             )
         }
     }
@@ -151,7 +149,7 @@ fun HomeScreen(
             receiveGift = viewModel::receiveGift,
             requireLogin = {
                 dialog = null
-                requireLogin()
+                navigateToLogin()
             },
             onFailed = {
                 dialog = GiftStatus.FAILED

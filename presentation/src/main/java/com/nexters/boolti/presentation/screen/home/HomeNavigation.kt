@@ -14,14 +14,14 @@ fun NavGraphBuilder.HomeScreen(
     ) {
         HomeScreen(
             modifier = modifier,
-            onClickShowItem = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
-            onClickTicket = { navigateTo("${MainDestination.TicketDetail.route}/$it") },
-            onClickQrScan = { navigateTo(MainDestination.HostedShows.route) },
-            onClickAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },
+            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
+            navigateToTicketDetail = { navigateTo("${MainDestination.TicketDetail.route}/$it") },
+            navigateToQrScan = { navigateTo(MainDestination.HostedShows.route) },
+            navigateToAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },
             navigateToReservations = { navigateTo(MainDestination.Reservations.route) },
             navigateToProfile = { navigateTo(MainDestination.Profile.createRoute()) },
             navigateToBusiness = { navigateTo(MainDestination.Business.route) },
-            requireLogin = { navigateTo(MainDestination.Login.route) },
+            navigateToLogin = { navigateTo(MainDestination.Login.route) },
         )
     }
 }

@@ -7,11 +7,11 @@ import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
 fun NavGraphBuilder.addMy(
     updateRoute: () -> Unit,
-    requireLogin: () -> Unit,
-    onClickAccountSetting: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
-    onClickQrScan: () -> Unit,
+    navigateToQrScan: () -> Unit,
 ) {
     composable<HomeRoute.My> {
         LaunchedEffect(Unit) {
@@ -19,11 +19,11 @@ fun NavGraphBuilder.addMy(
         }
 
         MyScreen(
-            requireLogin = requireLogin,
-            onClickAccountSetting = onClickAccountSetting,
+            requireLogin = navigateToLogin,
+            onClickAccountSetting = navigateToAccountSetting,
             navigateToReservations = navigateToReservations,
             navigateToProfile = navigateToProfile,
-            onClickQrScan = onClickQrScan,
+            onClickQrScan = navigateToQrScan,
         )
     }
 }

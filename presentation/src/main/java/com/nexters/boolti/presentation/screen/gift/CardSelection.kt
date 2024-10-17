@@ -20,17 +20,24 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.request.ImageRequest
 import com.nexters.boolti.domain.model.ImagePair
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -47,6 +54,8 @@ fun CardSelection(
     selectedImage: ImagePair?,
     onImageSelected: (ImagePair) -> Unit,
 ) {
+    var showBorder by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.padding(top = 24.dp, bottom = 48.dp),
     ) {
@@ -56,16 +65,22 @@ fun CardSelection(
                 .padding(horizontal = 32.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .border(
-                    width = 1.dp,
+                    width = if (showBorder) 1.dp else 0.dp,
                     color = Color.White.copy(alpha = 0.4f),
                     shape = RoundedCornerShape(8.dp)
                 )
         ) {
             AsyncImage(
                 modifier = Modifier.aspectRatio(311 / 394f), // 선물 이미지 사이즈
-                model = selectedImage?.originImage,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(selectedImage?.originImage)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = stringResource(id = R.string.gift_selected_image),
                 contentScale = ContentScale.Crop,
+                onState = { state ->
+                    showBorder = state is AsyncImagePainter.State.Success
+                }
             )
 
             Column(

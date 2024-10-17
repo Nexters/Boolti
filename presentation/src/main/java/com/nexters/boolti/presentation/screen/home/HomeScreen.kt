@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.home
 
-import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,16 +29,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.MyScreen
+import com.nexters.boolti.presentation.screen.my.addMy
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 import com.nexters.boolti.presentation.screen.navigation.homeRoutes
-import com.nexters.boolti.presentation.screen.show.ShowScreen
-import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
-import com.nexters.boolti.presentation.screen.ticket.TicketScreen
+import com.nexters.boolti.presentation.screen.show.addShow
+import com.nexters.boolti.presentation.screen.ticket.addTicket
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
@@ -119,61 +117,27 @@ fun HomeScreen(
             navController = navController,
             startDestination = HomeRoute.Show,
         ) {
-            composable<HomeRoute.Show>(
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "https://app.boolti.in/home/shows"
-                        action = Intent.ACTION_VIEW
-                    }
-                )
-            ) {
-                LaunchedEffect(Unit) {
-                    currentRoute = HomeRoute.Show
-                }
+            addShow(
+                updateRoute = { currentRoute = HomeRoute.Show },
+                onClickShowItem = onClickShowItem,
+                navigateToBusiness = navigateToBusiness,
+            )
 
-                ShowScreen(
-                    onClickShowItem = onClickShowItem,
-                    navigateToBusiness = navigateToBusiness,
-                )
-            }
-            composable<HomeRoute.Ticket>(
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "https://app.boolti.in/home/tickets"
-                        action = Intent.ACTION_VIEW
-                    }
-                )
-            ) {
-                LaunchedEffect(Unit) {
-                    currentRoute = HomeRoute.Ticket
-                }
+            addTicket(
+                updateRoute = { currentRoute = HomeRoute.Ticket },
+                loggedIn = loggedIn,
+                onLoginClick = requireLogin,
+                onClickTicket = onClickTicket,
+            )
 
-                when (loggedIn) {
-                    true -> TicketScreen(
-                        onClickTicket = onClickTicket,
-                    )
-
-                    false -> TicketLoginScreen(
-                        modifier.padding(innerPadding),
-                        onLoginClick = requireLogin
-                    )
-
-                    else -> Unit // 로그인 여부를 불러오는 중
-                }
-            }
-            composable<HomeRoute.My> {
-                LaunchedEffect(Unit) {
-                    currentRoute = HomeRoute.My
-                }
-
-                MyScreen(
-                    requireLogin = requireLogin,
-                    onClickAccountSetting = onClickAccountSetting,
-                    navigateToReservations = navigateToReservations,
-                    navigateToProfile = navigateToProfile,
-                    onClickQrScan = onClickQrScan,
-                )
-            }
+            addMy(
+                updateRoute = { currentRoute = HomeRoute.My },
+                requireLogin = requireLogin,
+                onClickAccountSetting = onClickAccountSetting,
+                navigateToReservations = navigateToReservations,
+                navigateToProfile = navigateToProfile,
+                onClickQrScan = onClickQrScan,
+            )
         }
     }
 

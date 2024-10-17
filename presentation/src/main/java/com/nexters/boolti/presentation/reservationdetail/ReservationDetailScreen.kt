@@ -326,6 +326,7 @@ private fun TicketHolderInfo(
             if (isGift && reservation.reservationState != ReservationState.CANCELED) {
                 val month = reservation.salesEndDateTime.month.value
                 val day = reservation.salesEndDateTime.dayOfMonth
+                val senderText = stringResource(id = R.string.gift_sender_description, reservation?.depositorName ?: "")
                 val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
                 val buttonText = stringResource(id = R.string.gift_check)
 
@@ -336,7 +337,7 @@ private fun TicketHolderInfo(
                             sendMessage(
                                 context = context,
                                 giftUuid = reservation.giftUuid!!,
-                                receiverName = reservation.visitorName,
+                                senderText = senderText,
                                 image = reservation.giftInviteImage,
                                 dateText = dateText,
                                 buttonText = buttonText

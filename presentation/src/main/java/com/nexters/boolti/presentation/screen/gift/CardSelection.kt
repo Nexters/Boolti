@@ -148,6 +148,7 @@ private fun CardCarousel(
                     }
             ) {
                 AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
                     model = image.thumbnailImage,
                     contentDescription = stringResource(id = R.string.gift_image),
                     contentScale = ContentScale.Crop,

@@ -21,6 +21,7 @@ fun NavGraphBuilder.HomeScreen(
             navigateToReservations = { navigateTo(MainDestination.Reservations.route) },
             navigateToProfile = { navigateTo(MainDestination.Profile.createRoute()) },
             navigateToBusiness = { navigateTo(MainDestination.Business.route) },
+            navigateToShowRegistration = { navigateTo(MainDestination.ShowRegistration.route) },
             requireLogin = { navigateTo(MainDestination.Login.route) },
         )
     }

@@ -124,6 +124,8 @@ sealed class MainDestination(val route: String) {
         fun createRoute(link: Link): String =
             "profileLinkEdit?id=${link.id}&title=${link.name}&url=${link.url}"
     }
+
+    data object ShowRegistration : MainDestination(route = "webView")
 }
 
 /**

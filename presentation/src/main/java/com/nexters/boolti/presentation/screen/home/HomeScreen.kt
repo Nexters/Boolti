@@ -55,6 +55,7 @@ fun HomeScreen(
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToBusiness: () -> Unit,
+    navigateToShowRegistration: () -> Unit,
     requireLogin: () -> Unit,
     modifier: Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -134,6 +135,7 @@ fun HomeScreen(
                     modifier = modifier.padding(innerPadding),
                     onClickShowItem = onClickShowItem,
                     navigateToBusiness = navigateToBusiness,
+                    navigateToShowRegistration = navigateToShowRegistration,
                 )
             }
             composable(
@@ -168,6 +170,7 @@ fun HomeScreen(
                     onClickAccountSetting = onClickAccountSetting,
                     navigateToReservations = navigateToReservations,
                     navigateToProfile = navigateToProfile,
+                    navigateToShowRegistration = navigateToShowRegistration,
                     onClickQrScan = onClickQrScan,
                 )
             }

@@ -43,10 +43,7 @@ fun BtAppBar(
             .background(color = colors.containerColor)
             .fillMaxWidth()
             .height(44.dp)
-            .padding(
-                start = if (navigateButtons != null) 0.dp else 4.dp,
-                end = if (actionButtons != null) 0.dp else 4.dp,
-            ),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         navigateButtons?.let {
@@ -76,6 +73,45 @@ fun BtAppBar(
             )
         }
     }
+}
+
+@Composable
+fun BtAppBar(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
+    navigationButtonIds: List<Int> = emptyList(),
+    actionButtonIds: List<Int> = emptyList(),
+    onClickNavigationButton: (index: Int) -> Unit = {},
+    onClickActionButton: (index: Int) -> Unit = {},
+) {
+    BtAppBar(
+        modifier = modifier,
+        title = title,
+        colors = colors,
+        navigateButtons = if (navigationButtonIds.isNotEmpty()) {
+            {
+                navigationButtonIds.forEachIndexed { i, res ->
+                    BtAppBarDefaults.AppBarIconButton(res) {
+                        onClickNavigationButton(i)
+                    }
+                }
+            }
+        } else {
+            null
+        },
+        actionButtons = if (actionButtonIds.isNotEmpty()) {
+            {
+                actionButtonIds.forEachIndexed { i, res ->
+                    BtAppBarDefaults.AppBarIconButton(res) {
+                        onClickActionButton(i)
+                    }
+                }
+            }
+        } else {
+            null
+        },
+    )
 }
 
 @Composable
@@ -205,7 +241,7 @@ private fun CloseableBtAppBarPreview() {
 
 @Preview
 @Composable
-private fun ShowDetailAppBarPreview() {
+private fun AppBarPreview() {
     BooltiTheme {
         Surface {
             BtAppBar(
@@ -233,6 +269,25 @@ private fun ShowDetailAppBarPreview() {
                         onClick = {},
                     )
                 }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AppBar2Preview() {
+    BooltiTheme {
+        Surface {
+            BtAppBar(
+                navigationButtonIds = listOf(
+                    R.drawable.ic_arrow_back,
+                    R.drawable.ic_home,
+                ),
+                actionButtonIds = listOf(
+                    R.drawable.ic_share,
+                    R.drawable.ic_verticle_more,
+                ),
             )
         }
     }

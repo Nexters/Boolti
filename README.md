@@ -25,10 +25,9 @@
 </br></br>
 
 ## Animations
-
-| Home | Tickets |
-| ------------- | ------------- |
-| <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/66c2ada2-7079-4704-b9a4-237b2c8e2769" /> | <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/37b8640a-38bb-4e03-adad-6931998082a4"/> |
+| Home | Tickets | QR | Webview |
+| ------------- | ------------- | ------------- | ------------- |
+| <img width="200" src="https://github.com/user-attachments/assets/8d1ee7c6-29b3-4f75-96d6-c0cca7c28d28" /> | <img width="200" src="https://github.com/user-attachments/assets/0f3f35b8-0a6b-4f53-9df4-e80f4a96ed5a"/> | <img width="200" src="https://github.com/user-attachments/assets/3e11f8f8-7a2a-40aa-984b-2262dfdeb453"/> | <img width="200" src="https://github.com/user-attachments/assets/1febd38e-4576-48a2-beaa-078d00ab9b47"/> |
 
 </br>
 

@@ -80,32 +80,26 @@ fun BtAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
     colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
-    navigationButtonIds: List<Int> = emptyList(),
-    actionButtonIds: List<Int> = emptyList(),
-    onClickNavigationButton: (index: Int) -> Unit = {},
-    onClickActionButton: (index: Int) -> Unit = {},
+    navigationButtons: List<Pair<Int, () -> Unit>> = emptyList(),
+    actionButtons: List<Pair<Int, () -> Unit>> = emptyList(),
 ) {
     BtAppBar(
         modifier = modifier,
         title = title,
         colors = colors,
-        navigateButtons = if (navigationButtonIds.isNotEmpty()) {
+        navigateButtons = if (navigationButtons.isNotEmpty()) {
             {
-                navigationButtonIds.forEachIndexed { i, res ->
-                    BtAppBarDefaults.AppBarIconButton(res) {
-                        onClickNavigationButton(i)
-                    }
+                navigationButtons.forEach { (res, onClick) ->
+                    BtAppBarDefaults.AppBarIconButton(iconRes = res, onClick = onClick)
                 }
             }
         } else {
             null
         },
-        actionButtons = if (actionButtonIds.isNotEmpty()) {
+        actionButtons = if (actionButtons.isNotEmpty()) {
             {
-                actionButtonIds.forEachIndexed { i, res ->
-                    BtAppBarDefaults.AppBarIconButton(res) {
-                        onClickActionButton(i)
-                    }
+                actionButtons.forEach { (res, onClick) ->
+                    BtAppBarDefaults.AppBarIconButton(iconRes = res, onClick = onClick)
                 }
             }
         } else {
@@ -280,13 +274,9 @@ private fun AppBar2Preview() {
     BooltiTheme {
         Surface {
             BtAppBar(
-                navigationButtonIds = listOf(
-                    R.drawable.ic_arrow_back,
-                    R.drawable.ic_home,
-                ),
-                actionButtonIds = listOf(
-                    R.drawable.ic_share,
-                    R.drawable.ic_verticle_more,
+                navigationButtons = listOf(
+                    R.drawable.ic_arrow_back to { /* clicked */ },
+                    R.drawable.ic_home to { /* clicked */ },
                 ),
             )
         }

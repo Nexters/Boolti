@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
+import com.nexters.boolti.tosspayments.extension.percentEncode
 import com.nexters.boolti.tosspayments.extension.toCurrency
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.AgreementStatus
@@ -259,7 +260,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
                 .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
                 .putExtra(EXTRA_KEY_ORDER_ID, orderId)
-                .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
+                .putExtra(EXTRA_KEY_ORDER_NAME, orderName.percentEncode())
                 .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
                 .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
                 .putExtra(EXTRA_KEY_VARIANT_KEY, variantKey)
@@ -298,7 +299,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
                 .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
                 .putExtra(EXTRA_KEY_ORDER_ID, orderId)
-                .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
+                .putExtra(EXTRA_KEY_ORDER_NAME, orderName.percentEncode())
                 .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
                 .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
                 .putExtra(EXTRA_KEY_SHOW_ID, showId)

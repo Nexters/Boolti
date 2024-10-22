@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -26,8 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -54,9 +56,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val navController = rememberNavControllerWithLog()
     val snackbarController = LocalSnackbarController.current
-    var currentRoute: HomeRoute by remember { mutableStateOf(HomeRoute.Show) }
+    val navController = rememberNavControllerWithLog()
+    val currentBackStack by navController.currentBackStackEntryAsState()
 
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -99,7 +101,7 @@ fun HomeScreen(
     Scaffold(
         bottomBar = {
             HomeNavigationBar(
-                currentDestination = currentRoute,
+                currentDestination = currentBackStack?.destination,
                 onDestinationChanged = { dest ->
                     navController.navigate(dest) {
                         popUpTo(navController.graph.findStartDestination().id)
@@ -116,20 +118,17 @@ fun HomeScreen(
             startDestination = HomeRoute.Show,
         ) {
             addShow(
-                updateRoute = { currentRoute = HomeRoute.Show },
                 navigateToShowDetail = navigateToShowDetail,
                 navigateToBusiness = navigateToBusiness,
             )
 
             addTicket(
-                updateRoute = { currentRoute = HomeRoute.Ticket },
                 isLoggedIn = isLoggedIn,
                 navigateToLogin = navigateToLogin,
                 navigateToTicketDetail = navigateToTicketDetail,
             )
 
             addMy(
-                updateRoute = { currentRoute = HomeRoute.My },
                 navigateToLogin = navigateToLogin,
                 navigateToAccountSetting = navigateToAccountSetting,
                 navigateToReservations = navigateToReservations,
@@ -161,7 +160,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeNavigationBar(
-    currentDestination: HomeRoute,
+    currentDestination: NavDestination?,
     onDestinationChanged: (HomeRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -176,7 +175,7 @@ private fun HomeNavigationBar(
             containerColor = MaterialTheme.colorScheme.background,
         ) {
             homeRoutes.forEach { dest ->
-                val selected = currentDestination == dest
+                val selected = currentDestination?.hasRoute(dest::class) ?: false
                 val label = stringResource(dest.label)
                 NavigationBarItem(
                     selected = selected,

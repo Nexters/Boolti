@@ -1,14 +1,12 @@
 package com.nexters.boolti.presentation.screen.ticket
 
 import android.content.Intent
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
 fun NavGraphBuilder.addTicket(
-    updateRoute: () -> Unit,
     isLoggedIn: Boolean?,
     navigateToTicketDetail: (String) -> Unit,
     navigateToLogin: () -> Unit,
@@ -21,10 +19,6 @@ fun NavGraphBuilder.addTicket(
             }
         )
     ) {
-        LaunchedEffect(Unit) {
-            updateRoute()
-        }
-
         when (isLoggedIn) {
             true -> TicketScreen(
                 onClickTicket = navigateToTicketDetail,

@@ -8,7 +8,6 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.hostedShowScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
     onClickShow: (showId: String, showName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -16,7 +15,7 @@ fun NavGraphBuilder.hostedShowScreen(
         HostedShowScreen(
             modifier = modifier,
             onClickShow = onClickShow,
-            onClickBack = popBackStack
+            onClickBack = navController::popBackStack
         )
     }
 }

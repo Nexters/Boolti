@@ -98,31 +98,12 @@ fun MainNavigation(
         navController = navController,
         startDestination = MainRoute.Home,
     ) {
-        homeScreen(
-            navController = navController,
-            navigateTo = navController::navigateTo
-        )
-        loginScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack
-        )
-        signoutScreen(
-            navController = navController,
-            navigateToHome = navController::navigateToHome,
-            popBackStack = navController::popBackStack
-        )
-        reservationsScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack
-        )
-        reservationDetailScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack
-        )
-        refundScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack
-        )
+        homeScreen(navController = navController)
+        loginScreen(navController = navController)
+        signoutScreen(navController = navController)
+        reservationsScreen(navController = navController)
+        reservationDetailScreen(navController = navController)
+        refundScreen(navController = navController)
 
         navigation<MainRoute.ShowDetail>(
             startDestination = ShowRoute.Detail,
@@ -157,10 +138,7 @@ fun MainNavigation(
             )
         }
 
-        ticketingScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack,
-        )
+        ticketingScreen(navController = navController)
 
         navigation(
             route = "${MainDestination.TicketDetail.route}/{$ticketId}",
@@ -186,40 +164,18 @@ fun MainNavigation(
             )
         }
 
-        giftScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack,
-        )
+        giftScreen(navController = navController)
 
         hostedShowScreen(
             navController = navController,
             onClickShow = onClickQrScan,
-            popBackStack = navController::popBackStack,
         )
 
-        paymentCompleteScreen(
-            navController = navController,
-            navigateByDeepLink = navController::navigate,
-            navigateToHome = navController::navigateToHome,
-        )
-        giftCompleteScreen(
-            navController = navController,
-            navigateToHome = navController::navigateToHome,
-            popBackStack = { navController.popBackStack(MainRoute.Gift, true) }
-        )
-        businessScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack
-        )
-        accountSettingScreen(
-            navController = navController,
-            popBackStack = navController::popBackStack,
-        )
-        profileScreen(
-            navController = navController,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack,
-        )
+        paymentCompleteScreen(navController = navController)
+        giftCompleteScreen(navController = navController)
+        businessScreen(navController = navController)
+        accountSettingScreen(navController = navController)
+        profileScreen(navController = navController)
         navigation(
             route = "profileEditNavigation",
             startDestination = MainDestination.ProfileEdit.route,

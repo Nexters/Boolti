@@ -7,11 +7,10 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.businessScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
 ) {
     composable<MainRoute.Business> {
         BusinessScreen(
-            onBackPressed = popBackStack
+            onBackPressed = navController::popBackStack
         )
     }
 }

@@ -9,14 +9,13 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.homeScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable<MainRoute.Home> {
         HomeScreen(
             modifier = modifier,
             navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
-            navigateToTicketDetail = { navigateTo("${MainDestination.TicketDetail.route}/$it") },
+            navigateToTicketDetail = { navController.navigate("${MainDestination.TicketDetail.route}/$it") },
             navigateToQrScan = { navController.navigate(MainRoute.HostedShows) },
             navigateToAccountSetting = { navController.navigate(MainRoute.AccountSetting) },
             navigateToReservations = { navController.navigate(MainRoute.Reservations) },

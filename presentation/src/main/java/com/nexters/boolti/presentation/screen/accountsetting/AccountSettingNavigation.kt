@@ -7,11 +7,10 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.accountSettingScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
 ) {
     composable<MainRoute.AccountSetting> {
         AccountSettingScreen(
-            navigateBack = popBackStack,
+            navigateBack = navController::popBackStack,
             onClickResign = { navController.navigate(MainRoute.SignOut) },
         )
     }

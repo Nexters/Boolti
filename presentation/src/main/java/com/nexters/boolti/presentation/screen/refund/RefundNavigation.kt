@@ -9,14 +9,13 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.refundScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
 ) {
     composable<MainRoute.Refund> { entry ->
         val route = entry.toRoute<MainRoute.Refund>()
 
         RefundScreen(
             isGift = route.isGift,
-            onBackPressed = popBackStack,
+            onBackPressed = navController::popBackStack,
         )
     }
 }

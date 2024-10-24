@@ -7,11 +7,10 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.reservationDetailScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
 ) {
     composable<MainRoute.ReservationDetail> {
         ReservationDetailScreen(
-            onBackPressed = popBackStack,
+            onBackPressed = navController::popBackStack,
             navigateToRefund = { id, isGift ->
                 navController.navigate(MainRoute.Refund(reservationId = id, isGift = isGift))
             },

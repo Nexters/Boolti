@@ -8,13 +8,12 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.giftScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable<MainRoute.Gift> {
         GiftScreen(
             modifier = modifier,
-            popBackStack = popBackStack,
+            popBackStack = navController::popBackStack,
             navigateToBusiness = { navController.navigate(MainRoute.Business) },
             navigateToComplete = { giftId ->
                 navController.navigate(MainRoute.GiftComplete(giftId = giftId))

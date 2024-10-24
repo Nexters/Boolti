@@ -8,13 +8,12 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.ticketingScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable<MainRoute.Ticketing> {
         TicketingScreen(
             modifier = modifier,
-            onBackClicked = popBackStack,
+            onBackClicked = navController::popBackStack,
             onReserved = { reservationId, showId ->
                 navController.navigate(
                     MainRoute.PaymentComplete(

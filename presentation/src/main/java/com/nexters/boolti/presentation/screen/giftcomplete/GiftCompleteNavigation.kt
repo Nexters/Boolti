@@ -1,10 +1,12 @@
 package com.nexters.boolti.presentation.screen.giftcomplete
 
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.giftCompleteScreen(
+    navController: NavHostController,
     navigateTo: (String) -> Unit,
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,

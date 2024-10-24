@@ -2,10 +2,12 @@ package com.nexters.boolti.presentation.screen.profileedit.link
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.profileLinkEditScreen(
+    navController: NavHostController,
     onAddLink: (linkName: String, url: String) -> Unit,
     onEditLink: (id: String, linkName: String, url: String) -> Unit,
     onRemoveLink: (id: String) -> Unit,

@@ -83,6 +83,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketGroup
@@ -116,6 +117,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 fun NavGraphBuilder.ticketDetailScreen(
+    navController: NavHostController,
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,

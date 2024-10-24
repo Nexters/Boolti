@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.presentation.screen.MainDestination
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.zip
 import java.util.UUID
 
 fun NavGraphBuilder.profileEditScreen(
+    navController: NavHostController,
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,

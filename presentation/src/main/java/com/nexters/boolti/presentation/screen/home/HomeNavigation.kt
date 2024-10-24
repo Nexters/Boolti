@@ -2,10 +2,12 @@ package com.nexters.boolti.presentation.screen.home
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.homeScreen(
+    navController: NavHostController,
     navigateTo: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {

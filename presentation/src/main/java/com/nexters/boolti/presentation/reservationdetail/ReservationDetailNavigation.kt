@@ -1,10 +1,12 @@
 package com.nexters.boolti.presentation.reservationdetail
 
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
 fun NavGraphBuilder.reservationDetailScreen(
+    navController: NavHostController,
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
 ) {

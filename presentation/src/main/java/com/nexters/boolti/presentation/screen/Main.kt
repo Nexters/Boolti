@@ -98,21 +98,33 @@ fun MainNavigation(
         navController = navController,
         startDestination = Home.route,
     ) {
-        homeScreen(navigateTo = navController::navigateTo)
-        loginScreen(popBackStack = navController::popBackStack)
+        homeScreen(
+            navController = navController,
+            navigateTo = navController::navigateTo
+        )
+        loginScreen(
+            navController = navController,
+            popBackStack = navController::popBackStack
+        )
         signoutScreen(
+            navController = navController,
             navigateToHome = navController::navigateToHome,
             popBackStack = navController::popBackStack
         )
         reservationsScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack
         )
         reservationDetailScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack
         )
-        refundScreen(popBackStack = navController::popBackStack)
+        refundScreen(
+            navController = navController,
+            popBackStack = navController::popBackStack
+        )
 
         navigation(
             route = "${ShowDetail.route}/{$showId}",
@@ -126,26 +138,31 @@ fun MainNavigation(
             ),
         ) {
             showDetailScreen(
+                navController = navController,
                 navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 navigateToHome = navController::navigateToHome,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
             showImagesScreen(
+                navController = navController,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
             showDetailContentScreen(
+                navController = navController,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
             reportScreen(
+                navController = navController,
                 navigateToHome = navController::navigateToHome,
                 popBackStack = navController::popBackStack,
             )
         }
 
         ticketingScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
@@ -162,27 +179,32 @@ fun MainNavigation(
             arguments = MainDestination.TicketDetail.arguments,
         ) {
             ticketDetailScreen(
+                navController = navController,
                 navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
             qrFullScreen(
+                navController = navController,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
         }
 
         giftScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
 
         hostedShowScreen(
+            navController = navController,
             onClickShow = onClickQrScan,
             popBackStack = navController::popBackStack,
         )
 
         paymentCompleteScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             navigateByDeepLink = navController::navigate,
             popBackStack = navController::popBackStack,
@@ -195,16 +217,22 @@ fun MainNavigation(
             navigateToHome = navController::navigateToHome,
         )
         giftCompleteScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             navigateToHome = navController::navigateToHome,
             popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
         )
-        businessScreen(popBackStack = navController::popBackStack)
+        businessScreen(
+            navController = navController,
+            popBackStack = navController::popBackStack
+        )
         accountSettingScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
         profileScreen(
+            navController = navController,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
@@ -213,10 +241,12 @@ fun MainNavigation(
             startDestination = MainDestination.ProfileEdit.route,
         ) {
             profileEditScreen(
+                navController = navController,
                 navigateTo = navController::navigate,
                 popBackStack = navController::popBackStack,
             )
             profileLinkEditScreen(
+                navController = navController,
                 onAddLink = { linkName, url ->
                     navController.previousBackStackEntry
                         ?.savedStateHandle

@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
@@ -55,6 +56,7 @@ import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
 fun NavGraphBuilder.qrFullScreen(
+    navController: NavHostController,
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,

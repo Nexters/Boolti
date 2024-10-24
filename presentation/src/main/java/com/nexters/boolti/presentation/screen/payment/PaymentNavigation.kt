@@ -3,12 +3,14 @@ package com.nexters.boolti.presentation.screen.payment
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.reservationId
 import com.nexters.boolti.presentation.screen.showId
 
 fun NavGraphBuilder.paymentCompleteScreen(
+    navController: NavHostController,
     navigateTo: (String) -> Unit,
     navigateByDeepLink: (Uri) -> Unit,
     popBackStack: () -> Unit,

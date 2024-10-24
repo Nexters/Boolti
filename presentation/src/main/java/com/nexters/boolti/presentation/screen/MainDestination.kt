@@ -56,7 +56,6 @@ sealed class MainDestination(val route: String) {
 
     data object Qr : MainDestination(route = "qr")
 
-    data object Reservations : MainDestination(route = "reservations")
     data object ReservationDetail : MainDestination(route = "reservations/{reservationId}?isGift={isGift}") {
         val arguments = listOf(
             navArgument("reservationId") { type = NavType.StringType },

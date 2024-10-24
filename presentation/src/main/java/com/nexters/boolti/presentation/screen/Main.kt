@@ -117,7 +117,6 @@ fun MainNavigation(
         )
         reservationDetailScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack
         )
         refundScreen(

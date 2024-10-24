@@ -5,17 +5,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.reservationId
 
 fun NavGraphBuilder.reservationDetailScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
 ) {
     composable<MainRoute.ReservationDetail> {
         ReservationDetailScreen(
             onBackPressed = popBackStack,
             navigateToRefund = { id, isGift ->
-                navigateTo(MainDestination.Refund.createRoute(id = id, isGift = isGift))
+                navController.navigate(MainRoute.Refund(reservationId = id, isGift = isGift))
             },
         )
     }

@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
@@ -87,15 +88,18 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
 }
 
 @Composable
-fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
-    val navController = rememberNavControllerWithLog()
-
+fun MainNavigation(
+    onClickQrScan: (showId: String, showName: String) -> Unit,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavControllerWithLog(),
+) {
     NavHost(
+        modifier = modifier,
         navController = navController,
         startDestination = Home.route,
     ) {
-        HomeScreen(modifier = modifier, navigateTo = navController::navigateTo)
-        LoginScreen(modifier = modifier, popBackStack = navController::popBackStack)
+        HomeScreen(navigateTo = navController::navigateTo)
+        LoginScreen(popBackStack = navController::popBackStack)
         SignoutScreen(
             navigateToHome = navController::navigateToHome,
             popBackStack = navController::popBackStack
@@ -122,7 +126,6 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             ),
         ) {
             ShowDetailScreen(
-                modifier = modifier,
                 navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 navigateToHome = navController::navigateToHome,
@@ -133,19 +136,16 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
             ShowDetailContentScreen(
-                modifier = modifier,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
             ReportScreen(
-                modifier = modifier,
                 navigateToHome = navController::navigateToHome,
                 popBackStack = navController::popBackStack,
             )
         }
 
         TicketingScreen(
-            modifier = modifier,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
@@ -162,26 +162,22 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             arguments = MainDestination.TicketDetail.arguments,
         ) {
             TicketDetailScreen(
-                modifier = modifier,
                 navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
             QrFullScreen(
-                modifier = modifier,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
         }
 
         addGiftScreen(
-            modifier = modifier,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
 
         HostedShowScreen(
-            modifier = modifier,
             onClickShow = onClickQrScan,
             popBackStack = navController::popBackStack,
         )
@@ -209,7 +205,6 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             popBackStack = navController::popBackStack,
         )
         ProfileScreen(
-            modifier = modifier,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
@@ -218,12 +213,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             startDestination = MainDestination.ProfileEdit.route,
         ) {
             ProfileEditScreen(
-                modifier = modifier,
                 navigateTo = navController::navigate,
                 popBackStack = navController::popBackStack,
             )
             ProfileLinkEditScreen(
-                modifier = modifier,
                 onAddLink = { linkName, url ->
                     navController.previousBackStackEntry
                         ?.savedStateHandle

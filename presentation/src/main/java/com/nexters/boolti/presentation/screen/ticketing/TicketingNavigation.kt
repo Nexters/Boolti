@@ -4,12 +4,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.ticketingScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -18,7 +16,12 @@ fun NavGraphBuilder.ticketingScreen(
             modifier = modifier,
             onBackClicked = popBackStack,
             onReserved = { reservationId, showId ->
-                navigateTo("${MainDestination.PaymentComplete.route}/$reservationId?showId=$showId")
+                navController.navigate(
+                    MainRoute.PaymentComplete(
+                        reservationId = reservationId,
+                        showId = showId,
+                    )
+                )
             },
             navigateToBusiness = { navController.navigate(MainRoute.Business) },
         )

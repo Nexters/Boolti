@@ -159,7 +159,6 @@ fun MainNavigation(
 
         ticketingScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
 
@@ -201,7 +200,6 @@ fun MainNavigation(
         paymentCompleteScreen(
             navController = navController,
             navigateByDeepLink = navController::navigate,
-            popBackStack = navController::popBackStack,
             navigateToHome = navController::navigateToHome,
         )
         giftCompleteScreen(

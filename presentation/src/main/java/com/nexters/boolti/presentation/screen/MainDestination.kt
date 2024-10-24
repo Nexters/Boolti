@@ -6,13 +6,6 @@ import com.nexters.boolti.domain.model.Link
 
 sealed class MainDestination(val route: String) {
 
-    data object PaymentComplete : MainDestination(route = "paymentComplete") {
-        val arguments = listOf(
-            navArgument(reservationId) { type = NavType.StringType },
-            navArgument(showId) { type = NavType.StringType }
-        )
-    }
-
     data object TicketDetail : MainDestination(route = "tickets") {
         val arguments = listOf(navArgument(ticketId) { type = NavType.StringType })
     }

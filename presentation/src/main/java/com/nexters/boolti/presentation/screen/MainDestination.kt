@@ -5,7 +5,6 @@ import androidx.navigation.navArgument
 import com.nexters.boolti.domain.model.Link
 
 sealed class MainDestination(val route: String) {
-    data object Home : MainDestination(route = "home")
     data object ShowDetail : MainDestination(route = "show") {
         val arguments = listOf(navArgument(showId) { type = NavType.StringType })
     }

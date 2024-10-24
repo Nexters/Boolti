@@ -32,6 +32,7 @@ import com.nexters.boolti.presentation.screen.gift.giftScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
@@ -96,7 +97,7 @@ fun MainNavigation(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Home.route,
+        startDestination = MainRoute.Home,
     ) {
         homeScreen(
             navController = navController,

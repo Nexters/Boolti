@@ -5,15 +5,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.homeScreen(
     navController: NavHostController,
     navigateTo: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Home.route,
-    ) {
+    composable<MainRoute.Home> {
         HomeScreen(
             modifier = modifier,
             navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },

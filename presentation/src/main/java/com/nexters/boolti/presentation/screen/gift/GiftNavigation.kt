@@ -17,7 +17,7 @@ fun NavGraphBuilder.giftScreen(
         GiftScreen(
             modifier = modifier,
             popBackStack = popBackStack,
-            navigateToBusiness = { navigateTo(MainDestination.Business.route) },
+            navigateToBusiness = { navController.navigate(MainRoute.Business) },
             navigateToComplete = { giftId ->
                 navigateTo(MainDestination.GiftComplete.createRoute(giftId))
             }

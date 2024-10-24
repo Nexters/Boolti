@@ -5,11 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.isInviteTicket
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
-import com.nexters.boolti.presentation.screen.salesTicketId
-import com.nexters.boolti.presentation.screen.showId
-import com.nexters.boolti.presentation.screen.ticketCount
 
 fun NavGraphBuilder.ticketingScreen(
     navController: NavHostController,
@@ -24,7 +20,7 @@ fun NavGraphBuilder.ticketingScreen(
             onReserved = { reservationId, showId ->
                 navigateTo("${MainDestination.PaymentComplete.route}/$reservationId?showId=$showId")
             },
-            navigateToBusiness = { navigateTo(MainDestination.Business.route) },
+            navigateToBusiness = { navController.navigate(MainRoute.Business) },
         )
     }
 }

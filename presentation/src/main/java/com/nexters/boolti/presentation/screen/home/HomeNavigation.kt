@@ -21,7 +21,7 @@ fun NavGraphBuilder.homeScreen(
             navigateToAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },
             navigateToReservations = { navController.navigate(MainRoute.Reservations) },
             navigateToProfile = { navigateTo(MainDestination.Profile.createRoute()) },
-            navigateToBusiness = { navigateTo(MainDestination.Business.route) },
+            navigateToBusiness = { navController.navigate(MainRoute.Business) },
             navigateToLogin = { navController.navigate(MainRoute.Login) },
         )
     }

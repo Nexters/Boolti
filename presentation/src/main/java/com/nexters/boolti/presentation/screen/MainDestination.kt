@@ -13,16 +13,6 @@ sealed class MainDestination(val route: String) {
         )
     }
 
-    data object GiftComplete : MainDestination(route = "giftComplete?giftId={giftId}") {
-        val arguments = listOf(
-            navArgument("giftId") { type = NavType.StringType },
-        )
-
-        fun createRoute(
-            giftId: String,
-        ): String = "giftComplete?giftId=${giftId}"
-    }
-
     data object TicketDetail : MainDestination(route = "tickets") {
         val arguments = listOf(navArgument(ticketId) { type = NavType.StringType })
     }

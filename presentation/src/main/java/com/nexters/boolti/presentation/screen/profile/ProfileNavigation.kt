@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.profileScreen(
     navController: NavHostController,
@@ -12,10 +13,7 @@ fun NavGraphBuilder.profileScreen(
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Profile.route,
-        arguments = MainDestination.Profile.arguments,
-    ) {
+    composable<MainRoute.Profile> {
         ProfileScreen(
             modifier = modifier,
             onClickBack = popBackStack,

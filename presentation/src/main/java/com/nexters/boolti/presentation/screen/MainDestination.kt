@@ -31,20 +31,6 @@ sealed class MainDestination(val route: String) {
 
     data object HostedShows : MainDestination(route = "hostedShows")
 
-    data object Profile : MainDestination(route = "profile?userCode={$userCode}") {
-        val arguments = listOf(
-            navArgument(userCode) {
-                type = NavType.StringType
-                nullable = true
-            },
-        )
-
-        fun createRoute(userCode: String? = null): String =
-            StringBuilder("profile").apply {
-                userCode?.let { append("?userCode=$it") }
-            }.toString()
-    }
-
     data object ProfileEdit : MainDestination(route = "profileEdit")
     data object ProfileLinkEdit :
         MainDestination(route = "profileLinkEdit?id={$linkId}&title={$linkTitle}&url={$url}") {
@@ -77,7 +63,6 @@ const val ticketId = "ticketId"
 const val ticketName = "ticketName"
 const val data = "data"
 const val reservationId = "reservationId"
-const val salesTicketId = "salesTicketId"
 const val ticketCount = "ticketCount"
 const val isInviteTicket = "isInviteTicket"
 const val userCode = "userCode"

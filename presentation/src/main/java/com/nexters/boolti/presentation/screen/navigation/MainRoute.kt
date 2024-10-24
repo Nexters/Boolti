@@ -77,7 +77,7 @@ sealed interface MainRoute {
 
     @Serializable
     data class Profile(
-        val userCode: String?
+        val userCode: String? = null
     ) : MainRoute
 
     @Serializable

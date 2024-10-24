@@ -24,7 +24,6 @@ import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.reservationdetail.reservationDetailScreen
-import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen

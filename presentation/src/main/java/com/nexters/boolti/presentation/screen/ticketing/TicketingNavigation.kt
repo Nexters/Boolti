@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.isInviteTicket
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.salesTicketId
 import com.nexters.boolti.presentation.screen.showId
 import com.nexters.boolti.presentation.screen.ticketCount
@@ -16,10 +17,7 @@ fun NavGraphBuilder.ticketingScreen(
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = "${MainDestination.Ticketing.route}/{$showId}?salesTicketId={$salesTicketId}&ticketCount={$ticketCount}&inviteTicket={$isInviteTicket}",
-        arguments = MainDestination.Ticketing.arguments,
-    ) {
+    composable<MainRoute.Ticketing> {
         TicketingScreen(
             modifier = modifier,
             onBackClicked = popBackStack,

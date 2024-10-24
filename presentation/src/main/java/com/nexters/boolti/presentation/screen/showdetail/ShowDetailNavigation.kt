@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
 fun NavGraphBuilder.showDetailScreen(
@@ -26,7 +27,14 @@ fun NavGraphBuilder.showDetailScreen(
             onClickHome = navigateToHome,
             onClickContent = { navigateTo("content") },
             onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
-                navigateTo("ticketing/$showId?salesTicketId=$ticketId&ticketCount=$ticketCount&inviteTicket=$isInviteTicket")
+                navController.navigate(
+                    MainRoute.Ticketing(
+                        showId = showId,
+                        salesTicketId = ticketId,
+                        ticketCount = ticketCount,
+                        isInviteTicket = isInviteTicket,
+                    )
+                )
             },
             onGiftTicketSelected = { showId, ticketId, ticketCount ->
                 navigateTo(

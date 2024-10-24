@@ -12,10 +12,8 @@ import com.nexters.boolti.presentation.screen.showId
 
 fun NavGraphBuilder.paymentCompleteScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     navigateByDeepLink: (Uri) -> Unit,
     popBackStack: () -> Unit,
-    popInclusiveBackStack: (String) -> Unit,
     navigateToHome: () -> Unit,
 ) {
     composable(
@@ -27,8 +25,8 @@ fun NavGraphBuilder.paymentCompleteScreen(
             onClickHome = navigateToHome,
             onClickClose = {
                 showId?.let { showId ->
-                    popInclusiveBackStack("${MainDestination.ShowDetail.route}/$showId")
-                    navigateTo("${MainDestination.ShowDetail.route}/$showId")
+                    navController.popBackStack<MainRoute.ShowDetail>(inclusive = true)
+                    navController.navigate(MainRoute.ShowDetail(showId = showId))
                 } ?: popBackStack()
             },
             navigateToReservation = { reservation ->

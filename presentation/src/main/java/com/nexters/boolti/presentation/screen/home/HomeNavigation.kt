@@ -15,7 +15,7 @@ fun NavGraphBuilder.homeScreen(
     composable<MainRoute.Home> {
         HomeScreen(
             modifier = modifier,
-            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
+            navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
             navigateToTicketDetail = { navigateTo("${MainDestination.TicketDetail.route}/$it") },
             navigateToQrScan = { navigateTo(MainDestination.HostedShows.route) },
             navigateToAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },

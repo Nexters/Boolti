@@ -24,7 +24,6 @@ import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.reservationdetail.reservationDetailScreen
-import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
 import com.nexters.boolti.presentation.screen.gift.giftScreen
@@ -32,6 +31,7 @@ import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
@@ -124,10 +124,8 @@ fun MainNavigation(
             popBackStack = navController::popBackStack
         )
 
-        navigation(
-            route = "${ShowDetail.route}/{$showId}",
-            startDestination = "detail",
-            arguments = ShowDetail.arguments,
+        navigation<MainRoute.ShowDetail>(
+            startDestination = ShowRoute.Detail,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "https://preview.boolti.in/show/{$showId}"
@@ -203,15 +201,8 @@ fun MainNavigation(
 
         paymentCompleteScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             navigateByDeepLink = navController::navigate,
             popBackStack = navController::popBackStack,
-            popInclusiveBackStack = { route ->
-                navController.popBackStack(
-                    route = route,
-                    inclusive = true,
-                )
-            },
             navigateToHome = navController::navigateToHome,
         )
         giftCompleteScreen(

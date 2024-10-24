@@ -98,6 +98,7 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
@@ -132,7 +133,7 @@ fun NavGraphBuilder.ticketDetailScreen(
             onClickQr = {
                 navigateTo(MainDestination.Qr.route)
             },
-            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
+            navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
             viewModel = getSharedViewModel(entry),
         )
     }
@@ -249,7 +250,11 @@ private fun TicketDetailScreen(
                         // 배경 블러된 이미지
                         Box(contentAlignment = Alignment.BottomCenter) {
                             AsyncImage(
-                                model = asyncImageBlurModel(context, ticketGroup.poster, radius = 24),
+                                model = asyncImageBlurModel(
+                                    context,
+                                    ticketGroup.poster,
+                                    radius = 24
+                                ),
                                 modifier = Modifier
                                     .width(contentWidth.toDp())
                                     .aspectRatio(317 / 570f)
@@ -262,7 +267,12 @@ private fun TicketDetailScreen(
                                     .fillMaxWidth()
                                     .aspectRatio(317 / 125f)
                                     .background(
-                                        brush = Brush.verticalGradient(listOf(Black.copy(alpha = 0f), Black)),
+                                        brush = Brush.verticalGradient(
+                                            listOf(
+                                                Black.copy(alpha = 0f),
+                                                Black
+                                            )
+                                        ),
                                     )
                             )
                         }
@@ -308,7 +318,8 @@ private fun TicketDetailScreen(
                             ) {
                                 Notice(notice = ticketGroup.ticketNotice)
 
-                                val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                                val copiedMessage =
+                                    stringResource(id = R.string.ticketing_address_copied_message)
                                 Inquiry(
                                     hostName = ticketGroup.hostName,
                                     hostPhoneNumber = ticketGroup.hostPhoneNumber,
@@ -367,7 +378,9 @@ private fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        if (LocalDate.now().toEpochDay() < uiState.ticketGroup.showDate.toLocalDate().toEpochDay()) {
+        if (LocalDate.now().toEpochDay() < uiState.ticketGroup.showDate.toLocalDate()
+                .toEpochDay()
+        ) {
             // 아직 공연일 아님
             BTDialog(
                 showCloseButton = false,

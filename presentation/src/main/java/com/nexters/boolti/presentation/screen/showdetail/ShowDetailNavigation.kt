@@ -45,7 +45,7 @@ fun NavGraphBuilder.showDetailScreen(
                 )
             },
             viewModel = showViewModel,
-            navigateToLogin = { navigateTo("login") },
+            navigateToLogin = { navController.navigate(MainRoute.Login) },
             navigateToImages = { index -> navigateTo("images/$index") },
             navigateToReport = {
                 val showId = entry.arguments?.getString("showId")

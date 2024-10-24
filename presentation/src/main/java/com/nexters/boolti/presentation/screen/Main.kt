@@ -208,7 +208,7 @@ fun MainNavigation(
         giftCompleteScreen(
             navController = navController,
             navigateToHome = navController::navigateToHome,
-            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
+            popBackStack = { navController.popBackStack(MainRoute.Gift, true) }
         )
         businessScreen(
             navController = navController,

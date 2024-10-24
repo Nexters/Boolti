@@ -37,11 +37,11 @@ fun NavGraphBuilder.showDetailScreen(
                 )
             },
             onGiftTicketSelected = { showId, ticketId, ticketCount ->
-                navigateTo(
-                    MainDestination.Gift.createRoute(
+                navController.navigate(
+                    MainRoute.Gift(
                         showId = showId,
                         salesTicketId = ticketId,
-                        ticketCount = ticketCount
+                        ticketCount = ticketCount,
                     )
                 )
             },

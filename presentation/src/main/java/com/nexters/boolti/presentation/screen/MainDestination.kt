@@ -12,8 +12,6 @@ sealed class MainDestination(val route: String) {
 
     data object Qr : MainDestination(route = "qr")
 
-    data object HostedShows : MainDestination(route = "hostedShows")
-
     data object ProfileEdit : MainDestination(route = "profileEdit")
     data object ProfileLinkEdit :
         MainDestination(route = "profileLinkEdit?id={$linkId}&title={$linkTitle}&url={$url}") {

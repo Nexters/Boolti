@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
-fun NavGraphBuilder.addShow(
+fun NavGraphBuilder.showScreen(
     navigateToShowDetail: (showId: String) -> Unit,
     navigateToBusiness: () -> Unit,
 ) {

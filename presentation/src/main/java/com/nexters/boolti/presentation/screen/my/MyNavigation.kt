@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
-fun NavGraphBuilder.addMy(
+fun NavGraphBuilder.myScreen(
     navigateToLogin: () -> Unit,
     navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,

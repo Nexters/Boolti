@@ -33,11 +33,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.my.addMy
+import com.nexters.boolti.presentation.screen.my.myScreen
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 import com.nexters.boolti.presentation.screen.navigation.homeRoutes
-import com.nexters.boolti.presentation.screen.show.addShow
-import com.nexters.boolti.presentation.screen.ticket.addTicket
+import com.nexters.boolti.presentation.screen.show.showScreen
+import com.nexters.boolti.presentation.screen.ticket.ticketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
@@ -117,18 +117,18 @@ fun HomeScreen(
             navController = navController,
             startDestination = HomeRoute.Show,
         ) {
-            addShow(
+            showScreen(
                 navigateToShowDetail = navigateToShowDetail,
                 navigateToBusiness = navigateToBusiness,
             )
 
-            addTicket(
+            ticketScreen(
                 isLoggedIn = isLoggedIn,
                 navigateToLogin = navigateToLogin,
                 navigateToTicketDetail = navigateToTicketDetail,
             )
 
-            addMy(
+            myScreen(
                 navigateToLogin = navigateToLogin,
                 navigateToAccountSetting = navigateToAccountSetting,
                 navigateToReservations = navigateToReservations,

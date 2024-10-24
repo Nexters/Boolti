@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
-fun NavGraphBuilder.addTicket(
+fun NavGraphBuilder.ticketScreen(
     isLoggedIn: Boolean?,
     navigateToTicketDetail: (String) -> Unit,
     navigateToLogin: () -> Unit,

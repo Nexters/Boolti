@@ -4,10 +4,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.accountSettingScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
 ) {
     composable(
@@ -15,7 +15,7 @@ fun NavGraphBuilder.accountSettingScreen(
     ) {
         AccountSettingScreen(
             navigateBack = popBackStack,
-            onClickResign = { navigateTo(MainDestination.SignOut.route) },
+            onClickResign = { navController.navigate(MainRoute.SignOut) },
         )
     }
 }

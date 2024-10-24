@@ -228,7 +228,6 @@ fun MainNavigation(
         )
         accountSettingScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
         profileScreen(

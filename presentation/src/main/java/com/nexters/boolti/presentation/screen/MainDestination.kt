@@ -83,7 +83,6 @@ sealed class MainDestination(val route: String) {
 
     data object HostedShows : MainDestination(route = "hostedShows")
 
-    data object SignOut : MainDestination(route = "signout")
     data object Business : MainDestination(route = "business")
     data object AccountSetting : MainDestination(route = "accountSetting")
     data object Profile : MainDestination(route = "profile?userCode={$userCode}") {

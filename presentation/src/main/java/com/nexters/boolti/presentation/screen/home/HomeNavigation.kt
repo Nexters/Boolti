@@ -18,7 +18,7 @@ fun NavGraphBuilder.homeScreen(
             navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
             navigateToTicketDetail = { navigateTo("${MainDestination.TicketDetail.route}/$it") },
             navigateToQrScan = { navigateTo(MainDestination.HostedShows.route) },
-            navigateToAccountSetting = { navigateTo(MainDestination.AccountSetting.route) },
+            navigateToAccountSetting = { navController.navigate(MainRoute.AccountSetting) },
             navigateToReservations = { navController.navigate(MainRoute.Reservations) },
             navigateToProfile = { navigateTo(MainDestination.Profile.createRoute()) },
             navigateToBusiness = { navController.navigate(MainRoute.Business) },

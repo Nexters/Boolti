@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.SignoutScreen(
+fun NavGraphBuilder.signoutScreen(
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,
 ) {

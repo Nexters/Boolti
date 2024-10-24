@@ -23,30 +23,30 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
-import com.nexters.boolti.presentation.reservationdetail.ReservationDetailScreen
+import com.nexters.boolti.presentation.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
-import com.nexters.boolti.presentation.screen.accountsetting.AccountSettingScreen
-import com.nexters.boolti.presentation.screen.business.BusinessScreen
-import com.nexters.boolti.presentation.screen.gift.addGiftScreen
-import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
-import com.nexters.boolti.presentation.screen.home.HomeScreen
-import com.nexters.boolti.presentation.screen.login.LoginScreen
-import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
-import com.nexters.boolti.presentation.screen.profile.ProfileScreen
-import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
-import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
-import com.nexters.boolti.presentation.screen.qr.QrFullScreen
-import com.nexters.boolti.presentation.screen.refund.RefundScreen
-import com.nexters.boolti.presentation.screen.report.ReportScreen
-import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
-import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
-import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
-import com.nexters.boolti.presentation.screen.showdetail.ShowImagesScreen
-import com.nexters.boolti.presentation.screen.signout.SignoutScreen
-import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
-import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
+import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
+import com.nexters.boolti.presentation.screen.business.businessScreen
+import com.nexters.boolti.presentation.screen.gift.giftScreen
+import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
+import com.nexters.boolti.presentation.screen.home.homeScreen
+import com.nexters.boolti.presentation.screen.login.loginScreen
+import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
+import com.nexters.boolti.presentation.screen.profile.profileScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
+import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
+import com.nexters.boolti.presentation.screen.qr.qrFullScreen
+import com.nexters.boolti.presentation.screen.refund.refundScreen
+import com.nexters.boolti.presentation.screen.report.reportScreen
+import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
+import com.nexters.boolti.presentation.screen.showdetail.showDetailContentScreen
+import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
+import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
+import com.nexters.boolti.presentation.screen.signout.signoutScreen
+import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
+import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -98,21 +98,21 @@ fun MainNavigation(
         navController = navController,
         startDestination = Home.route,
     ) {
-        HomeScreen(navigateTo = navController::navigateTo)
-        LoginScreen(popBackStack = navController::popBackStack)
-        SignoutScreen(
+        homeScreen(navigateTo = navController::navigateTo)
+        loginScreen(popBackStack = navController::popBackStack)
+        signoutScreen(
             navigateToHome = navController::navigateToHome,
             popBackStack = navController::popBackStack
         )
-        ReservationsScreen(
+        reservationsScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack
         )
-        ReservationDetailScreen(
+        reservationDetailScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack
         )
-        RefundScreen(popBackStack = navController::popBackStack)
+        refundScreen(popBackStack = navController::popBackStack)
 
         navigation(
             route = "${ShowDetail.route}/{$showId}",
@@ -125,27 +125,27 @@ fun MainNavigation(
                 },
             ),
         ) {
-            ShowDetailScreen(
+            showDetailScreen(
                 navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 navigateToHome = navController::navigateToHome,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
-            ShowImagesScreen(
+            showImagesScreen(
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
-            ShowDetailContentScreen(
+            showDetailContentScreen(
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
             )
-            ReportScreen(
+            reportScreen(
                 navigateToHome = navController::navigateToHome,
                 popBackStack = navController::popBackStack,
             )
         }
 
-        TicketingScreen(
+        ticketingScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
@@ -161,28 +161,28 @@ fun MainNavigation(
             startDestination = "detail",
             arguments = MainDestination.TicketDetail.arguments,
         ) {
-            TicketDetailScreen(
+            ticketDetailScreen(
                 navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
-            QrFullScreen(
+            qrFullScreen(
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
         }
 
-        addGiftScreen(
+        giftScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
 
-        HostedShowScreen(
+        hostedShowScreen(
             onClickShow = onClickQrScan,
             popBackStack = navController::popBackStack,
         )
 
-        PaymentCompleteScreen(
+        paymentCompleteScreen(
             navigateTo = navController::navigateTo,
             navigateByDeepLink = navController::navigate,
             popBackStack = navController::popBackStack,
@@ -194,17 +194,17 @@ fun MainNavigation(
             },
             navigateToHome = navController::navigateToHome,
         )
-        addGiftCompleteScreen(
+        giftCompleteScreen(
             navigateTo = navController::navigateTo,
             navigateToHome = navController::navigateToHome,
             popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
         )
-        BusinessScreen(popBackStack = navController::popBackStack)
-        AccountSettingScreen(
+        businessScreen(popBackStack = navController::popBackStack)
+        accountSettingScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
-        ProfileScreen(
+        profileScreen(
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
@@ -212,11 +212,11 @@ fun MainNavigation(
             route = "profileEditNavigation",
             startDestination = MainDestination.ProfileEdit.route,
         ) {
-            ProfileEditScreen(
+            profileEditScreen(
                 navigateTo = navController::navigate,
                 popBackStack = navController::popBackStack,
             )
-            ProfileLinkEditScreen(
+            profileLinkEditScreen(
                 onAddLink = { linkName, url ->
                     navController.previousBackStackEntry
                         ?.savedStateHandle

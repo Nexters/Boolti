@@ -4,7 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
-fun NavGraphBuilder.ReportScreen(
+fun NavGraphBuilder.reportScreen(
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,

@@ -7,7 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
-fun NavGraphBuilder.ShowImagesScreen(
+fun NavGraphBuilder.showImagesScreen(
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> ShowDetailViewModel,
 ) {

@@ -6,7 +6,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
-fun NavGraphBuilder.ShowDetailContentScreen(
+fun NavGraphBuilder.showDetailContentScreen(
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> ShowDetailViewModel,
     modifier: Modifier = Modifier,

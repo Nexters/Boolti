@@ -115,7 +115,7 @@ import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-fun NavGraphBuilder.TicketDetailScreen(
+fun NavGraphBuilder.ticketDetailScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,

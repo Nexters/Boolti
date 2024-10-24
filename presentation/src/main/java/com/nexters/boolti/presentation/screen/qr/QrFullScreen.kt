@@ -54,7 +54,7 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
-fun NavGraphBuilder.QrFullScreen(
+fun NavGraphBuilder.qrFullScreen(
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,

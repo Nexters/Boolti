@@ -9,7 +9,7 @@ import com.nexters.boolti.presentation.screen.salesTicketId
 import com.nexters.boolti.presentation.screen.showId
 import com.nexters.boolti.presentation.screen.ticketCount
 
-fun NavGraphBuilder.TicketingScreen(
+fun NavGraphBuilder.ticketingScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,

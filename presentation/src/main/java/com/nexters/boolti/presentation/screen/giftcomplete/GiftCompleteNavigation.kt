@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.addGiftCompleteScreen(
+fun NavGraphBuilder.giftCompleteScreen(
     navigateTo: (String) -> Unit,
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,

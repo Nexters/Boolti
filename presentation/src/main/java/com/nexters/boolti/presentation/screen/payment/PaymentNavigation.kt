@@ -8,7 +8,7 @@ import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.reservationId
 import com.nexters.boolti.presentation.screen.showId
 
-fun NavGraphBuilder.PaymentCompleteScreen(
+fun NavGraphBuilder.paymentCompleteScreen(
     navigateTo: (String) -> Unit,
     navigateByDeepLink: (Uri) -> Unit,
     popBackStack: () -> Unit,

@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.ProfileScreen(
+fun NavGraphBuilder.profileScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,

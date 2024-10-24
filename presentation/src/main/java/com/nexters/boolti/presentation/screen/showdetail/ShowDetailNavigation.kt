@@ -7,7 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.ShowDetailScreen(
+fun NavGraphBuilder.showDetailScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     navigateToHome: () -> Unit,

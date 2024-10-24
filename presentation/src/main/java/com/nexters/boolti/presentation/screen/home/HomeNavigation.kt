@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.HomeScreen(
+fun NavGraphBuilder.homeScreen(
     navigateTo: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {

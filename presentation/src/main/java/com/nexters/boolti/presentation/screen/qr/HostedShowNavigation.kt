@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.HostedShowScreen(
+fun NavGraphBuilder.hostedShowScreen(
     popBackStack: () -> Unit,
     onClickShow: (showId: String, showName: String) -> Unit,
     modifier: Modifier = Modifier,

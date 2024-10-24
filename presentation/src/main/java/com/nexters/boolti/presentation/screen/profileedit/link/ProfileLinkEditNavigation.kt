@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
 
-fun NavGraphBuilder.ProfileLinkEditScreen(
+fun NavGraphBuilder.profileLinkEditScreen(
     onAddLink: (linkName: String, url: String) -> Unit,
     onEditLink: (id: String, linkName: String, url: String) -> Unit,
     onRemoveLink: (id: String) -> Unit,

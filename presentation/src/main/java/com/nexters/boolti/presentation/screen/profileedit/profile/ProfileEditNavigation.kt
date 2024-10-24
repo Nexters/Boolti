@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.zip
 import java.util.UUID
 
-fun NavGraphBuilder.ProfileEditScreen(
+fun NavGraphBuilder.profileEditScreen(
     navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,

@@ -113,7 +113,6 @@ fun MainNavigation(
         )
         reservationsScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack
         )
         reservationDetailScreen(
@@ -218,7 +217,6 @@ fun MainNavigation(
         )
         giftCompleteScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             navigateToHome = navController::navigateToHome,
             popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
         )

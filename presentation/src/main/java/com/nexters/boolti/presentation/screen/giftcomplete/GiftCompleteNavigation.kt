@@ -4,10 +4,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.giftCompleteScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,
 ) {
@@ -18,9 +18,9 @@ fun NavGraphBuilder.giftCompleteScreen(
             onClickClose = popBackStack,
             onClickHome = navigateToHome,
             navigateToReservation = { reservation ->
-                navigateTo(
-                    MainDestination.ReservationDetail.createRoute(
-                        id = reservation.id,
+                navController.navigate(
+                    MainRoute.ReservationDetail(
+                        reservationId = reservation.id,
                         isGift = true,
                     )
                 )

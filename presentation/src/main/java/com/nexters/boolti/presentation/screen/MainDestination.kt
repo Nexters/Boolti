@@ -56,18 +56,6 @@ sealed class MainDestination(val route: String) {
 
     data object Qr : MainDestination(route = "qr")
 
-    data object ReservationDetail : MainDestination(route = "reservations/{reservationId}?isGift={isGift}") {
-        val arguments = listOf(
-            navArgument("reservationId") { type = NavType.StringType },
-            navArgument("isGift") { type = NavType.BoolType },
-        )
-
-        fun createRoute(
-            id: String,
-            isGift: Boolean = false,
-        ): String = "reservations/$id?isGift=$isGift"
-    }
-
     data object Refund : MainDestination(route = "refund/{reservationId}?isGift={isGift}") {
         val arguments = listOf(
             navArgument("reservationId") { type = NavType.StringType },

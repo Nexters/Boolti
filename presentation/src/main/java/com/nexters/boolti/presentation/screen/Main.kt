@@ -189,7 +189,6 @@ fun MainNavigation(
 
         giftScreen(
             navController = navController,
-            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
 

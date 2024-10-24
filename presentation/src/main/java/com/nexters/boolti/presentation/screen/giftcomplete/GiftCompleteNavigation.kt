@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.giftcomplete
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.giftCompleteScreen(
@@ -11,9 +10,7 @@ fun NavGraphBuilder.giftCompleteScreen(
     navigateToHome: () -> Unit,
     popBackStack: () -> Unit,
 ) {
-    composable(
-        route = MainDestination.GiftComplete.route,
-    ) {
+    composable<MainRoute.GiftComplete> {
         GiftCompleteScreen(
             onClickClose = popBackStack,
             onClickHome = navigateToHome,

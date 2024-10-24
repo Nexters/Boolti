@@ -4,12 +4,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.giftScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -19,7 +17,7 @@ fun NavGraphBuilder.giftScreen(
             popBackStack = popBackStack,
             navigateToBusiness = { navController.navigate(MainRoute.Business) },
             navigateToComplete = { giftId ->
-                navigateTo(MainDestination.GiftComplete.createRoute(giftId))
+                navController.navigate(MainRoute.GiftComplete(giftId = giftId))
             }
         )
     }

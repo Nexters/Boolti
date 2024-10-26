@@ -221,6 +221,16 @@
     <string name="show_tab_cast">출연진</string>
     <string name="empty_cast_title">COMING SOON</string>
     <string name="empty_cast_desc">조금만 기다려주세요!</string>
+    <string name="show_share_format">
+        공연 정보를 공유드려요!\n
+        \n
+        - 공연명 : %s\n
+        - 일시 : %s\n
+        - 장소 : %s\n
+        \n
+        공연 상세 정보 ▼\n
+        %s
+    </string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>

@@ -52,7 +52,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,6 +69,7 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
@@ -85,7 +85,6 @@ import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
 
 @Composable
@@ -143,7 +142,7 @@ fun ShowDetailScreen(
         modifier = modifier,
         topBar = {
             ShowDetailAppBar(
-                showId = uiState.showDetail.id,
+                showDetail = uiState.showDetail,
                 onBack = { viewModel.sendEvent(ShowDetailEvent.PopBackStack) },
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
@@ -252,7 +251,7 @@ fun ShowDetailScreen(
 
 @Composable
 private fun ShowDetailAppBar(
-    showId: String,
+    showDetail: ShowDetail,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
@@ -261,6 +260,18 @@ private fun ShowDetailAppBar(
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
+    val dateString = "${showDetail.date.showDateTimeString} -"
+    val addressString =
+        "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
+    val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
+    val sharingText = stringResource(
+        R.string.show_share_format,
+        showDetail.name,
+        dateString,
+        addressString,
+        previewUrl
+    )
+
     BtAppBar(
         colors = BtAppBarDefaults.appBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -284,10 +295,7 @@ private fun ShowDetailAppBar(
                 onClick = {
                     val sendIntent = Intent().apply {
                         action = Intent.ACTION_SEND
-                        putExtra(
-                            Intent.EXTRA_TEXT,
-                            "https://preview.boolti.in/show/$showId"
-                        )
+                        putExtra(Intent.EXTRA_TEXT, sharingText)
                         type = "text/plain"
                     }
                     val shareIntent = Intent.createChooser(sendIntent, null)
@@ -409,16 +417,14 @@ private fun LazyListScope.ShowInfoTab(
 
     item {
         // 일시
-        val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
-        val indexOfDay = showDetail.date.dayOfWeek.value - 1
-        val minute = stringResource(id = R.string.ticketing_minutes)
         // ex. 2024.01.20 (토) / 18:00 (150분)
-        val formatter =
-            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
+        val minute = stringResource(id = R.string.ticketing_minutes)
+        val dateTimeString =
+            showDetail.date.showDateTimeString + " (${showDetail.runningTime}${minute})"
         Section(
             modifier = paddingModifier.padding(top = 8.dp),
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = { SectionContent(text = showDetail.date.format(formatter)) },
+            content = { SectionContent(text = dateTimeString) },
         )
     }
 

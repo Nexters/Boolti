@@ -1,5 +1,37 @@
 package com.nexters.boolti.tosspayments.extension
 
+/**
+ * ## 따옴표 변환
+ *
+ * 큰 따옴표(")를 열리는 큰 따옴표(“)와 닫히는 큰 따옴표(”)로 변환하거나
+ * 작은 따옴표(')를 열리는 작은 따옴표(‘)와 닫히는 작은 따옴표(’)로 변환
+ *
+ * 토스페이먼츠에서 orderName에 따옴표가 들어간 경우 결제 렌더링이 안 되는 문제 해결을 위해 다른 문자로 대체하기 위해 사용함
+ *
+ * @see [TossPaymentWidgetActivity.getCommonIntent]
+ * @return 따옴표가 변환된 문자열을 반환
+ */
+fun String.convertQuotes(): String = StringBuilder().apply {
+    var isDoubleQuoteOpen = true
+    var isSingleQuoteOpen = true
+
+    this@convertQuotes.forEach { c ->
+        when (c) {
+            '"' -> {
+                append(if (isDoubleQuoteOpen) "“" else "”")
+                isDoubleQuoteOpen = !isDoubleQuoteOpen
+            }
+
+            '\'' -> {
+                append(if (isSingleQuoteOpen) "‘" else "’")
+                isSingleQuoteOpen = !isSingleQuoteOpen
+            }
+
+            else -> append(c)
+        }
+    }
+}.toString()
+
 private val encodingMap = mapOf(
     ':' to "%3A",
     '/' to "%2F",

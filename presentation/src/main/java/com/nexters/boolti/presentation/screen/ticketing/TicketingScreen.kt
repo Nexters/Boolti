@@ -49,7 +49,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -95,6 +94,7 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
+import com.nexters.boolti.tosspayments.extension.convertQuotes
 import java.time.LocalDateTime
 
 @Composable
@@ -146,7 +146,7 @@ fun TicketingScreen(
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
                             customerKey = "user-${it.userId}",
                             orderId = it.orderId,
-                            orderName = "${uiState.showName} ${uiState.ticketName}",
+                            orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android".convertQuotes(),
                             currency = Currency.KRW.name,
                             countryCode = "KR",
                             showId = viewModel.showId,

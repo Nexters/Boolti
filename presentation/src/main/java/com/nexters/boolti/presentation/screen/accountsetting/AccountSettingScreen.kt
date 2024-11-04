@@ -131,13 +131,13 @@ fun AccountSettingScreen(
                             color = Grey30,
                         )
 
-                        val copiedMessage = stringResource(R.string.code_copied_message)
+                        val copySuccessMessage = stringResource(R.string.code_copy_success_message)
                         SmallButton(
                             label = stringResource(R.string.copy_code_label),
                             iconRes = R.drawable.ic_copy,
                         ) {
                             userCode.copyToClipboard(
-                                copiedMessage = copiedMessage,
+                                copySuccessMessage = copySuccessMessage,
                                 snackbarHostState = snackbarHostState,
                                 clipboardManager = clipboardManager,
                                 scope = scope,

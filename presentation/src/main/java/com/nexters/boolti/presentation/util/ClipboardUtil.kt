@@ -14,12 +14,12 @@ import kotlinx.coroutines.launch
 fun String.copyToClipboard(
     clipboardManager: ClipboardManager,
     scope: CoroutineScope,
-    copiedMessage: String? = null,
+    copySuccessMessage: String? = null,
     snackbarHostState: SnackbarHostState? = null,
 ) {
     copyMessage(
         message = this,
-        copiedMessage = copiedMessage,
+        copySuccessMessage = copySuccessMessage,
         clipboardManager = clipboardManager,
         snackbarHostState = snackbarHostState,
         scope = scope,
@@ -28,29 +28,29 @@ fun String.copyToClipboard(
 
 fun copyMessage(
     message: AnnotatedString,
-    copiedMessage: String? = null,
+    copySuccessMessage: String? = null,
     clipboardManager: ClipboardManager,
     snackbarHostState: SnackbarHostState? = null,
     scope: CoroutineScope,
 ) {
     clipboardManager.setText(message)
-    if (copiedMessage != null && snackbarHostState != null && Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+    if (copySuccessMessage != null && snackbarHostState != null && Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
         scope.launch {
-            snackbarHostState.showSnackbar(copiedMessage)
+            snackbarHostState.showSnackbar(copySuccessMessage)
         }
     }
 }
 
 fun copyMessage(
     message: String,
-    copiedMessage: String? = null,
+    copySuccessMessage: String? = null,
     clipboardManager: ClipboardManager,
     snackbarHostState: SnackbarHostState? = null,
     scope: CoroutineScope,
 ) {
     copyMessage(
         message = AnnotatedString(message),
-        copiedMessage = copiedMessage,
+        copySuccessMessage = copySuccessMessage,
         clipboardManager = clipboardManager,
         snackbarHostState = snackbarHostState,
         scope = scope
@@ -61,12 +61,12 @@ fun copyMessage(
 @Composable
 fun copyMessage(
     message: AnnotatedString,
-    copiedMessage: String? = null,
+    copySuccessMessage: String? = null,
     clipboardManager: ClipboardManager = LocalClipboardManager.current,
     snackbarHostState: SnackbarController = LocalSnackbarController.current
 ) {
     clipboardManager.setText(message)
-    if (copiedMessage != null && Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-        snackbarHostState.showMessage(copiedMessage)
+    if (copySuccessMessage != null && Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+        snackbarHostState.showMessage(copySuccessMessage)
     }
 }

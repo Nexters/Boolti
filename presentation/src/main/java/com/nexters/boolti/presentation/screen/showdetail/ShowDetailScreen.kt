@@ -437,7 +437,7 @@ private fun LazyListScope.ShowInfoTab(
                     SectionTitle(stringResource(id = R.string.ticketing_place))
                     Spacer(modifier = Modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current
-                    val copiedMessage =
+                    val copySuccessMessage =
                         stringResource(id = R.string.ticketing_address_copied_message)
                     SmallButton(
                         iconRes = R.drawable.ic_copy,
@@ -445,7 +445,7 @@ private fun LazyListScope.ShowInfoTab(
                         onClick = {
                             clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                snackbarController.showMessage(copiedMessage)
+                                snackbarController.showMessage(copySuccessMessage)
                             }
                         }
                     )

@@ -306,7 +306,7 @@ private fun TicketDetailScreen(
                             ) {
                                 Notice(notice = ticketGroup.ticketNotice)
 
-                                val copiedMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                                val copySuccessMessage = stringResource(id = R.string.ticketing_address_copied_message)
                                 Inquiry(
                                     hostName = ticketGroup.hostName,
                                     hostPhoneNumber = ticketGroup.hostPhoneNumber,
@@ -314,7 +314,7 @@ private fun TicketDetailScreen(
                                         clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
                                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                                             scope.launch {
-                                                snackbarHostState.showSnackbar(copiedMessage)
+                                                snackbarHostState.showSnackbar(copySuccessMessage)
                                             }
                                         }
                                     },

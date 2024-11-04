@@ -94,7 +94,6 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
-import com.nexters.boolti.tosspayments.extension.convertQuotes
 import java.time.LocalDateTime
 
 @Composable
@@ -146,7 +145,7 @@ fun TicketingScreen(
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
                             customerKey = "user-${it.userId}",
                             orderId = it.orderId,
-                            orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android".convertQuotes(),
+                            orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
                             currency = Currency.KRW.name,
                             countryCode = "KR",
                             showId = viewModel.showId,

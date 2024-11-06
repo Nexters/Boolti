@@ -2,8 +2,6 @@ package com.nexters.boolti.presentation.component
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -42,14 +40,11 @@ fun PolicyBottomSheet(
     ) {
         AndroidView(
             factory = { context ->
-                WebView(context).apply {
+                BtWebView(context).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
-                    webViewClient = WebViewClient()
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
                     loadUrl(url)
                 }
             })

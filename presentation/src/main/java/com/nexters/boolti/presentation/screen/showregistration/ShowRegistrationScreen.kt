@@ -60,7 +60,7 @@ fun ShowRegistrationScreen(
             BtWebView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                 )
                 setWebChromeClient(
                     launchActivity = { launcher.launch(arrayOf("image/*")) },

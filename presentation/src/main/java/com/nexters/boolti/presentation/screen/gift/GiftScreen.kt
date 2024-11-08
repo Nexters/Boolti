@@ -107,7 +107,7 @@ fun GiftScreen(
                                 clientKey = BuildConfig.TOSS_CLIENT_KEY,
                                 customerKey = "user-${event.userId}",
                                 orderId = event.orderId,
-                                orderName = "${uiState.showName} ${uiState.ticketName}",
+                                orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
                                 currency = Currency.KRW.name,
                                 countryCode = "KR",
                                 showId = viewModel.showId,

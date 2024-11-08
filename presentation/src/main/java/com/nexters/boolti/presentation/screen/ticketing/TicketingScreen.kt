@@ -49,7 +49,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -146,7 +145,7 @@ fun TicketingScreen(
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
                             customerKey = "user-${it.userId}",
                             orderId = it.orderId,
-                            orderName = "${uiState.showName} ${uiState.ticketName}",
+                            orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
                             currency = Currency.KRW.name,
                             countryCode = "KR",
                             showId = viewModel.showId,

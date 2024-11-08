@@ -58,6 +58,13 @@ fun NavGraphBuilder.ProfileEditScreen(
         ProfileEditScreen(
             modifier = modifier,
             navigateBack = popBackStack,
+            navigateToSnsEdit = { sns ->
+                sns?.let {
+                    navigateTo(MainDestination.ProfileSnsEdit.createRoute(it))
+                } ?: run {
+                    navigateTo(MainDestination.ProfileSnsEdit.createRoute())
+                }
+            },
             navigateToLinkEdit = { link ->
                 link?.let {
                     navigateTo(MainDestination.ProfileLinkEdit.createRoute(it))

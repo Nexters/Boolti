@@ -272,6 +272,7 @@
     <!-- 프로필 & 프로필 편집 & 링크 편집 -->
     <string name="profile_title">프로필</string>
     <string name="profile_links_title">SNS 링크</string>
+    <string name="profile_edit_sns_title">SNS</string>
     <string name="profile_edit">프로필 편집</string>
     <string name="profile_edit_button_label">프로필 편집</string>
     <string name="profile_edit_nickname_placeholder">닉네임을 입력해 주세요 (20자 이내)</string>
@@ -282,6 +283,8 @@
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
+
+    <string name="sns_add">SNS 추가</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>

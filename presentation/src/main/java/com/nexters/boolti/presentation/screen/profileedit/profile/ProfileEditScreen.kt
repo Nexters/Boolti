@@ -51,6 +51,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
@@ -76,6 +77,7 @@ import java.io.IOException
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
+    navigateToSnsEdit: (Sns?) -> Unit,
     navigateToLinkEdit: (Link?) -> Unit,
     newLinkCallback: Flow<Link>,
     editLinkCallback: Flow<Link>,
@@ -125,6 +127,7 @@ fun ProfileEditScreen(
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
+        onClickAddSns = { navigateToSnsEdit(null) },
         onClickAddLink = { navigateToLinkEdit(null) },
         onClickEditLink = { link -> navigateToLinkEdit(link) },
     )
@@ -145,6 +148,7 @@ fun ProfileEditScreen(
     onClickComplete: (uri: Uri?) -> Unit,
     onChangeNickname: (String) -> Unit,
     onChangeIntroduction: (String) -> Unit,
+    onClickAddSns: () -> Unit,
     onClickAddLink: () -> Unit,
     onClickEditLink: (Link) -> Unit,
 ) {
@@ -299,6 +303,21 @@ fun ProfileEditScreen(
                         enabled = !saving,
                     )
                 }
+
+                Section(
+                    modifier = Modifier.padding(top = 12.dp),
+                    title = stringResource(R.string.profile_edit_sns_title),
+                ) {
+                    Column {
+                        LinkAddButton(
+                            modifier = Modifier.padding(top = 4.dp),
+                            label = stringResource(R.string.sns_add),
+                            onClick = onClickAddSns,
+                            enabled = !saving,
+                        )
+                    }
+                }
+
                 Section(
                     modifier = Modifier.padding(top = 12.dp),
                     title = stringResource(R.string.label_links),
@@ -306,6 +325,7 @@ fun ProfileEditScreen(
                     Column {
                         LinkAddButton(
                             modifier = Modifier.padding(top = 4.dp),
+                            label = stringResource(R.string.link_add_btn),
                             onClick = onClickAddLink,
                             enabled = !saving,
                         )
@@ -342,6 +362,7 @@ fun ProfileEditScreen(
 
 @Composable
 private fun LinkAddButton(
+    label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -364,12 +385,12 @@ private fun LinkAddButton(
                 modifier = Modifier.size(20.dp),
                 imageVector = Icons.Rounded.Add,
                 tint = Grey30,
-                contentDescription = stringResource(R.string.link_add_btn),
+                contentDescription = label,
             )
         }
         Text(
             modifier = Modifier.padding(start = 16.dp),
-            text = stringResource(R.string.link_add_btn),
+            text = label,
             style = MaterialTheme.typography.titleMedium,
         )
     }

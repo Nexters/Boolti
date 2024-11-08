@@ -35,6 +35,7 @@ import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
 import com.nexters.boolti.presentation.screen.profile.ProfileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.sns.ProfileSnsEditScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
@@ -43,10 +44,10 @@ import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
-import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -221,6 +222,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             ProfileEditScreen(
                 modifier = modifier,
                 navigateTo = navController::navigate,
+                popBackStack = navController::popBackStack,
+            )
+            ProfileSnsEditScreen(
+                modifier = modifier,
                 popBackStack = navController::popBackStack,
             )
             ProfileLinkEditScreen(

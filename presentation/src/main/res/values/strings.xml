@@ -240,6 +240,8 @@
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_mismatch">올바른 입장 코드를 입력해 주세요</string>
     <string name="show_entry_code">입장코드 보기</string>
+    <string name="copy_code_label">코드 복사</string>
+    <string name="code_copy_success_message">식별 코드를 복사했어요</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

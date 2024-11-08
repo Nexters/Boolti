@@ -3,6 +3,8 @@ package com.nexters.boolti.presentation.screen.showdetail
 import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,6 +39,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -512,6 +515,7 @@ private fun LazyListScope.ShowInfoTab(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName")
 fun LazyListScope.CastTab(
     teams: List<CastTeams>,
@@ -559,14 +563,19 @@ fun LazyListScope.CastTab(
                      * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요
                      */
                     val gridHeight = memberHeight * rows + spacedBySize * (rows - 1)
-                    LazyVerticalGrid(
-                        modifier = Modifier.height(gridHeight),
-                        columns = GridCells.Fixed(spanCount),
-                        verticalArrangement = Arrangement.spacedBy(spacedBySize),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items(team.members) { member ->
-                            Cast(memberHeight, member, onClick = { onClickMember(member.userCode) })
+                    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+                        LazyVerticalGrid(
+                            modifier = Modifier.height(gridHeight),
+                            columns = GridCells.Fixed(spanCount),
+                            verticalArrangement = Arrangement.spacedBy(spacedBySize),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            items(team.members) { member ->
+                                Cast(
+                                    memberHeight,
+                                    member,
+                                    onClick = { onClickMember(member.userCode) })
+                            }
                         }
                     }
                 }

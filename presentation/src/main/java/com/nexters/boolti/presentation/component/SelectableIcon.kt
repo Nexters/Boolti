@@ -1,0 +1,137 @@
+package com.nexters.boolti.presentation.component
+
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey85
+
+@Composable
+fun SelectableIcon(
+    @DrawableRes iconRes: Int,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
+    backgroundColor: Color = Grey85,
+    iconTint: Color = Grey30,
+    iconSize: Dp? = 28.dp,
+    contentPadding: Dp = 10.dp,
+    contentDescription: String? = null,
+    onClick: () -> Unit = {},
+) {
+    SelectableIcon(
+        selected = selected,
+        modifier = modifier,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        contentPadding = contentPadding,
+        onClick = onClick,
+    ) {
+        Icon(
+            modifier = if (iconSize == null) Modifier.matchParentSize() else Modifier.size(iconSize),
+            imageVector = ImageVector.vectorResource(iconRes),
+            tint = iconTint,
+            contentDescription = contentDescription,
+        )
+    }
+}
+
+@Composable
+fun SelectableIcon(
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
+    iconTint: Color = Grey30,
+    backgroundColor: Color = Grey85,
+    contentPadding: Dp = 10.dp,
+    onClick: () -> Unit = {},
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    icon: @Composable BoxScope.() -> Unit,
+) {
+    Surface(
+        shape = shape,
+        border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null,
+        color = backgroundColor,
+        onClick = onClick,
+        contentColor = iconTint,
+        interactionSource = interactionSource,
+        content = {
+            Box(
+                modifier = modifier.padding(contentPadding),
+                contentAlignment = Alignment.Center,
+            ) { icon() }
+        },
+    )
+}
+
+@Preview
+@Composable
+private fun SelectableIconPreview() {
+    BooltiTheme {
+        var selectedSns = remember { mutableStateOf("youtube") }
+
+        Row(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            // Low Level Composable
+            SelectableIcon(
+                selected = selectedSns.value == "instagram",
+                onClick = { selectedSns.value = "instagram" },
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_logo_instagram),
+                    tint = Grey30,
+                    contentDescription = null,
+                )
+            }
+
+            // High Level Composable
+            // iconSize 가 null 이 아니고 modifier 에 크기를 지정하지 않으면 iconSize + contentPadding 만큼의 크기를 가진다.
+            SelectableIcon(
+                selected = selectedSns.value == "youtube",
+                iconRes = R.drawable.ic_logo_youtube,
+                iconSize = 40.dp,
+                onClick = { selectedSns.value = "youtube" },
+            )
+
+            // High Level Composable
+            // iconSize 가 null 이면 전체 크기에서 contentPadding을 뺀 만큼 차지한다. 이때 modifier에 크기를 지정해야 함
+            SelectableIcon(
+                modifier = Modifier.size(80.dp),
+                selected = selectedSns.value == "youtube",
+                iconRes = R.drawable.ic_logo_youtube,
+                iconSize = null,
+                onClick = { selectedSns.value = "youtube" },
+            )
+        }
+    }
+}

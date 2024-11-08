@@ -26,7 +26,7 @@ class BtWebView @JvmOverloads constructor(
         javaScriptEnabled: Boolean = true,
         domStorageEnabled: Boolean = true,
     ) = with(settings) {
-        userAgentString = "BOOLTI/ANDROID"
+        userAgentString = "$userAgentString BOOLTI/ANDROID"
         this.javaScriptEnabled = javaScriptEnabled
         this.domStorageEnabled = domStorageEnabled
     }

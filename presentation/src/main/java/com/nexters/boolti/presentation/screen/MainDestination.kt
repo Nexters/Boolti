@@ -116,10 +116,6 @@ sealed class MainDestination(val route: String) {
                 type = NavType.StringType
                 nullable = true
             },
-            navArgument(linkTitle) {
-                type = NavType.StringType
-                nullable = true
-            },
             navArgument(username) {
                 type = NavType.StringType
                 nullable = true
@@ -128,7 +124,7 @@ sealed class MainDestination(val route: String) {
 
         fun createRoute(): String = "profileSnsEdit"
         fun createRoute(sns: Sns): String =
-            "profileSnsEdit?sns=${sns.type}id=${sns.id}&title=${sns.name}&username=${sns.username}"
+            "profileSnsEdit?sns=${sns.type}&id=${sns.id}&username=${sns.username}"
     }
 
     data object ProfileLinkEdit :

@@ -74,6 +74,7 @@ fun SelectableIcon(
     icon: @Composable BoxScope.() -> Unit,
 ) {
     Surface(
+        modifier = modifier,
         shape = shape,
         border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null,
         color = backgroundColor,
@@ -82,7 +83,7 @@ fun SelectableIcon(
         interactionSource = interactionSource,
         content = {
             Box(
-                modifier = modifier.padding(contentPadding),
+                modifier = Modifier.padding(contentPadding),
                 contentAlignment = Alignment.Center,
             ) { icon() }
         },

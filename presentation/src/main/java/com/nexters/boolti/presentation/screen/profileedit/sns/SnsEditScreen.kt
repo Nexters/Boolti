@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +19,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTTextField
@@ -26,27 +30,46 @@ import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.SelectableIcon
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun SnsEditScreen(
     modifier: Modifier = Modifier,
+    viewModel: SnsEditViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
 ) {
-    // TODO 추후 ViewModel 로 이관
-    var selectedSns: Sns.SnsType by remember { mutableStateOf(Sns.SnsType.INSTAGRAM) }
-    var username: String by remember { mutableStateOf("") }
-    val isError = when (selectedSns) {
-        Sns.SnsType.INSTAGRAM -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._]+"))
-        Sns.SnsType.YOUTUBE -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._-]+"))
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
+    SnsEditScreen(
         modifier = modifier,
+        isEditMode = uiState.isEditMode,
+        selectedSns = uiState.selectedSns,
+        username = uiState.username,
+        usernameHasError = uiState.usernameHasError,
+        onChangeSns = viewModel::setSns,
+        onChangeUsername = viewModel::setUsername,
+        navigateBack = navigateBack,
+    )
+}
+
+@Composable
+private fun SnsEditScreen(
+    modifier: Modifier = Modifier,
+    isEditMode: Boolean = false,
+    selectedSns: Sns.SnsType = Sns.SnsType.INSTAGRAM,
+    username: String = "",
+    usernameHasError: Boolean = false,
+    onChangeSns: (Sns.SnsType) -> Unit = {},
+    onChangeUsername: (String) -> Unit = {},
+    navigateBack: () -> Unit = {},
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
         topBar = {
             BtAppBar(
-                title = "SNS 추가", // TODO SNS 변경이 될 수 있음
+                title = if (isEditMode) "SNS 편집" else "SNS 추가",
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
                         iconRes = R.drawable.ic_arrow_back,
@@ -56,7 +79,7 @@ fun SnsEditScreen(
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
-                        enabled = username.isNotBlank() && !isError,
+                        enabled = username.isNotBlank() && !usernameHasError,
                         onClick = navigateBack,
                     )
                 },
@@ -76,14 +99,14 @@ fun SnsEditScreen(
                     SelectableIcon(
                         selected = selectedSns == Sns.SnsType.INSTAGRAM,
                         iconRes = R.drawable.ic_logo_instagram,
-                        onClick = { selectedSns = Sns.SnsType.INSTAGRAM },
+                        onClick = { onChangeSns(Sns.SnsType.INSTAGRAM) },
                         contentDescription = "인스타그램 선택",
                     )
                     SelectableIcon(
                         modifier = Modifier.padding(start = 12.dp),
                         selected = selectedSns == Sns.SnsType.YOUTUBE,
                         iconRes = R.drawable.ic_logo_youtube,
-                        onClick = { selectedSns = Sns.SnsType.YOUTUBE },
+                        onClick = { onChangeSns(Sns.SnsType.YOUTUBE) },
                         contentDescription = "유튜브 선택",
                     )
                 }
@@ -94,19 +117,20 @@ fun SnsEditScreen(
                 BTTextField(
                     modifier = Modifier.weight(1f),
                     text = username,
-                    isError = isError,
+                    isError = usernameHasError,
                     placeholder = "ex) boolti_official",
                     supportingText = when {
                         username.contains('@') -> "@을 제외환 Username을 입력해 주세요"
-                        isError -> "지원하지 않는 특수문자가 포함되어 있습니다"
+                        usernameHasError -> "지원하지 않는 특수문자가 포함되어 있습니다"
                         else -> null
                     },
                     trailingIcon = if (username.isNotEmpty()) {
-                        { BTTextFieldDefaults.ClearButton(onClick = { username = "" }) }
+                        { BTTextFieldDefaults.ClearButton(onClick = { onChangeUsername("") }) }
                     } else {
                         null
                     },
-                    onValueChanged = { username = it },
+                    singleLine = true,
+                    onValueChanged = onChangeUsername,
                 )
             }
         }
@@ -131,5 +155,27 @@ private fun InfoRow(
         )
         Spacer(Modifier.size(12.dp))
         content()
+    }
+}
+
+@Preview
+@Composable
+private fun SnsEditPreview() {
+    var selectedSns by remember { mutableStateOf(Sns.SnsType.INSTAGRAM) }
+    var username by remember { mutableStateOf("") }
+    val usernameHasError: Boolean = when (selectedSns) {
+        Sns.SnsType.INSTAGRAM -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._]+"))
+        Sns.SnsType.YOUTUBE -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._-]+"))
+    }
+
+    BooltiTheme {
+        SnsEditScreen(
+            isEditMode = false,
+            selectedSns = selectedSns,
+            username = username,
+            usernameHasError = usernameHasError,
+            onChangeSns = { selectedSns = it },
+            onChangeUsername = { username = it },
+        )
     }
 }

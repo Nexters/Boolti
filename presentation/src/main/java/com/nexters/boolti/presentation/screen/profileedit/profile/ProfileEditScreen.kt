@@ -129,6 +129,7 @@ fun ProfileEditScreen(
         onChangeIntroduction = viewModel::changeIntroduction,
         onClickAddSns = { navigateToSnsEdit(null) },
         onClickAddLink = { navigateToLinkEdit(null) },
+        onClickEditSns = { sns -> navigateToSnsEdit(sns) },
         onClickEditLink = { link -> navigateToLinkEdit(link) },
     )
 }
@@ -150,6 +151,7 @@ fun ProfileEditScreen(
     onChangeIntroduction: (String) -> Unit,
     onClickAddSns: () -> Unit,
     onClickAddLink: () -> Unit,
+    onClickEditSns: (Sns) -> Unit,
     onClickEditLink: (Link) -> Unit,
 ) {
     val scrollState = rememberScrollState()

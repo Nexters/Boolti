@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -104,6 +105,7 @@ fun ProfileEditScreen(
         nickname = uiState.nickname,
         nicknameError = uiState.nicknameError,
         introduction = uiState.introduction,
+        snsList = uiState.snsList.toImmutableList(),
         links = uiState.links.toImmutableList(),
         saving = uiState.saving,
         event = event,
@@ -141,6 +143,7 @@ fun ProfileEditScreen(
     nickname: String,
     nicknameError: NicknameError? = null,
     introduction: String,
+    snsList: ImmutableList<Sns>,
     links: ImmutableList<Link>,
     saving: Boolean,
     event: Flow<ProfileEditEvent>,
@@ -317,6 +320,12 @@ fun ProfileEditScreen(
                             onClick = onClickAddSns,
                             enabled = !saving,
                         )
+                        snsList.forEach { sns ->
+                            SnsItem(
+                                modifier = Modifier.padding(top = 12.dp),
+                                sns = sns,
+                            ) { if (!saving) onClickEditSns(sns) }
+                        }
                     }
                 }
 
@@ -394,6 +403,57 @@ private fun LinkAddButton(
             modifier = Modifier.padding(start = 16.dp),
             text = label,
             style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+@Composable
+private fun SnsItem(
+    sns: Sns,
+    modifier: Modifier = Modifier,
+    onClickEdit: () -> Unit,
+) {
+    val (icon, label) = when (sns.type) {
+        Sns.SnsType.INSTAGRAM -> R.drawable.ic_logo_instagram to "instagram"
+        Sns.SnsType.YOUTUBE -> R.drawable.ic_logo_youtube to "youtube"
+    }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClickEdit)
+            .padding(horizontal = marginHorizontal, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            imageVector = ImageVector.vectorResource(icon),
+            tint = Grey30,
+            contentDescription = label,
+        )
+        Text(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .defaultMinSize(minWidth = 72.dp),
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Grey30,
+        )
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .weight(1f),
+            text = sns.username,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleMedium,
+            color = Grey15,
+        )
+        Icon(
+            modifier = Modifier.size(20.dp),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_edit_pen),
+            tint = Grey50,
+            contentDescription = stringResource(R.string.link_edit),
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 
 data class ProfileEditState(
     val loading: Boolean = false,
@@ -8,6 +9,7 @@ data class ProfileEditState(
     val thumbnail: String = "",
     val nickname: String = "",
     val introduction: String = "",
+    val snsList: List<Sns> = emptyList(),
     val links: List<Link> = emptyList(),
 ) {
     val nicknameError: NicknameError?

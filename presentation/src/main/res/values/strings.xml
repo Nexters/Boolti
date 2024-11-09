@@ -73,6 +73,7 @@
     <string name="stepper_plus_description">증가</string>
 
     <string name="complete">완료</string>
+    <string name="edit">편집</string>
 
     <string name="input_lower_limit_text">%d자 이상 입력해 주세요</string>
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>
@@ -300,7 +301,7 @@
     <string name="link_add_msg">링크를 추가했어요</string>
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
-    <string name="invalid_link">링크를 열 수 없습니다</string>
+    <string name="invalid_link">유효한 링크가 아니에요</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

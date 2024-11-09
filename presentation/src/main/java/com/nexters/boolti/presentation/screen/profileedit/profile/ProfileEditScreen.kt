@@ -362,7 +362,7 @@ fun ProfileEditScreen(
                     )
                 },
                 positiveButtonLabel = stringResource(R.string.save),
-                negativeButtonLabel = stringResource(R.string.cancel),
+                negativeButtonLabel = stringResource(R.string.btn_exit),
                 onClickPositiveButton = { onClickComplete(selectedImage) },
                 onClickNegativeButton = navigateBack,
                 onDismiss = { showExitAlertDialog = false },
@@ -489,6 +489,7 @@ private fun LinkItem(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey30,
+                maxLines = 1,
             )
         }
         Icon(

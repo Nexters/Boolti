@@ -3,13 +3,17 @@ package com.nexters.boolti.presentation.screen.profile
 import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -35,12 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.model.url
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.component.BtBackAppBar
-import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -101,10 +106,25 @@ fun ProfileScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            BtBackAppBar(
+            BtAppBar(
                 title = stringResource(R.string.profile_title),
                 colors = BtAppBarDefaults.appBarColors(containerColor = MaterialTheme.colorScheme.surface),
-                onClickBack = onClickBack,
+                navigateButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        iconRes = R.drawable.ic_arrow_back,
+                        onClick = onClickBack,
+                    )
+                },
+                actionButtons = if (isMine) {
+                    {
+                        BtAppBarDefaults.AppBarTextButton(
+                            label = stringResource(R.string.edit),
+                            onClick = navigateToProfileEdit,
+                        )
+                    }
+                } else {
+                    null
+                },
             )
         }
     ) { innerPadding ->
@@ -115,8 +135,13 @@ fun ProfileScreen(
         ) {
             ProfileHeader(
                 user = user,
-                isMine = isMine,
-                onClickEdit = navigateToProfileEdit,
+                onClickSns = { sns ->
+                    try {
+                        uriHandler.openUri(sns.url.toValidUrlString())
+                    } catch (e: ActivityNotFoundException) {
+                        snackbarHostState.showMessage(invalidUrlMsg)
+                    }
+                },
             )
 
             if (user.link.isNotEmpty()) { // SNS 링크가 있으면
@@ -129,7 +154,7 @@ fun ProfileScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     user.link.forEach { link ->
-                        SnsLink(
+                        LinkItem(
                             modifier = Modifier.padding(top = 16.dp),
                             link = link,
                             onClick = {
@@ -169,12 +194,12 @@ fun ProfileScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileHeader(
     user: User,
-    isMine: Boolean,
-    onClickEdit: () -> Unit,
     modifier: Modifier = Modifier,
+    onClickSns: (Sns) -> Unit,
 ) {
     val shape = RoundedCornerShape(
         bottomStart = 12.dp,
@@ -212,22 +237,56 @@ private fun ProfileHeader(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
-
-        if (isMine) {
-            SmallButton(
-                modifier = Modifier.padding(top = 28.dp),
-                label = stringResource(R.string.profile_edit_button_label),
-                iconRes = R.drawable.ic_edit_pen,
-                iconTint = Grey30,
-                backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                onClick = onClickEdit,
-            )
+        if (user.sns.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                user.sns.forEach { sns -> SnsChip(sns) { onClickSns(sns) } }
+            }
         }
     }
 }
 
 @Composable
-private fun SnsLink(
+private fun SnsChip(
+    sns: Sns,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    val (iconRes, desc) = when (sns.type) {
+        Sns.SnsType.INSTAGRAM -> R.drawable.ic_logo_instagram to "instagram"
+        Sns.SnsType.YOUTUBE -> R.drawable.ic_logo_youtube to "youtube"
+    }
+
+    Row(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .clickable(onClick = onClick)
+            .padding(start = 8.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(20.dp),
+            imageVector = ImageVector.vectorResource(iconRes),
+            tint = Grey30,
+            contentDescription = desc,
+        )
+        Text(
+            modifier = Modifier.padding(start = 6.dp),
+            text = sns.username,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Grey30,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Composable
+private fun LinkItem(
     modifier: Modifier = Modifier,
     link: Link,
     onClick: () -> Unit,

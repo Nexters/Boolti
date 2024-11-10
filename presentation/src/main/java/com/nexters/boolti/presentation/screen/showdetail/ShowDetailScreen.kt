@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,7 +66,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
-import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -73,6 +73,7 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
@@ -89,6 +90,7 @@ import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
 
 @Composable
@@ -178,14 +180,8 @@ fun ShowDetailScreen(
                 }
 
                 item {
-                    TicketReservationPeriod(
-                        modifier = Modifier.padding(vertical = 40.dp, horizontal = 20.dp),
-                        startDate = uiState.showDetail.salesStartDate,
-                        endDate = uiState.showDetail.salesEndDate,
-                    )
-                }
-                item {
                     ContentTabRow(
+                        modifier = Modifier.padding(top = 20.dp),
                         selectedTabIndex = uiState.selectedTab,
                         onSelectTab = viewModel::selectTab,
                     )
@@ -422,6 +418,24 @@ private fun LazyListScope.ShowInfoTab(
     val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
 
     item {
+        val startDate = showDetail.salesStartDate
+        val endDate = showDetail.salesEndDate
+
+        Section(
+            modifier = paddingModifier.padding(top = 8.dp),
+            title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
+            // ex. 2023.12.01 (토) - 2024.01.20 (월)
+            content = {
+                SectionContent(
+                    text = "${startDate.showDateString} - ${endDate.showDateString}"
+                )
+            }
+        )
+    }
+
+    item { Divider(paddingModifier) }
+
+    item {
         // 일시
         // ex. 2024.01.20 (토) / 18:00 (150분)
         val minute = stringResource(id = R.string.ticketing_minutes)
@@ -622,7 +636,7 @@ private fun Section(
     title: @Composable () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    paddingVertical: Dp = 32.dp,
+    paddingVertical: Dp = 24.dp,
     space: Dp = 16.dp,
 ) {
     Column(modifier.padding(vertical = paddingVertical)) {

@@ -18,6 +18,7 @@ data class ShowDetail(
     val hostName: String = "",
     val hostPhoneNumber: String = "",
     val isReserved: Boolean = false,
+    val salesTicketCount: Int,
 ) {
     val state: ShowState
         get() {

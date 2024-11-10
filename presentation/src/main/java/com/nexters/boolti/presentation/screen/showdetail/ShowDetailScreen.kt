@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -216,11 +217,13 @@ fun ShowDetailScreen(
                 }
             }
 
-            ShowDetailButtons(
-                showState = uiState.showDetail.state,
-                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
-            )
+            if (!uiState.showDetail.state.isClosedOrFinished) {
+                ShowDetailButtons(
+                    showState = uiState.showDetail.state,
+                    onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
+                    onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
+                )
+            }
         }
 
         showBottomSheet?.let { type ->

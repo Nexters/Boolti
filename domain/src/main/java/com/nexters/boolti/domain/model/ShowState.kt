@@ -5,4 +5,7 @@ sealed interface ShowState {
     data object TicketingInProgress : ShowState
     data object ClosedTicketing : ShowState
     data object FinishedShow : ShowState
+
+    val isClosedOrFinished: Boolean
+        get() = this in listOf(ClosedTicketing, FinishedShow)
 }

@@ -125,15 +125,3 @@ fun ShowDetailButtonsPreview() {
         )
     }
 }
-
-@Preview(heightDp = 100)
-@Composable
-fun ExpiredShowDetailButtonPreview() {
-    BooltiTheme {
-        ShowDetailButtons(
-            showState = ShowState.ClosedTicketing,
-            onTicketingClicked = {},
-            onGiftClicked = {}
-        )
-    }
-}

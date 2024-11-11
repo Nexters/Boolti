@@ -31,6 +31,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -52,11 +53,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -90,7 +92,6 @@ import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
 
 @Composable
@@ -426,9 +427,32 @@ private fun LazyListScope.ShowInfoTab(
             title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
             // ex. 2023.12.01 (토) - 2024.01.20 (월)
             content = {
-                SectionContent(
-                    text = "${startDate.showDateString} - ${endDate.showDateString}"
-                )
+                Column {
+                    Text(
+                        text = "${startDate.showDateString} - ${endDate.showDateString}",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30)
+                    )
+                    if (showDetail.state.isClosedOrFinished) {
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_ticket),
+                                tint = Grey30,
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = stringResource(
+                                    R.string.show_sold_ticket_count,
+                                    showDetail.salesTicketCount
+                                ),
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                            )
+                        }
+                    }
+                }
             }
         )
     }

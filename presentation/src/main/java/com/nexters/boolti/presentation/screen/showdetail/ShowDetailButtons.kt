@@ -21,10 +21,12 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.extension.countDownString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import java.time.LocalDateTime
 
 @Composable
 fun ShowDetailButtons(
@@ -93,10 +95,7 @@ private fun TicketingButton(
 ) {
     val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
-        is ShowState.WaitingTicketing -> stringResource(
-            id = R.string.ticketing_button_upcoming_ticket, showState.dDay
-        )
-
+        is ShowState.WaitingTicketing -> showState.startDateTime.countDownString
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
@@ -120,6 +119,20 @@ fun ShowDetailButtonsPreview() {
     BooltiTheme {
         ShowDetailButtons(
             showState = ShowState.TicketingInProgress,
+            onTicketingClicked = {},
+            onGiftClicked = {}
+        )
+    }
+}
+
+@Preview(heightDp = 100)
+@Composable
+fun ShowDetailButtonsBeforeTicketingPreview() {
+    BooltiTheme {
+        ShowDetailButtons(
+            showState = ShowState.WaitingTicketing(
+                LocalDateTime.now().plusDays(3).plusHours(2).plusMinutes(17)
+            ),
             onTicketingClicked = {},
             onGiftClicked = {}
         )

@@ -1,7 +1,9 @@
 package com.nexters.boolti.domain.model
 
+import java.time.LocalDateTime
+
 sealed interface ShowState {
-    data class WaitingTicketing(val dDay: Int) : ShowState
+    data class WaitingTicketing(val startDateTime: LocalDateTime) : ShowState
     data object TicketingInProgress : ShowState
     data object ClosedTicketing : ShowState
     data object FinishedShow : ShowState

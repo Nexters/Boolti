@@ -23,11 +23,10 @@ data class ShowDetail(
     val state: ShowState
         get() {
             val now = LocalDate.now()
-            val dDay = salesStartDate.toEpochDay() - now.toEpochDay()
 
             return when {
                 now > date.toLocalDate() -> ShowState.FinishedShow
-                now < salesStartDate -> ShowState.WaitingTicketing(dDay.toInt())
+                now < salesStartDate -> ShowState.WaitingTicketing(salesStartDate.atStartOfDay())
                 now <= salesEndDate -> ShowState.TicketingInProgress
                 now > salesEndDate -> ShowState.ClosedTicketing
                 else -> ShowState.FinishedShow

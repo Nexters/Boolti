@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
@@ -463,12 +464,32 @@ private fun LazyListScope.ShowInfoTab(
         // 일시
         // ex. 2024.01.20 (토) / 18:00 (150분)
         val minute = stringResource(id = R.string.ticketing_minutes)
-        val dateTimeString =
-            showDetail.date.showDateTimeString + " (${showDetail.runningTime}${minute})"
         Section(
             modifier = paddingModifier.padding(top = 8.dp),
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = { SectionContent(text = dateTimeString) },
+            content = {
+                Row {
+                    Text(
+                        text = showDetail.date.showDateTimeString,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Grey50,
+                                shape = CircleShape,
+                            )
+                            .padding(horizontal = 12.dp, vertical = 3.dp),
+                    ) {
+                        Text(
+                            text = "${showDetail.runningTime}${minute}",
+                            style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
+                        )
+                    }
+                }
+            },
         )
     }
 

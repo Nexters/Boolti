@@ -21,11 +21,11 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
-import com.nexters.boolti.presentation.extension.countDownString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import java.time.Duration
 import java.time.LocalDateTime
 
 @Composable
@@ -138,3 +138,18 @@ fun ShowDetailButtonsBeforeTicketingPreview() {
         )
     }
 }
+
+private val LocalDateTime.countDownString: String
+    @Composable
+    get() = run {
+        val now = LocalDateTime.now()
+
+        val duration = Duration.between(now, this)
+
+        val days = duration.toDays()
+        val hours = duration.toHours() % 24
+        val minutes = duration.toMinutes() % 60
+
+        stringResource(id = R.string.ticketing_button_ticket_countdown, days) +
+                " ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}"
+    }

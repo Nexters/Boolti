@@ -62,6 +62,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -81,18 +82,23 @@ import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
+import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Duration
+import java.time.LocalDateTime
 import kotlin.math.ceil
 
 @Composable
@@ -172,6 +178,12 @@ fun ShowDetailScreen(
             LazyColumn(
                 modifier = Modifier,
             ) {
+                item {
+                    CountDownBanner(
+                        uiState.showDetail.salesEndDate.plusDays(1).atStartOfDay().minusMinutes(1)
+                    )
+                }
+
                 item {
                     Poster(
                         modifier = modifier.fillMaxWidth(),
@@ -770,4 +782,49 @@ private fun Cast(
 @Composable
 private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier, color = Grey85)
+}
+
+@Composable
+private fun CountDownBanner(deadlineDateTime: LocalDateTime) {
+    Box(
+        modifier = Modifier
+            .height(40.dp)
+            .fillMaxWidth()
+            .background(Grey05),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = deadlineDateTime.countDownString,
+            style = MaterialTheme.typography.titleLarge.copy(color = Grey90)
+        )
+    }
+}
+
+private val LocalDateTime.countDownString: String
+    @Composable
+    get() = run {
+        val now = LocalDateTime.now()
+
+        val duration = Duration.between(now, this)
+        val hours = duration.toHours() % 24
+        val minutes = duration.toMinutes() % 60
+        val seconds = duration.seconds % 60
+
+        stringResource(id = R.string.show_ticketing_deadline_countdown) + " " +
+                "${hours.toString().padStart(2, '0')}:" +
+                "${minutes.toString().padStart(2, '0')}:" +
+                seconds.toString().padStart(2, '0')
+    }
+
+@Preview
+@Composable
+private fun CountDownBannerPreview() {
+    BooltiTheme {
+        CountDownBanner(
+            deadlineDateTime = LocalDateTime.now()
+                .plusHours(0)
+                .plusMinutes(5)
+                .plusSeconds(12)
+        )
+    }
 }

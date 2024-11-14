@@ -60,6 +60,8 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.UserThumbnail
+import com.nexters.boolti.presentation.extension.icon
+import com.nexters.boolti.presentation.extension.label
 import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
@@ -197,38 +199,14 @@ fun ProfileEditScreen(
 
     ObserveAsEvents(event) {
         when (it) {
-            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(
-                linkAddMsg,
-                dismissPrevious = true
-            )
-
-            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(
-                linkEditMsg,
-                dismissPrevious = true
-            )
-
-            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(
-                linkRemoveMsg,
-                dismissPrevious = true
-            )
-
-            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(
-                snsAddMsg,
-                dismissPrevious = true
-            )
-
-            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(
-                snsEditMsg,
-                dismissPrevious = true
-            )
-
-            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(
-                snsRemoveMsg,
-                dismissPrevious = true
-            )
-
+            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
+            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(linkEditMsg)
+            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
+            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(snsAddMsg)
+            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(snsEditMsg)
+            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(snsRemoveMsg)
             ProfileEditEvent.OnSuccessEditProfile -> {
-                snackbarHostState.showMessage(profileEditSuccessMsg, dismissPrevious = true)
+                snackbarHostState.showMessage(profileEditSuccessMsg)
                 navigateBack()
             }
         }
@@ -455,11 +433,6 @@ private fun SnsItem(
     modifier: Modifier = Modifier,
     onClickEdit: () -> Unit,
 ) {
-    val (icon, label) = when (sns.type) {
-        Sns.SnsType.INSTAGRAM -> R.drawable.ic_logo_instagram to "instagram"
-        Sns.SnsType.YOUTUBE -> R.drawable.ic_logo_youtube to "youtube"
-    }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -469,15 +442,15 @@ private fun SnsItem(
     ) {
         Icon(
             modifier = Modifier.size(24.dp),
-            imageVector = ImageVector.vectorResource(icon),
+            imageVector = ImageVector.vectorResource(sns.type.icon),
             tint = Grey30,
-            contentDescription = label,
+            contentDescription = sns.type.label,
         )
         Text(
             modifier = Modifier
                 .padding(start = 8.dp)
                 .defaultMinSize(minWidth = 72.dp),
-            text = label,
+            text = sns.type.label,
             style = MaterialTheme.typography.bodyLarge,
             color = Grey30,
         )

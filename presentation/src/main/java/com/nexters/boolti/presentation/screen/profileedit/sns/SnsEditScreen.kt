@@ -96,7 +96,11 @@ private fun SnsEditScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             BtAppBar(
-                title = if (isEditMode) "SNS 편집" else "SNS 추가",
+                title = if (isEditMode) {
+                    stringResource(R.string.sns_edit)
+                } else {
+                    stringResource(R.string.sns_add)
+                },
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
                         iconRes = R.drawable.ic_arrow_back,
@@ -123,35 +127,35 @@ private fun SnsEditScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 InfoRow(
-                    label = "SNS",
+                    label = stringResource(R.string.sns),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         SelectableIcon(
                             selected = selectedSns == Sns.SnsType.INSTAGRAM,
                             iconRes = R.drawable.ic_logo_instagram,
                             onClick = { onChangeSns(Sns.SnsType.INSTAGRAM) },
-                            contentDescription = "인스타그램 선택",
+                            contentDescription = stringResource(R.string.sns_select_instagram_description),
                         )
                         SelectableIcon(
                             modifier = Modifier.padding(start = 12.dp),
                             selected = selectedSns == Sns.SnsType.YOUTUBE,
                             iconRes = R.drawable.ic_logo_youtube,
                             onClick = { onChangeSns(Sns.SnsType.YOUTUBE) },
-                            contentDescription = "유튜브 선택",
+                            contentDescription = stringResource(R.string.sns_select_youtube_description),
                         )
                     }
                 }
                 InfoRow(
-                    label = "Username",
+                    label = stringResource(R.string.username),
                 ) {
                     BTTextField(
                         modifier = Modifier.weight(1f),
                         text = username,
                         isError = usernameHasError,
-                        placeholder = "ex) boolti_official",
+                        placeholder = stringResource(R.string.sns_username_placeholder),
                         supportingText = when {
-                            username.contains('@') -> "@을 제외환 Username을 입력해 주세요"
-                            usernameHasError -> "지원하지 않는 특수문자가 포함되어 있습니다"
+                            username.contains('@') -> stringResource(R.string.sns_username_contains_at_error)
+                            usernameHasError -> stringResource(R.string.contains_unsupported_char_error)
                             else -> null
                         },
                         trailingIcon = if (username.isNotEmpty()) {

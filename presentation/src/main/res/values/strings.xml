@@ -285,12 +285,20 @@
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
 
+    <string name="sns">SNS</string>
+    <string name="username">Username</string>
     <string name="sns_add">SNS 추가</string>
+    <string name="sns_edit">SNS 편집</string>
     <string name="sns_delete">SNS 삭제</string>
     <string name="sns_delete_message">SNS를 삭제하시겠어요?</string>
     <string name="sns_add_msg">SNS를 추가했어요</string>
     <string name="sns_edit_msg">SNS를 편집했어요</string>
     <string name="sns_remove_msg">SNS를 삭제했어요</string>
+    <string name="sns_username_placeholder">ex) boolti_official</string>
+    <string name="sns_username_contains_at_error">\@을 제외환 Username을 입력해 주세요</string>
+    <string name="contains_unsupported_char_error">지원하지 않는 특수문자가 포함되어 있습니다</string>
+    <string name="sns_select_instagram_description">인스타그램 선택</string>
+    <string name="sns_select_youtube_description">유튜브 선택</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>

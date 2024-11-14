@@ -197,12 +197,36 @@ fun ProfileEditScreen(
 
     ObserveAsEvents(event) {
         when (it) {
-            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg, dismissPrevious = true)
-            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(linkEditMsg, dismissPrevious = true)
-            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg, dismissPrevious = true)
-            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(snsAddMsg, dismissPrevious = true)
-            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(snsEditMsg, dismissPrevious = true)
-            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(snsRemoveMsg, dismissPrevious = true)
+            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(
+                linkAddMsg,
+                dismissPrevious = true
+            )
+
+            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(
+                linkEditMsg,
+                dismissPrevious = true
+            )
+
+            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(
+                linkRemoveMsg,
+                dismissPrevious = true
+            )
+
+            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(
+                snsAddMsg,
+                dismissPrevious = true
+            )
+
+            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(
+                snsEditMsg,
+                dismissPrevious = true
+            )
+
+            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(
+                snsRemoveMsg,
+                dismissPrevious = true
+            )
+
             ProfileEditEvent.OnSuccessEditProfile -> {
                 snackbarHostState.showMessage(profileEditSuccessMsg, dismissPrevious = true)
                 navigateBack()
@@ -539,6 +563,8 @@ private fun Section(
             Text(
                 modifier = Modifier.padding(horizontal = marginHorizontal),
                 text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.size(16.dp))
             content()

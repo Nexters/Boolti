@@ -95,6 +95,8 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Duration
@@ -169,18 +171,19 @@ fun ShowDetailScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-
             val host = stringResource(
                 id = R.string.ticketing_host_format,
                 uiState.showDetail.hostName,
                 uiState.showDetail.hostPhoneNumber,
             )
+
             LazyColumn(
                 modifier = Modifier,
             ) {
+
                 item {
-                    CountDownBanner(
-                        uiState.showDetail.salesEndDate.plusDays(1).atStartOfDay().minusMinutes(1)
+                    CountDownBanner( // todo : 날짜 변경
+                        LocalDateTime.now().plusSeconds(15)
                     )
                 }
 
@@ -786,6 +789,14 @@ private fun Divider(modifier: Modifier = Modifier) {
 
 @Composable
 private fun CountDownBanner(deadlineDateTime: LocalDateTime) {
+    val remainingTime by flow {
+        while (true) {
+            val duration = Duration.between(LocalDateTime.now(), deadlineDateTime)
+            emit(maxOf(duration, Duration.ZERO))
+            delay(1000L)
+        }
+    }.collectAsStateWithLifecycle(Duration.ZERO)
+
     Box(
         modifier = Modifier
             .height(40.dp)
@@ -794,27 +805,22 @@ private fun CountDownBanner(deadlineDateTime: LocalDateTime) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = deadlineDateTime.countDownString,
+            text = stringResource(id = R.string.show_ticketing_deadline_countdown) + " " +
+                    getRemainingTimeString(duration = remainingTime),
             style = MaterialTheme.typography.titleLarge.copy(color = Grey90)
         )
     }
 }
 
-private val LocalDateTime.countDownString: String
-    @Composable
-    get() = run {
-        val now = LocalDateTime.now()
+fun getRemainingTimeString(duration: Duration): String {
+    val hours = duration.toHours() % 24
+    val minutes = duration.toMinutes() % 60
+    val seconds = duration.seconds % 60
 
-        val duration = Duration.between(now, this)
-        val hours = duration.toHours() % 24
-        val minutes = duration.toMinutes() % 60
-        val seconds = duration.seconds % 60
-
-        stringResource(id = R.string.show_ticketing_deadline_countdown) + " " +
-                "${hours.toString().padStart(2, '0')}:" +
-                "${minutes.toString().padStart(2, '0')}:" +
-                seconds.toString().padStart(2, '0')
-    }
+    return "${hours.toString().padStart(2, '0')}:" +
+            "${minutes.toString().padStart(2, '0')}:" +
+            seconds.toString().padStart(2, '0')
+}
 
 @Preview
 @Composable

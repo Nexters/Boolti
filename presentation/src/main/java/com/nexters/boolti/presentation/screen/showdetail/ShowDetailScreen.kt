@@ -100,6 +100,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
 
@@ -171,6 +172,8 @@ fun ShowDetailScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            val showCountdownBanner =
+                uiState.showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
             val host = stringResource(
                 id = R.string.ticketing_host_format,
                 uiState.showDetail.hostName,
@@ -180,16 +183,15 @@ fun ShowDetailScreen(
             LazyColumn(
                 modifier = Modifier,
             ) {
-
                 item {
-                    CountDownBanner( // todo : 날짜 변경
-                        LocalDateTime.now().plusSeconds(15)
-                    )
-                }
+                    val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 
-                item {
                     Poster(
-                        modifier = modifier.fillMaxWidth(),
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                            .background(color = MaterialTheme.colorScheme.surface)
+                            .padding(top = paddingTop),
                         navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
                         title = uiState.showDetail.name,
                         images = uiState.showDetail.images.map { it.originImage }
@@ -236,6 +238,10 @@ fun ShowDetailScreen(
                     onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
                     onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
                 )
+            }
+
+            if (showCountdownBanner) {
+                CountDownBanner(uiState.showDetail.salesEndDateTime)
             }
         }
 
@@ -436,7 +442,7 @@ private fun LazyListScope.ShowInfoTab(
 
     item {
         val startDate = showDetail.salesStartDate
-        val endDate = showDetail.salesEndDate
+        val endDate = showDetail.salesEndDateTime.toLocalDate()
 
         Section(
             modifier = paddingModifier.padding(top = 8.dp),
@@ -669,11 +675,7 @@ private fun Poster(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-            .background(color = MaterialTheme.colorScheme.surface)
-            .padding(top = 16.dp)
-            .padding(horizontal = 38.dp)
+        modifier = modifier.padding(horizontal = 38.dp)
     ) {
         SwipeableImage(
             modifier = Modifier

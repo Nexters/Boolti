@@ -34,7 +34,7 @@ internal data class ShowDetailResponse(
             detailAddress = detailAddress,
             notice = notice,
             salesStartDate = salesStartTime.toLocalDate(),
-            salesEndDate = salesEndTime.toLocalDate(),
+            salesEndDateTime = salesEndTime.toLocalDateTime(),
             images = showImg.toDomains(),
             hostName = hostName,
             hostPhoneNumber = hostPhoneNumber,

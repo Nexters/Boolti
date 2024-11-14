@@ -13,7 +13,7 @@ data class ShowDetail(
     val detailAddress: String = "",
     val notice: String = "",
     val salesStartDate: LocalDate = LocalDate.now(),
-    val salesEndDate: LocalDate = LocalDate.now(),
+    val salesEndDateTime: LocalDateTime = LocalDateTime.now(),
     val images: List<ImagePair> = emptyList(),
     val hostName: String = "",
     val hostPhoneNumber: String = "",
@@ -27,8 +27,8 @@ data class ShowDetail(
             return when {
                 now > date.toLocalDate() -> ShowState.FinishedShow
                 now < salesStartDate -> ShowState.WaitingTicketing(salesStartDate.atStartOfDay())
-                now <= salesEndDate -> ShowState.TicketingInProgress
-                now > salesEndDate -> ShowState.ClosedTicketing
+                now <= salesEndDateTime.toLocalDate() -> ShowState.TicketingInProgress
+                now > salesEndDateTime.toLocalDate() -> ShowState.ClosedTicketing
                 else -> ShowState.FinishedShow
             }
         }

@@ -11,8 +11,10 @@ class SnackbarController(
 ) {
     fun showMessage(
         message: String,
+        dismissPrevious: Boolean = false,
     ) {
         coroutineScope.launch {
+            if (dismissPrevious) snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar(message)
         }
     }

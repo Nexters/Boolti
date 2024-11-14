@@ -83,6 +83,9 @@ fun ProfileEditScreen(
     newLinkCallback: Flow<Link>,
     editLinkCallback: Flow<Link>,
     removeLinkCallback: Flow<String>,
+    newSnsCallback: Flow<Sns>,
+    editSnsCallback: Flow<Sns>,
+    removeSnsCallback: Flow<String>,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -93,10 +96,19 @@ fun ProfileEditScreen(
         newLinkCallback.collect(viewModel::onNewLinkAdded)
     }
     LaunchedEffect(editLinkCallback) {
-        editLinkCallback.collect(viewModel::onLinkEditted)
+        editLinkCallback.collect(viewModel::onLinkEdited)
     }
     LaunchedEffect(removeLinkCallback) {
         removeLinkCallback.collect(viewModel::onLinkRemoved)
+    }
+    LaunchedEffect(newSnsCallback) {
+        newSnsCallback.collect(viewModel::onSnsAdded)
+    }
+    LaunchedEffect(editSnsCallback) {
+        editSnsCallback.collect(viewModel::onSnsEdited)
+    }
+    LaunchedEffect(removeSnsCallback) {
+        removeSnsCallback.collect(viewModel::onSnsRemoved)
     }
 
     ProfileEditScreen(
@@ -163,6 +175,9 @@ fun ProfileEditScreen(
     val linkAddMsg = stringResource(R.string.link_add_msg)
     val linkEditMsg = stringResource(R.string.link_edit_msg)
     val linkRemoveMsg = stringResource(R.string.link_remove_msg)
+    val snsAddMsg = stringResource(R.string.sns_add_msg)
+    val snsEditMsg = stringResource(R.string.sns_edit_msg)
+    val snsRemoveMsg = stringResource(R.string.sns_remove_msg)
     val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
 
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
@@ -182,11 +197,14 @@ fun ProfileEditScreen(
 
     ObserveAsEvents(event) {
         when (it) {
-            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
-            ProfileEditEvent.OnLinkEditted -> snackbarHostState.showMessage(linkEditMsg)
-            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
+            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg, dismissPrevious = true)
+            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(linkEditMsg, dismissPrevious = true)
+            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg, dismissPrevious = true)
+            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(snsAddMsg, dismissPrevious = true)
+            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(snsEditMsg, dismissPrevious = true)
+            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(snsRemoveMsg, dismissPrevious = true)
             ProfileEditEvent.OnSuccessEditProfile -> {
-                snackbarHostState.showMessage(profileEditSuccessMsg)
+                snackbarHostState.showMessage(profileEditSuccessMsg, dismissPrevious = true)
                 navigateBack()
             }
         }

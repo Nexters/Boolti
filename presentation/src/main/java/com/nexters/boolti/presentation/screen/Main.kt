@@ -226,6 +226,31 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             )
             ProfileSnsEditScreen(
                 modifier = modifier,
+                onAddSns = { type, username ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("newSnsType", type.name)
+                            set("newSnsUsername", username)
+                        }
+                    navController.popBackStack()
+                },
+                onEditSns = { id, type, username ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("editSnsId", id)
+                            set("editSnsType", type.name)
+                            set("editSnsUsername", username)
+                        }
+                    navController.popBackStack()
+                },
+                onRemoveSns = { id ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("removeSnsId", id)
+                    navController.popBackStack()
+                },
                 popBackStack = navController::popBackStack,
             )
             ProfileLinkEditScreen(

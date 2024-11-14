@@ -16,13 +16,12 @@ import javax.inject.Inject
 class SnsEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-    private val snsId: String? = savedStateHandle[linkId]
     private val _uiState = MutableStateFlow(
         SnsEditState(
+            snsId = savedStateHandle[linkId],
             selectedSns = Sns.SnsType.fromString(savedStateHandle[snsType])
                 ?: Sns.SnsType.INSTAGRAM,
             username = savedStateHandle[username] ?: "",
-            isEditMode = snsId != null,
         )
     )
     val uiState = _uiState.asStateFlow()

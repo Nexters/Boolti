@@ -163,6 +163,18 @@ sealed class MainDestination(val route: String) {
         fun createRoute(userCode: String) = "linkList?userCode=$userCode"
     }
 
+    data object PerformedShows : MainDestination(route = "performedShows") {
+        val arguments = listOf(
+            navArgument(userCode) {
+                type = NavType.StringType
+                nullable = true
+            },
+        )
+
+        fun createRoute(): String = "performedShows"
+        fun createRoute(userCode: String) = "performedShows?userCode=$userCode"
+    }
+
     data object ShowRegistration : MainDestination(route = "webView")
 }
 

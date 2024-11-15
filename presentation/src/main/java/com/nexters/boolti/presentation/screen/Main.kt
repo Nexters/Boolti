@@ -33,6 +33,7 @@ import com.nexters.boolti.presentation.screen.home.HomeScreen
 import com.nexters.boolti.presentation.screen.link.LinkListScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
+import com.nexters.boolti.presentation.screen.perforemdshows.PerformedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.ProfileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
@@ -218,6 +219,11 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         )
         LinkListScreen(
             modifier = modifier,
+            popBackStack = navController::popBackStack,
+        )
+        PerformedShowsScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
         navigation(

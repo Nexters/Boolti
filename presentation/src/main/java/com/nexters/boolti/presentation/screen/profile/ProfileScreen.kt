@@ -70,6 +70,7 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: (userCode: String?) -> Unit,
+    navigateToPerformedShows: (userCode: String?) -> Unit,
     navigateToShow: (showId: String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -89,6 +90,12 @@ fun ProfileScreen(
                 is User.Others -> navigateToLinks(uiState.user.userCode)
             }
         },
+        navigateToPerformedShows = {
+            when (uiState.user) {
+                is User.My -> navigateToPerformedShows(null)
+                is User.Others -> navigateToPerformedShows(uiState.user.userCode)
+            }
+        },
         navigateToShow = navigateToShow,
     )
 }
@@ -102,6 +109,7 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: () -> Unit,
+    navigateToPerformedShows: () -> Unit,
     navigateToShow: (showId: String) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
@@ -202,7 +210,7 @@ fun ProfileScreen(
                 Section(
                     title = stringResource(R.string.performed_shows),
                     onClickShowAll = if (user.performedShow.size >= 3) {
-                        { }
+                        { navigateToPerformedShows() }
                     } else {
                         null
                     },

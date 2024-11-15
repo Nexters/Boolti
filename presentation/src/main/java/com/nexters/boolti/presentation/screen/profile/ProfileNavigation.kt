@@ -24,6 +24,13 @@ fun NavGraphBuilder.ProfileScreen(
                     navigateTo(MainDestination.LinkList.createRoute())
                 }
             },
+            navigateToPerformedShows = { userCode ->
+                if (userCode != null) {
+                    navigateTo(MainDestination.PerformedShows.createRoute(userCode))
+                } else {
+                    navigateTo(MainDestination.PerformedShows.createRoute())
+                }
+            },
             navigateToProfileEdit = { navigateTo(MainDestination.ProfileEdit.route) },
             navigateToShow = { showId -> navigateTo(MainDestination.ShowDetail.createRoute(showId)) },
         )

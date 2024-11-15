@@ -30,6 +30,7 @@ import com.nexters.boolti.presentation.screen.business.BusinessScreen
 import com.nexters.boolti.presentation.screen.gift.addGiftScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
+import com.nexters.boolti.presentation.screen.link.LinkListScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
 import com.nexters.boolti.presentation.screen.profile.ProfileScreen
@@ -213,6 +214,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         ProfileScreen(
             modifier = modifier,
             navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        LinkListScreen(
+            modifier = modifier,
             popBackStack = navController::popBackStack,
         )
         navigation(

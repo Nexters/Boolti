@@ -17,6 +17,13 @@ fun NavGraphBuilder.ProfileScreen(
         ProfileScreen(
             modifier = modifier,
             onClickBack = popBackStack,
+            navigateToLinks = { userCode ->
+                if (userCode != null) {
+                    navigateTo(MainDestination.LinkList.createRoute(userCode))
+                } else {
+                    navigateTo(MainDestination.LinkList.createRoute())
+                }
+            },
             navigateToProfileEdit = { navigateTo(MainDestination.ProfileEdit.route) },
         )
     }

@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,7 +51,9 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +64,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
+    navigateToLinks: (userCode: String?) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -72,6 +77,12 @@ fun ProfileScreen(
         event = event,
         onClickBack = onClickBack,
         navigateToProfileEdit = navigateToProfileEdit,
+        navigateToLinks = {
+            when (uiState.user) {
+                is User.My -> navigateToLinks(null)
+                is User.Others -> navigateToLinks(uiState.user.userCode)
+            }
+        },
     )
 }
 
@@ -83,6 +94,7 @@ fun ProfileScreen(
     event: Flow<ProfileEvent>,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
+    navigateToLinks: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarHostState = LocalSnackbarController.current
@@ -144,18 +156,20 @@ fun ProfileScreen(
                 },
             )
 
-            if (user.link.isNotEmpty()) { // SNS 링크가 있으면
-                Column(
-                    modifier = Modifier.padding(vertical = 32.dp, horizontal = marginHorizontal),
+            if (user.link.isNotEmpty()) { // 링크가 있으면
+                Section(
+                    title = stringResource(R.string.profile_links_title),
+                    onClickShowAll = if (user.link.size >= 3) {
+                        { navigateToLinks() }
+                    } else {
+                        null
+                    },
                 ) {
-                    Text(
-                        text = stringResource(R.string.profile_links_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                    user.link.forEach { link ->
+                    user.link.take(3).forEachIndexed { i, link ->
                         LinkItem(
-                            modifier = Modifier.padding(top = 16.dp),
+                            modifier = Modifier
+                                .padding(top = if (i == 0) 0.dp else 16.dp)
+                                .padding(horizontal = marginHorizontal),
                             link = link,
                             onClick = {
                                 try {
@@ -286,7 +300,48 @@ private fun SnsChip(
 }
 
 @Composable
-private fun LinkItem(
+private fun Section(
+    title: String,
+    modifier: Modifier = Modifier,
+    onClickShowAll: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 24.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(start = marginHorizontal)
+                    .weight(1f),
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            if (onClickShowAll != null) {
+                TextButton(
+                    modifier = Modifier.padding(end = 8.dp),
+                    onClick = onClickShowAll,
+                ) {
+                    Text(
+                        text = stringResource(R.string.show_all),
+                        color = Grey50,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        }
+        content()
+    }
+}
+
+@Composable
+fun LinkItem(
     modifier: Modifier = Modifier,
     link: Link,
     onClick: () -> Unit,
@@ -312,5 +367,16 @@ private fun LinkItem(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Preview
+@Composable
+private fun SectionPreview() {
+    BooltiTheme {
+        Section(
+            title = "링크",
+            onClickShowAll = {},
+        ) {}
     }
 }

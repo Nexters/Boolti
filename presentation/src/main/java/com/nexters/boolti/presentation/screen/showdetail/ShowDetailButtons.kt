@@ -11,12 +11,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
@@ -26,6 +32,8 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -94,16 +102,26 @@ private fun TicketingButton(
     showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
+    var remainingTime by remember { mutableStateOf(Duration.ZERO) }
+
+    LaunchedEffect(showState) {
+        if (showState !is ShowState.WaitingTicketing) return@LaunchedEffect
+
+        while (true) {
+            remainingTime = Duration.between(LocalDateTime.now(), showState.startDateTime)
+            delay(1000L)
+        }
+    }
+
     val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
         is ShowState.WaitingTicketing -> {
-            val duration = Duration.between(LocalDateTime.now(), showState.startDateTime)
-            val days = duration.toDays()
+            val days = remainingTime.toDays()
 
             stringResource(
                 id = R.string.ticketing_button_ticket_countdown,
                 days
-            ) + duration.asString()
+            ) + " " + remainingTime.asString()
         }
 
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)

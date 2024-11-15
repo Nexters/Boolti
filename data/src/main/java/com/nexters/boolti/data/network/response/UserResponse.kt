@@ -12,17 +12,19 @@ internal data class UserResponse(
     val imgPath: String? = null,
     val userCode: String? = null,
     val introduction: String = "",
+    val sns: List<EditProfileRequest.SnsDto> = emptyList(),
     val link: List<EditProfileRequest.LinkDto> = emptyList(),
+    val performedShow: List<ShowResponse> = emptyList(),
 ) {
-    fun toDomain(): User.My {
-        return User.My(
-            id = id,
-            nickname = nickname ?: "",
-            email = email ?: "",
-            photo = imgPath,
-            userCode = userCode ?: "",
-            introduction = introduction,
-            link = link.map { it.toDomain() },
-        )
-    }
+    fun toDomain(): User.My = User.My(
+        id = id,
+        nickname = nickname ?: "",
+        email = email ?: "",
+        photo = imgPath,
+        userCode = userCode ?: "",
+        introduction = introduction,
+        sns = sns.map { it.toDomain() },
+        link = link.map { it.toDomain() },
+        performedShow = performedShow.toDomains(),
+    )
 }

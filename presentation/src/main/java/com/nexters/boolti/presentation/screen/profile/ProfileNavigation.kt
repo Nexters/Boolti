@@ -25,6 +25,7 @@ fun NavGraphBuilder.ProfileScreen(
                 }
             },
             navigateToProfileEdit = { navigateTo(MainDestination.ProfileEdit.route) },
+            navigateToShow = { showId -> navigateTo(MainDestination.ShowDetail.createRoute(showId)) },
         )
     }
 }

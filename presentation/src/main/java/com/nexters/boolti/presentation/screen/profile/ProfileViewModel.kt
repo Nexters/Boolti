@@ -67,7 +67,7 @@ class ProfileViewModel @Inject constructor(
                         user = user.copy(
                             performedShow = List(5) { // TODO REMOVE ME
                                 Show(
-                                    id = "31",
+                                    id = "127",
                                     name = "Show",
                                     date = LocalDateTime.now(),
                                     salesStartDate = LocalDate.now(),

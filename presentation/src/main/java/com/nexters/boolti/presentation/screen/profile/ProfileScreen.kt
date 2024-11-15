@@ -70,6 +70,7 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: (userCode: String?) -> Unit,
+    navigateToShow: (showId: String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -88,6 +89,7 @@ fun ProfileScreen(
                 is User.Others -> navigateToLinks(uiState.user.userCode)
             }
         },
+        navigateToShow = navigateToShow,
     )
 }
 
@@ -100,6 +102,7 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: () -> Unit,
+    navigateToShow: (showId: String) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarHostState = LocalSnackbarController.current
@@ -209,7 +212,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = if (i == 0) 0.dp else 24.dp)
-                                .clickable { },
+                                .clickable { navigateToShow(show.id) },
                             show = show,
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                             paddingValues = PaddingValues(horizontal = marginHorizontal),

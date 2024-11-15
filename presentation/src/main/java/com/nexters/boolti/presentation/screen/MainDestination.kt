@@ -9,6 +9,8 @@ sealed class MainDestination(val route: String) {
     data object Home : MainDestination(route = "home")
     data object ShowDetail : MainDestination(route = "show") {
         val arguments = listOf(navArgument(showId) { type = NavType.StringType })
+
+        fun createRoute(showId: String): String = "${ShowDetail.route}/$showId"
     }
 
     data object Ticketing : MainDestination(route = "ticketing") {

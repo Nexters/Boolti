@@ -76,6 +76,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
+import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.extension.showDateTimeString
@@ -189,7 +190,12 @@ fun ShowDetailScreen(
                     Poster(
                         modifier = modifier
                             .fillMaxWidth()
-                            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                            .clip(
+                                shape = RoundedCornerShape(
+                                    bottomStart = 20.dp,
+                                    bottomEnd = 20.dp
+                                )
+                            )
                             .background(color = MaterialTheme.colorScheme.surface)
                             .padding(top = paddingTop),
                         navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
@@ -807,21 +813,10 @@ private fun CountDownBanner(deadlineDateTime: LocalDateTime) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(id = R.string.show_ticketing_deadline_countdown) + " " +
-                    getRemainingTimeString(duration = remainingTime),
+            text = stringResource(id = R.string.show_ticketing_deadline_countdown) + " " + remainingTime.asString(),
             style = MaterialTheme.typography.titleLarge.copy(color = Grey90)
         )
     }
-}
-
-fun getRemainingTimeString(duration: Duration): String {
-    val hours = duration.toHours() % 24
-    val minutes = duration.toMinutes() % 60
-    val seconds = duration.seconds % 60
-
-    return "${hours.toString().padStart(2, '0')}:" +
-            "${minutes.toString().padStart(2, '0')}:" +
-            seconds.toString().padStart(2, '0')
 }
 
 @Preview

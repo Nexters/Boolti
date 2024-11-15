@@ -21,6 +21,7 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
@@ -95,7 +96,16 @@ private fun TicketingButton(
 ) {
     val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
-        is ShowState.WaitingTicketing -> showState.startDateTime.countDownString
+        is ShowState.WaitingTicketing -> {
+            val duration = Duration.between(LocalDateTime.now(), showState.startDateTime)
+            val days = duration.toDays()
+
+            stringResource(
+                id = R.string.ticketing_button_ticket_countdown,
+                days
+            ) + duration.asString()
+        }
+
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
@@ -138,18 +148,3 @@ fun ShowDetailButtonsBeforeTicketingPreview() {
         )
     }
 }
-
-private val LocalDateTime.countDownString: String
-    @Composable
-    get() = run {
-        val now = LocalDateTime.now()
-
-        val duration = Duration.between(now, this)
-
-        val days = duration.toDays()
-        val hours = duration.toHours() % 24
-        val minutes = duration.toMinutes() % 60
-
-        stringResource(id = R.string.ticketing_button_ticket_countdown, days) +
-                " ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}"
-    }

@@ -24,7 +24,7 @@ val LocalDateTime.dayOfWeekString: String
 val LocalDateTime.showDateTimeString: String
     @Composable
     get() = run {
-        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd ($dayOfWeekString) HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd ($dayOfWeekString) / HH:mm")
         format(formatter)
     }
 

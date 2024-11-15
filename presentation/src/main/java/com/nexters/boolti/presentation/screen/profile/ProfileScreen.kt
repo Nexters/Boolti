@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -48,12 +51,14 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.flow.Flow
@@ -178,6 +183,36 @@ fun ProfileScreen(
                                     snackbarHostState.showMessage(invalidUrlMsg)
                                 }
                             },
+                        )
+                    }
+                }
+            }
+
+            if (user.link.isNotEmpty() && user.performedShow.isNotEmpty()) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = marginHorizontal),
+                    color = Grey85,
+                )
+            }
+
+            if (user.performedShow.isNotEmpty()) { // 출연한 공연이 있으면
+                Section(
+                    title = stringResource(R.string.performed_shows),
+                    onClickShowAll = if (user.performedShow.size >= 3) {
+                        { }
+                    } else {
+                        null
+                    },
+                ) {
+                    user.performedShow.take(3).forEachIndexed { i, show ->
+                        ShowItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = if (i == 0) 0.dp else 24.dp)
+                                .clickable { },
+                            show = show,
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+                            paddingValues = PaddingValues(horizontal = marginHorizontal),
                         )
                     }
                 }
@@ -312,7 +347,9 @@ private fun Section(
             .padding(top = 8.dp, bottom = 24.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = if (onClickShowAll != null) 0.dp else 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

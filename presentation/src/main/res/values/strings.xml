@@ -274,6 +274,7 @@
     <!-- 프로필 & 프로필 편집 & 링크 편집 -->
     <string name="profile_title">프로필</string>
     <string name="profile_links_title">링크</string>
+    <string name="performed_shows">출연한 공연</string>
     <string name="profile_edit_sns_title">SNS</string>
     <string name="profile_edit">프로필 편집</string>
     <string name="profile_edit_button_label">프로필 편집</string>

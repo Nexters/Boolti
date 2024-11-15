@@ -2,11 +2,13 @@ package com.nexters.boolti.presentation.screen.payment
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -36,14 +37,18 @@ fun TicketSummarySection(
     poster: String,
     showName: String,
     showDate: LocalDateTime,
+    paddingValues: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
+    colors: CardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
 ) {
     Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = Modifier
+            .padding(paddingValues)
+            .then(modifier),
+        colors = colors,
         shape = RoundedCornerShape(4.dp),
     ) {
         Row(
-            modifier = Modifier.padding(vertical = 16.dp, horizontal = marginHorizontal),
+            modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AsyncImage(

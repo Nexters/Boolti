@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profile
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.MemberRepository
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,7 +61,24 @@ class ProfileViewModel @Inject constructor(
     private fun collectMyProfile() {
         authRepository.cachedUser
             .filterNotNull()
-            .onEach { user -> _uiState.update { it.copy(user = user) } }
+            .onEach { user ->
+                _uiState.update {
+                    it.copy(
+                        user = user.copy(
+                            performedShow = List(5) { // TODO REMOVE ME
+                                Show(
+                                    id = "31",
+                                    name = "Show",
+                                    date = LocalDateTime.now(),
+                                    salesStartDate = LocalDate.now(),
+                                    salesEndDate = LocalDate.now(),
+                                    thumbnailImage = "",
+                                )
+                            },
+                        )
+                    )
+                }
+            }
             .launchIn(viewModelScope)
     }
 

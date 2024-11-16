@@ -8,6 +8,8 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class BtWebView @JvmOverloads constructor(
     context: Context,
@@ -15,6 +17,9 @@ class BtWebView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
 ) : WebView(context, attrs, defStyleAttr, defStyleRes) {
+
+    private val _progress = MutableStateFlow(0)
+    val progress = _progress.asStateFlow()
 
     init {
         setupSettings()
@@ -39,7 +44,11 @@ class BtWebView @JvmOverloads constructor(
         launchActivity: () -> Unit,
         setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
     ) {
-        webChromeClient = BtWebChromeClient(launchActivity, setFilePathCallback)
+        webChromeClient = BtWebChromeClient(
+            launchActivity = launchActivity,
+            setFilePathCallback = setFilePathCallback,
+            onProgressChanged = { _progress.value = it },
+        )
     }
 }
 
@@ -48,7 +57,13 @@ class BtWebViewClient : WebViewClient()
 class BtWebChromeClient(
     private val launchActivity: () -> Unit,
     private val setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
+    private val onProgressChanged: (Int) -> Unit = {},
 ) : WebChromeClient() {
+    override fun onProgressChanged(view: WebView?, newProgress: Int) {
+        super.onProgressChanged(view, newProgress)
+        onProgressChanged(newProgress)
+    }
+
     override fun onShowFileChooser(
         webView: WebView,
         filePathCallback: ValueCallback<Array<Uri>>?,

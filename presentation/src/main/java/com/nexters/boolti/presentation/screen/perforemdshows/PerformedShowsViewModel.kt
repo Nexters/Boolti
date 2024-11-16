@@ -2,7 +2,6 @@ package com.nexters.boolti.presentation.screen.perforemdshows
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -14,8 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,16 +43,7 @@ class PerformedShowsViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     loading = false,
-                    shows = List(5) { // TODO REMOVE ME
-                        Show(
-                            id = "127",
-                            name = "Show",
-                            date = LocalDateTime.now(),
-                            salesStartDate = LocalDate.now(),
-                            salesEndDate = LocalDate.now(),
-                            thumbnailImage = "",
-                        )
-                    },
+                    shows = shows,
                 )
             }
         } ?: event(PerformedShowsEvent.FetchFailed)

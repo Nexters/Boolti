@@ -38,7 +38,7 @@ import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.point1
-import java.time.LocalDateTime
+import java.time.Duration
 
 @Composable
 fun ShowFeed(
@@ -124,7 +124,7 @@ private fun ShowBadge(
     var dDay: Int? = null
     val (color, containerColor, labelId) = when (showState) {
         is ShowState.WaitingTicketing -> {
-            dDay = showState.startDateTime.dDay.toInt()
+            dDay = showState.remainingTime.dDay.toInt()
             Triple(
                 MaterialTheme.colorScheme.primary,
                 Grey80,
@@ -158,6 +158,6 @@ private fun ShowBadge(
 @Composable
 private fun ShowBadgePreview() {
     BooltiTheme {
-        ShowBadge(ShowState.WaitingTicketing(LocalDateTime.now().plusDays(3).plusHours(1)))
+        ShowBadge(ShowState.WaitingTicketing(Duration.ofHours(73)))
     }
 }

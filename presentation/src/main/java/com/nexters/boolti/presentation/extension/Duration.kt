@@ -11,3 +11,6 @@ fun Duration.asString(): String {
             "${minutes.toString().padStart(2, '0')}:" +
             seconds.toString().padStart(2, '0')
 }
+
+val Duration.dDay: Long
+    get() = toDays() + 1

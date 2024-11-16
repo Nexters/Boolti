@@ -1,5 +1,6 @@
 package com.nexters.boolti.domain.model
 
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -26,7 +27,13 @@ data class ShowDetail(
 
             return when {
                 now > date.toLocalDate() -> ShowState.FinishedShow
-                now < salesStartDate -> ShowState.WaitingTicketing(salesStartDate.atStartOfDay())
+                now < salesStartDate -> ShowState.WaitingTicketing(
+                    Duration.between(
+                        LocalDateTime.now(),
+                        salesStartDate.atStartOfDay()
+                    )
+                )
+
                 now <= salesEndDateTime.toLocalDate() -> ShowState.TicketingInProgress
                 now > salesEndDateTime.toLocalDate() -> ShowState.ClosedTicketing
                 else -> ShowState.FinishedShow

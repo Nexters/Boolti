@@ -129,6 +129,12 @@ fun ShowDetailScreen(
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val showState by flow {
+        while (true) {
+            emit(uiState.showDetail.state)
+            delay(1000)
+        }
+    }.collectAsStateWithLifecycle(uiState.showDetail.state)
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
@@ -238,16 +244,18 @@ fun ShowDetailScreen(
                 }
             }
 
-            if (!uiState.showDetail.state.isClosedOrFinished) {
+            if (!showState.isClosedOrFinished) {
                 ShowDetailButtons(
-                    showState = uiState.showDetail.state,
+                    showState = showState,
                     onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
                     onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
                 )
             }
 
             if (showCountdownBanner) {
-                CountDownBanner(uiState.showDetail.salesEndDateTime)
+                CountDownBanner(
+                    uiState.showDetail.salesEndDateTime,
+                )
             }
         }
 

@@ -31,9 +31,3 @@ val LocalDateTime.showDateTimeString: String
     }
 
 fun LocalDateTime.format(pattern: String): String = format(DateTimeFormatter.ofPattern(pattern))
-
-val LocalDateTime.dDay: Long
-    get() = run {
-        val today = LocalDate.now()
-        ChronoUnit.DAYS.between(today, toLocalDate())
-    }

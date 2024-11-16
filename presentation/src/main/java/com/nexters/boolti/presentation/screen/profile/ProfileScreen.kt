@@ -247,7 +247,7 @@ fun ProfileScreen(
             if (user.performedShow.isNotEmpty()) { // 출연한 공연이 있으면
                 Section(
                     title = stringResource(R.string.performed_shows),
-                    onClickShowAll = if (user.performedShow.size >= 3) {
+                    onClickShowAll = if (user.performedShow.size >= 2) {
                         { navigateToPerformedShows() }
                     } else {
                         null

@@ -154,7 +154,7 @@ private fun PaymentCompleteScreen(
             )
 
             ShowItem(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp),
                 poster = reservation.showImage,

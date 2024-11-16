@@ -3,17 +3,15 @@ package com.nexters.boolti.presentation.reservationdetail
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,17 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.kakao.sdk.share.ShareClient
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.ReservationState
@@ -51,6 +46,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.screen.giftcomplete.GiftPolicy
@@ -59,10 +55,8 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
-import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.theme.point2
 
 @Composable
 fun ReservationDetailScreen(
@@ -120,7 +114,18 @@ fun ReservationDetailScreen(
                     style = MaterialTheme.typography.bodySmall.copy(color = textColor)
                 )
             }
-            Header(reservation = state.reservation)
+            ShowItem(
+                modifier = Modifier.fillMaxWidth(),
+                poster = state.reservation.showImage,
+                title = state.reservation.showName,
+                description = stringResource(
+                    id = R.string.reservation_ticket_info_format,
+                    state.reservation.ticketName,
+                    state.reservation.ticketCount,
+                ),
+                backgroundColor = MaterialTheme.colorScheme.background,
+                contentPadding = PaddingValues(20.dp),
+            )
             TicketHolderInfo(reservation = state.reservation)
             if (state.reservation.totalAmountPrice > 0 || state.reservation.isGift) {
                 DepositorInfo(reservation = state.reservation)
@@ -171,48 +176,6 @@ fun ReservationDetailScreen(
                     textAlign = TextAlign.Center,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun Header(
-    reservation: ReservationDetail,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.padding(horizontal = marginHorizontal, vertical = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .width(70.dp)
-                .height(98.dp)
-                .border(color = Grey80, width = 1.dp, shape = RoundedCornerShape(4.dp))
-                .clip(shape = RoundedCornerShape(4.dp)),
-            model = reservation.showImage,
-            contentDescription = stringResource(id = R.string.description_poster),
-            contentScale = ContentScale.Crop,
-        )
-        Column(
-            modifier = Modifier.padding(start = 16.dp),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = reservation.showName,
-                style = point2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = stringResource(
-                    id = R.string.reservation_ticket_info_format,
-                    reservation.ticketName,
-                    reservation.ticketCount
-                ),
-                style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
-            )
         }
     }
 }
@@ -326,7 +289,10 @@ private fun TicketHolderInfo(
             if (isGift && reservation.reservationState != ReservationState.CANCELED) {
                 val month = reservation.salesEndDateTime.month.value
                 val day = reservation.salesEndDateTime.dayOfMonth
-                val senderText = stringResource(id = R.string.gift_sender_description, reservation?.depositorName ?: "")
+                val senderText = stringResource(
+                    id = R.string.gift_sender_description,
+                    reservation?.depositorName ?: ""
+                )
                 val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
                 val buttonText = stringResource(id = R.string.gift_check)
 

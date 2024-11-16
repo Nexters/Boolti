@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -34,6 +35,7 @@ import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
+import com.nexters.boolti.presentation.theme.point2
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -44,6 +46,8 @@ import java.time.LocalDateTime
  *
  * @param show 공연 정보
  * @param modifier 컴포넌트 외부 패딩은 [modifier]를 사용
+ * @param showNameStyle 공연명 텍스트 스타일. 보통 헤더로 사용되면 [point2], 아이템으로 사용되면 [point1]
+ * @param showDateStyle 공연 일자 텍스트 스타일
  * @param backgroundColor 배경 색상
  * @param contentPadding 컴포넌트 내부 패딩
  * @param shape 코너 radius 변경 등에 사용
@@ -53,6 +57,8 @@ import java.time.LocalDateTime
 fun ShowItem(
     show: Show,
     modifier: Modifier = Modifier,
+    showNameStyle: TextStyle = point1,
+    showDateStyle : TextStyle = MaterialTheme.typography.bodySmall,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     shape: Shape = RoundedCornerShape(4.dp),
@@ -63,6 +69,8 @@ fun ShowItem(
         poster = show.thumbnailImage,
         showName = show.name,
         showDate = show.date,
+        showNameStyle = showNameStyle,
+        showDateStyle = showDateStyle,
         backgroundColor = backgroundColor,
         contentPadding = contentPadding,
         shape = shape,
@@ -79,6 +87,8 @@ fun ShowItem(
  * @param showName 공연 이름
  * @param showDate 공연 일자. [LocalDateTime.showDateTimeString] 를 사용하여 화면에 표시됨
  * @param modifier 컴포넌트 외부 패딩은 [modifier]를 사용
+ * @param showNameStyle 공연명 텍스트 스타일. 보통 헤더로 사용되면 [point2], 아이템으로 사용되면 [point1]
+ * @param showDateStyle 공연 일자 텍스트 스타일
  * @param backgroundColor 배경 색상
  * @param contentPadding 컴포넌트 내부 패딩
  * @param shape 코너 radius 변경 등에 사용
@@ -90,6 +100,8 @@ fun ShowItem(
     showName: String,
     showDate: LocalDateTime,
     modifier: Modifier = Modifier,
+    showNameStyle: TextStyle = point1,
+    showDateStyle : TextStyle = MaterialTheme.typography.bodySmall,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shape: Shape = RoundedCornerShape(4.dp),
@@ -100,6 +112,8 @@ fun ShowItem(
         poster = poster,
         title = showName,
         description = showDate.showDateTimeString,
+        titleStyle = showNameStyle,
+        descriptionStyle = showDateStyle,
         contentPadding = contentPadding,
         backgroundColor = backgroundColor,
         shape = shape,
@@ -116,6 +130,8 @@ fun ShowItem(
  * @param title 타이틀 영역 문구 (공연에서는 공연명)
  * @param description 설명 문구 (공연 일자나 티켓 관련 정보 등을 사용)
  * @param modifier 컴포넌트 외부 패딩은 [modifier]를 사용
+ * @param titleStyle 타이틀 텍스트 스타일. 보통 헤더로 사용되면 [point2], 아이템으로 사용되면 [point1]
+ * @param descriptionStyle 설명 문구 텍스트 스타일
  * @param backgroundColor 배경 색상
  * @param contentPadding 컴포넌트 내부 패딩
  * @param shape 코너 radius 변경 등에 사용
@@ -127,6 +143,8 @@ fun ShowItem(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
+    titleStyle: TextStyle = point1,
+    descriptionStyle : TextStyle = MaterialTheme.typography.bodySmall,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shape: Shape = RoundedCornerShape(4.dp),
@@ -164,14 +182,14 @@ fun ShowItem(
             ) {
                 Text(
                     text = title,
-                    style = point1,
+                    style = titleStyle,
                     color = Grey05,
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     text = description,
+                    style = descriptionStyle,
                     color = Grey30,
-                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
@@ -250,6 +268,20 @@ private fun ShowItemPreview() {
                     ),
                     contentPadding = PaddingValues(vertical = 20.dp, horizontal = 30.dp),
                     shape = RoundedCornerShape(30.dp),
+                )
+
+                Text("헤더로 사용되는 경우 글자 크기 조정")
+                ShowItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    show = Show(
+                        id = "1",
+                        name = "2024 TOGETHER LUCKY CLUB",
+                        thumbnailImage = "",
+                        date = LocalDateTime.now(),
+                        salesStartDate = LocalDate.now(),
+                        salesEndDate = LocalDate.now().plusDays(10),
+                    ),
+                    showNameStyle = point2,
                 )
             }
         }

@@ -85,6 +85,7 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
@@ -189,6 +190,7 @@ fun TicketingScreen(
                     poster = uiState.poster,
                     showName = uiState.showName,
                     showDate = uiState.showDate,
+                    showNameStyle = point2,
                     contentPadding = PaddingValues(20.dp),
                     backgroundColor = MaterialTheme.colorScheme.background,
                 )

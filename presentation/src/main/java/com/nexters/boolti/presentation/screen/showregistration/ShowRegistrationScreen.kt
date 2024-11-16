@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.showregistration
 
 import android.annotation.SuppressLint
-import android.app.ActionBar.LayoutParams
 import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
@@ -13,7 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,6 +44,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@OptIn(ExperimentalLayoutApi::class)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ShowRegistrationScreen(
@@ -98,16 +100,13 @@ fun ShowRegistrationScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .imePadding(),
         ) {
             AndroidView(
+                modifier = Modifier.fillMaxSize(),
                 factory = { context ->
                     BtWebView(context).apply {
-                        layoutParams = LayoutParams(
-                            LayoutParams.MATCH_PARENT,
-                            LayoutParams.MATCH_PARENT,
-                        )
-
                         setWebChromeClient(
                             launchActivity = { launcher.launch(arrayOf("image/*")) },
                             setFilePathCallback = { callback -> filePathCallback = callback },
@@ -133,7 +132,10 @@ fun ShowRegistrationScreen(
             if (showExitDialog) {
                 BTDialog(
                     positiveButtonLabel = stringResource(R.string.btn_exit),
-                    onClickPositiveButton = onClickBack,
+                    onClickPositiveButton = {
+                        showExitDialog = false
+                        onClickBack()
+                    },
                     onClickNegativeButton = { showExitDialog = false },
                     onDismiss = { showExitDialog = false },
                 ) {

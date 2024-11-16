@@ -8,7 +8,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +46,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -63,7 +61,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Currency
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.BuildConfig
@@ -73,9 +70,9 @@ import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.PolicyBottomSheet
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
-import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -88,13 +85,11 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
-import java.time.LocalDateTime
 
 @Composable
 fun TicketingScreen(
@@ -190,11 +185,12 @@ fun TicketingScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(scrollState),
             ) {
-                Header(
-                    modifier = Modifier.padding(20.dp),
+                ShowItem(
                     poster = uiState.poster,
                     showName = uiState.showName,
                     showDate = uiState.showDate,
+                    contentPadding = PaddingValues(20.dp),
+                    backgroundColor = MaterialTheme.colorScheme.background,
                 )
                 // 예매자 정보
                 TicketHolderSection(
@@ -330,50 +326,6 @@ fun TicketingScreen(
             PolicyBottomSheet(onDismissRequest = {
                 policyPageUrl = null
             }, url = url)
-        }
-    }
-}
-
-// TODO : 자주 쓰이는 컴포넌트이므로 별도의 컴포넌트로 관리하는 게 빼야겠다
-@Composable
-internal fun Header(
-    poster: String,
-    showName: String,
-    showDate: LocalDateTime,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AsyncImage(
-            model = poster,
-            contentDescription = stringResource(R.string.description_poster),
-            modifier = Modifier
-                .size(width = 70.dp, height = 98.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(4.dp),
-                ),
-            contentScale = ContentScale.Crop,
-        )
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(start = 16.dp)
-        ) {
-            Text(
-                text = showName,
-                style = point2,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = showDate.showDateTimeString,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey30,
-            )
         }
     }
 }

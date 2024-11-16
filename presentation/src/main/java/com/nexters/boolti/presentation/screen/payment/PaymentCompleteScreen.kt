@@ -36,6 +36,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.SecondaryButton
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
@@ -93,7 +94,8 @@ private fun PaymentCompleteScreen(
 
             InfoRow(
                 modifier = Modifier.padding(top = 24.dp),
-                label = stringResource(R.string.reservation_number), value = reservation.csReservationId
+                label = stringResource(R.string.reservation_number),
+                value = reservation.csReservationId,
             )
             InfoRow(
                 modifier = Modifier.padding(top = 16.dp),
@@ -104,7 +106,10 @@ private fun PaymentCompleteScreen(
                 InfoRow(
                     modifier = Modifier.padding(top = 16.dp),
                     label = stringResource(R.string.depositor_info_label),
-                    value = slashFormat(reservation.depositorName, reservation.depositorPhoneNumber),
+                    value = slashFormat(
+                        reservation.depositorName,
+                        reservation.depositorPhoneNumber,
+                    ),
                 )
             }
             SectionDivider(modifier = Modifier.padding(top = 24.dp))
@@ -119,7 +124,9 @@ private fun PaymentCompleteScreen(
                             stringResource(R.string.payment_installment_plan_months, months)
                         }
                     }
-                    StringBuilder(reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context) ?: "")
+                    StringBuilder(
+                        reservation.cardDetail?.issuerCode?.cardCodeToCompanyName(context) ?: "",
+                    )
                         .apply {
                             installment?.let { append(" / $it") }
                         }
@@ -146,8 +153,8 @@ private fun PaymentCompleteScreen(
                 ),
             )
 
-            TicketSummarySection(
-                Modifier
+            ShowItem(
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp),
                 poster = reservation.showImage,

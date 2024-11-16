@@ -37,8 +37,8 @@ data class EditProfileRequest(
 fun Link.toDto(): EditProfileRequest.LinkDto = EditProfileRequest.LinkDto(name, url)
 fun Sns.toDto(): EditProfileRequest.SnsDto = EditProfileRequest.SnsDto(
     type = when (type) {
-        Sns.SnsType.INSTAGRAM -> "Instagram"
-        Sns.SnsType.YOUTUBE -> "YouTube"
+        Sns.SnsType.INSTAGRAM -> "INSTAGRAM"
+        Sns.SnsType.YOUTUBE -> "YOUTUBE"
     },
     username = username,
 )

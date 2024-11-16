@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -220,10 +219,11 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = if (i == 0) 0.dp else 24.dp)
-                                .clickable { navigateToShow(show.id) },
+                                .padding(horizontal = marginHorizontal),
                             show = show,
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-                            paddingValues = PaddingValues(horizontal = marginHorizontal),
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            onClick = { navigateToShow(show.id) },
+                            contentPadding = PaddingValues(),
                         )
                     }
                 }

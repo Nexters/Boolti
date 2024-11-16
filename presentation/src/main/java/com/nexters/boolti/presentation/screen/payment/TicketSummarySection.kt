@@ -31,6 +31,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDateTime
 
+// TODO [ShowItem] 으로 마이그레이션
 @Composable
 fun TicketSummarySection(
     modifier: Modifier = Modifier,

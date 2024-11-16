@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -13,10 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -55,6 +60,7 @@ import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
@@ -120,6 +126,9 @@ fun ProfileScreen(
     var backDialogMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val invalidUserMessage = stringResource(R.string.profile_invalid_user_message)
     val withdrawUserMessage = stringResource(R.string.profile_withdraw_user_message)
+    val reportFinishedMessage = stringResource(R.string.report_finished)
+
+    var showContextMenu by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(event) {
         event.collectLatest {
@@ -142,17 +151,47 @@ fun ProfileScreen(
                         onClick = onClickBack,
                     )
                 },
-                actionButtons = if (isMine) {
-                    {
+                actionButtons = {
+                    if (isMine) {
                         BtAppBarDefaults.AppBarTextButton(
                             label = stringResource(R.string.edit),
                             onClick = navigateToProfileEdit,
                         )
+                    } else {
+                        BtAppBarDefaults.AppBarIconButton(
+                            iconRes = R.drawable.ic_verticle_more,
+                            description = stringResource(R.string.description_more_menu),
+                            onClick = { showContextMenu = true },
+                        )
                     }
-                } else {
-                    null
                 },
             )
+            if (showContextMenu) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.TopEnd),
+                ) {
+                    DropdownMenu(
+                        modifier = Modifier.background(Grey20),
+                        expanded = showContextMenu,
+                        onDismissRequest = { showContextMenu = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(id = R.string.report),
+                                    color = Color.Black,
+                                )
+                            },
+                            onClick = {
+                                showContextMenu = false
+                                snackbarHostState.showMessage(reportFinishedMessage)
+                            },
+                        )
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         Column(

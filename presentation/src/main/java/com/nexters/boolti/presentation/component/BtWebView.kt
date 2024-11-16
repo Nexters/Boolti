@@ -22,6 +22,9 @@ class BtWebView @JvmOverloads constructor(
     val progress = _progress.asStateFlow()
 
     init {
+        isFocusable = true
+        isFocusableInTouchMode = true
+
         setupSettings()
         setupWebViewClient()
     }

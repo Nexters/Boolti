@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.request.EditProfileRequest
@@ -29,7 +30,8 @@ class ProfileEditViewModel @Inject constructor(
         get() = initialState.nickname != uiState.value.nickname ||
                 initialState.introduction != uiState.value.introduction ||
                 initialState.thumbnail != uiState.value.thumbnail ||
-                initialState.links != uiState.value.links
+                initialState.links != uiState.value.links ||
+                initialState.snsList != uiState.value.snsList
 
     private val _uiState = MutableStateFlow(ProfileEditState())
     val uiState = _uiState.asStateFlow()
@@ -69,13 +71,13 @@ class ProfileEditViewModel @Inject constructor(
         event(ProfileEditEvent.OnLinkAdded)
     }
 
-    fun onLinkEditted(link: Link) {
+    fun onLinkEdited(link: Link) {
         val newLinks = uiState.value.links.toMutableList().apply {
             val index = indexOfFirst { it.id == link.id }
             set(index, link)
         }
         _uiState.update { it.copy(links = newLinks) }
-        event(ProfileEditEvent.OnLinkEditted)
+        event(ProfileEditEvent.OnLinkEdited)
     }
 
     fun onLinkRemoved(id: String) {
@@ -84,6 +86,28 @@ class ProfileEditViewModel @Inject constructor(
         }
         _uiState.update { it.copy(links = newLinks) }
         event(ProfileEditEvent.OnLinkRemoved)
+    }
+
+    fun onSnsAdded(sns: Sns) {
+        _uiState.update { it.copy(snsList = listOf(sns) + it.snsList) }
+        event(ProfileEditEvent.OnSnsAdded)
+    }
+
+    fun onSnsEdited(sns: Sns) {
+        val newSnsList = uiState.value.snsList.toMutableList().apply {
+            val index = indexOfFirst { it.id == sns.id }
+            set(index, sns)
+        }
+        _uiState.update { it.copy(snsList = newSnsList) }
+        event(ProfileEditEvent.OnSnsEdited)
+    }
+
+    fun onSnsRemoved(id: String) {
+        val newSnsList = uiState.value.snsList.toMutableList().apply {
+            removeIf { it.id == id }
+        }
+        _uiState.update { it.copy(snsList = newSnsList) }
+        event(ProfileEditEvent.OnSnsRemoved)
     }
 
     fun completeEdits(thumbnailFile: File?) {

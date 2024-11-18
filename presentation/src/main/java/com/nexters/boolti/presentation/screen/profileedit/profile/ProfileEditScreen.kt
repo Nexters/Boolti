@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +52,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
@@ -58,6 +60,8 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.UserThumbnail
+import com.nexters.boolti.presentation.extension.icon
+import com.nexters.boolti.presentation.extension.label
 import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
@@ -76,10 +80,14 @@ import java.io.IOException
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
+    navigateToSnsEdit: (Sns?) -> Unit,
     navigateToLinkEdit: (Link?) -> Unit,
     newLinkCallback: Flow<Link>,
     editLinkCallback: Flow<Link>,
     removeLinkCallback: Flow<String>,
+    newSnsCallback: Flow<Sns>,
+    editSnsCallback: Flow<Sns>,
+    removeSnsCallback: Flow<String>,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,10 +98,19 @@ fun ProfileEditScreen(
         newLinkCallback.collect(viewModel::onNewLinkAdded)
     }
     LaunchedEffect(editLinkCallback) {
-        editLinkCallback.collect(viewModel::onLinkEditted)
+        editLinkCallback.collect(viewModel::onLinkEdited)
     }
     LaunchedEffect(removeLinkCallback) {
         removeLinkCallback.collect(viewModel::onLinkRemoved)
+    }
+    LaunchedEffect(newSnsCallback) {
+        newSnsCallback.collect(viewModel::onSnsAdded)
+    }
+    LaunchedEffect(editSnsCallback) {
+        editSnsCallback.collect(viewModel::onSnsEdited)
+    }
+    LaunchedEffect(removeSnsCallback) {
+        removeSnsCallback.collect(viewModel::onSnsRemoved)
     }
 
     ProfileEditScreen(
@@ -102,6 +119,7 @@ fun ProfileEditScreen(
         nickname = uiState.nickname,
         nicknameError = uiState.nicknameError,
         introduction = uiState.introduction,
+        snsList = uiState.snsList.toImmutableList(),
         links = uiState.links.toImmutableList(),
         saving = uiState.saving,
         event = event,
@@ -125,7 +143,9 @@ fun ProfileEditScreen(
         },
         onChangeNickname = viewModel::changeNickname,
         onChangeIntroduction = viewModel::changeIntroduction,
+        onClickAddSns = { navigateToSnsEdit(null) },
         onClickAddLink = { navigateToLinkEdit(null) },
+        onClickEditSns = { sns -> navigateToSnsEdit(sns) },
         onClickEditLink = { link -> navigateToLinkEdit(link) },
     )
 }
@@ -137,6 +157,7 @@ fun ProfileEditScreen(
     nickname: String,
     nicknameError: NicknameError? = null,
     introduction: String,
+    snsList: ImmutableList<Sns>,
     links: ImmutableList<Link>,
     saving: Boolean,
     event: Flow<ProfileEditEvent>,
@@ -145,7 +166,9 @@ fun ProfileEditScreen(
     onClickComplete: (uri: Uri?) -> Unit,
     onChangeNickname: (String) -> Unit,
     onChangeIntroduction: (String) -> Unit,
+    onClickAddSns: () -> Unit,
     onClickAddLink: () -> Unit,
+    onClickEditSns: (Sns) -> Unit,
     onClickEditLink: (Link) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -154,6 +177,9 @@ fun ProfileEditScreen(
     val linkAddMsg = stringResource(R.string.link_add_msg)
     val linkEditMsg = stringResource(R.string.link_edit_msg)
     val linkRemoveMsg = stringResource(R.string.link_remove_msg)
+    val snsAddMsg = stringResource(R.string.sns_add_msg)
+    val snsEditMsg = stringResource(R.string.sns_edit_msg)
+    val snsRemoveMsg = stringResource(R.string.sns_remove_msg)
     val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
 
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
@@ -174,8 +200,11 @@ fun ProfileEditScreen(
     ObserveAsEvents(event) {
         when (it) {
             ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
-            ProfileEditEvent.OnLinkEditted -> snackbarHostState.showMessage(linkEditMsg)
+            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(linkEditMsg)
             ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
+            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(snsAddMsg)
+            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(snsEditMsg)
+            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(snsRemoveMsg)
             ProfileEditEvent.OnSuccessEditProfile -> {
                 snackbarHostState.showMessage(profileEditSuccessMsg)
                 navigateBack()
@@ -299,6 +328,27 @@ fun ProfileEditScreen(
                         enabled = !saving,
                     )
                 }
+
+                Section(
+                    modifier = Modifier.padding(top = 12.dp),
+                    title = stringResource(R.string.profile_edit_sns_title),
+                ) {
+                    Column {
+                        LinkAddButton(
+                            modifier = Modifier.padding(top = 4.dp),
+                            label = stringResource(R.string.sns_add),
+                            onClick = onClickAddSns,
+                            enabled = !saving,
+                        )
+                        snsList.forEach { sns ->
+                            SnsItem(
+                                modifier = Modifier.padding(top = 12.dp),
+                                sns = sns,
+                            ) { if (!saving) onClickEditSns(sns) }
+                        }
+                    }
+                }
+
                 Section(
                     modifier = Modifier.padding(top = 12.dp),
                     title = stringResource(R.string.label_links),
@@ -306,6 +356,7 @@ fun ProfileEditScreen(
                     Column {
                         LinkAddButton(
                             modifier = Modifier.padding(top = 4.dp),
+                            label = stringResource(R.string.link_add_btn),
                             onClick = onClickAddLink,
                             enabled = !saving,
                         )
@@ -331,7 +382,7 @@ fun ProfileEditScreen(
                     )
                 },
                 positiveButtonLabel = stringResource(R.string.save),
-                negativeButtonLabel = stringResource(R.string.cancel),
+                negativeButtonLabel = stringResource(R.string.btn_exit),
                 onClickPositiveButton = { onClickComplete(selectedImage) },
                 onClickNegativeButton = navigateBack,
                 onDismiss = { showExitAlertDialog = false },
@@ -342,6 +393,7 @@ fun ProfileEditScreen(
 
 @Composable
 private fun LinkAddButton(
+    label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -364,13 +416,59 @@ private fun LinkAddButton(
                 modifier = Modifier.size(20.dp),
                 imageVector = Icons.Rounded.Add,
                 tint = Grey30,
-                contentDescription = stringResource(R.string.link_add_btn),
+                contentDescription = label,
             )
         }
         Text(
             modifier = Modifier.padding(start = 16.dp),
-            text = stringResource(R.string.link_add_btn),
+            text = label,
             style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+@Composable
+private fun SnsItem(
+    sns: Sns,
+    modifier: Modifier = Modifier,
+    onClickEdit: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClickEdit)
+            .padding(horizontal = marginHorizontal, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            imageVector = ImageVector.vectorResource(sns.type.icon),
+            tint = Grey30,
+            contentDescription = sns.type.label,
+        )
+        Text(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .defaultMinSize(minWidth = 72.dp),
+            text = sns.type.label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Grey30,
+        )
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .weight(1f),
+            text = sns.username,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleMedium,
+            color = Grey15,
+        )
+        Icon(
+            modifier = Modifier.size(20.dp),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_edit_pen),
+            tint = Grey50,
+            contentDescription = stringResource(R.string.link_edit),
         )
     }
 }
@@ -406,6 +504,7 @@ private fun LinkItem(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey30,
+                maxLines = 1,
             )
         }
         Icon(
@@ -437,6 +536,8 @@ private fun Section(
             Text(
                 modifier = Modifier.padding(horizontal = marginHorizontal),
                 text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.size(16.dp))
             content()

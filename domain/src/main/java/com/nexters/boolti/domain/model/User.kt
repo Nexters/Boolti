@@ -6,22 +6,25 @@ sealed interface User {
     val userCode: String
     val introduction: String
     val link: List<Link>
+    val sns: List<Sns>
 
-    class My(
+    data class My(
         val id: String,
         override val nickname: String = "",
         val email: String = "",
         override val photo: String? = null,
         override val userCode: String = "",
         override val introduction: String = "",
+        override val sns: List<Sns> = emptyList(),
         override val link: List<Link> = emptyList(),
     ) : User
 
-    class Others(
+    data class Others(
         override val nickname: String = "",
         override val photo: String? = null,
         override val userCode: String = "",
         override val introduction: String = "",
+        override val sns: List<Sns> = emptyList(),
         override val link: List<Link> = emptyList(),
     ) : User
 }

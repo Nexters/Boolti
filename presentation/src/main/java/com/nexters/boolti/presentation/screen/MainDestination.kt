@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 
 sealed class MainDestination(val route: String) {
     data object Home : MainDestination(route = "home")
@@ -58,7 +59,8 @@ sealed class MainDestination(val route: String) {
     data object Qr : MainDestination(route = "qr")
 
     data object Reservations : MainDestination(route = "reservations")
-    data object ReservationDetail : MainDestination(route = "reservations/{reservationId}?isGift={isGift}") {
+    data object ReservationDetail :
+        MainDestination(route = "reservations/{reservationId}?isGift={isGift}") {
         val arguments = listOf(
             navArgument("reservationId") { type = NavType.StringType },
             navArgument("isGift") { type = NavType.BoolType },
@@ -103,6 +105,28 @@ sealed class MainDestination(val route: String) {
     }
 
     data object ProfileEdit : MainDestination(route = "profileEdit")
+    data object ProfileSnsEdit :
+        MainDestination(route = "profileSnsEdit?sns={$snsType}&id={$linkId}&title={$linkTitle}&username={$username}") {
+        val arguments = listOf(
+            navArgument(snsType) {
+                type = NavType.StringType
+                nullable = true
+            },
+            navArgument(linkId) {
+                type = NavType.StringType
+                nullable = true
+            },
+            navArgument(username) {
+                type = NavType.StringType
+                nullable = true
+            },
+        )
+
+        fun createRoute(): String = "profileSnsEdit"
+        fun createRoute(sns: Sns): String =
+            "profileSnsEdit?sns=${sns.type}&id=${sns.id}&username=${sns.username}"
+    }
+
     data object ProfileLinkEdit :
         MainDestination(route = "profileLinkEdit?id={$linkId}&title={$linkTitle}&url={$url}") {
         val arguments = listOf(
@@ -143,3 +167,5 @@ const val userCode = "userCode"
 const val linkId = "linkId"
 const val linkTitle = "linkTitle"
 const val url = "url"
+const val snsType = "snsType"
+const val username = "username"

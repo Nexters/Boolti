@@ -73,6 +73,7 @@
     <string name="stepper_plus_description">증가</string>
 
     <string name="complete">완료</string>
+    <string name="edit">편집</string>
 
     <string name="input_lower_limit_text">%d자 이상 입력해 주세요</string>
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>
@@ -273,6 +274,7 @@
     <!-- 프로필 & 프로필 편집 & 링크 편집 -->
     <string name="profile_title">프로필</string>
     <string name="profile_links_title">SNS 링크</string>
+    <string name="profile_edit_sns_title">SNS</string>
     <string name="profile_edit">프로필 편집</string>
     <string name="profile_edit_button_label">프로필 편집</string>
     <string name="profile_edit_nickname_placeholder">닉네임을 입력해 주세요 (20자 이내)</string>
@@ -283,6 +285,21 @@
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
+
+    <string name="sns">SNS</string>
+    <string name="username">Username</string>
+    <string name="sns_add">SNS 추가</string>
+    <string name="sns_edit">SNS 편집</string>
+    <string name="sns_delete">SNS 삭제</string>
+    <string name="sns_delete_message">SNS를 삭제하시겠어요?</string>
+    <string name="sns_add_msg">SNS를 추가했어요</string>
+    <string name="sns_edit_msg">SNS를 편집했어요</string>
+    <string name="sns_remove_msg">SNS를 삭제했어요</string>
+    <string name="sns_username_placeholder">ex) boolti_official</string>
+    <string name="sns_username_contains_at_error">\@을 제외환 Username을 입력해 주세요</string>
+    <string name="contains_unsupported_char_error">지원하지 않는 특수문자가 포함되어 있습니다</string>
+    <string name="sns_select_instagram_description">인스타그램 선택</string>
+    <string name="sns_select_youtube_description">유튜브 선택</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>
@@ -298,7 +315,7 @@
     <string name="link_add_msg">링크를 추가했어요</string>
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
-    <string name="invalid_link">링크를 열 수 없습니다</string>
+    <string name="invalid_link">유효한 링크가 아니에요</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>

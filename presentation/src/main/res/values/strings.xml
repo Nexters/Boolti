@@ -264,6 +264,7 @@
     <string name="my_scan_qr">입장 확인</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
     <string name="my_register_show">공연 등록</string>
+    <string name="exit_register_msg">공연 등록을 종료하시겠어요?</string>
     <string name="show_profile_button">프로필 보기</string>
     <string name="account_setting">계정 설정</string>
     <string name="my_show">내 공연</string>

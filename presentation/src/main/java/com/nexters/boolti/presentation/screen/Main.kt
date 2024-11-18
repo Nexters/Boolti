@@ -43,10 +43,10 @@ import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
-import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -254,7 +254,10 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             )
         }
 
-        addShowRegistration()
+        addShowRegistration(
+            modifier = modifier,
+            popBackStack = navController::popBackStack,
+        )
     }
 }
 

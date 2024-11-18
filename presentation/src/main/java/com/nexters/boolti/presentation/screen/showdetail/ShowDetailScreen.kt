@@ -136,7 +136,6 @@ fun ShowDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val showState by flow {
         while (true) {
-            println("헛")
             emit(uiState.showDetail.state)
             delay(1000)
         }

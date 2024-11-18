@@ -3,6 +3,10 @@ package com.nexters.boolti.presentation.screen.showdetail
 import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
@@ -70,6 +74,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -131,6 +136,7 @@ fun ShowDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val showState by flow {
         while (true) {
+            println("헛")
             emit(uiState.showDetail.state)
             delay(1000)
         }
@@ -244,7 +250,11 @@ fun ShowDetailScreen(
                 }
             }
 
-            if (!showState.isClosedOrFinished) {
+            AnimatedVisibility(
+                visible = !showState.isClosedOrFinished,
+                enter = EnterTransition.None,
+                exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter),
+            ) {
                 ShowDetailButtons(
                     showState = showState,
                     onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
@@ -254,7 +264,7 @@ fun ShowDetailScreen(
 
             if (showCountdownBanner) {
                 CountDownBanner(
-                    uiState.showDetail.salesEndDateTime,
+                    deadlineDateTime = uiState.showDetail.salesEndDateTime,
                 )
             }
         }
@@ -804,11 +814,17 @@ private fun Divider(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CountDownBanner(deadlineDateTime: LocalDateTime) {
+private fun CountDownBanner(
+    deadlineDateTime: LocalDateTime,
+) {
     val remainingTime by flow {
         while (true) {
-            val duration = Duration.between(LocalDateTime.now(), deadlineDateTime)
+            val duration = Duration.between(
+                LocalDateTime.now(),
+                deadlineDateTime
+            )
             emit(maxOf(duration, Duration.ZERO))
+            if (duration <= Duration.ZERO) break
             delay(1000L)
         }
     }.collectAsStateWithLifecycle(Duration.ZERO)
@@ -835,7 +851,7 @@ private fun CountDownBannerPreview() {
             deadlineDateTime = LocalDateTime.now()
                 .plusHours(0)
                 .plusMinutes(5)
-                .plusSeconds(12)
+                .plusSeconds(12),
         )
     }
 }

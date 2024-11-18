@@ -23,19 +23,19 @@ data class ShowDetail(
 ) {
     val state: ShowState
         get() {
-            val now = LocalDate.now()
+            val now = LocalDateTime.now()
 
             return when {
-                now > date.toLocalDate() -> ShowState.FinishedShow
-                now < salesStartDate -> ShowState.WaitingTicketing(
+                now > date.plusMinutes(runningTime.toLong()) -> ShowState.FinishedShow
+                now.toLocalDate() < salesStartDate -> ShowState.WaitingTicketing(
                     Duration.between(
                         LocalDateTime.now(),
                         salesStartDate.atStartOfDay()
                     )
                 )
 
-                now <= salesEndDateTime.toLocalDate() -> ShowState.TicketingInProgress
-                now > salesEndDateTime.toLocalDate() -> ShowState.ClosedTicketing
+                now <= salesEndDateTime -> ShowState.TicketingInProgress
+                now > salesEndDateTime -> ShowState.ClosedTicketing
                 else -> ShowState.FinishedShow
             }
         }

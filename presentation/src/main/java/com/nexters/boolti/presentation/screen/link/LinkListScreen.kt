@@ -29,6 +29,9 @@ import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.profile.LinkItem
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.ObserveAsEvents
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun LinkListScreen(
@@ -42,6 +45,7 @@ fun LinkListScreen(
         modifier = modifier,
         links = uiState.links,
         loading = uiState.loading,
+        event = viewModel.event,
         onClickBack = onClickBack,
     )
 }
@@ -51,11 +55,19 @@ private fun LinkListScreen(
     links: List<Link>,
     modifier: Modifier = Modifier,
     loading: Boolean = false,
+    event: Flow<LinkListEvent> = emptyFlow(),
     onClickBack: () -> Unit = {},
 ) {
     val snackbarController = LocalSnackbarController.current
     val uriHandler = LocalUriHandler.current
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
     val invalidUrlMsg = stringResource(R.string.invalid_link)
+
+    ObserveAsEvents(event) {
+        when (it) {
+            LinkListEvent.LoadFailed -> snackbarController.showMessage(unknownErrorMsg) // TODO 추후 에러 공통화 필요
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

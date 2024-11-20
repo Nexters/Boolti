@@ -23,6 +23,10 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.util.ObserveAsEvents
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun PerformedShowsScreen(
@@ -37,6 +41,7 @@ fun PerformedShowsScreen(
         modifier = modifier,
         loading = uiState.loading,
         shows = uiState.shows,
+        event = viewModel.event,
         onClickShow = onClickShow,
         onClickBack = onClickBack,
     )
@@ -47,9 +52,19 @@ private fun PerformedShowsScreen(
     shows: List<Show>,
     modifier: Modifier = Modifier,
     loading: Boolean = false,
+    event: Flow<PerformedShowsEvent> = emptyFlow(),
     onClickShow: (show: Show) -> Unit = {},
     onClickBack: () -> Unit,
 ) {
+    val snackbarController = LocalSnackbarController.current
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
+
+    ObserveAsEvents(event) {
+        when (it) {
+            PerformedShowsEvent.FetchFailed -> snackbarController.showMessage(unknownErrorMsg) // TODO 추후 에러 공통화 필요
+        }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {

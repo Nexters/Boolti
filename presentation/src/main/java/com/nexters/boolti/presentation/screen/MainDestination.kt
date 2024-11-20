@@ -9,6 +9,8 @@ sealed class MainDestination(val route: String) {
     data object Home : MainDestination(route = "home")
     data object ShowDetail : MainDestination(route = "show") {
         val arguments = listOf(navArgument(showId) { type = NavType.StringType })
+
+        fun createRoute(showId: String): String = "${ShowDetail.route}/$showId"
     }
 
     data object Ticketing : MainDestination(route = "ticketing") {
@@ -147,6 +149,30 @@ sealed class MainDestination(val route: String) {
         fun createRoute(): String = "profileLinkEdit"
         fun createRoute(link: Link): String =
             "profileLinkEdit?id=${link.id}&title=${link.name}&url=${link.url}"
+    }
+
+    data object LinkList : MainDestination(route = "linkList") {
+        val arguments = listOf(
+            navArgument(userCode) {
+                type = NavType.StringType
+                nullable = true
+            },
+        )
+
+        fun createRoute(): String = "linkList"
+        fun createRoute(userCode: String) = "linkList?userCode=$userCode"
+    }
+
+    data object PerformedShows : MainDestination(route = "performedShows") {
+        val arguments = listOf(
+            navArgument(userCode) {
+                type = NavType.StringType
+                nullable = true
+            },
+        )
+
+        fun createRoute(): String = "performedShows"
+        fun createRoute(userCode: String) = "performedShows?userCode=$userCode"
     }
 
     data object ShowRegistration : MainDestination(route = "webView")

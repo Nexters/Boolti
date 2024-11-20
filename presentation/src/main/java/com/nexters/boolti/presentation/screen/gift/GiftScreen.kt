@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +44,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.PolicyBottomSheet
-import com.nexters.boolti.presentation.screen.ticketing.Header
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.screen.ticketing.InputRow
 import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
 import com.nexters.boolti.presentation.screen.ticketing.PaymentFailureDialog
@@ -186,10 +187,12 @@ fun GiftScreen(
 
                 // 공연 및 티켓 정보
                 Section(title = stringResource(id = R.string.gift_show_info)) {
-                    Header(
+                    ShowItem(
+                        modifier = Modifier.fillMaxWidth(),
                         poster = uiState.poster,
                         showName = uiState.showName,
                         showDate = uiState.showDate,
+                        contentPadding = PaddingValues(),
                     )
                     TicketInfoSection(
                         modifier = Modifier.padding(top = 28.dp),

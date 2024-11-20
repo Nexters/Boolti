@@ -181,6 +181,7 @@ fun ProfileEditScreen(
     val snsEditMsg = stringResource(R.string.sns_edit_msg)
     val snsRemoveMsg = stringResource(R.string.sns_remove_msg)
     val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
 
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
 
@@ -190,6 +191,7 @@ fun ProfileEditScreen(
     )
 
     var showExitAlertDialog by remember { mutableStateOf(false) }
+    var showUnAuthorizedDialog by remember { mutableStateOf(false) }
 
     fun tryBack() {
         if (checkDataChanged()) showExitAlertDialog = true else navigateBack()
@@ -209,6 +211,9 @@ fun ProfileEditScreen(
                 snackbarHostState.showMessage(profileEditSuccessMsg)
                 navigateBack()
             }
+
+            ProfileEditEvent.UnAuthorized -> showUnAuthorizedDialog = true
+            ProfileEditEvent.EditFailed -> snackbarHostState.showMessage(unknownErrorMsg)
         }
     }
 
@@ -387,6 +392,21 @@ fun ProfileEditScreen(
                 onClickNegativeButton = navigateBack,
                 onDismiss = { showExitAlertDialog = false },
             )
+        }
+        if (showUnAuthorizedDialog) {
+            BTDialog(
+                enableDismiss = false,
+                showCloseButton = false,
+                onDismiss = navigateBack,
+                onClickPositiveButton = navigateBack,
+                positiveButtonLabel = stringResource(R.string.btn_exit),
+            ) {
+                Text(
+                    text = unknownErrorMsg,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
         }
     }
 }

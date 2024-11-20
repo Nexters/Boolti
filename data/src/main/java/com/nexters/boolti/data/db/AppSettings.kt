@@ -19,6 +19,7 @@ internal data class AppSettings(
     val userCode: String? = null,
     val profileIntroduction: String = "",
     val profileLink: List<EditProfileRequest.LinkDto> = emptyList(),
+    val profileSns: List<EditProfileRequest.SnsDto> = emptyList(),
     val accessToken: String = "",
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),

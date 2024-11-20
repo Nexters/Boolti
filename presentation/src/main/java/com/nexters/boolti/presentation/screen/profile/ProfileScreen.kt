@@ -4,22 +4,29 @@ import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,12 +36,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,10 +55,15 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.flow.Flow
@@ -60,6 +74,9 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
+    navigateToLinks: (userCode: String?) -> Unit,
+    navigateToPerformedShows: (userCode: String?) -> Unit,
+    navigateToShow: (showId: String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -72,6 +89,19 @@ fun ProfileScreen(
         event = event,
         onClickBack = onClickBack,
         navigateToProfileEdit = navigateToProfileEdit,
+        navigateToLinks = {
+            when (uiState.user) {
+                is User.My -> navigateToLinks(null)
+                is User.Others -> navigateToLinks(uiState.user.userCode)
+            }
+        },
+        navigateToPerformedShows = {
+            when (uiState.user) {
+                is User.My -> navigateToPerformedShows(null)
+                is User.Others -> navigateToPerformedShows(uiState.user.userCode)
+            }
+        },
+        navigateToShow = navigateToShow,
     )
 }
 
@@ -83,6 +113,9 @@ fun ProfileScreen(
     event: Flow<ProfileEvent>,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
+    navigateToLinks: () -> Unit,
+    navigateToPerformedShows: () -> Unit,
+    navigateToShow: (showId: String) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarHostState = LocalSnackbarController.current
@@ -93,6 +126,9 @@ fun ProfileScreen(
     var backDialogMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val invalidUserMessage = stringResource(R.string.profile_invalid_user_message)
     val withdrawUserMessage = stringResource(R.string.profile_withdraw_user_message)
+    val reportFinishedMessage = stringResource(R.string.report_finished)
+
+    var showContextMenu by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(event) {
         event.collectLatest {
@@ -115,17 +151,47 @@ fun ProfileScreen(
                         onClick = onClickBack,
                     )
                 },
-                actionButtons = if (isMine) {
-                    {
+                actionButtons = {
+                    if (isMine) {
                         BtAppBarDefaults.AppBarTextButton(
                             label = stringResource(R.string.edit),
                             onClick = navigateToProfileEdit,
                         )
+                    } else {
+                        BtAppBarDefaults.AppBarIconButton(
+                            iconRes = R.drawable.ic_verticle_more,
+                            description = stringResource(R.string.description_more_menu),
+                            onClick = { showContextMenu = true },
+                        )
                     }
-                } else {
-                    null
                 },
             )
+            if (showContextMenu) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(Alignment.TopEnd),
+                ) {
+                    DropdownMenu(
+                        modifier = Modifier.background(Grey20),
+                        expanded = showContextMenu,
+                        onDismissRequest = { showContextMenu = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(id = R.string.report),
+                                    color = Color.Black,
+                                )
+                            },
+                            onClick = {
+                                showContextMenu = false
+                                snackbarHostState.showMessage(reportFinishedMessage)
+                            },
+                        )
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         Column(
@@ -144,18 +210,20 @@ fun ProfileScreen(
                 },
             )
 
-            if (user.link.isNotEmpty()) { // SNS 링크가 있으면
-                Column(
-                    modifier = Modifier.padding(vertical = 32.dp, horizontal = marginHorizontal),
+            if (user.link.isNotEmpty()) { // 링크가 있으면
+                Section(
+                    title = stringResource(R.string.profile_links_title),
+                    onClickShowAll = if (user.link.size >= 3) {
+                        { navigateToLinks() }
+                    } else {
+                        null
+                    },
                 ) {
-                    Text(
-                        text = stringResource(R.string.profile_links_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                    user.link.forEach { link ->
+                    user.link.take(3).forEachIndexed { i, link ->
                         LinkItem(
-                            modifier = Modifier.padding(top = 16.dp),
+                            modifier = Modifier
+                                .padding(top = if (i == 0) 0.dp else 16.dp)
+                                .padding(horizontal = marginHorizontal),
                             link = link,
                             onClick = {
                                 try {
@@ -164,6 +232,37 @@ fun ProfileScreen(
                                     snackbarHostState.showMessage(invalidUrlMsg)
                                 }
                             },
+                        )
+                    }
+                }
+            }
+
+            if (user.link.isNotEmpty() && user.performedShow.isNotEmpty()) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = marginHorizontal),
+                    color = Grey85,
+                )
+            }
+
+            if (user.performedShow.isNotEmpty()) { // 출연한 공연이 있으면
+                Section(
+                    title = stringResource(R.string.performed_shows),
+                    onClickShowAll = if (user.performedShow.size >= 2) {
+                        { navigateToPerformedShows() }
+                    } else {
+                        null
+                    },
+                ) {
+                    user.performedShow.take(3).forEachIndexed { i, show ->
+                        ShowItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = if (i == 0) 0.dp else 24.dp)
+                                .padding(horizontal = marginHorizontal),
+                            show = show,
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            onClick = { navigateToShow(show.id) },
+                            contentPadding = PaddingValues(),
                         )
                     }
                 }
@@ -286,7 +385,50 @@ private fun SnsChip(
 }
 
 @Composable
-private fun LinkItem(
+private fun Section(
+    title: String,
+    modifier: Modifier = Modifier,
+    onClickShowAll: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 24.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = if (onClickShowAll != null) 0.dp else 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(start = marginHorizontal)
+                    .weight(1f),
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            if (onClickShowAll != null) {
+                TextButton(
+                    modifier = Modifier.padding(end = 8.dp),
+                    onClick = onClickShowAll,
+                ) {
+                    Text(
+                        text = stringResource(R.string.show_all),
+                        color = Grey50,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        }
+        content()
+    }
+}
+
+@Composable
+fun LinkItem(
     modifier: Modifier = Modifier,
     link: Link,
     onClick: () -> Unit,
@@ -312,5 +454,16 @@ private fun LinkItem(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Preview
+@Composable
+private fun SectionPreview() {
+    BooltiTheme {
+        Section(
+            title = "링크",
+            onClickShowAll = {},
+        ) {}
     }
 }

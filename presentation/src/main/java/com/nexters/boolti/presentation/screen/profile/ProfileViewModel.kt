@@ -58,7 +58,15 @@ class ProfileViewModel @Inject constructor(
     private fun collectMyProfile() {
         authRepository.cachedUser
             .filterNotNull()
-            .onEach { user -> _uiState.update { it.copy(user = user) } }
+            .onEach { user ->
+                _uiState.update {
+                    it.copy(
+                        user = user.copy(
+                            performedShow = user.performedShow,
+                        )
+                    )
+                }
+            }
             .launchIn(viewModelScope)
     }
 

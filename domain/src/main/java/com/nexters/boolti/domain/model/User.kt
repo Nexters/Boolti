@@ -7,6 +7,7 @@ sealed interface User {
     val introduction: String
     val link: List<Link>
     val sns: List<Sns>
+    val performedShow: List<Show>
 
     data class My(
         val id: String,
@@ -17,6 +18,7 @@ sealed interface User {
         override val introduction: String = "",
         override val sns: List<Sns> = emptyList(),
         override val link: List<Link> = emptyList(),
+        override val performedShow: List<Show> = emptyList(),
     ) : User
 
     data class Others(
@@ -26,5 +28,6 @@ sealed interface User {
         override val introduction: String = "",
         override val sns: List<Sns> = emptyList(),
         override val link: List<Link> = emptyList(),
+        override val performedShow: List<Show> = emptyList(),
     ) : User
 }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.domain.model
 
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -13,22 +14,28 @@ data class ShowDetail(
     val detailAddress: String = "",
     val notice: String = "",
     val salesStartDate: LocalDate = LocalDate.now(),
-    val salesEndDate: LocalDate = LocalDate.now(),
+    val salesEndDateTime: LocalDateTime = LocalDateTime.now(),
     val images: List<ImagePair> = emptyList(),
     val hostName: String = "",
     val hostPhoneNumber: String = "",
     val isReserved: Boolean = false,
+    val salesTicketCount: Int = 0,
 ) {
     val state: ShowState
         get() {
-            val now = LocalDate.now()
-            val dDay = salesStartDate.toEpochDay() - now.toEpochDay()
+            val now = LocalDateTime.now()
 
             return when {
-                now > date.toLocalDate() -> ShowState.FinishedShow
-                now < salesStartDate -> ShowState.WaitingTicketing(dDay.toInt())
-                now <= salesEndDate -> ShowState.TicketingInProgress
-                now > salesEndDate -> ShowState.ClosedTicketing
+                now > date.plusMinutes(runningTime.toLong()) -> ShowState.FinishedShow
+                now.toLocalDate() < salesStartDate -> ShowState.WaitingTicketing(
+                    Duration.between(
+                        LocalDateTime.now(),
+                        salesStartDate.atStartOfDay()
+                    )
+                )
+
+                now <= salesEndDateTime -> ShowState.TicketingInProgress
+                now > salesEndDateTime -> ShowState.ClosedTicketing
                 else -> ShowState.FinishedShow
             }
         }

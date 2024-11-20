@@ -137,7 +137,7 @@ fun ShowDetailScreen(
     val showState by flow {
         while (true) {
             emit(uiState.showDetail.state)
-            delay(1000)
+            delay(200)
         }
     }.collectAsStateWithLifecycle(uiState.showDetail.state)
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
@@ -824,7 +824,7 @@ private fun CountDownBanner(
             )
             emit(maxOf(duration, Duration.ZERO))
             if (duration <= Duration.ZERO) break
-            delay(1000L)
+            delay(200L)
         }
     }.collectAsStateWithLifecycle(Duration.ZERO)
 

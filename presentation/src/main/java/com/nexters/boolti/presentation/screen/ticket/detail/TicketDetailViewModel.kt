@@ -97,7 +97,11 @@ class TicketDetailViewModel @Inject constructor(
         val giftUuid = uiState.value.ticketGroup.giftUuid ?: return
 
         giftRepository.cancelRegisteredGift(giftUuid = giftUuid)
-            .onEach { giftRepository.cancelRegisteredGift(giftUuid) }
+            .onEach { isSuccessful ->
+                if (isSuccessful) event(TicketDetailEvent.GiftRefunded)
+                else event(TicketDetailEvent.FailedToRefund)
+            }
+            .catch { event(TicketDetailEvent.NetworkError) }
             .launchIn(viewModelScope + recordExceptionHandler)
     }
 

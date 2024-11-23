@@ -39,7 +39,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -94,7 +93,6 @@ import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.InstagramIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
-import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -114,7 +112,6 @@ import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.UrlParser
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
-import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.TicketDetailScreen(
     navigateTo: (String) -> Unit,
@@ -151,11 +148,8 @@ private fun TicketDetailScreen(
     var showTicketNotFoundDialog by remember { mutableStateOf(false) }
     var showRefundGiftTicket by rememberSaveable { mutableStateOf(false) }
 
-
-    val snackbarHostState = remember { SnackbarHostState() }
     val snackbarHostController = LocalSnackbarController.current
     val clipboardManager = LocalClipboardManager.current
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     var contentWidth by remember { mutableFloatStateOf(0f) }
@@ -173,15 +167,26 @@ private fun TicketDetailScreen(
     val pullToRefreshState = rememberPullToRefreshState()
 
     val entranceSuccessMsg = stringResource(R.string.message_ticket_validated)
+    val failedToRefundMsg = stringResource(R.string.refund_failed_to_registered_gift)
+    val networkErrorMsg = stringResource(R.string.error_network)
+    val giftRefundedString = stringResource(R.string.refund_complete_ticket_refund)
     LaunchedEffect(viewModel.event) {
         viewModel.event.collect {
             when (it) {
-                TicketDetailEvent.ManagerCodeValid -> snackbarHostState.showSnackbar(
+                TicketDetailEvent.ManagerCodeValid -> snackbarHostController.showMessage(
                     entranceSuccessMsg
                 )
 
                 TicketDetailEvent.OnRefresh -> showEnterCodeDialog = false
                 TicketDetailEvent.NotFound -> showTicketNotFoundDialog = true
+                TicketDetailEvent.FailedToRefund -> snackbarHostController.showMessage(
+                    failedToRefundMsg
+                )
+
+                TicketDetailEvent.NetworkError -> snackbarHostController.showMessage(networkErrorMsg)
+                TicketDetailEvent.GiftRefunded -> {
+                    snackbarHostController.showMessage(giftRefundedString)
+                }
             }
         }
     }
@@ -198,12 +203,6 @@ private fun TicketDetailScreen(
                 onClickBack = onBackClicked,
             )
         },
-        snackbarHost = {
-            ToastSnackbarHost(
-                modifier = Modifier.padding(bottom = 54.dp),
-                hostState = snackbarHostState,
-            )
-        }
     ) { innerPadding ->
         if (pullToRefreshState.isRefreshing) {
             viewModel.refresh().invokeOnCompletion {
@@ -251,7 +250,11 @@ private fun TicketDetailScreen(
                         // 배경 블러된 이미지
                         Box(contentAlignment = Alignment.BottomCenter) {
                             AsyncImage(
-                                model = asyncImageBlurModel(context, ticketGroup.poster, radius = 24),
+                                model = asyncImageBlurModel(
+                                    context,
+                                    ticketGroup.poster,
+                                    radius = 24
+                                ),
                                 modifier = Modifier
                                     .width(contentWidth.toDp())
                                     .aspectRatio(317 / 570f)
@@ -315,16 +318,15 @@ private fun TicketDetailScreen(
                             ) {
                                 Notice(notice = ticketGroup.ticketNotice)
 
-                                val copySuccessMessage = stringResource(id = R.string.ticketing_address_copied_message)
+                                val copySuccessMessage =
+                                    stringResource(id = R.string.ticketing_address_copied_message)
                                 Inquiry(
                                     hostName = ticketGroup.hostName,
                                     hostPhoneNumber = ticketGroup.hostPhoneNumber,
                                     onClickCopyPlace = {
                                         clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
                                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(copySuccessMessage)
-                                            }
+                                            snackbarHostController.showMessage(copySuccessMessage)
                                         }
                                     },
                                     onClickNavigateToShowDetail = {
@@ -417,19 +419,12 @@ private fun TicketDetailScreen(
     }
 
     if (showRefundGiftTicket) {
-        val completeRefundString = stringResource(R.string.refund_complete_ticket_refund)
-
         BTDialog(
             enableDismiss = false,
             showCloseButton = false,
             onClickPositiveButton = {
                 showRefundGiftTicket = false
                 viewModel.refundGiftTicket()
-
-                if (true) { // todo 성공 시
-                    onBackClicked()
-                    snackbarHostController.showMessage(message = completeRefundString)
-                }
             },
         ) {
             Text(

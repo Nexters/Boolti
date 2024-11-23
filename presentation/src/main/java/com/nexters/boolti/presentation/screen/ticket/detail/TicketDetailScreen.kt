@@ -50,7 +50,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -134,7 +133,7 @@ fun NavGraphBuilder.TicketDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TicketDetailScreen(
     modifier: Modifier = Modifier,
@@ -462,7 +461,6 @@ private fun Title(showName: String = "") {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun QrCodes(
     modifier: Modifier = Modifier,

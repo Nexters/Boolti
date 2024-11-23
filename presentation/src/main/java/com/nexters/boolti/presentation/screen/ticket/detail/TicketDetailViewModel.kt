@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.ManagerCodeException
 import com.nexters.boolti.domain.exception.TicketException
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
@@ -33,6 +34,7 @@ class TicketDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketRepository,
     private val showRepository: ShowRepository,
+    private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
     private val ticketId: String = requireNotNull(savedStateHandle["ticketId"]) {
@@ -107,6 +109,14 @@ class TicketDetailViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun refundGiftTicket() {
+        val giftUuid = uiState.value.ticketGroup.giftUuid ?: return
+
+        giftRepository.cancelRegisteredGift(giftUuid = giftUuid)
+            .onEach { giftRepository.cancelRegisteredGift(giftUuid) }
+            .launchIn(viewModelScope + recordExceptionHandler)
     }
 
     fun setManagerCode(code: String) {

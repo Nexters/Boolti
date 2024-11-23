@@ -52,6 +52,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -96,6 +97,7 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -148,8 +150,11 @@ private fun TicketDetailScreen(
     val scrollState = rememberScrollState()
     var showEnterCodeDialog by remember { mutableStateOf(false) }
     var showTicketNotFoundDialog by remember { mutableStateOf(false) }
+    var showRefundGiftTicket by rememberSaveable { mutableStateOf(false) }
+
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostController = LocalSnackbarController.current
     val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -350,7 +355,10 @@ private fun TicketDetailScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
-                if (ticketTempState == TicketTempState.CAN_ENTER) {
+                if (
+                    currentTicket.ticketState == TicketState.Ready &&
+                    ticketTempState == TicketTempState.CAN_ENTER
+                ) {
                     Text(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 60.dp)
@@ -368,7 +376,7 @@ private fun TicketDetailScreen(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 60.dp)
                             .align(Alignment.CenterHorizontally)
-                            .clickable { },
+                            .clickable { showRefundGiftTicket = true },
                         text = stringResource(R.string.cancel_registered_gift_button),
                         style = MaterialTheme.typography.bodySmall,
                         color = Grey50,
@@ -384,28 +392,13 @@ private fun TicketDetailScreen(
     }
 
     if (showEnterCodeDialog) {
-        if (LocalDate.now().toEpochDay() < uiState.ticketGroup.showDate.toLocalDate().toEpochDay()) {
-            // 아직 공연일 아님
-            BTDialog(
-                showCloseButton = false,
-                onClickPositiveButton = { showEnterCodeDialog = false },
-                onDismiss = { showEnterCodeDialog = false },
-            ) {
-                Text(
-                    text = stringResource(R.string.error_show_not_today),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        } else if (currentTicket.ticketState == TicketState.Ready) {
-            ManagerCodeDialog(
-                managerCode = managerCodeState.code,
-                onManagerCodeChanged = viewModel::setManagerCode,
-                error = managerCodeState.error,
-                onDismiss = { showEnterCodeDialog = false },
-                onClickConfirm = { viewModel.requestEntrance(it) }
-            )
-        }
+        ManagerCodeDialog(
+            managerCode = managerCodeState.code,
+            onManagerCodeChanged = viewModel::setManagerCode,
+            error = managerCodeState.error,
+            onDismiss = { showEnterCodeDialog = false },
+            onClickConfirm = { viewModel.requestEntrance(it) }
+        )
     }
 
     if (showTicketNotFoundDialog) {
@@ -419,6 +412,30 @@ private fun TicketDetailScreen(
         ) {
             Text(
                 text = stringResource(R.string.error_ticket_not_found),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+
+    if (showRefundGiftTicket) {
+        val completeRefundString = stringResource(R.string.refund_complete_ticket_refund)
+
+        BTDialog(
+            enableDismiss = false,
+            showCloseButton = false,
+            onClickPositiveButton = {
+                showRefundGiftTicket = false
+                viewModel.refundGiftTicket()
+
+                if (true) { // todo 성공 시
+                    onBackClicked()
+                    snackbarHostController.showMessage(message = completeRefundString)
+                }
+            },
+        ) {
+            Text(
+                text = stringResource(R.string.refund_registered_ticket_dialog),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

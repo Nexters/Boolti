@@ -6,7 +6,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,6 +73,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -185,6 +185,7 @@ private fun TicketDetailScreen(
                 TicketDetailEvent.NetworkError -> snackbarHostController.showMessage(networkErrorMsg)
                 TicketDetailEvent.GiftRefunded -> {
                     snackbarHostController.showMessage(giftRefundedString)
+                    onBackClicked()
                 }
             }
         }
@@ -420,16 +421,19 @@ private fun TicketDetailScreen(
     if (showRefundGiftTicket) {
         BTDialog(
             enableDismiss = false,
-            showCloseButton = false,
             onClickPositiveButton = {
-                showRefundGiftTicket = false
                 viewModel.refundGiftTicket()
+                showRefundGiftTicket = false
             },
+            onDismiss = {
+                showRefundGiftTicket = false
+            }
         ) {
             Text(
                 text = stringResource(R.string.refund_registered_ticket_dialog),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
         }
     }

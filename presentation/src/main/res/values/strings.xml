@@ -240,6 +240,7 @@
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>
+    <string name="cancel_registered_gift_button">받은 선물 취소하기</string>
     <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
     <string name="enter_code_dialog_desc">입장 코드는 주최자 계정의 마이 > QR 스캔 > 해당 공연 스캐너에서 확인 가능해요.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>

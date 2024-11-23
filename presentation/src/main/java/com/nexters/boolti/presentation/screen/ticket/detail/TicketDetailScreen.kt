@@ -159,6 +159,7 @@ private fun TicketDetailScreen(
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val ticketTempState by viewModel.ticketTempState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
     val ticketGroup = uiState.ticketGroup
     val pagerState = rememberPagerState { ticketGroup.tickets.size }
@@ -260,7 +261,12 @@ private fun TicketDetailScreen(
                                     .fillMaxWidth()
                                     .aspectRatio(317 / 125f)
                                     .background(
-                                        brush = Brush.verticalGradient(listOf(Black.copy(alpha = 0f), Black)),
+                                        brush = Brush.verticalGradient(
+                                            listOf(
+                                                Black.copy(alpha = 0f),
+                                                Black
+                                            )
+                                        ),
                                     )
                             )
                         }
@@ -344,13 +350,26 @@ private fun TicketDetailScreen(
                 Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
-                if (currentTicket.ticketState == TicketState.Ready) {
+                if (ticketTempState == TicketTempState.CAN_ENTER) {
                     Text(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 60.dp)
                             .align(Alignment.CenterHorizontally)
                             .clickable { showEnterCodeDialog = true },
                         text = stringResource(R.string.input_enter_code_button),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Grey50,
+                        textDecoration = TextDecoration.Underline,
+                    )
+                }
+
+                if (ticketTempState == TicketTempState.REFUNDABLE_GIFT) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 20.dp, bottom = 60.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable { },
+                        text = stringResource(R.string.cancel_registered_gift_button),
                         style = MaterialTheme.typography.bodySmall,
                         color = Grey50,
                         textDecoration = TextDecoration.Underline,

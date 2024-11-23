@@ -27,6 +27,8 @@ internal data class TicketsDto(
     val ticketName: String? = null,
     @SerialName("ticketCount")
     val ticketCount: Int? = null,
+    @SerialName("giftUuid")
+    val giftUuid: String? = null,
 ) {
     fun toDomain(): TicketGroup = TicketGroup(
         userId = userId ?: "",
@@ -53,7 +55,8 @@ internal data class TicketsDto(
                 csTicketId = "",
                 showDate = LocalDateTime.MIN,
             )
-        }
+        },
+        isGift = giftUuid != null,
     )
 }
 
@@ -91,6 +94,8 @@ internal data class TicketGroupDto(
     val tickets: List<TicketDto>? = null,
     @SerialName("userId")
     val userId: String? = null,
+    @SerialName("giftUuid")
+    val giftUuid: String? = null,
 ) {
     fun toDomain(): TicketGroup = TicketGroup(
         userId = userId ?: "",
@@ -111,6 +116,7 @@ internal data class TicketGroupDto(
         tickets = tickets?.map {
             it.toDomain(showDate = showDate?.toLocalDateTime() ?: LocalDateTime.MIN)
         } ?: emptyList(),
+        isGift = giftUuid != null,
     )
 
     @Serializable

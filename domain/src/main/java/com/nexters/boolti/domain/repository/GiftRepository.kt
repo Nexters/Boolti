@@ -22,4 +22,6 @@ interface GiftRepository {
     fun getGiftPaymentInfo(giftId: String): Flow<ReservationDetail>
 
     fun cancelGift(giftUuid: String): Flow<Boolean>
+
+    fun cancelRegisteredGift(giftUuid: String): Flow<Boolean>
 }

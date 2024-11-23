@@ -35,4 +35,7 @@ internal interface GiftService {
 
     @POST("app/api/v1/order/cancel-gift")
     suspend fun cancelGift(@Body request: GiftCancelRequest): Boolean
+
+    @POST("app/api/v1/order/cancel-receive-gift")
+    suspend fun cancelReceiveGift(@Body request: GiftCancelRequest): Boolean
 }

@@ -57,6 +57,7 @@ internal data class TicketsDto(
             )
         },
         isGift = giftUuid != null,
+        giftUuid = giftUuid,
     )
 }
 
@@ -117,6 +118,7 @@ internal data class TicketGroupDto(
             it.toDomain(showDate = showDate?.toLocalDateTime() ?: LocalDateTime.MIN)
         } ?: emptyList(),
         isGift = giftUuid != null,
+        giftUuid = giftUuid,
     )
 
     @Serializable

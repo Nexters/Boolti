@@ -115,7 +115,6 @@ import com.nexters.boolti.presentation.util.UrlParser
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 fun NavGraphBuilder.TicketDetailScreen(
     navigateTo: (String) -> Unit,
@@ -164,7 +163,6 @@ private fun TicketDetailScreen(
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val ticketTempState by viewModel.ticketTempState.collectAsStateWithLifecycle()
     val managerCodeState by viewModel.managerCodeState.collectAsStateWithLifecycle()
     val ticketGroup = uiState.ticketGroup
     val pagerState = rememberPagerState { ticketGroup.tickets.size }
@@ -357,7 +355,7 @@ private fun TicketDetailScreen(
 
                 if (
                     currentTicket.ticketState == TicketState.Ready &&
-                    ticketTempState == TicketTempState.CAN_ENTER
+                    uiState.isShowDate
                 ) {
                     Text(
                         modifier = Modifier
@@ -371,7 +369,7 @@ private fun TicketDetailScreen(
                     )
                 }
 
-                if (ticketTempState == TicketTempState.REFUNDABLE_GIFT) {
+                if (uiState.isRefundableGift) {
                     Text(
                         modifier = Modifier
                             .padding(top = 20.dp, bottom = 60.dp)

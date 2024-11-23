@@ -31,7 +31,7 @@ data class TicketGroup(
     val hostName: String = "",
     val hostPhoneNumber: String = "",
     val tickets: List<Ticket> = emptyList(),
-    val giftUuid: String?,
+    val giftUuid: String? = null,
     val isGift: Boolean = false,
 ) {
     data class Ticket(

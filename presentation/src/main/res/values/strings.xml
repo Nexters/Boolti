@@ -210,7 +210,7 @@
     <string name="gift_successfully_registered">선물이 등록되었어요</string>
     <string name="gift_need_login">로그인 후 선물 등록이 가능합니다.\n로그인해 주세요.</string>
     <string name="gift_register">등록하기</string>
-    <string name="gift_register_dialog">선물을 등록하면\n선물 취소 및 환불이 불가합니다.\n등록하시겠습니까?</string>
+    <string name="gift_register_dialog">선물을 등록하시겠습니까?</string>
     <string name="gift_self_dialog">본인이 결제한 선물입니다.\n선물을 등록하면 다른 분께 보낼 수 없습니다. 등록하시겠습니까?</string>
     <string name="gift_registration_failed">선물 등록에 실패했어요</string>
     <string name="gift_registration_failed_dialog">선물 등록 중 오류가 발생했습니다.\n웹 링크에서 선물 상태를 확인 후 다시 시도해 주세요</string>

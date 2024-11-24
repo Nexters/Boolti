@@ -99,6 +99,7 @@ internal class AuthDataSource @Inject constructor(
                 profileIntroduction = user.introduction,
                 profileSns = user.sns,
                 profileLink = user.link,
+                performedShow = user.performedShow,
             )
         }
         Firebase.analytics.apply {

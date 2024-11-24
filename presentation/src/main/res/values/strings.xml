@@ -81,6 +81,8 @@
 
     <string name="input_limit">%d/%d자</string>
 
+    <string name="error_network">네트워크 오류가 발생했어요</string>
+
     <!-- 로그인 -->
     <string name="catch_phrase">지금 불티에 로그인하고\n당신의 공연을 시작해 보세요!</string>
     <string name="login_with_kakaotalk">카카오톡으로 시작하기</string>
@@ -210,7 +212,7 @@
     <string name="gift_successfully_registered">선물이 등록되었어요</string>
     <string name="gift_need_login">로그인 후 선물 등록이 가능합니다.\n로그인해 주세요.</string>
     <string name="gift_register">등록하기</string>
-    <string name="gift_register_dialog">선물을 등록하면\n선물 취소 및 환불이 불가합니다.\n등록하시겠습니까?</string>
+    <string name="gift_register_dialog">선물을 등록하시겠습니까?</string>
     <string name="gift_self_dialog">본인이 결제한 선물입니다.\n선물을 등록하면 다른 분께 보낼 수 없습니다. 등록하시겠습니까?</string>
     <string name="gift_registration_failed">선물 등록에 실패했어요</string>
     <string name="gift_registration_failed_dialog">선물 등록 중 오류가 발생했습니다.\n웹 링크에서 선물 상태를 확인 후 다시 시도해 주세요</string>
@@ -240,6 +242,7 @@
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>
+    <string name="cancel_registered_gift_button">받은 선물 취소하기</string>
     <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
     <string name="enter_code_dialog_desc">입장 코드는 주최자 계정의 마이 > QR 스캔 > 해당 공연 스캐너에서 확인 가능해요.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
@@ -378,6 +381,9 @@
     <string name="refund_method">환불 수단</string>
     <string name="refund_confirm_policy">취소/환불 규정을 확인했습니다</string>
     <string name="refund_error">"알 수 없는 오류로 환불에 실패했어요"</string>
+    <string name="refund_registered_ticket_dialog">취소 시 선물을 보낸 분께 알림이 발송되며 결제가 자동 취소됩니다. 취소하시겠습니까?</string>
+    <string name="refund_complete_ticket_refund">받은 선물을 취소했어요</string>
+    <string name="refund_failed_to_registered_gift">받은 선물 취소 중 오류가 발생했어요</string>
 
     <!-- 신고 -->
     <string name="report">신고하기</string>

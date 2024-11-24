@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.ManagerCodeException
 import com.nexters.boolti.domain.exception.TicketException
+import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
@@ -27,8 +28,10 @@ import javax.inject.Inject
 class TicketDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketRepository,
+    private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
+    // 실제로는 reservationId가 들어온다. api 변경에 따른 수정
     private val ticketId: String = requireNotNull(savedStateHandle["ticketId"]) {
         "TicketDetailViewModel 에 ticketId 가 전달되지 않았습니다."
     }
@@ -88,6 +91,18 @@ class TicketDetailViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun refundGiftTicket() {
+        val giftUuid = uiState.value.ticketGroup.giftUuid ?: return
+
+        giftRepository.cancelRegisteredGift(giftUuid = giftUuid)
+            .onEach { isSuccessful ->
+                if (isSuccessful) event(TicketDetailEvent.GiftRefunded)
+                else event(TicketDetailEvent.FailedToRefund)
+            }
+            .catch { event(TicketDetailEvent.NetworkError) }
+            .launchIn(viewModelScope + recordExceptionHandler)
     }
 
     fun setManagerCode(code: String) {

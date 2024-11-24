@@ -42,6 +42,7 @@ internal class AuthDataSource @Inject constructor(
                         introduction = it.profileIntroduction,
                         sns = it.profileSns,
                         link = it.profileLink,
+                        performedShow = it.performedShow,
                     )
                 }
             }

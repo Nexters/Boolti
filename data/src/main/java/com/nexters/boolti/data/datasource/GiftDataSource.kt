@@ -32,4 +32,7 @@ internal class GiftDataSource @Inject constructor(
 
     suspend fun cancelGift(giftUuid: String): Boolean =
         service.cancelGift(GiftCancelRequest(giftUuid = giftUuid))
+
+    suspend fun cancelRegisteredGift(giftUuid: String): Boolean =
+        service.cancelReceiveGift(GiftCancelRequest(giftUuid = giftUuid))
 }

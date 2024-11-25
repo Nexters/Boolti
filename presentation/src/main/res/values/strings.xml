@@ -58,6 +58,7 @@
     <string name="btn_goto_login">로그인 하러 가기</string>
     <string name="btn_delete">삭제하기</string>
     <string name="btn_exit">나가기</string>
+    <string name="btn_finish">종료하기</string>
     <string name="login">로그인</string>
     <string name="message_unknown_error">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="copy">복사</string>

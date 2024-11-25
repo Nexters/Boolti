@@ -52,6 +52,7 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.KakaoYellow
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.copyToClipboard
@@ -135,6 +136,7 @@ fun AccountSettingScreen(
                         SmallButton(
                             label = stringResource(R.string.copy_code_label),
                             iconRes = R.drawable.ic_copy,
+                            backgroundColor = Grey80,
                         ) {
                             userCode.copyToClipboard(
                                 copySuccessMessage = copySuccessMessage,

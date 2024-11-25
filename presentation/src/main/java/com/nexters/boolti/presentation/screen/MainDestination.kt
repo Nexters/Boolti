@@ -151,7 +151,7 @@ sealed class MainDestination(val route: String) {
             "profileLinkEdit?id=${link.id}&title=${link.name}&url=${link.url}"
     }
 
-    data object LinkList : MainDestination(route = "linkList") {
+    data object LinkList : MainDestination(route = "linkList?userCode={$userCode}") {
         val arguments = listOf(
             navArgument(userCode) {
                 type = NavType.StringType
@@ -163,7 +163,7 @@ sealed class MainDestination(val route: String) {
         fun createRoute(userCode: String) = "linkList?userCode=$userCode"
     }
 
-    data object PerformedShows : MainDestination(route = "performedShows") {
+    data object PerformedShows : MainDestination(route = "performedShows?userCode={$userCode}") {
         val arguments = listOf(
             navArgument(userCode) {
                 type = NavType.StringType

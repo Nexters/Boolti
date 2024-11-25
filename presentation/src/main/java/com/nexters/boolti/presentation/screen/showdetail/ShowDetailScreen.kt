@@ -837,7 +837,7 @@ private fun CountDownBanner(
     ) {
         Text(
             text = stringResource(id = R.string.show_ticketing_deadline_countdown) + " " + remainingTime.asString(),
-            style = MaterialTheme.typography.titleLarge.copy(color = Grey90)
+            style = MaterialTheme.typography.titleMedium.copy(color = Grey90)
         )
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -210,10 +211,14 @@ fun ProfileScreen(
                 },
             )
 
+            if (user.link.isNotEmpty() || user.performedShow.isNotEmpty()) {
+                Spacer(Modifier.size(8.dp))
+            }
+
             if (user.link.isNotEmpty()) { // 링크가 있으면
                 Section(
                     title = stringResource(R.string.profile_links_title),
-                    onClickShowAll = if (user.link.size >= 3) {
+                    onClickShowAll = if (user.link.size >= 4) {
                         { navigateToLinks() }
                     } else {
                         null
@@ -247,17 +252,17 @@ fun ProfileScreen(
             if (user.performedShow.isNotEmpty()) { // 출연한 공연이 있으면
                 Section(
                     title = stringResource(R.string.performed_shows),
-                    onClickShowAll = if (user.performedShow.size >= 2) {
+                    onClickShowAll = if (user.performedShow.size >= 3) {
                         { navigateToPerformedShows() }
                     } else {
                         null
                     },
                 ) {
-                    user.performedShow.take(3).forEachIndexed { i, show ->
+                    user.performedShow.take(2).forEachIndexed { i, show ->
                         ShowItem(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = if (i == 0) 0.dp else 24.dp)
+                                .padding(top = if (i == 0) 0.dp else 20.dp)
                                 .padding(horizontal = marginHorizontal),
                             show = show,
                             backgroundColor = MaterialTheme.colorScheme.background,
@@ -436,8 +441,8 @@ fun LinkItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
             .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

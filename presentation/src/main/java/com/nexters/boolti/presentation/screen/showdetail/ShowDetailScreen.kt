@@ -236,7 +236,9 @@ fun ShowDetailScreen(
                     )
                 }
 
-                item { Spacer(modifier = Modifier.size(114.dp)) }
+                if (uiState.showDetail.state != ShowState.FinishedShow) {
+                    item { Spacer(modifier = Modifier.size(120.dp)) }
+                }
             }
 
             val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
@@ -481,6 +483,7 @@ private fun LazyListScope.ShowInfoTab(
                         Row(
                             modifier = Modifier.padding(top = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 modifier = Modifier.size(20.dp),
@@ -653,7 +656,7 @@ fun LazyListScope.CastTab(
         }
     } else {
         itemsIndexed(teams) { index, team ->
-            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(16.dp))
+            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
             Section(
                 modifier = paddingModifier,
                 title = { SectionTitle(title = team.teamName) },

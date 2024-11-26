@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,6 +34,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.SelectableIcon
+import com.nexters.boolti.presentation.component.TextFieldLayout
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
@@ -126,47 +126,51 @@ private fun SnsEditScreen(
                 modifier = Modifier.padding(marginHorizontal),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                InfoRow(
-                    label = stringResource(R.string.sns),
+                // SNS
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        SelectableIcon(
-                            selected = selectedSns == Sns.SnsType.INSTAGRAM,
-                            iconRes = R.drawable.ic_logo_instagram,
-                            onClick = { onChangeSns(Sns.SnsType.INSTAGRAM) },
-                            contentDescription = stringResource(R.string.sns_select_instagram_description),
-                        )
-                        SelectableIcon(
-                            modifier = Modifier.padding(start = 12.dp),
-                            selected = selectedSns == Sns.SnsType.YOUTUBE,
-                            iconRes = R.drawable.ic_logo_youtube,
-                            onClick = { onChangeSns(Sns.SnsType.YOUTUBE) },
-                            contentDescription = stringResource(R.string.sns_select_youtube_description),
-                        )
-                    }
-                }
-                InfoRow(
-                    label = stringResource(R.string.username),
-                ) {
-                    BTTextField(
-                        modifier = Modifier.weight(1f),
-                        text = username,
-                        isError = usernameHasError,
-                        placeholder = stringResource(R.string.sns_username_placeholder),
-                        supportingText = when {
-                            username.contains('@') -> stringResource(R.string.sns_username_contains_at_error)
-                            usernameHasError -> stringResource(R.string.contains_unsupported_char_error)
-                            else -> null
-                        },
-                        trailingIcon = if (username.isNotEmpty()) {
-                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeUsername("") }) }
-                        } else {
-                            null
-                        },
-                        singleLine = true,
-                        onValueChanged = onChangeUsername,
+                    Label(stringResource(R.string.sns))
+                    SelectableIcon(
+                        selected = selectedSns == Sns.SnsType.INSTAGRAM,
+                        iconRes = R.drawable.ic_logo_instagram,
+                        onClick = { onChangeSns(Sns.SnsType.INSTAGRAM) },
+                        contentDescription = stringResource(R.string.sns_select_instagram_description),
+                    )
+                    SelectableIcon(
+                        modifier = Modifier.padding(start = 12.dp),
+                        selected = selectedSns == Sns.SnsType.YOUTUBE,
+                        iconRes = R.drawable.ic_logo_youtube,
+                        onClick = { onChangeSns(Sns.SnsType.YOUTUBE) },
+                        contentDescription = stringResource(R.string.sns_select_youtube_description),
                     )
                 }
+
+                // Username
+                TextFieldLayout(
+                    prevView = { Label(stringResource(R.string.username)) },
+                    textField = {
+                        BTTextField(
+                            modifier = Modifier.weight(1f),
+                            text = username,
+                            isError = usernameHasError,
+                            placeholder = stringResource(R.string.sns_username_placeholder),
+                            supportingText = when {
+                                username.contains('@') -> stringResource(R.string.sns_username_contains_at_error)
+                                usernameHasError -> stringResource(R.string.contains_unsupported_char_error)
+                                else -> null
+                            },
+                            trailingIcon = if (username.isNotEmpty()) {
+                                { BTTextFieldDefaults.ClearButton(onClick = { onChangeUsername("") }) }
+                            } else {
+                                null
+                            },
+                            singleLine = true,
+                            onValueChanged = onChangeUsername,
+                        )
+                    },
+                )
+
                 Spacer(Modifier.weight(1f))
                 if (isEditMode) {
                     MainButton(
@@ -203,24 +207,18 @@ private fun SnsEditScreen(
 }
 
 @Composable
-private fun InfoRow(
+private fun Label(
     label: String,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
 ) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier.defaultMinSize(minWidth = 72.dp),
-            text = label,
-            color = Grey30,
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Spacer(Modifier.size(12.dp))
-        content()
-    }
+    Text(
+        modifier = modifier
+            .defaultMinSize(minWidth = 72.dp)
+            .padding(end = 12.dp),
+        text = label,
+        color = Grey30,
+        style = MaterialTheme.typography.bodySmall,
+    )
 }
 
 @Preview

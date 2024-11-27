@@ -61,7 +61,7 @@ fun ShowRegistrationScreen(
     val domain = BuildConfig.DOMAIN
     val url = "https://${domain}/show/add"
 
-    var showExitDialog by mutableStateOf(false)
+    var showExitDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     var webView: WebView? by remember { mutableStateOf(null) }

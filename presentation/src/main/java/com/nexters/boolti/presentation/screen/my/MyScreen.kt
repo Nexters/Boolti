@@ -60,6 +60,9 @@ fun MyScreen(
     onClickQrScan: () -> Unit,
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
+
+    val domain = BuildConfig.DOMAIN
+    val url = "https://${domain}/show/add"
     val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(Unit) {
@@ -72,7 +75,7 @@ fun MyScreen(
         onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
-        onClickRegisterShow = navigateToShowRegistration,
+        onClickRegisterShow = { uriHandler.openUri(url) },// navigateToShowRegistration, // TODO 추후 인앱 공연 등록 반영 시 주석 해제
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }

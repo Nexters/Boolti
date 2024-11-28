@@ -34,7 +34,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.SelectableIcon
-import com.nexters.boolti.presentation.component.TextFieldLayout
+import com.nexters.boolti.presentation.extension.centerToTop
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
@@ -147,29 +147,30 @@ private fun SnsEditScreen(
                 }
 
                 // Username
-                TextFieldLayout(
-                    prevView = { Label(stringResource(R.string.username)) },
-                    textField = {
-                        BTTextField(
-                            modifier = Modifier.weight(1f),
-                            text = username,
-                            isError = usernameHasError,
-                            placeholder = stringResource(R.string.sns_username_placeholder),
-                            supportingText = when {
-                                username.contains('@') -> stringResource(R.string.sns_username_contains_at_error)
-                                usernameHasError -> stringResource(R.string.contains_unsupported_char_error)
-                                else -> null
-                            },
-                            trailingIcon = if (username.isNotEmpty()) {
-                                { BTTextFieldDefaults.ClearButton(onClick = { onChangeUsername("") }) }
-                            } else {
-                                null
-                            },
-                            singleLine = true,
-                            onValueChanged = onChangeUsername,
-                        )
-                    },
-                )
+                Row {
+                    Label(
+                        label = stringResource(R.string.username),
+                        modifier = Modifier.centerToTop(top = 24.dp),
+                    )
+                    BTTextField(
+                        modifier = Modifier.weight(1f),
+                        text = username,
+                        isError = usernameHasError,
+                        placeholder = stringResource(R.string.sns_username_placeholder),
+                        supportingText = when {
+                            username.contains('@') -> stringResource(R.string.sns_username_contains_at_error)
+                            usernameHasError -> stringResource(R.string.contains_unsupported_char_error)
+                            else -> null
+                        },
+                        trailingIcon = if (username.isNotEmpty()) {
+                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeUsername("") }) }
+                        } else {
+                            null
+                        },
+                        singleLine = true,
+                        onValueChanged = onChangeUsername,
+                    )
+                }
 
                 Spacer(Modifier.weight(1f))
                 if (isEditMode) {

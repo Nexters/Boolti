@@ -421,6 +421,7 @@ private fun TicketDetailScreen(
     if (showRefundGiftTicket) {
         BTDialog(
             enableDismiss = false,
+            positiveButtonLabel = stringResource(R.string.cancel_registered_gift_button),
             onClickPositiveButton = {
                 viewModel.refundGiftTicket()
                 showRefundGiftTicket = false

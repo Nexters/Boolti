@@ -47,7 +47,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -193,11 +192,6 @@ fun ShowDetailScreen(
             )
 
             var buttonsHeight by remember { mutableStateOf(0.dp) }
-            val bottomPadding by remember {
-                derivedStateOf {
-                    if (buttonsHeight > 0.dp) buttonsHeight + 56.dp else 0.dp
-                }
-            }
 
             LazyColumn(
                 modifier = Modifier,
@@ -243,7 +237,7 @@ fun ShowDetailScreen(
                     )
                 }
 
-                item { Spacer(modifier = Modifier.size(bottomPadding)) }
+                item { Spacer(modifier = Modifier.size(buttonsHeight)) }
             }
 
             val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
@@ -472,12 +466,16 @@ private fun LazyListScope.ShowInfoTab(
 ) {
     val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
 
+    // 최상단 섹션의 상단 패딩
+    item { Spacer(Modifier.size(8.dp)) }
+
+    // 티켓 판매 섹션
     item {
         val startDate = showDetail.salesStartDate
         val endDate = showDetail.salesEndDateTime.toLocalDate()
 
         Section(
-            modifier = paddingModifier.padding(top = 8.dp),
+            modifier = paddingModifier,
             title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
             // ex. 2023.12.01 (토) - 2024.01.20 (월)
             content = {
@@ -514,12 +512,13 @@ private fun LazyListScope.ShowInfoTab(
 
     item { Divider(paddingModifier) }
 
+    // 일시 섹션
     item {
         // 일시
         // ex. 2024.01.20 (토) / 18:00 (150분)
         val minute = stringResource(id = R.string.ticketing_minutes)
         Section(
-            modifier = paddingModifier.padding(top = 8.dp),
+            modifier = paddingModifier,
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = {
                 Row {
@@ -549,7 +548,7 @@ private fun LazyListScope.ShowInfoTab(
 
     item { Divider(paddingModifier) }
 
-    // 장소
+    // 장소 섹션
     item {
         val snackbarController = LocalSnackbarController.current
 
@@ -589,7 +588,7 @@ private fun LazyListScope.ShowInfoTab(
     }
     item { Divider(paddingModifier) }
 
-    // 공연 내용
+    // 내용 섹션
     item {
         Section(
             modifier = paddingModifier,
@@ -616,7 +615,7 @@ private fun LazyListScope.ShowInfoTab(
     }
     item { Divider(paddingModifier) }
 
-    // 주최자
+    // 주최 섹션
     item {
         Section(
             modifier = paddingModifier,
@@ -629,6 +628,9 @@ private fun LazyListScope.ShowInfoTab(
             },
         )
     }
+
+    // 최하단 섹션의 하단 패딩
+    item { Spacer(Modifier.size(8.dp)) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -696,6 +698,7 @@ fun LazyListScope.CastTab(
                     }
                 }
             )
+            if (index == teams.lastIndex) Spacer(modifier = Modifier.size(8.dp))
         }
     }
 }

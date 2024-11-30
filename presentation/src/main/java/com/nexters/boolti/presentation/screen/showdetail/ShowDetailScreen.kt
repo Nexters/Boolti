@@ -47,6 +47,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,7 +75,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
-import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -192,6 +192,13 @@ fun ShowDetailScreen(
                 uiState.showDetail.hostPhoneNumber,
             )
 
+            var buttonsHeight by remember { mutableStateOf(0.dp) }
+            val bottomPadding by remember {
+                derivedStateOf {
+                    if (buttonsHeight > 0.dp) buttonsHeight + 56.dp else 0.dp
+                }
+            }
+
             LazyColumn(
                 modifier = Modifier,
             ) {
@@ -236,9 +243,7 @@ fun ShowDetailScreen(
                     )
                 }
 
-                if (uiState.showDetail.state != ShowState.FinishedShow) {
-                    item { Spacer(modifier = Modifier.size(120.dp)) }
-                }
+                item { Spacer(modifier = Modifier.size(bottomPadding)) }
             }
 
             val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
@@ -252,6 +257,7 @@ fun ShowDetailScreen(
             }
 
             AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
                 visible = !showState.isClosedOrFinished,
                 enter = EnterTransition.None,
                 exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter),
@@ -259,7 +265,8 @@ fun ShowDetailScreen(
                 ShowDetailButtons(
                     showState = showState,
                     onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                    onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
+                    onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
+                    onHeightChanged = { buttonsHeight = it },
                 )
             }
 

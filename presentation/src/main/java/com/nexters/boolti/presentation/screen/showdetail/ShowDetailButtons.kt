@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,31 +13,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.extension.asString
+import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import java.time.Duration
-import java.time.LocalDateTime
 
 @Composable
 fun ShowDetailButtons(
     showState: ShowState,
     onTicketingClicked: () -> Unit,
     onGiftClicked: () -> Unit,
+    onHeightChanged: (height: Dp) -> Unit = {},
 ) {
+    val density = LocalDensity.current
     Column(
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.onSizeChanged {
+            onHeightChanged(it.height.toDp(density))
+        },
     ) {
-        Spacer(modifier = Modifier.weight(1.0f))
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()

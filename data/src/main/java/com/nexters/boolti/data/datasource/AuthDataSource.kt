@@ -42,6 +42,7 @@ internal class AuthDataSource @Inject constructor(
                         introduction = it.profileIntroduction,
                         sns = it.profileSns,
                         link = it.profileLink,
+                        performedShow = it.performedShow,
                     )
                 }
             }
@@ -98,6 +99,7 @@ internal class AuthDataSource @Inject constructor(
                 profileIntroduction = user.introduction,
                 profileSns = user.sns,
                 profileLink = user.link,
+                performedShow = user.performedShow,
             )
         }
         Firebase.analytics.apply {

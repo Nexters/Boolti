@@ -74,7 +74,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
-import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -192,6 +191,8 @@ fun ShowDetailScreen(
                 uiState.showDetail.hostPhoneNumber,
             )
 
+            var buttonsHeight by remember { mutableStateOf(0.dp) }
+
             LazyColumn(
                 modifier = Modifier,
             ) {
@@ -236,7 +237,7 @@ fun ShowDetailScreen(
                     )
                 }
 
-                item { Spacer(modifier = Modifier.size(114.dp)) }
+                item { Spacer(modifier = Modifier.size(buttonsHeight)) }
             }
 
             val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
@@ -250,6 +251,7 @@ fun ShowDetailScreen(
             }
 
             AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
                 visible = !showState.isClosedOrFinished,
                 enter = EnterTransition.None,
                 exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter),
@@ -257,7 +259,8 @@ fun ShowDetailScreen(
                 ShowDetailButtons(
                     showState = showState,
                     onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                    onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
+                    onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
+                    onHeightChanged = { buttonsHeight = it },
                 )
             }
 
@@ -463,12 +466,16 @@ private fun LazyListScope.ShowInfoTab(
 ) {
     val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
 
+    // 최상단 섹션의 상단 패딩
+    item { Spacer(Modifier.size(8.dp)) }
+
+    // 티켓 판매 섹션
     item {
         val startDate = showDetail.salesStartDate
         val endDate = showDetail.salesEndDateTime.toLocalDate()
 
         Section(
-            modifier = paddingModifier.padding(top = 8.dp),
+            modifier = paddingModifier,
             title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
             // ex. 2023.12.01 (토) - 2024.01.20 (월)
             content = {
@@ -481,6 +488,7 @@ private fun LazyListScope.ShowInfoTab(
                         Row(
                             modifier = Modifier.padding(top = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 modifier = Modifier.size(20.dp),
@@ -504,12 +512,13 @@ private fun LazyListScope.ShowInfoTab(
 
     item { Divider(paddingModifier) }
 
+    // 일시 섹션
     item {
         // 일시
         // ex. 2024.01.20 (토) / 18:00 (150분)
         val minute = stringResource(id = R.string.ticketing_minutes)
         Section(
-            modifier = paddingModifier.padding(top = 8.dp),
+            modifier = paddingModifier,
             title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
             content = {
                 Row {
@@ -539,7 +548,7 @@ private fun LazyListScope.ShowInfoTab(
 
     item { Divider(paddingModifier) }
 
-    // 장소
+    // 장소 섹션
     item {
         val snackbarController = LocalSnackbarController.current
 
@@ -579,7 +588,7 @@ private fun LazyListScope.ShowInfoTab(
     }
     item { Divider(paddingModifier) }
 
-    // 공연 내용
+    // 내용 섹션
     item {
         Section(
             modifier = paddingModifier,
@@ -606,7 +615,7 @@ private fun LazyListScope.ShowInfoTab(
     }
     item { Divider(paddingModifier) }
 
-    // 주최자
+    // 주최 섹션
     item {
         Section(
             modifier = paddingModifier,
@@ -619,6 +628,9 @@ private fun LazyListScope.ShowInfoTab(
             },
         )
     }
+
+    // 최하단 섹션의 하단 패딩
+    item { Spacer(Modifier.size(8.dp)) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -653,7 +665,7 @@ fun LazyListScope.CastTab(
         }
     } else {
         itemsIndexed(teams) { index, team ->
-            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(16.dp))
+            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
             Section(
                 modifier = paddingModifier,
                 title = { SectionTitle(title = team.teamName) },
@@ -686,6 +698,7 @@ fun LazyListScope.CastTab(
                     }
                 }
             )
+            if (index == teams.lastIndex) Spacer(modifier = Modifier.size(8.dp))
         }
     }
 }

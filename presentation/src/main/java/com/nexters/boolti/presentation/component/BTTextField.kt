@@ -189,7 +189,7 @@ fun BTTextField(
                     modifier = Modifier.constrainAs(supportingTextRef) {
                         start.linkTo(textFieldRef.start)
                         end.linkTo(textFieldRef.end)
-                        top.linkTo(textFieldRef.bottom, 12.dp)
+                        top.linkTo(textFieldRef.bottom, 8.dp)
                         bottom.linkTo(parent.bottom)
                         width = Dimension.fillToConstraints
                     },

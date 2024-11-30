@@ -62,7 +62,7 @@ fun BtAppBar(
             text = title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = colors.titleColor,
         )
         actionButtons?.let {

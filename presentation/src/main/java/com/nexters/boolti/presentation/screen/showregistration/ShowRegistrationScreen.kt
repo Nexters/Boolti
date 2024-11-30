@@ -131,7 +131,7 @@ fun ShowRegistrationScreen(
 
             if (showExitDialog) {
                 BTDialog(
-                    positiveButtonLabel = stringResource(R.string.btn_exit),
+                    positiveButtonLabel = stringResource(R.string.btn_finish),
                     onClickPositiveButton = {
                         showExitDialog = false
                         onClickBack()

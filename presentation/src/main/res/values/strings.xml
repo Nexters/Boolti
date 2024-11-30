@@ -58,6 +58,7 @@
     <string name="btn_goto_login">로그인 하러 가기</string>
     <string name="btn_delete">삭제하기</string>
     <string name="btn_exit">나가기</string>
+    <string name="btn_finish">종료하기</string>
     <string name="login">로그인</string>
     <string name="message_unknown_error">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="copy">복사</string>
@@ -133,10 +134,10 @@
     <string name="ticketing_minutes">분</string>
     <string name="ticketing_place">장소</string>
     <string name="ticketing_copy_address">주소복사</string>
-    <string name="ticketing_content">공연 내용</string>
+    <string name="ticketing_content">내용</string>
     <string name="ticketing_all_content">전체보기</string>
     <string name="ticketing_all_content_title">공연 내용</string>
-    <string name="ticketing_host">공연 관련 문의</string>
+    <string name="ticketing_host">주최</string>
     <string name="ticketing_button_label">예매하기</string>
     <string name="ticketing_give_a_gift">선물하기</string>
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>

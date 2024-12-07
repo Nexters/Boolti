@@ -109,6 +109,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShowDetailScreen(
     onBack: () -> Unit,
@@ -133,19 +134,11 @@ fun ShowDetailScreen(
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val showState by flow {
-        while (true) {
-            emit(uiState.showDetail.state)
-            delay(200)
-        }
-    }.collectAsStateWithLifecycle(uiState.showDetail.state)
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
-
-    val window = LocalContext.current.requireActivity().window
-    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
+    BackHandler {
+        viewModel.sendEvent(ShowDetailEvent.PopBackStack)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -162,16 +155,69 @@ fun ShowDetailScreen(
         }
     }
 
-    BackHandler {
-        viewModel.sendEvent(ShowDetailEvent.PopBackStack)
+    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+        ShowDetailScreen(
+            uiState = uiState,
+            onBack = onBack,
+            onClickHome = onClickHome,
+            onClickContent = onClickContent,
+            navigateToLogin = navigateToLogin,
+            navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+            onTicketSelected = onTicketSelected,
+            onGiftTicketSelected = onGiftTicketSelected,
+            navigateToReport = navigateToReport,
+            navigateToProfile = navigateToProfile,
+            isLoggedIn = isLoggedIn == true,
+            onSelectTab = viewModel::selectTab,
+            modifier = modifier,
+        )
     }
+}
+
+@Composable
+fun ShowDetailScreen(
+    uiState: ShowDetailUiState,
+    onBack: () -> Unit,
+    onClickHome: () -> Unit,
+    onClickContent: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToImages: (index: Int) -> Unit,
+    onTicketSelected: (
+        showId: String,
+        ticketId: String,
+        ticketCount: Int,
+        isInviteTicket: Boolean,
+    ) -> Unit,
+    onGiftTicketSelected: (
+        showId: String,
+        ticketId: String,
+        ticketCount: Int,
+    ) -> Unit,
+    navigateToReport: () -> Unit,
+    navigateToProfile: (userCode: String) -> Unit,
+    isLoggedIn: Boolean,
+    onSelectTab: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val showState by flow {
+        while (true) {
+            emit(uiState.showDetail.state)
+            delay(200)
+        }
+    }.collectAsStateWithLifecycle(uiState.showDetail.state)
+
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
+
+    val window = LocalContext.current.requireActivity().window
+    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     Scaffold(
         modifier = modifier,
         topBar = {
             ShowDetailAppBar(
                 showDetail = uiState.showDetail,
-                onBack = { viewModel.sendEvent(ShowDetailEvent.PopBackStack) },
+                onBack = onBack,
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
             )
@@ -210,7 +256,7 @@ fun ShowDetailScreen(
                             )
                             .background(color = MaterialTheme.colorScheme.surface)
                             .padding(top = paddingTop),
-                        navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                        navigateToImages = navigateToImages,
                         title = uiState.showDetail.name,
                         images = uiState.showDetail.images.map { it.originImage }
                     )
@@ -220,7 +266,7 @@ fun ShowDetailScreen(
                     ContentTabRow(
                         modifier = Modifier.padding(top = 20.dp),
                         selectedTabIndex = uiState.selectedTab,
-                        onSelectTab = viewModel::selectTab,
+                        onSelectTab = onSelectTab,
                     )
                 }
 
@@ -242,7 +288,7 @@ fun ShowDetailScreen(
 
             val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
                 scope.launch {
-                    if (isLoggedIn == true) {
+                    if (isLoggedIn) {
                         showBottomSheet = type
                     } else {
                         navigateToLogin()
@@ -681,19 +727,17 @@ fun LazyListScope.CastTab(
                      * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요
                      */
                     val gridHeight = memberHeight * rows + spacedBySize * (rows - 1)
-                    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-                        LazyVerticalGrid(
-                            modifier = Modifier.height(gridHeight),
-                            columns = GridCells.Fixed(spanCount),
-                            verticalArrangement = Arrangement.spacedBy(spacedBySize),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        ) {
-                            items(team.members) { member ->
-                                Cast(
-                                    memberHeight,
-                                    member,
-                                    onClick = { onClickMember(member.userCode) })
-                            }
+                    LazyVerticalGrid(
+                        modifier = Modifier.height(gridHeight),
+                        columns = GridCells.Fixed(spanCount),
+                        verticalArrangement = Arrangement.spacedBy(spacedBySize),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        items(team.members) { member ->
+                            Cast(
+                                memberHeight,
+                                member,
+                                onClick = { onClickMember(member.userCode) })
                         }
                     }
                 }
@@ -851,6 +895,27 @@ private fun CountDownBanner(
         Text(
             text = stringResource(id = R.string.show_ticketing_deadline_countdown) + " " + remainingTime.asString(),
             style = MaterialTheme.typography.titleMedium.copy(color = Grey90)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ShowDetailScreenPreview() {
+    BooltiTheme {
+        ShowDetailScreen(
+            uiState = ShowDetailUiState(),
+            onBack = {},
+            onClickHome = {},
+            onClickContent = {},
+            navigateToLogin = {},
+            navigateToImages = {},
+            onTicketSelected = { _, _, _, _ -> },
+            onGiftTicketSelected = { _, _, _ -> },
+            navigateToReport = {},
+            navigateToProfile = {},
+            isLoggedIn = true,
+            onSelectTab = {},
         )
     }
 }

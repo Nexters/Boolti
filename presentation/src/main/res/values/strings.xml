@@ -263,6 +263,7 @@
     <string name="my_login_sub">원하는 공연 티켓을 예매해보세요!</string>
     <string name="my_logout">로그아웃</string>
     <string name="my_ticketing_history">결제 내역</string>
+    <string name="my_manage_show">공연 관리</string>
     <string name="my_scan_qr">입장 확인</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
     <string name="my_register_show">공연 등록</string>

@@ -1,13 +1,15 @@
 package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.DeviceTokenDataSource
 import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.LoginResponse
+import com.nexters.boolti.domain.model.AccessToken
 import com.nexters.boolti.domain.model.LoginUserState
-import com.nexters.boolti.domain.model.TokenPair
+import com.nexters.boolti.domain.model.TokenPairs
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.EditProfileRequest
@@ -23,6 +25,7 @@ import javax.inject.Inject
 internal class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val tokenDataSource: TokenDataSource,
+    private val authTokenDataSource: AuthTokenDataSource,
     private val signUpDataSource: SignUpDataSource,
     private val userDateSource: UserDataSource,
     private val deviceTokenDataSource: DeviceTokenDataSource,
@@ -72,7 +75,13 @@ internal class AuthRepositoryImpl @Inject constructor(
             .onSuccess { authDataSource.updateUser(it) }
             .mapCatching {}
 
-    override fun getTokens(): Flow<TokenPair> = authDataSource.getTokens().map {
-        TokenPair(it.first, it.second)
+    override fun getTokens(): Flow<TokenPairs> = authDataSource.getTokens().map {
+        TokenPairs(it.first, it.second)
+    }
+
+    override fun refreshToken(): Flow<AccessToken> = flow {
+        authTokenDataSource.getNewAccessToken()?.let {
+            emit(AccessToken(it))
+        }
     }
 }

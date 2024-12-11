@@ -13,4 +13,8 @@ class ShowRegistrationViewModel @Inject constructor(
 ) : ViewModel() {
     val tokens = authRepository.getTokens()
         .stateInUi(viewModelScope, null)
+
+    fun refreshToken() {
+        authRepository.refreshToken()
+    }
 }

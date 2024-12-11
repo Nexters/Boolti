@@ -5,7 +5,6 @@ import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import android.webkit.WebStorage
-import android.webkit.WebView
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,9 +35,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.BridgeData
+import com.nexters.boolti.presentation.component.BridgeRequest
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.component.Command
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -64,7 +66,7 @@ fun ShowRegistrationScreen(
     var showExitDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    var webView: WebView? by remember { mutableStateOf(null) }
+    var webView: BtWebView? by remember { mutableStateOf(null) }
     var webviewProgress by remember { mutableIntStateOf(0) }
     val loading by remember { derivedStateOf { webviewProgress < 100 } }
 
@@ -81,6 +83,14 @@ fun ShowRegistrationScreen(
                     setCookie(url, "x-refresh-token=${tokens.refreshToken}")
                     flush()
                 }
+                /*launch {
+                    webView?.evaluate(
+                        BridgeRequest(
+                            command = Command.REQUEST_TOKEN.name,
+                            data = tokens.accessToken,
+                        )
+                    )
+                }*/
             }
     }
 
@@ -114,7 +124,28 @@ fun ShowRegistrationScreen(
                         Timber.d("내가 만든 쿠키 : ${CookieManager.getInstance().getCookie(url)}")
 
                         scope.launch {
-                            progress.collect { webviewProgress = it }
+                            launch {
+                                progress.collect { webviewProgress = it }
+                            }
+                            launch {
+                                bridgeEvent.collect { data ->
+                                    Timber.tag("MANGBAAM-(ShowRegistrationScreen)").d("$data")
+                                    when (data) {
+                                        is BridgeData.RequestToken -> {
+                                            evaluate(
+                                                BridgeRequest(
+                                                    command = Command.REQUEST_TOKEN.name,
+                                                    data = "hello",
+                                                )
+                                            )
+                                        }
+
+                                        else -> {
+                                            Timber.tag("MANGBAAM-(ShowRegistrationScreen)").d("안 탔나?")
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }.also { webView = it }
                 },

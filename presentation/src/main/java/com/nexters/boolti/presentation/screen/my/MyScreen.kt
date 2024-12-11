@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.my
 
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -78,10 +77,7 @@ fun MyScreen(
         onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
-        onClickRegisterShow = {
-            uriHandler.openUri(url)
-            Toast.makeText(context, "공연 등록을 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
-        },// navigateToShowRegistration, // TODO 추후 인앱 공연 등록 반영 시 주석 해제
+        onClickRegisterShow = navigateToShowRegistration,
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }

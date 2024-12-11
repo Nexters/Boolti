@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -46,7 +45,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@OptIn(ExperimentalLayoutApi::class)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ShowRegistrationScreen(
@@ -129,20 +127,19 @@ fun ShowRegistrationScreen(
                             }
                             launch {
                                 bridgeEvent.collect { data ->
-                                    Timber.tag("MANGBAAM-(ShowRegistrationScreen)").d("$data")
+                                    Timber.tag("bridge").d("bridgeEvent 수집(ShowRegistrationScreen) - $data")
                                     when (data) {
                                         is BridgeData.RequestToken -> {
                                             evaluate(
                                                 BridgeRequest(
-                                                    command = Command.REQUEST_TOKEN.name,
+                                                    id = data.uuid,
+                                                    command = Command.Send.REQUEST_TOKEN,
                                                     data = "hello",
                                                 )
                                             )
                                         }
 
-                                        else -> {
-                                            Timber.tag("MANGBAAM-(ShowRegistrationScreen)").d("안 탔나?")
-                                        }
+                                        else -> Unit
                                     }
                                 }
                             }

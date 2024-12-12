@@ -755,7 +755,11 @@ fun InputRow(
             } else {
                 VisualTransformation.None
             },
-            onValueChanged = onValueChanged,
+            onValueChanged = {
+                onValueChanged(
+                    if (isPhoneNumber) it.filterToPhoneNumber() else it,
+                )
+            },
         )
     }
 }

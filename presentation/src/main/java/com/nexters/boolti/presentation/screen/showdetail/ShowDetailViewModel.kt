@@ -3,6 +3,8 @@ package com.nexters.boolti.presentation.screen.showdetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,13 +18,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class ShowDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val showRepository: ShowRepository,
-    private val authRepository: AuthRepository,
+    authRepository: AuthRepository,
 ) : ViewModel() {
     private val showId: String = checkNotNull(savedStateHandle["showId"])
 
@@ -40,6 +43,7 @@ class ShowDetailViewModel @Inject constructor(
 
     init {
         fetchShowDetail()
+        fetchCastTeams()
     }
 
     fun sendEvent(event: ShowDetailEvent) = viewModelScope.launch { _events.send(event) }
@@ -51,10 +55,29 @@ class ShowDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(showDetail = newShowDetail) }
                 }
                 .onFailure {
-                    it.printStackTrace()
-                    // todo : 예외 처리
+                    Firebase.crashlytics.recordException(it)
+                    Timber.e(it)
                 }
         }
+    }
+
+    private fun fetchCastTeams() {
+        viewModelScope.launch {
+            showRepository.requestCastTeams(showId = showId)
+                .onSuccess { newCastTeams ->
+                    _uiState.update {
+                        it.copy(castTeams = newCastTeams)
+                    }
+                }
+                .onFailure {
+                    Firebase.crashlytics.recordException(it)
+                    Timber.e(it)
+                }
+        }
+    }
+
+    fun selectTab(index: Int) {
+        _uiState.update { it.copy(selectedTab = index.coerceIn(0..1)) }
     }
 
     fun preventEvents() {

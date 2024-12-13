@@ -1,6 +1,8 @@
 package com.nexters.boolti.data.db
 
 import androidx.datastore.core.Serializer
+import com.nexters.boolti.data.network.response.ShowResponse
+import com.nexters.boolti.domain.request.EditProfileRequest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -15,6 +17,11 @@ internal data class AppSettings(
     val email: String? = null,
     val phoneNumber: String? = null,
     val photo: String? = null,
+    val userCode: String? = null,
+    val performedShow: List<ShowResponse> = emptyList(),
+    val profileIntroduction: String = "",
+    val profileLink: List<EditProfileRequest.LinkDto> = emptyList(),
+    val profileSns: List<EditProfileRequest.SnsDto> = emptyList(),
     val accessToken: String = "",
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),

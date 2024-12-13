@@ -11,18 +11,23 @@
 </br>
 
 ## Screenshots
-<img width=20% src="https://github.com/Nexters/Boolti/assets/35232655/1720adc2-80aa-46aa-a079-cdf23bfd8a01">
-<img width=20% src="https://github.com/Nexters/Boolti/assets/35232655/b218b684-7022-49a9-9b97-308d4d7a942b">
-<img width=20% src="https://github.com/Nexters/Boolti/assets/35232655/bc784377-ec05-4d28-b578-1c638d2cd5b5">
-<img width=20% src="https://github.com/Nexters/Boolti/assets/35232655/d080d5e0-e979-4e66-94f8-dcd8d49d3d78">  
+
+<img width=20% src="https://github.com/user-attachments/assets/b84901fc-3eb6-4136-8a39-c9bb6f05aed8">
+<img width=20% src="https://github.com/user-attachments/assets/2294cbc8-3de6-4647-8929-d33b15c74b89"> <br/>
+<img width=20% src="https://github.com/user-attachments/assets/d690ffc3-3be2-4da0-b95f-660cb74b336c">
+<img width=20% src="https://github.com/user-attachments/assets/6d62c29e-321f-401a-9e08-6da7cb402e8c">
+<img width=20% src="https://github.com/user-attachments/assets/7a2970cf-60e9-4e47-988e-4bcebc95932f">
+<img width=20% src="https://github.com/user-attachments/assets/5863e14a-6ce4-4894-b004-90f2eebdc278">
+<img width=20% src="https://github.com/user-attachments/assets/52bc2bc4-821c-45f5-affb-f3234b13556d">
+<img width=20% src="https://github.com/user-attachments/assets/dd5ab375-a352-427e-b027-5f346b513aa6">
+<img width=20% src="https://github.com/user-attachments/assets/7917efe8-d74c-45b0-b9d1-cd62f28f053c">
 
 </br></br>
 
 ## Animations
-
-| Home | Ticktes |
-| ------------- | ------------- |
-| <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/66c2ada2-7079-4704-b9a4-237b2c8e2769" /> | <img width="200" src="https://github.com/Nexters/Boolti/assets/35232655/37b8640a-38bb-4e03-adad-6931998082a4"/> |
+| Home | Tickets | QR | Webview |
+| ------------- | ------------- | ------------- | ------------- |
+| <img width="200" src="https://github.com/user-attachments/assets/8d1ee7c6-29b3-4f75-96d6-c0cca7c28d28" /> | <img width="200" src="https://github.com/user-attachments/assets/0f3f35b8-0a6b-4f53-9df4-e80f4a96ed5a"/> | <img width="200" src="https://github.com/user-attachments/assets/3e11f8f8-7a2a-40aa-984b-2262dfdeb453"/> | <img width="200" src="https://github.com/user-attachments/assets/1febd38e-4576-48a2-beaa-078d00ab9b47"/> |
 
 </br>
 

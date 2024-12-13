@@ -8,13 +8,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,19 +30,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCheckBox
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -67,8 +63,18 @@ fun RefundInfoPage(
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        Header(
-            reservation = reservation
+        ShowItem(
+            modifier = Modifier.padding(top = 12.dp),
+            poster = reservation.showImage,
+            title = reservation.showName,
+            description = stringResource(
+                id = R.string.reservation_ticket_info_format,
+                reservation.ticketName,
+                reservation.ticketCount
+            ),
+            titleStyle = point2,
+            contentPadding = PaddingValues(20.dp),
+            backgroundColor = MaterialTheme.colorScheme.background,
         )
         Section(
             modifier = Modifier.padding(top = 12.dp),
@@ -136,49 +142,6 @@ fun RefundInfoPage(
             enabled = uiState.isAbleToRequest,
             label = stringResource(id = R.string.refund_button)
         )
-    }
-}
-
-
-@Composable
-private fun Header(
-    reservation: ReservationDetail,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.padding(horizontal = marginHorizontal, vertical = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AsyncImage(
-            modifier = Modifier
-                .width(70.dp)
-                .height(98.dp)
-                .border(color = Grey80, width = 1.dp, shape = RoundedCornerShape(4.dp))
-                .clip(shape = RoundedCornerShape(4.dp)),
-            model = reservation.showImage,
-            contentDescription = stringResource(id = R.string.description_poster),
-            contentScale = ContentScale.Crop,
-        )
-        Column(
-            modifier = Modifier.padding(start = 16.dp),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = reservation.showName,
-                style = point2,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = stringResource(
-                    id = R.string.reservation_ticket_info_format,
-                    reservation.ticketName,
-                    reservation.ticketCount
-                ),
-                style = MaterialTheme.typography.bodySmall.copy(color = Grey30),
-            )
-        }
     }
 }
 

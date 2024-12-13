@@ -7,12 +7,15 @@ import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.LoginResponse
 import com.nexters.boolti.domain.model.LoginUserState
+import com.nexters.boolti.domain.model.TokenPair
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import com.nexters.boolti.domain.request.SignoutRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -27,13 +30,14 @@ internal class AuthRepositoryImpl @Inject constructor(
     override val loggedIn: Flow<Boolean>
         get() = authDataSource.loggedIn
 
-    override val cachedUser: Flow<User?>
+    override val cachedUser: Flow<User.My?>
         get() = authDataSource.user.map { it?.toDomain() }
 
     override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
         return authDataSource.login(request).onSuccess { response ->
             tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             deviceTokenDataSource.sendFcmToken()
+            getUserAndCache().first()
         }.mapCatching(LoginResponse::toDomain)
     }
 
@@ -52,11 +56,23 @@ internal class AuthRepositoryImpl @Inject constructor(
         authDataSource.localLogout()
     }
 
-    override fun getUserAndCache(): Flow<User> = flow {
+    override fun getUserAndCache(): Flow<User.My?> = flow {
         val response = userDateSource.getUser()
-        authDataSource.updateUser(response)
-        emit(response.toDomain())
+        response?.let {
+            authDataSource.updateUser(it)
+        }
+
+        emit(response?.toDomain())
     }
 
     override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()
+
+    override suspend fun editProfile(editProfileRequest: EditProfileRequest) =
+        runCatching { userDateSource.edit(editProfileRequest) }
+            .onSuccess { authDataSource.updateUser(it) }
+            .mapCatching {}
+
+    override fun getTokens(): Flow<TokenPair> = authDataSource.getTokens().map {
+        TokenPair(it.first, it.second)
+    }
 }

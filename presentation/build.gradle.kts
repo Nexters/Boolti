@@ -18,12 +18,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "PACKAGE_NAME", "\"${libs.versions.packageName.get()}\"")
+        buildConfigField("String", "VERSION_NAME", "\"${libs.versions.versionName.get()}\"")
     }
 
     buildTypes {
         debug {
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("DEV_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
+            buildConfigField("String", "DOMAIN", getLocalProperty("DEV_DOMAIN"))
         }
         release {
             isMinifyEnabled = false
@@ -31,6 +33,7 @@ android {
 
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
+            buildConfigField("String", "DOMAIN", getLocalProperty("PROD_DOMAIN"))
         }
     }
     compileOptions {
@@ -67,6 +70,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.bundles.lifecycle)
     implementation(libs.bundles.compose)
+    implementation(libs.immutable)
     implementation(platform(libs.andoridx.compose.compose.bom))
     implementation(libs.bundles.coroutines)
     implementation(libs.bundles.firebase)
@@ -81,6 +85,7 @@ dependencies {
     implementation(libs.lottie)
     implementation(libs.bundles.coil)
     api(libs.kakao.login)
+    implementation(libs.kakao.share)
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)

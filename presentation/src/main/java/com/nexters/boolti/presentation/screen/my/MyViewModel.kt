@@ -21,12 +21,6 @@ class MyViewModel @Inject constructor(
         null,
     )
 
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logout()
-        }
-    }
-
     fun fetchMyInfo() {
         authRepository.getUserAndCache()
             .launchIn(viewModelScope + recordExceptionHandler)

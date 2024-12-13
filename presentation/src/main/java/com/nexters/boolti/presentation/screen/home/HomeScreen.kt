@@ -3,12 +3,13 @@ package com.nexters.boolti.presentation.screen.home
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -20,8 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,11 +36,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
-import com.nexters.boolti.presentation.screen.HomeViewModel
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.MyScreen
 import com.nexters.boolti.presentation.screen.show.ShowScreen
 import com.nexters.boolti.presentation.screen.ticket.TicketLoginScreen
@@ -43,32 +48,68 @@ import com.nexters.boolti.presentation.screen.ticket.TicketScreen
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
 
 @Composable
 fun HomeScreen(
     onClickShowItem: (showId: String) -> Unit,
     onClickTicket: (ticketId: String) -> Unit,
-    onClickQr: (data: String, ticketName: String) -> Unit,
     onClickQrScan: () -> Unit,
-    onClickSignout: () -> Unit,
+    onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
+    navigateToProfile: () -> Unit,
     navigateToBusiness: () -> Unit,
+    navigateToShowRegistration: () -> Unit,
     requireLogin: () -> Unit,
     modifier: Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val navController = rememberNavController()
+    val navController = rememberNavControllerWithLog()
+    val snackbarController = LocalSnackbarController.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route ?: Destination.Show.route
 
     val loggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+    val domain = BuildConfig.DOMAIN
+    val url = "https://${domain}/show/add"
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+    val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
+
+    var dialog: GiftStatus? by rememberSaveable { mutableStateOf(null) }
 
     removeInvalidDeepLink(LocalContext.current)
 
     LaunchedEffect(Unit) {
-        viewModel.event.collect { deepLink ->
-            navController.navigate(Uri.parse(deepLink))
+        viewModel.events.collect { event ->
+            when (event) {
+                is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
+                is HomeEvent.GiftNotification -> {
+                    dialog = event.status
+                }
+
+                is HomeEvent.GiftRegistered -> {
+                    snackbarController.showMessage(giftRegistrationMessage)
+                }
+            }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        val intent = context.requireActivity().intent
+        intent.action?.let { _ ->
+            val deepLink = intent.data.toString()
+            intent.data = null
+            val regex = "^https://app.boolti.in/gift/([\\w-])+$".toRegex()
+            if (regex.matches(deepLink)) {
+                val giftUuid = deepLink.split("/").last()
+                viewModel.processGift(giftUuid)
+            }
+        }
+    }
+
+    LaunchedEffect(loggedIn) {
+        if (loggedIn == true) viewModel.processGift()
     }
 
     Scaffold(
@@ -92,12 +133,21 @@ fun HomeScreen(
         ) {
             composable(
                 route = Destination.Show.route,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "https://app.boolti.in/home/shows"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
             ) {
                 ShowScreen(
                     modifier = modifier.padding(innerPadding),
                     onClickShowItem = onClickShowItem,
-                    navigateToReservations = navigateToReservations,
                     navigateToBusiness = navigateToBusiness,
+                    navigateToShowRegistration = {
+                        uriHandler.openUri(url)
+                        Toast.makeText(context, "공연 등록을 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
+                    }  // navigateToShowRegistration,  // TODO 추후 인앱 공연 등록 반영 시 주석 해제
                 )
             }
             composable(
@@ -112,7 +162,6 @@ fun HomeScreen(
                 when (loggedIn) {
                     true -> TicketScreen(
                         onClickTicket = onClickTicket,
-                        onClickQr = onClickQr,
                         modifier = modifier.padding(innerPadding),
                     )
 
@@ -130,12 +179,33 @@ fun HomeScreen(
                 MyScreen(
                     modifier = modifier.padding(innerPadding),
                     requireLogin = requireLogin,
+                    onClickAccountSetting = onClickAccountSetting,
                     navigateToReservations = navigateToReservations,
+                    navigateToProfile = navigateToProfile,
+                    navigateToShowRegistration = navigateToShowRegistration,
                     onClickQrScan = onClickQrScan,
-                    onClickSignout = onClickSignout,
                 )
             }
         }
+    }
+
+    if (dialog != null) {
+        GiftDialog(
+            status = dialog!!,
+            onDismiss = {
+                dialog = null
+                viewModel.cancelGift()
+            },
+            receiveGift = viewModel::receiveGift,
+            requireLogin = {
+                dialog = null
+                requireLogin()
+            },
+            onFailed = {
+                dialog = GiftStatus.FAILED
+                viewModel.cancelGift()
+            }
+        )
     }
 }
 
@@ -170,7 +240,7 @@ private fun HomeNavigationBar(
     modifier: Modifier = Modifier,
 ) {
     Column {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,
             color = Grey85,

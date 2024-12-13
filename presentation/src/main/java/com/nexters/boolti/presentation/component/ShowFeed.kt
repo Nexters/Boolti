@@ -20,14 +20,17 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.constants.posterRatio
+import com.nexters.boolti.presentation.extension.dDay
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -35,6 +38,7 @@ import com.nexters.boolti.presentation.theme.Grey40
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.point1
+import java.time.Duration
 
 @Composable
 fun ShowFeed(
@@ -65,7 +69,7 @@ fun ShowFeed(
                 contentScale = ContentScale.Crop,
             )
 
-            if (showState is ShowState.WaitingTicketing || showState is ShowState.FinishedShow) {
+            if (showState is ShowState.WaitingTicketing) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,7 +124,7 @@ private fun ShowBadge(
     var dDay: Int? = null
     val (color, containerColor, labelId) = when (showState) {
         is ShowState.WaitingTicketing -> {
-            dDay = showState.dDay
+            dDay = showState.remainingTime.dDay.toInt()
             Triple(
                 MaterialTheme.colorScheme.primary,
                 Grey80,
@@ -148,4 +152,12 @@ private fun ShowBadge(
             .padding(horizontal = 12.dp, vertical = 3.dp),
         style = MaterialTheme.typography.labelMedium.copy(color = color),
     )
+}
+
+@Preview
+@Composable
+private fun ShowBadgePreview() {
+    BooltiTheme {
+        ShowBadge(ShowState.WaitingTicketing(Duration.ofHours(73)))
+    }
 }

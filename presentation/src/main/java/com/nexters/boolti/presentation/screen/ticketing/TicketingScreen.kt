@@ -8,7 +8,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,9 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -64,7 +61,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Currency
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.presentation.BuildConfig
@@ -73,9 +69,10 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.PolicyBottomSheet
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
-import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -94,7 +91,6 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
-import java.time.LocalDateTime
 
 @Composable
 fun TicketingScreen(
@@ -110,8 +106,8 @@ fun TicketingScreen(
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showPaymentFailureDialog by remember { mutableStateOf(false) }
     var showTicketSoldOutDialog by remember { mutableStateOf(false) }
+    var policyPageUrl: String? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    val uriHandler = LocalUriHandler.current
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -119,7 +115,8 @@ fun TicketingScreen(
                 RESULT_SUCCESS -> {
                     val intent = result.data ?: return@rememberLauncherForActivityResult
                     val reservationId =
-                        intent.getStringExtra("reservationId") ?: return@rememberLauncherForActivityResult
+                        intent.getStringExtra("reservationId")
+                            ?: return@rememberLauncherForActivityResult
                     onReserved(reservationId, viewModel.showId)
                 }
 
@@ -144,7 +141,7 @@ fun TicketingScreen(
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
                             customerKey = "user-${it.userId}",
                             orderId = it.orderId,
-                            orderName = "${uiState.showName} ${uiState.ticketName}",
+                            orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
                             currency = Currency.KRW.name,
                             countryCode = "KR",
                             showId = viewModel.showId,
@@ -189,10 +186,13 @@ fun TicketingScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(scrollState),
             ) {
-                Header(
+                ShowItem(
                     poster = uiState.poster,
                     showName = uiState.showName,
                     showDate = uiState.showDate,
+                    showNameStyle = point2,
+                    contentPadding = PaddingValues(20.dp),
+                    backgroundColor = MaterialTheme.colorScheme.background,
                 )
                 // 예매자 정보
                 TicketHolderSection(
@@ -216,11 +216,13 @@ fun TicketingScreen(
                 }
 
                 // 티켓 정보
-                TicketInfoSection(
-                    ticketName = uiState.ticketName,
-                    ticketCount = uiState.ticketCount,
-                    totalPrice = uiState.totalPrice,
-                )
+                Section(title = stringResource(R.string.ticket_info_label)) {
+                    TicketInfoSection(
+                        ticketName = uiState.ticketName,
+                        ticketCount = uiState.ticketCount,
+                        totalPrice = uiState.totalPrice,
+                    )
+                }
 
                 // 초청 코드
                 if (uiState.isInviteTicket) {
@@ -240,12 +242,10 @@ fun TicketingScreen(
                     agreement = uiState.orderAgreement,
                     onClickTotalAgree = viewModel::toggleAgreement,
                     onClickShow = {
-                        val url = when (it) {
-                            0 -> "https://boolti.notion.site/00259d85983c4ba8a987a374e2615396?pvs=4"
-                            1 -> "https://boolti.notion.site/3-354880c7d75e424486b7974e5cc8bcad?pvs=4"
-                            else -> return@OrderAgreementSection
+                        when (it) {
+                            0 -> policyPageUrl = "https://boolti.in/site-policy/privacy"
+                            1 -> policyPageUrl = "https://boolti.in/site-policy/consent"
                         }
-                        uriHandler.openUri(url)
                     },
                 )
 
@@ -324,53 +324,16 @@ fun TicketingScreen(
                 onBackClicked()
             }
         }
-    }
-}
-
-@Composable
-private fun Header(
-    poster: String,
-    showName: String,
-    showDate: LocalDateTime,
-) {
-    Row(
-        modifier = Modifier.padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AsyncImage(
-            model = poster,
-            contentDescription = stringResource(R.string.description_poster),
-            modifier = Modifier
-                .size(width = 70.dp, height = 98.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(4.dp),
-                ),
-            contentScale = ContentScale.Crop,
-        )
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(start = 16.dp)
-        ) {
-            Text(
-                text = showName,
-                style = point2,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-            Text(
-                text = showDate.showDateTimeString,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey30,
-            )
+        policyPageUrl?.let { url ->
+            PolicyBottomSheet(onDismissRequest = {
+                policyPageUrl = null
+            }, url = url)
         }
     }
 }
 
 @Composable
-private fun RefundPolicySection(refundPolicy: List<String>) {
+internal fun RefundPolicySection(refundPolicy: List<String>) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 0F else 180F,
@@ -491,8 +454,15 @@ private fun InviteCodeSection(
 }
 
 @Composable
-private fun TicketInfoSection(ticketName: String, ticketCount: Int, totalPrice: Int) {
-    Section(title = stringResource(R.string.ticket_info_label)) {
+internal fun TicketInfoSection(
+    ticketName: String,
+    ticketCount: Int,
+    totalPrice: Int,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
         SectionTicketInfo(
             stringResource(R.string.ticket_type_label),
             ticketName,
@@ -630,7 +600,7 @@ private fun TicketHolderSection(
 }
 
 @Composable
-private fun OrderAgreementSection(
+internal fun OrderAgreementSection(
     totalAgreed: Boolean,
     agreement: List<Pair<Int, Boolean>>,
     onClickTotalAgree: () -> Unit,
@@ -724,7 +694,7 @@ private fun ShowButton(
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     modifier: Modifier = Modifier,
     title: String,
     titleRowOption: (@Composable () -> Unit)? = null,
@@ -785,7 +755,11 @@ fun InputRow(
             } else {
                 VisualTransformation.None
             },
-            onValueChanged = onValueChanged,
+            onValueChanged = {
+                onValueChanged(
+                    if (isPhoneNumber) it.filterToPhoneNumber() else it,
+                )
+            },
         )
     }
 }

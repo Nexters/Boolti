@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -26,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
-import com.nexters.boolti.presentation.theme.Grey10
 
 @Composable
 fun BtAppBar(
@@ -41,10 +43,7 @@ fun BtAppBar(
             .background(color = colors.containerColor)
             .fillMaxWidth()
             .height(44.dp)
-            .padding(
-                start = if (navigateButtons != null) 0.dp else 4.dp,
-                end = if (actionButtons != null) 0.dp else 4.dp,
-            ),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         navigateButtons?.let {
@@ -63,16 +62,50 @@ fun BtAppBar(
             text = title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = colors.titleColor,
         )
         actionButtons?.let {
             CompositionLocalProvider(
                 LocalContentColor provides colors.actionIconColor,
+                LocalTextStyle provides MaterialTheme.typography.titleLarge.copy(color = colors.actionIconColor),
                 content = { it() },
             )
         }
     }
+}
+
+@Composable
+fun BtAppBar(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
+    navigationButtons: List<Pair<Int, () -> Unit>> = emptyList(),
+    actionButtons: List<Pair<Int, () -> Unit>> = emptyList(),
+) {
+    BtAppBar(
+        modifier = modifier,
+        title = title,
+        colors = colors,
+        navigateButtons = if (navigationButtons.isNotEmpty()) {
+            {
+                navigationButtons.forEach { (res, onClick) ->
+                    BtAppBarDefaults.AppBarIconButton(iconRes = res, onClick = onClick)
+                }
+            }
+        } else {
+            null
+        },
+        actionButtons = if (actionButtons.isNotEmpty()) {
+            {
+                actionButtons.forEach { (res, onClick) ->
+                    BtAppBarDefaults.AppBarIconButton(iconRes = res, onClick = onClick)
+                }
+            }
+        } else {
+            null
+        },
+    )
 }
 
 @Composable
@@ -137,11 +170,34 @@ object BtAppBarDefaults {
     }
 
     @Composable
+    fun AppBarTextButton(
+        label: String,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        color: Color = MaterialTheme.colorScheme.onBackground,
+        enabled: Boolean = true,
+    ) {
+        TextButton(
+            onClick = onClick,
+            modifier = modifier,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = color,
+            ),
+            enabled = enabled,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
+    }
+
+    @Composable
     fun appBarColors(
         containerColor: Color = MaterialTheme.colorScheme.background,
-        navigationIconColor: Color = Grey10,
-        titleColor: Color = Grey10,
-        actionIconColor: Color = Grey10,
+        navigationIconColor: Color = MaterialTheme.colorScheme.onBackground,
+        titleColor: Color = MaterialTheme.colorScheme.onBackground,
+        actionIconColor: Color = MaterialTheme.colorScheme.onBackground,
     ): BtAppBarColors = BtAppBarColors(
         containerColor = containerColor,
         navigationIconColor = navigationIconColor,
@@ -179,7 +235,7 @@ private fun CloseableBtAppBarPreview() {
 
 @Preview
 @Composable
-private fun ShowDetailAppBarPreview() {
+private fun AppBarPreview() {
     BooltiTheme {
         Surface {
             BtAppBar(
@@ -207,6 +263,21 @@ private fun ShowDetailAppBarPreview() {
                         onClick = {},
                     )
                 }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AppBar2Preview() {
+    BooltiTheme {
+        Surface {
+            BtAppBar(
+                navigationButtons = listOf(
+                    R.drawable.ic_arrow_back to { /* clicked */ },
+                    R.drawable.ic_home to { /* clicked */ },
+                ),
             )
         }
     }

@@ -1,11 +1,11 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.SalesTicketRequest
+import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class SalesTicketViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val showId: String = requireNotNull(savedStateHandle["showId"]) {
         "SalesTicketViewModel 에 showId 가 전달되지 않았습니다."
@@ -28,7 +28,7 @@ class SalesTicketViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(recordExceptionHandler) {
             repository.getSalesTickets(SalesTicketRequest(showId))
                 .firstOrNull()?.let { tickets ->
                     _uiState.update { it.copy(tickets = tickets) }

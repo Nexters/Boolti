@@ -1,16 +1,13 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +24,6 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.presentation.constants.posterRatio
 import com.nexters.boolti.presentation.theme.Grey95
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SwipeableImage(
     models: List<String>,
@@ -72,29 +68,11 @@ fun SwipeableImage(
                     )
                 )
         )
-        Indicator(
-            modifier = Modifier.padding(bottom = 14.dp),
-            position = pageState.currentPage,
-            size = models.size
-        )
-    }
-}
-
-@Composable
-private fun Indicator(
-    modifier: Modifier = Modifier,
-    position: Int,
-    size: Int,
-) {
-    Row(modifier = modifier) {
-        (0 until size).forEach { index ->
-            val opacity = if (index == position) 1f else 0.5f
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .size(7.dp)
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .background(Color.White.copy(alpha = opacity))
+        if (models.size > 1) {
+            Indicator(
+                modifier = Modifier.padding(bottom = 14.dp),
+                position = pageState.currentPage,
+                size = models.size
             )
         }
     }

@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
+import com.nexters.boolti.tosspayments.extension.convertQuotes
 import com.nexters.boolti.tosspayments.extension.toCurrency
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.AgreementStatus
@@ -59,7 +60,8 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             override fun onAgreementStatusChanged(agreementStatus: AgreementStatus) {
                 Log.d(TAG, "onAgreementStatusChanged : ${agreementStatus.agreedRequiredTerms}")
                 runOnUiThread {
-                    binding.btnPay.isEnabled = agreementStatus.agreedRequiredTerms && viewModel.loadSuccess
+                    binding.btnPay.isEnabled =
+                        agreementStatus.agreedRequiredTerms && viewModel.loadSuccess
                 }
             }
         }
@@ -134,6 +136,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 val intent = Intent().apply {
                     putExtra("orderId", event.orderId)
                     putExtra("reservationId", event.reservationId)
+                    putExtra("giftId", event.giftId)
                 }
                 setResult(RESULT_SUCCESS, intent)
                 finish()
@@ -230,23 +233,7 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
         const val RESULT_SUCCESS = 200
         const val RESULT_FAIL = 400
         const val RESULT_SOLD_OUT = 401
-        private const val TAG = "PaymentWidgetActivity"
-        private const val EXTRA_KEY_AMOUNT = "extraKeyAmount"
-        private const val EXTRA_KEY_CLIENT_KEY = "extraKeyClientKey"
-        private const val EXTRA_KEY_CUSTOMER_KEY = "extraKeyCustomerKey"
-        private const val EXTRA_KEY_ORDER_ID = "extraKeyOrderId"
-        private const val EXTRA_KEY_ORDER_NAME = "extraKeyOrderName"
-        private const val EXTRA_KEY_CURRENCY = "extraKeyCurrency"
-        private const val EXTRA_KEY_COUNTRY_CODE = "extraKeyCountryCode"
-        private const val EXTRA_KEY_VARIANT_KEY = "extraKeyVariantKey"
-        private const val EXTRA_KEY_REDIRECT_URL = "extraKeyRedirectUrl"
-        private const val EXTRA_KEY_SHOW_ID = "extraKeyShowId"
-        private const val EXTRA_KEY_SALES_TICKET_ID = "extraKeySalesTicketId"
-        private const val EXTRA_KEY_TICKET_COUNT = "extraKeyTicketCount"
-        private const val EXTRA_KEY_RESERVATION_NAME = "extraKeyReservationName"
-        private const val EXTRA_KEY_RESERVATION_PHONE_NUMBER = "extraKeyReservationPhoneNumber"
-        private const val EXTRA_KEY_DEPOSITOR_NAME = "extraKeyDepositorName"
-        private const val EXTRA_KEY_DEPOSITOR_PHONE_NUMBER = "extraKeyDepositorPhoneNumber"
+        const val TAG = "PaymentWidgetActivity"
 
         fun getIntent(
             context: Context,
@@ -267,23 +254,91 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             variantKey: String? = null,
             redirectUrl: String? = null,
         ): Intent {
-            return Intent(context, TossPaymentWidgetActivity::class.java)
-                .putExtra(EXTRA_KEY_AMOUNT, amount)
-                .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
-                .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
-                .putExtra(EXTRA_KEY_ORDER_ID, orderId)
-                .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
-                .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
-                .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
+            return getCommonIntent(
+                context = context,
+                amount = amount,
+                clientKey = clientKey,
+                customerKey = customerKey,
+                orderId = orderId,
+                orderName = orderName,
+                currency = currency,
+                countryCode = countryCode,
+                showId = showId,
+                salesTicketTypeId = salesTicketTypeId,
+                ticketCount = ticketCount,
+            )
+                .putExtra(EXTRA_KEY_ORDER_TYPE, OrderType.TICKETING)
                 .putExtra(EXTRA_KEY_VARIANT_KEY, variantKey)
                 .putExtra(EXTRA_KEY_REDIRECT_URL, redirectUrl)
-                .putExtra(EXTRA_KEY_SHOW_ID, showId)
-                .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
-                .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
                 .putExtra(EXTRA_KEY_RESERVATION_NAME, reservationName)
                 .putExtra(EXTRA_KEY_RESERVATION_PHONE_NUMBER, reservationPhoneNumber)
                 .putExtra(EXTRA_KEY_DEPOSITOR_NAME, depositorName)
                 .putExtra(EXTRA_KEY_DEPOSITOR_PHONE_NUMBER, depositorPhoneNumber)
         }
+
+        fun getGiftIntent(
+            context: Context,
+            amount: Number,
+            clientKey: String,
+            customerKey: String,
+            orderId: String,
+            orderName: String,
+            currency: String,
+            countryCode: String,
+            showId: String,
+            salesTicketTypeId: String,
+            ticketCount: Int,
+            senderName: String,
+            senderContact: String,
+            receiverName: String,
+            receiverContact: String,
+            message: String,
+            imageId: String,
+        ): Intent {
+            return getCommonIntent(
+                context = context,
+                amount = amount,
+                clientKey = clientKey,
+                customerKey = customerKey,
+                orderId = orderId,
+                orderName = orderName,
+                currency = currency,
+                countryCode = countryCode,
+                showId = showId,
+                salesTicketTypeId = salesTicketTypeId,
+                ticketCount = ticketCount,
+            )
+                .putExtra(EXTRA_KEY_ORDER_TYPE, OrderType.GIFT)
+                .putExtra(EXTRA_KEY_SENDER_NAME, senderName)
+                .putExtra(EXTRA_KEY_SENDER_PHONE_NUMBER, senderContact)
+                .putExtra(EXTRA_KEY_RECEIVER_NAME, receiverName)
+                .putExtra(EXTRA_KEY_RECEIVER_PHONE_NUMBER, receiverContact)
+                .putExtra(EXTRA_KEY_MESSAGE, message)
+                .putExtra(EXTRA_KEY_IMAGE_ID, imageId)
+        }
+
+        private fun getCommonIntent(
+            context: Context,
+            amount: Number,
+            clientKey: String,
+            customerKey: String,
+            orderId: String,
+            orderName: String,
+            currency: String,
+            countryCode: String,
+            showId: String,
+            salesTicketTypeId: String,
+            ticketCount: Int,
+        ): Intent = Intent(context, TossPaymentWidgetActivity::class.java)
+            .putExtra(EXTRA_KEY_AMOUNT, amount)
+            .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
+            .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
+            .putExtra(EXTRA_KEY_ORDER_ID, orderId)
+            .putExtra(EXTRA_KEY_ORDER_NAME, orderName.convertQuotes())
+            .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
+            .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
+            .putExtra(EXTRA_KEY_SHOW_ID, showId)
+            .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
+            .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
     }
 }

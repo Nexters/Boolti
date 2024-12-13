@@ -7,6 +7,8 @@ data class ReservationDetail(
     val showImage: String,
     val showName: String,
     val showDate: LocalDateTime,
+    val giftUuid: String? = null,
+    val giftInviteImage: String = "",
     val ticketName: String,
     val isInviteTicket: Boolean,
     val ticketCount: Int,
@@ -18,14 +20,28 @@ data class ReservationDetail(
     val totalAmountPrice: Int,
     val reservationState: ReservationState,
     val completedDateTime: LocalDateTime?,
-    val ticketHolderName: String,
-    val ticketHolderPhoneNumber: String,
+    val visitorName: String,
+    val visitorPhoneNumber: String,
     val depositorName: String,
     val depositorPhoneNumber: String,
     val csReservationId: String,
     val cardDetail: CardDetail?,
     val provider: String = "",
 ) {
+    val isGift = giftUuid != null
+
+    val isRefundable: Boolean
+        get() {
+            return if (isGift) {
+                reservationState == ReservationState.REGISTERING_GIFT &&
+                        salesEndDateTime >= LocalDateTime.now()
+            } else {
+                reservationState == ReservationState.RESERVED &&
+                        !isInviteTicket &&
+                        salesEndDateTime >= LocalDateTime.now()
+            }
+        }
+
     /**
      * @param installmentPlanMonths 할부 개월 수. 0 이면 일시불
      * @param issuerCode 카드 발급사 [숫자 코드](https://docs.tosspayments.com/reference/codes#%EC%B9%B4%EB%93%9C%EC%82%AC-%EC%BD%94%EB%93%9C)

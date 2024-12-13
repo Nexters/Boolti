@@ -1,7 +1,9 @@
 package com.nexters.boolti.domain.repository
 
 import com.nexters.boolti.domain.model.LoginUserState
+import com.nexters.boolti.domain.model.TokenPair
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import com.nexters.boolti.domain.request.SignoutRequest
@@ -20,9 +22,13 @@ interface AuthRepository {
     suspend fun logout(): Result<Unit>
     suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit>
     suspend fun signout(request: SignoutRequest): Result<Unit>
-    fun getUserAndCache(): Flow<User>
+    fun getUserAndCache(): Flow<User.My?>
     suspend fun sendFcmToken(): Result<Unit>
 
     val loggedIn: Flow<Boolean>
-    val cachedUser: Flow<User?>
+    val cachedUser: Flow<User.My?>
+
+    suspend fun editProfile(editProfileRequest: EditProfileRequest): Result<Unit>
+
+    fun getTokens(): Flow<TokenPair>
 }

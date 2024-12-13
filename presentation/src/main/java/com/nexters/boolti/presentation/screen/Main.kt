@@ -19,30 +19,40 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.reservationdetail.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.MainDestination.Home
 import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
+import com.nexters.boolti.presentation.screen.accountsetting.AccountSettingScreen
 import com.nexters.boolti.presentation.screen.business.BusinessScreen
+import com.nexters.boolti.presentation.screen.gift.addGiftScreen
+import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.HomeScreen
+import com.nexters.boolti.presentation.screen.link.LinkListScreen
 import com.nexters.boolti.presentation.screen.login.LoginScreen
 import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
+import com.nexters.boolti.presentation.screen.perforemdshows.PerformedShowsScreen
+import com.nexters.boolti.presentation.screen.profile.ProfileScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.sns.ProfileSnsEditScreen
 import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.QrFullScreen
 import com.nexters.boolti.presentation.screen.refund.RefundScreen
 import com.nexters.boolti.presentation.screen.report.ReportScreen
-import com.nexters.boolti.presentation.screen.reservations.ReservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.ShowImagesScreen
+import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.screen.signout.SignoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
+import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
 
 val LocalSnackbarController = staticCompositionLocalOf {
     SnackbarController(SnackbarHostState())
@@ -82,7 +92,7 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
 
 @Composable
 fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
-    val navController = rememberNavController()
+    val navController = rememberNavControllerWithLog()
 
     NavHost(
         navController = navController,
@@ -109,10 +119,6 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             startDestination = "detail",
             arguments = ShowDetail.arguments,
             deepLinks = listOf(
-//                navDeepLink {
-//                    uriPattern = "https://app.boolti.in/show?showId={$showId}"
-//                    action = Intent.ACTION_VIEW
-//                },
                 navDeepLink {
                     uriPattern = "https://preview.boolti.in/show/{$showId}"
                     action = Intent.ACTION_VIEW
@@ -142,17 +148,42 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             )
         }
 
-        TicketDetailScreen(
-            modifier = modifier,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack
-        )
         TicketingScreen(
             modifier = modifier,
             navigateTo = navController::navigateTo,
             popBackStack = navController::popBackStack,
         )
-        QrFullScreen(modifier = modifier, popBackStack = navController::popBackStack)
+
+        navigation(
+            route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://app.boolti.in/tickets/{ticketId}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
+            startDestination = "detail",
+            arguments = MainDestination.TicketDetail.arguments,
+        ) {
+            TicketDetailScreen(
+                modifier = modifier,
+                navigateTo = navController::navigateTo,
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+            )
+            QrFullScreen(
+                modifier = modifier,
+                popBackStack = navController::popBackStack,
+                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+            )
+        }
+
+        addGiftScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+
         HostedShowScreen(
             modifier = modifier,
             onClickShow = onClickQrScan,
@@ -161,6 +192,7 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
 
         PaymentCompleteScreen(
             navigateTo = navController::navigateTo,
+            navigateByDeepLink = navController::navigate,
             popBackStack = navController::popBackStack,
             popInclusiveBackStack = { route ->
                 navController.popBackStack(
@@ -170,7 +202,103 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
             },
             navigateToHome = navController::navigateToHome,
         )
+        addGiftCompleteScreen(
+            navigateTo = navController::navigateTo,
+            navigateToHome = navController::navigateToHome,
+            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
+        )
         BusinessScreen(popBackStack = navController::popBackStack)
+        AccountSettingScreen(
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        ProfileScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        LinkListScreen(
+            modifier = modifier,
+            popBackStack = navController::popBackStack,
+        )
+        PerformedShowsScreen(
+            modifier = modifier,
+            navigateTo = navController::navigateTo,
+            popBackStack = navController::popBackStack,
+        )
+        navigation(
+            route = "profileEditNavigation",
+            startDestination = MainDestination.ProfileEdit.route,
+        ) {
+            ProfileEditScreen(
+                modifier = modifier,
+                navigateTo = navController::navigate,
+                popBackStack = navController::popBackStack,
+            )
+            ProfileSnsEditScreen(
+                modifier = modifier,
+                onAddSns = { type, username ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("newSnsType", type.name)
+                            set("newSnsUsername", username)
+                        }
+                    navController.popBackStack()
+                },
+                onEditSns = { id, type, username ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("editSnsId", id)
+                            set("editSnsType", type.name)
+                            set("editSnsUsername", username)
+                        }
+                    navController.popBackStack()
+                },
+                onRemoveSns = { id ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("removeSnsId", id)
+                    navController.popBackStack()
+                },
+                popBackStack = navController::popBackStack,
+            )
+            ProfileLinkEditScreen(
+                modifier = modifier,
+                onAddLink = { linkName, url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("newLinkName", linkName)
+                            set("newLinkUrl", url)
+                        }
+                    navController.popBackStack()
+                },
+                onEditLink = { id, linkName, url ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.apply {
+                            set("editLinkId", id)
+                            set("editLinkName", linkName)
+                            set("editLinkUrl", url)
+                        }
+                    navController.popBackStack()
+                },
+                onRemoveLink = { id ->
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("removeLinkId", id)
+                    navController.popBackStack()
+                },
+                popBackStack = navController::popBackStack,
+            )
+        }
+
+        addShowRegistration(
+            modifier = modifier,
+            popBackStack = navController::popBackStack,
+        )
     }
 }
 

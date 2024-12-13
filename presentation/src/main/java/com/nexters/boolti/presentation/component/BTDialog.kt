@@ -1,9 +1,11 @@
 package com.nexters.boolti.presentation.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +29,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey80
 
 @Composable
 fun BTDialog(
@@ -35,6 +39,8 @@ fun BTDialog(
     enableDismiss: Boolean = true,
     showCloseButton: Boolean = true,
     onDismiss: () -> Unit = {},
+    negativeButtonLabel: String = stringResource(R.string.cancel),
+    onClickNegativeButton: (() -> Unit)? = null,
     positiveButtonLabel: String = stringResource(R.string.btn_ok),
     positiveButtonEnabled: Boolean = true,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
@@ -79,12 +85,27 @@ fun BTDialog(
                 }
                 content()
                 Spacer(modifier = Modifier.size(28.dp))
-                MainButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = positiveButtonLabel,
-                    enabled = positiveButtonEnabled,
-                    onClick = onClickPositiveButton,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (onClickNegativeButton != null) {
+                        MainButton(
+                            modifier = Modifier.weight(1f),
+                            label = negativeButtonLabel,
+                            onClick = onClickNegativeButton,
+                            colors = MainButtonDefaults.buttonColors(
+                                containerColor = Grey80,
+                                contentColor = Grey05,
+                            )
+                        )
+                    }
+                    MainButton(
+                        modifier = Modifier.weight(1f),
+                        label = positiveButtonLabel,
+                        enabled = positiveButtonEnabled,
+                        onClick = onClickPositiveButton,
+                    )
+                }
             }
         }
     }
@@ -96,6 +117,20 @@ fun BTDialogPreview() {
     BooltiTheme {
         Surface {
             BTDialog {
+                Text(text = "관리자 코드로 입장 확인")
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BTDialogHavingNegativeButtonPreview() {
+    BooltiTheme {
+        Surface {
+            BTDialog(
+                onClickNegativeButton = {}
+            ) {
                 Text(text = "관리자 코드로 입장 확인")
             }
         }

@@ -34,6 +34,7 @@
         <activity
             android:name=".presentation.screen.MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Boolti">
 
             <intent-filter>
@@ -45,6 +46,9 @@
                 <data android:scheme="https" />
                 <data android:host="app.boolti.in" />
                 <data android:host="preview.boolti.in" />
+                <data
+                    android:host="kakaolink"
+                    android:scheme="kakao${KAKAO_APP_KEY}" />
             </intent-filter>
         </activity>
 
@@ -108,6 +112,19 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+        </service>
+
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
+            android:enabled="false"
+            android:exported="false"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+            </intent-filter>
+            <meta-data
+                android:name="photopicker_activity:0:required"
+                android:value="" />
         </service>
     </application>
 </manifest>

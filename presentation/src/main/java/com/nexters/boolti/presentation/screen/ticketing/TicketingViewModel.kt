@@ -42,7 +42,9 @@ class TicketingViewModel @Inject constructor(
     val showId: String = requireNotNull(savedStateHandle["showId"])
     val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
-    private val userId = getUserUsecase().id
+    private val userId = checkNotNull(getUserUsecase()?.id) {
+        "[TicketingViewModel] 사용자 정보가 없습니다."
+    }
 
     private val _uiState = MutableStateFlow(TicketingState())
     val uiState = _uiState.asStateFlow()
@@ -68,7 +70,7 @@ class TicketingViewModel @Inject constructor(
     }
 
     private suspend fun progressPayment() {
-        getOrderId()
+        requestOrderId()
             .onStart { _uiState.update { it.copy(loading = true) } }
             .onEach { orderId ->
                 Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
@@ -204,8 +206,8 @@ class TicketingViewModel @Inject constructor(
         _uiState.update { it.toggleAgreement() }
     }
 
-    private fun getOrderId(): Flow<String> {
-        return repository.getOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
+    private fun requestOrderId(): Flow<String> {
+        return repository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
     }
 
     private fun event(event: TicketingEvent) {

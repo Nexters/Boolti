@@ -34,12 +34,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BridgeData
-import com.nexters.boolti.presentation.component.BridgeRequest
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
-import com.nexters.boolti.presentation.component.Command
+import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
+import com.nexters.boolti.presentation.util.bridge.BridgeManager
+import com.nexters.boolti.presentation.util.bridge.TokenDto
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -68,6 +68,16 @@ fun ShowRegistrationScreen(
     var webviewProgress by remember { mutableIntStateOf(0) }
     val loading by remember { derivedStateOf { webviewProgress < 100 } }
 
+    LaunchedEffect(webView != null) {
+        webView?.setBridgeManager(
+            BridgeManager(
+                object : BridgeCallbackHandler {
+                    override fun fetchToken(): TokenDto = TokenDto("test")
+                }
+            )
+        )
+    }
+
     LaunchedEffect(Unit) {
         CookieManager.getInstance().removeAllCookies(null)
         WebStorage.getInstance().deleteAllData()
@@ -81,14 +91,6 @@ fun ShowRegistrationScreen(
                     setCookie(url, "x-refresh-token=${tokens.refreshToken}")
                     flush()
                 }
-                /*launch {
-                    webView?.evaluate(
-                        BridgeRequest(
-                            command = Command.REQUEST_TOKEN.name,
-                            data = tokens.accessToken,
-                        )
-                    )
-                }*/
             }
     }
 
@@ -122,27 +124,7 @@ fun ShowRegistrationScreen(
                         Timber.d("내가 만든 쿠키 : ${CookieManager.getInstance().getCookie(url)}")
 
                         scope.launch {
-                            launch {
-                                progress.collect { webviewProgress = it }
-                            }
-                            launch {
-                                bridgeEvent.collect { data ->
-                                    Timber.tag("bridge").d("bridgeEvent 수집(ShowRegistrationScreen) - $data")
-                                    when (data) {
-                                        is BridgeData.RequestToken -> {
-                                            evaluate(
-                                                BridgeRequest(
-                                                    id = data.uuid,
-                                                    command = Command.Send.REQUEST_TOKEN,
-                                                    data = "hello",
-                                                )
-                                            )
-                                        }
-
-                                        else -> Unit
-                                    }
-                                }
-                            }
+                            progress.collect { webviewProgress = it }
                         }
                     }.also { webView = it }
                 },

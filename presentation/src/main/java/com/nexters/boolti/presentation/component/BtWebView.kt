@@ -10,17 +10,13 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.nexters.boolti.presentation.util.bridge.BridgeDto
+import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 import timber.log.Timber
-import java.util.UUID
 
 class BtWebView @JvmOverloads constructor(
     context: Context,
@@ -32,24 +28,12 @@ class BtWebView @JvmOverloads constructor(
     private val _progress = MutableStateFlow(0)
     val progress = _progress.asStateFlow()
 
-    private val _bridgeEvent = MutableSharedFlow<BridgeData>(
-        extraBufferCapacity = 5,
-    )
-    val bridgeEvent = _bridgeEvent.asSharedFlow()
-
-    private val json = Json {
-        isLenient = true
-        prettyPrint = true
-        ignoreUnknownKeys = true
-    }
-
     init {
         isFocusable = true
         isFocusableInTouchMode = true
 
         setupSettings()
         setupWebViewClient()
-        setupBridge()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -66,33 +50,6 @@ class BtWebView @JvmOverloads constructor(
         webViewClient = BtWebViewClient()
     }
 
-    private fun setupBridge() {
-        addJavascriptInterface(
-            NativeBridge { response ->
-                Timber.tag("bridge").d("(WEB -> APP) $response")
-                val data = response.toBridgeData()
-                Timber.tag("bridge").d("(APP) 변환 후 데이터: $data")
-                _bridgeEvent.tryEmit(data)
-            },
-            "boolti",
-        )
-    }
-
-    /**
-     * 앱 -> 웹 데이터를 보내기 위한 함수
-     *
-     * @param data 웹에 보낼 정보
-     * @param result
-     */
-    fun evaluate(data: BridgeRequest, result: (String) -> Unit = {}) {
-        val dataAsString = json.encodeToString(data)
-        Timber.tag("bridge").d("(APP -> WEB) $dataAsString")
-        evaluateJavascript("javascript:__boolti__webview__bridge__.postMessage($dataAsString)") {
-            Timber.tag("bridge").d("(APP -> WEB -> APP) 콜백: $it")
-            result(it)
-        }
-    }
-
     fun setWebChromeClient(
         launchActivity: () -> Unit,
         setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
@@ -100,10 +57,40 @@ class BtWebView @JvmOverloads constructor(
         webChromeClient = BtWebChromeClient(
             launchActivity = launchActivity,
             setFilePathCallback = setFilePathCallback,
-            onProgressChanged = {
-                _progress.value = it
-            },
+            onProgressChanged = { _progress.value = it },
         )
+    }
+
+    suspend fun setBridgeManager(bridgeManager: BridgeManager) {
+        addJavascriptInterface(
+            object {
+                @JavascriptInterface
+                fun postMessage(message: String) {
+                    Timber.tag("webview_bridge").d("(WEB -> APP) $message 수신")
+                    try {
+                        // JSON 메시지 파싱
+                        val dto = Json.decodeFromString(BridgeDto.serializer(), message)
+                        bridgeManager.handleIncomingData(dto)
+                    } catch (e: SerializationException) {
+                        Timber.tag("webview_bridge")
+                            .e(e, "(WEB -> APP) 유효하지 않은 JSON 포맷: $message")
+                    } catch (e: IllegalArgumentException) {
+                        Timber.tag("webview_bridge")
+                            .e(e, "(WEB -> APP) BridgeDto 타입으로 파싱 실패: $message")
+                    } catch (e: Exception) {
+                        Timber.tag("webview_bridge")
+                            .e(e, "(WEB -> APP) 알 수 없는 에러")
+                        e.printStackTrace() // 에러 처리
+                    }
+                }
+            },
+            bridgeManager.bridgeName,
+        )
+        bridgeManager.dataToSendWeb.collect {
+            evaluateJavascript(it) { result ->
+                Timber.tag("webview_bridge").d("(APP -> WEB)\n\t$it\n전송 결과:\n\t$result")
+            }
+        }
     }
 }
 
@@ -138,87 +125,3 @@ class BtWebChromeClient(
         return true
     }
 }
-
-class NativeBridge(private val callback: (BridgeResponse) -> Unit = {}) {
-    @JavascriptInterface
-    fun postMessage(jsonString: String) {
-        runCatching { json.decodeFromString<BridgeResponse>(jsonString) }
-            .onSuccess(callback)
-            .onFailure { it.printStackTrace() } // TODO 에러 처리
-    }
-
-    companion object {
-        private val json = Json {
-            isLenient = true
-            prettyPrint = true
-            ignoreUnknownKeys = true
-        }
-    }
-}
-
-sealed interface Command {
-    @Serializable
-    enum class Receive : Command {
-        NAVIGATE_TO_SHOW_DETAIL,
-        NAVIGATE_BACK,
-        REQUEST_TOKEN,
-        UNKNOWN;
-
-        companion object {
-            fun fromString(value: String): Receive =
-                Receive.entries.find { it.name == value.trim().uppercase() } ?: UNKNOWN
-        }
-    }
-
-    @Serializable
-    enum class Send : Command {
-        REQUEST_TOKEN,
-        UNKNOWN;
-
-        companion object {
-            fun fromString(value: String): Send =
-                Send.entries.find { it.name == value.trim().uppercase() } ?: UNKNOWN
-        }
-    }
-}
-
-sealed interface BridgeData {
-    val uuid: String
-    data class ShowDetail(override val uuid: String, val id: String) : BridgeData
-    data class NavigateBack(override val uuid: String) : BridgeData
-    data class RequestToken(override val uuid: String) : BridgeData
-    data class Unknown(override val uuid: String) : BridgeData
-}
-
-@Serializable
-data class BridgeResponse(
-    val id: String = UUID.randomUUID().toString(),
-    val timestamp: String = System.currentTimeMillis().toString(),
-    val command: String,
-    val data: JsonElement? = null,
-) {
-    fun toBridgeData(): BridgeData = when (Command.Receive.fromString(command)) {
-        Command.Receive.NAVIGATE_TO_SHOW_DETAIL -> {
-            val showId = when (data) {
-                is JsonObject -> requireNotNull(data["showId"]?.toString()) {
-                    Timber.tag("MANGBAAM-BridgeResponse(toBridgeData)").d("showId is undefined")
-                }
-
-                else -> throw IllegalArgumentException("data is not JsonObject")
-            }
-            BridgeData.ShowDetail(id, showId)
-        }
-
-        Command.Receive.NAVIGATE_BACK -> BridgeData.NavigateBack(id)
-        Command.Receive.REQUEST_TOKEN -> BridgeData.RequestToken(id)
-        Command.Receive.UNKNOWN -> BridgeData.Unknown(id)
-    }
-}
-
-@Serializable
-data class BridgeRequest(
-    val command: Command.Send,
-    val data: String? = null,
-    val id: String = UUID.randomUUID().toString(),
-    val timestamp: String = System.currentTimeMillis().toString(),
-)

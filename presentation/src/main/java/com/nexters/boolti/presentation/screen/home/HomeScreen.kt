@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.home
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -76,6 +77,8 @@ fun HomeScreen(
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
     var dialog: GiftStatus? by rememberSaveable { mutableStateOf(null) }
+
+    removeInvalidDeepLink(LocalContext.current)
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -203,6 +206,19 @@ fun HomeScreen(
                 viewModel.cancelGift()
             }
         )
+    }
+}
+
+/**
+ * issue #209를 해결하기 위한 메서드.
+ * 처리하지 말아야 할 deep link가 부적절한 destination과 match되는 것을 방지하기 위함.
+ */
+private fun removeInvalidDeepLink(context: Context) {
+    runCatching {
+        val intent = context.requireActivity().intent
+        if (intent.action == null) return
+        val deepLink = intent.action!!
+        if (!deepLink.contains("home")) intent.setAction(null)
     }
 }
 

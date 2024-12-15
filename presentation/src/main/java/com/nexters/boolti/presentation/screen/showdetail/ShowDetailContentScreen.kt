@@ -29,7 +29,7 @@ fun ShowDetailContentScreen(
     val uriHandler = LocalUriHandler.current
     val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val notice = uiState.showDetail.notice
+    val notice = uiState.showDetail?.notice ?: return
     val urlParser = UrlParser(notice)
 
     Scaffold(

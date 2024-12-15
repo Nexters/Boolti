@@ -27,7 +27,7 @@ class ShowDetailViewModel @Inject constructor(
     private val showRepository: ShowRepository,
     authRepository: AuthRepository,
 ) : ViewModel() {
-    private val showId: String = checkNotNull(savedStateHandle["showId"])
+    val showId: String = checkNotNull(savedStateHandle["showId"])
 
     private val _uiState = MutableStateFlow(ShowDetailUiState())
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()
@@ -52,9 +52,10 @@ class ShowDetailViewModel @Inject constructor(
         viewModelScope.launch {
             showRepository.searchById(id = showId)
                 .onSuccess { newShowDetail ->
-                    _uiState.update { it.copy(showDetail = newShowDetail) }
+                    _uiState.update { it.copy(showDetail = newShowDetail, isLoading = false) }
                 }
                 .onFailure {
+                    _uiState.update { it.copy(isLoading = false) }
                     Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }

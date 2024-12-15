@@ -30,10 +30,11 @@ fun ShowImagesScreen(
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val showDetail = uiState.showDetail ?: return
 
     val pageState = rememberPagerState(
         initialPage = index, initialPageOffsetFraction = 0f
-    ) { uiState.showDetail.images.size }
+    ) { showDetail.images.size }
 
     Scaffold(
         topBar = { BtCloseableAppBar(onClickClose = onBackPressed) },
@@ -57,7 +58,7 @@ fun ShowImagesScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .zoomable(rememberZoomState()),
-                        model = uiState.showDetail.images[it].originImage,
+                        model = showDetail.images[it].originImage,
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
                     )

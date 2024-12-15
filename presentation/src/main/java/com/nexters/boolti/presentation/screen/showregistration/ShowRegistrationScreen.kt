@@ -71,9 +71,10 @@ fun ShowRegistrationScreen(
     LaunchedEffect(webView != null) {
         webView?.setBridgeManager(
             BridgeManager(
-                object : BridgeCallbackHandler {
+                callbackHandler = object : BridgeCallbackHandler {
                     override fun fetchToken(): TokenDto = TokenDto("test")
-                }
+                },
+                scope = scope,
             )
         )
     }

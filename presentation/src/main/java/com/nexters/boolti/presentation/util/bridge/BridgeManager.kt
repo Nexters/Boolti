@@ -5,7 +5,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -67,12 +66,11 @@ class BridgeManager(
         originData: BridgeDto,
         responseData: JsonElement?
     ) {
-        val responseDto = originData.toBridgeCallbackDto(
-            data = responseData
+        val responseDto = originData.copy(
+            data = responseData,
+            timestamp = System.currentTimeMillis(),
         )
         val json = json.encodeToString(responseDto)
-            .replace("\"{\"", "{")
-            .replace("\"}\"", "}")
         sendDataToWeb(json)
     }
 
@@ -86,26 +84,4 @@ class BridgeManager(
         const val DEFAULT_BRIDGE_NAME = "boolti"
         const val DEFAULT_WEB_CALLBACK_NAME = "__boolti__webview__bridge__.postMessage"
     }
-}
-
-@Serializable
-private data class BridgeCallbackDto(
-    val id: String,
-    val command: CommandType,
-    val timestamp: Long = System.currentTimeMillis(),
-    val data: String?,
-)
-
-private fun BridgeDto.toBridgeCallbackDto(data: JsonElement? = null): BridgeCallbackDto {
-    val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-    }
-    val dataJsonElement = data ?: this.data
-    return BridgeCallbackDto(
-        id = id,
-        command = command,
-        data = json.encodeToString(dataJsonElement),
-        timestamp = timestamp,
-    )
 }

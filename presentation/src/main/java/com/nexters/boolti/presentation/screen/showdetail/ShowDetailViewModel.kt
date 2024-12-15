@@ -27,7 +27,7 @@ class ShowDetailViewModel @Inject constructor(
     private val showRepository: ShowRepository,
     authRepository: AuthRepository,
 ) : ViewModel() {
-    private val showId: String = checkNotNull(savedStateHandle["showId"])
+    val showId: String = checkNotNull(savedStateHandle["showId"])
 
     private val _uiState = MutableStateFlow(ShowDetailUiState())
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()

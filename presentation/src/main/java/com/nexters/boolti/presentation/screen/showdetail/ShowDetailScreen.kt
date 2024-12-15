@@ -157,6 +157,7 @@ fun ShowDetailScreen(
 
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         ShowDetailScreen(
+            showId = viewModel.showId,
             uiState = uiState,
             onBack = onBack,
             onClickHome = onClickHome,
@@ -176,6 +177,7 @@ fun ShowDetailScreen(
 
 @Composable
 fun ShowDetailScreen(
+    showId: String,
     uiState: ShowDetailUiState,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
@@ -220,6 +222,7 @@ fun ShowDetailScreen(
                 onBack = onBack,
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
+                showId = showId,
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -352,6 +355,7 @@ private fun ShowDetailAppBar(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
+    showId: String,
 ) {
     val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
@@ -360,7 +364,7 @@ private fun ShowDetailAppBar(
     val dateString = "${showDetail.date.showDateTimeString} -"
     val addressString =
         "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
-    val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
+    val previewUrl = "https://preview.boolti.in/show/${showId}"
     val sharingText = stringResource(
         R.string.show_share_format,
         showDetail.name,
@@ -904,6 +908,7 @@ private fun CountDownBanner(
 private fun ShowDetailScreenPreview() {
     BooltiTheme {
         ShowDetailScreen(
+            showId = "1",
             uiState = ShowDetailUiState(),
             onBack = {},
             onClickHome = {},

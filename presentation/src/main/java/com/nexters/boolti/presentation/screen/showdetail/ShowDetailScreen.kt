@@ -77,6 +77,7 @@ import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
@@ -156,29 +157,42 @@ fun ShowDetailScreen(
     }
 
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-        ShowDetailScreen(
-            showId = viewModel.showId,
-            uiState = uiState,
-            onBack = onBack,
-            onClickHome = onClickHome,
-            onClickContent = onClickContent,
-            navigateToLogin = navigateToLogin,
-            navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-            onTicketSelected = onTicketSelected,
-            onGiftTicketSelected = onGiftTicketSelected,
-            navigateToReport = navigateToReport,
-            navigateToProfile = navigateToProfile,
-            isLoggedIn = isLoggedIn == true,
-            onSelectTab = viewModel::selectTab,
-            modifier = modifier,
-        )
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                BtCircularProgressIndicator()
+            }
+        } else if (uiState.showDetail != null) {
+            ShowDetailScreen(
+                showId = viewModel.showId,
+                showDetail = uiState.showDetail!!,
+                castTeams = uiState.castTeams,
+                selectedTab = uiState.selectedTab,
+                onBack = onBack,
+                onClickHome = onClickHome,
+                onClickContent = onClickContent,
+                navigateToLogin = navigateToLogin,
+                navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                onTicketSelected = onTicketSelected,
+                onGiftTicketSelected = onGiftTicketSelected,
+                navigateToReport = navigateToReport,
+                navigateToProfile = navigateToProfile,
+                isLoggedIn = isLoggedIn == true,
+                onSelectTab = viewModel::selectTab,
+                modifier = modifier,
+            )
+        }
     }
 }
 
 @Composable
 fun ShowDetailScreen(
     showId: String,
-    uiState: ShowDetailUiState,
+    showDetail: ShowDetail,
+    castTeams: List<CastTeams>,
+    selectedTab: Int,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     onClickContent: () -> Unit,
@@ -203,10 +217,10 @@ fun ShowDetailScreen(
 ) {
     val showState by flow {
         while (true) {
-            emit(uiState.showDetail.state)
+            emit(showDetail.state)
             delay(200)
         }
-    }.collectAsStateWithLifecycle(uiState.showDetail.state)
+    }.collectAsStateWithLifecycle(showDetail.state)
 
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
@@ -218,7 +232,7 @@ fun ShowDetailScreen(
         modifier = modifier,
         topBar = {
             ShowDetailAppBar(
-                showDetail = uiState.showDetail,
+                showDetail = showDetail,
                 onBack = onBack,
                 onClickHome = onClickHome,
                 navigateToReport = navigateToReport,
@@ -233,11 +247,11 @@ fun ShowDetailScreen(
                 .padding(innerPadding),
         ) {
             val showCountdownBanner =
-                uiState.showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
+                showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
             val host = stringResource(
                 id = R.string.ticketing_host_format,
-                uiState.showDetail.hostName,
-                uiState.showDetail.hostPhoneNumber,
+                showDetail.hostName,
+                showDetail.hostPhoneNumber,
             )
 
             var buttonsHeight by remember { mutableStateOf(0.dp) }
@@ -260,28 +274,28 @@ fun ShowDetailScreen(
                             .background(color = MaterialTheme.colorScheme.surface)
                             .padding(top = paddingTop),
                         navigateToImages = navigateToImages,
-                        title = uiState.showDetail.name,
-                        images = uiState.showDetail.images.map { it.originImage }
+                        title = showDetail.name,
+                        images = showDetail.images.map { it.originImage }
                     )
                 }
 
                 item {
                     ContentTabRow(
                         modifier = Modifier.padding(top = 20.dp),
-                        selectedTabIndex = uiState.selectedTab,
+                        selectedTabIndex = selectedTab,
                         onSelectTab = onSelectTab,
                     )
                 }
 
-                when (uiState.selectedTab) {
+                when (selectedTab) {
                     0 -> ShowInfoTab(
-                        showDetail = uiState.showDetail,
+                        showDetail = showDetail,
                         host = host,
                         onClickContent = onClickContent,
                     )
 
                     1 -> CastTab(
-                        teams = uiState.castTeams,
+                        teams = castTeams,
                         onClickMember = navigateToProfile,
                     )
                 }
@@ -315,7 +329,7 @@ fun ShowDetailScreen(
 
             if (showCountdownBanner) {
                 CountDownBanner(
-                    deadlineDateTime = uiState.showDetail.salesEndDateTime,
+                    deadlineDateTime = showDetail.salesEndDateTime,
                 )
             }
         }
@@ -326,7 +340,7 @@ fun ShowDetailScreen(
                 onTicketingClicked = { ticket, count ->
                     Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
                     onTicketSelected(
-                        uiState.showDetail.id,
+                        showDetail.id,
                         ticket.id,
                         count,
                         ticket.isInviteTicket,
@@ -335,7 +349,7 @@ fun ShowDetailScreen(
                 },
                 onGiftTicketClicked = { ticket, count ->
                     onGiftTicketSelected(
-                        uiState.showDetail.id,
+                        showDetail.id,
                         ticket.id,
                         count,
                     )
@@ -909,7 +923,9 @@ private fun ShowDetailScreenPreview() {
     BooltiTheme {
         ShowDetailScreen(
             showId = "1",
-            uiState = ShowDetailUiState(),
+            showDetail = ShowDetail(),
+            castTeams = emptyList(),
+            selectedTab = 0,
             onBack = {},
             onClickHome = {},
             onClickContent = {},

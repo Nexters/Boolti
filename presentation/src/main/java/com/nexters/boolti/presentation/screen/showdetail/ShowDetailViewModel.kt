@@ -52,9 +52,10 @@ class ShowDetailViewModel @Inject constructor(
         viewModelScope.launch {
             showRepository.searchById(id = showId)
                 .onSuccess { newShowDetail ->
-                    _uiState.update { it.copy(showDetail = newShowDetail) }
+                    _uiState.update { it.copy(showDetail = newShowDetail, isLoading = false) }
                 }
                 .onFailure {
+                    _uiState.update { it.copy(isLoading = false) }
                     Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }

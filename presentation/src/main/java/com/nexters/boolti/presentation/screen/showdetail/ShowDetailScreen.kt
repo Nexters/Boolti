@@ -157,44 +157,50 @@ fun ShowDetailScreen(
     }
 
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                BtCircularProgressIndicator()
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                ShowDetailAppBar(
+                    showDetail = uiState.showDetail,
+                    onBack = onBack,
+                    onClickHome = onClickHome,
+                    navigateToReport = navigateToReport,
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+        ) { innerPadding ->
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BtCircularProgressIndicator()
+                }
+            } else if (uiState.showDetail != null) {
+                ShowDetailScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    showDetail = uiState.showDetail!!,
+                    castTeams = uiState.castTeams,
+                    selectedTab = uiState.selectedTab,
+                    onClickContent = onClickContent,
+                    navigateToLogin = navigateToLogin,
+                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                    onTicketSelected = onTicketSelected,
+                    onGiftTicketSelected = onGiftTicketSelected,
+                    navigateToProfile = navigateToProfile,
+                    isLoggedIn = isLoggedIn == true,
+                    onSelectTab = viewModel::selectTab,
+                )
             }
-        } else if (uiState.showDetail != null) {
-            ShowDetailScreen(
-                showId = viewModel.showId,
-                showDetail = uiState.showDetail!!,
-                castTeams = uiState.castTeams,
-                selectedTab = uiState.selectedTab,
-                onBack = onBack,
-                onClickHome = onClickHome,
-                onClickContent = onClickContent,
-                navigateToLogin = navigateToLogin,
-                navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-                onTicketSelected = onTicketSelected,
-                onGiftTicketSelected = onGiftTicketSelected,
-                navigateToReport = navigateToReport,
-                navigateToProfile = navigateToProfile,
-                isLoggedIn = isLoggedIn == true,
-                onSelectTab = viewModel::selectTab,
-                modifier = modifier,
-            )
         }
     }
 }
 
 @Composable
 fun ShowDetailScreen(
-    showId: String,
     showDetail: ShowDetail,
     castTeams: List<CastTeams>,
     selectedTab: Int,
-    onBack: () -> Unit,
-    onClickHome: () -> Unit,
     onClickContent: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToImages: (index: Int) -> Unit,
@@ -209,7 +215,6 @@ fun ShowDetailScreen(
         ticketId: String,
         ticketCount: Int,
     ) -> Unit,
-    navigateToReport: () -> Unit,
     navigateToProfile: (userCode: String) -> Unit,
     isLoggedIn: Boolean,
     onSelectTab: (index: Int) -> Unit,
@@ -228,164 +233,137 @@ fun ShowDetailScreen(
     val window = LocalContext.current.requireActivity().window
     window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            ShowDetailAppBar(
-                showDetail = showDetail,
-                onBack = onBack,
-                onClickHome = onClickHome,
-                navigateToReport = navigateToReport,
-                showId = showId,
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        val showCountdownBanner =
+            showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
+        val host = stringResource(
+            id = R.string.ticketing_host_format,
+            showDetail.hostName,
+            showDetail.hostPhoneNumber,
+        )
+
+        var buttonsHeight by remember { mutableStateOf(0.dp) }
+
+        LazyColumn(
+            modifier = Modifier,
         ) {
-            val showCountdownBanner =
-                showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
-            val host = stringResource(
-                id = R.string.ticketing_host_format,
-                showDetail.hostName,
-                showDetail.hostPhoneNumber,
-            )
+            item {
+                val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 
-            var buttonsHeight by remember { mutableStateOf(0.dp) }
-
-            LazyColumn(
-                modifier = Modifier,
-            ) {
-                item {
-                    val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
-
-                    Poster(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    bottomStart = 20.dp,
-                                    bottomEnd = 20.dp
-                                )
+                Poster(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clip(
+                            shape = RoundedCornerShape(
+                                bottomStart = 20.dp,
+                                bottomEnd = 20.dp
                             )
-                            .background(color = MaterialTheme.colorScheme.surface)
-                            .padding(top = paddingTop),
-                        navigateToImages = navigateToImages,
-                        title = showDetail.name,
-                        images = showDetail.images.map { it.originImage }
-                    )
-                }
-
-                item {
-                    ContentTabRow(
-                        modifier = Modifier.padding(top = 20.dp),
-                        selectedTabIndex = selectedTab,
-                        onSelectTab = onSelectTab,
-                    )
-                }
-
-                when (selectedTab) {
-                    0 -> ShowInfoTab(
-                        showDetail = showDetail,
-                        host = host,
-                        onClickContent = onClickContent,
-                    )
-
-                    1 -> CastTab(
-                        teams = castTeams,
-                        onClickMember = navigateToProfile,
-                    )
-                }
-
-                item { Spacer(modifier = Modifier.size(buttonsHeight)) }
-            }
-
-            val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
-                scope.launch {
-                    if (isLoggedIn) {
-                        showBottomSheet = type
-                    } else {
-                        navigateToLogin()
-                    }
-                }
-            }
-
-            AnimatedVisibility(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                visible = !showState.isClosedOrFinished,
-                enter = EnterTransition.None,
-                exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter),
-            ) {
-                ShowDetailButtons(
-                    showState = showState,
-                    onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                    onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
-                    onHeightChanged = { buttonsHeight = it },
+                        )
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .padding(top = paddingTop),
+                    navigateToImages = navigateToImages,
+                    title = showDetail.name,
+                    images = showDetail.images.map { it.originImage }
                 )
             }
 
-            if (showCountdownBanner) {
-                CountDownBanner(
-                    deadlineDateTime = showDetail.salesEndDateTime,
+            item {
+                ContentTabRow(
+                    modifier = Modifier.padding(top = 20.dp),
+                    selectedTabIndex = selectedTab,
+                    onSelectTab = onSelectTab,
                 )
+            }
+
+            when (selectedTab) {
+                0 -> ShowInfoTab(
+                    showDetail = showDetail,
+                    host = host,
+                    onClickContent = onClickContent,
+                )
+
+                1 -> CastTab(
+                    teams = castTeams,
+                    onClickMember = navigateToProfile,
+                )
+            }
+
+            item { Spacer(modifier = Modifier.size(buttonsHeight)) }
+        }
+
+        val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
+            scope.launch {
+                if (isLoggedIn) {
+                    showBottomSheet = type
+                } else {
+                    navigateToLogin()
+                }
             }
         }
 
-        showBottomSheet?.let { type ->
-            ChooseTicketBottomSheet(
-                ticketType = type,
-                onTicketingClicked = { ticket, count ->
-                    Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
-                    onTicketSelected(
-                        showDetail.id,
-                        ticket.id,
-                        count,
-                        ticket.isInviteTicket,
-                    )
-                    showBottomSheet = null
-                },
-                onGiftTicketClicked = { ticket, count ->
-                    onGiftTicketSelected(
-                        showDetail.id,
-                        ticket.id,
-                        count,
-                    )
-                    showBottomSheet = null
-                },
-                onDismissRequest = {
-                    showBottomSheet = null
-                }
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            visible = !showState.isClosedOrFinished,
+            enter = EnterTransition.None,
+            exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter),
+        ) {
+            ShowDetailButtons(
+                showState = showState,
+                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
+                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
+                onHeightChanged = { buttonsHeight = it },
+            )
+        }
+
+        if (showCountdownBanner) {
+            CountDownBanner(
+                deadlineDateTime = showDetail.salesEndDateTime,
             )
         }
     }
+
+    showBottomSheet?.let { type ->
+        ChooseTicketBottomSheet(
+            ticketType = type,
+            onTicketingClicked = { ticket, count ->
+                Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
+                onTicketSelected(
+                    showDetail.id,
+                    ticket.id,
+                    count,
+                    ticket.isInviteTicket,
+                )
+                showBottomSheet = null
+            },
+            onGiftTicketClicked = { ticket, count ->
+                onGiftTicketSelected(
+                    showDetail.id,
+                    ticket.id,
+                    count,
+                )
+                showBottomSheet = null
+            },
+            onDismissRequest = {
+                showBottomSheet = null
+            }
+        )
+    }
+
 }
 
 @Composable
 private fun ShowDetailAppBar(
-    showDetail: ShowDetail,
+    showDetail: ShowDetail?,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
-    showId: String,
 ) {
     val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
-    val dateString = "${showDetail.date.showDateTimeString} -"
-    val addressString =
-        "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
-    val previewUrl = "https://preview.boolti.in/show/${showId}"
-    val sharingText = stringResource(
-        R.string.show_share_format,
-        showDetail.name,
-        dateString,
-        addressString,
-        previewUrl
-    )
 
     BtAppBar(
         colors = BtAppBarDefaults.appBarColors(
@@ -404,25 +382,39 @@ private fun ShowDetailAppBar(
             )
         },
         actionButtons = {
-            BtAppBarDefaults.AppBarIconButton(
-                iconRes = R.drawable.ic_share,
-                description = stringResource(id = R.string.ticketing_share),
-                onClick = {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, sharingText)
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
+            if (showDetail != null) {
+                val dateString = "${showDetail.date.showDateTimeString} -"
+                val addressString =
+                    "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
+                val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
+                val sharingText = stringResource(
+                    R.string.show_share_format,
+                    showDetail.name,
+                    dateString,
+                    addressString,
+                    previewUrl
+                )
 
-                    context.startActivity(shareIntent)
-                },
-            )
-            BtAppBarDefaults.AppBarIconButton(
-                iconRes = R.drawable.ic_verticle_more,
-                description = stringResource(id = R.string.description_more_menu),
-                onClick = { isContextMenuVisible = true },
-            )
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_share,
+                    description = stringResource(id = R.string.ticketing_share),
+                    onClick = {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, sharingText)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+
+                        context.startActivity(shareIntent)
+                    },
+                )
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_verticle_more,
+                    description = stringResource(id = R.string.description_more_menu),
+                    onClick = { isContextMenuVisible = true },
+                )
+            }
         },
     )
 
@@ -922,18 +914,14 @@ private fun CountDownBanner(
 private fun ShowDetailScreenPreview() {
     BooltiTheme {
         ShowDetailScreen(
-            showId = "1",
             showDetail = ShowDetail(),
             castTeams = emptyList(),
             selectedTab = 0,
-            onBack = {},
-            onClickHome = {},
             onClickContent = {},
             navigateToLogin = {},
             navigateToImages = {},
             onTicketSelected = { _, _, _, _ -> },
             onGiftTicketSelected = { _, _, _ -> },
-            navigateToReport = {},
             navigateToProfile = {},
             isLoggedIn = true,
             onSelectTab = {},

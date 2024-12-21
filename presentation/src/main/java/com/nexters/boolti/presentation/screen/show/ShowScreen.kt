@@ -27,7 +27,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -113,75 +112,71 @@ fun ShowScreen(
         }
     }
 
-    Scaffold(
+    Box(
         modifier = modifier.nestedScroll(nestedScrollConnection),
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding),
-            contentAlignment = Alignment.TopCenter,
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        LazyVerticalGrid(
+            modifier = Modifier
+                .padding(horizontal = marginHorizontal),
+            state = lazyGridState,
+            columns = GridCells.Adaptive(minSize = 150.dp),
+            horizontalArrangement = Arrangement.spacedBy(15.dp),
+            verticalArrangement = Arrangement.spacedBy(28.dp),
+            contentPadding = PaddingValues(top = 12.dp + appbarHeight),
         ) {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .padding(horizontal = marginHorizontal),
-                state = lazyGridState,
-                columns = GridCells.Adaptive(minSize = 150.dp),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-                verticalArrangement = Arrangement.spacedBy(28.dp),
-                contentPadding = PaddingValues(top = 12.dp + appbarHeight),
-            ) {
-                items(
-                    count = uiState.shows.size.coerceAtMost(4),
-                    key = { index -> uiState.shows[index].id }) { index ->
-                    ShowFeed(
-                        show = uiState.shows[index],
-                        modifier = Modifier
-                            .clickable { onClickShowItem(uiState.shows[index].id) },
-                    )
-                }
-
-                // 4개의 공연 뒤 보이는 배너
-                if (uiState.shows.isNotEmpty()) item(
-                    span = { GridItemSpan(2) },
-                ) {
-                    Banner(
-                        modifier = Modifier.fillMaxWidth(),
-                        navigateToShowRegistration = navigateToShowRegistration,
-                    )
-                }
-
-                // 나머지 공연 목록
-                items(
-                    count = (uiState.shows.size - 4).coerceAtLeast(0),
-                    key = { index -> uiState.shows[index + 4].id }) { index ->
-                    ShowFeed(
-                        show = uiState.shows[index + 4],
-                        modifier = Modifier
-                            .clickable { onClickShowItem(uiState.shows[index + 4].id) },
-                    )
-                }
-
-                item(
-                    span = { GridItemSpan(2) },
-                ) {
-                    BusinessInformation(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        onClick = navigateToBusiness
-                    )
-                }
+            items(
+                count = uiState.shows.size.coerceAtMost(4),
+                key = { index -> uiState.shows[index].id }) { index ->
+                ShowFeed(
+                    show = uiState.shows[index],
+                    modifier = Modifier
+                        .clickable { onClickShowItem(uiState.shows[index].id) },
+                )
             }
-            ShowAppBar(
-                modifier = Modifier.offset {
-                    IntOffset(
-                        x = 0,
-                        y = appbarOffsetHeightPx.coerceAtLeast(-changeableAppBarHeightPx).toInt(),
-                    )
-                },
-                nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
-                text = uiState.keyword,
-                onKeywordChanged = viewModel::updateKeyword,
-                search = viewModel::search,
-            )
+
+            // 4개의 공연 뒤 보이는 배너
+            if (uiState.shows.isNotEmpty()) item(
+                span = { GridItemSpan(2) },
+            ) {
+                Banner(
+                    modifier = Modifier.fillMaxWidth(),
+                    navigateToShowRegistration = navigateToShowRegistration,
+                )
+            }
+
+            // 나머지 공연 목록
+            items(
+                count = (uiState.shows.size - 4).coerceAtLeast(0),
+                key = { index -> uiState.shows[index + 4].id }) { index ->
+                ShowFeed(
+                    show = uiState.shows[index + 4],
+                    modifier = Modifier
+                        .clickable { onClickShowItem(uiState.shows[index + 4].id) },
+                )
+            }
+
+            item(
+                span = { GridItemSpan(2) },
+            ) {
+                BusinessInformation(
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    onClick = navigateToBusiness
+                )
+            }
         }
+        ShowAppBar(
+            modifier = Modifier.offset {
+                IntOffset(
+                    x = 0,
+                    y = appbarOffsetHeightPx.coerceAtLeast(-changeableAppBarHeightPx).toInt(),
+                )
+            },
+            nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
+            text = uiState.keyword,
+            onKeywordChanged = viewModel::updateKeyword,
+            search = viewModel::search,
+        )
     }
 }
 

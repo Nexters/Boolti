@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -58,6 +59,7 @@ val LocalSnackbarController = staticCompositionLocalOf {
     SnackbarController(SnackbarHostState())
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
@@ -73,7 +75,7 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
                         hostState = snackbarHostState,
                     )
                 },
-            ) { innerPadding ->
+            ) {
                 CompositionLocalProvider(
                     LocalSnackbarController provides SnackbarController(
                         snackbarHostState,
@@ -81,7 +83,7 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
                     )
                 ) {
                     MainNavigation(
-                        modifier = modifier.padding(innerPadding),
+                        modifier = modifier,
                         onClickQrScan = onClickQrScan,
                     )
                 }

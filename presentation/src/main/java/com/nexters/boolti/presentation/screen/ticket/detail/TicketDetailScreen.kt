@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -197,6 +198,7 @@ private fun TicketDetailScreen(
     }
 
     Scaffold(
+        modifier = modifier.statusBarsPadding(),
         topBar = {
             BtBackAppBar(
                 title = stringResource(R.string.ticket_detail_title),
@@ -216,7 +218,7 @@ private fun TicketDetailScreen(
                 .padding(top = 16.dp)
         ) {
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(innerPadding)
                     .padding(horizontal = 29.dp)
                     .verticalScroll(scrollState),

@@ -8,7 +8,12 @@ import kotlinx.serialization.Serializable
  * 새로운 액션이 정의되는 경우 [BridgeManager.handleIncomingData] 도 함께 수정되어야 한다.
  */
 interface BridgeCallbackHandler {
-    fun fetchToken(): TokenDto
+    suspend fun fetchToken(): TokenDto
+    fun navigateTo(route: String, navigateOption: NavigateOption = NavigateOption.PUSH)
+}
+
+enum class NavigateOption {
+    PUSH, HOME, CLOSE_AND_OPEN,
 }
 
 @Serializable

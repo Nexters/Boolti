@@ -8,6 +8,8 @@ import com.nexters.boolti.presentation.screen.MainDestination
 fun NavGraphBuilder.addShowRegistration(
     modifier: Modifier = Modifier,
     popBackStack: () -> Unit,
+    navigateTo: (route: String) -> Unit,
+    navigateToHome: () -> Unit,
 ) {
     composable(
         route = MainDestination.ShowRegistration.route,
@@ -15,6 +17,8 @@ fun NavGraphBuilder.addShowRegistration(
         ShowRegistrationScreen(
             modifier = modifier,
             onClickBack = popBackStack,
+            navigateTo = navigateTo,
+            navigateToHome = navigateToHome,
         )
     }
 }

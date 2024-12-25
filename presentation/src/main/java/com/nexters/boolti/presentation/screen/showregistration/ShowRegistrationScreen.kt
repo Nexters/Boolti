@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
-import android.webkit.WebStorage
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,9 +38,8 @@ import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
 import com.nexters.boolti.presentation.util.bridge.BridgeManager
+import com.nexters.boolti.presentation.util.bridge.NavigateOption
 import com.nexters.boolti.presentation.util.bridge.TokenDto
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -50,6 +48,8 @@ import timber.log.Timber
 fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
+    navigateTo: (route: String) -> Unit,
+    navigateToHome: () -> Unit,
     viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
     var filePathCallback: ValueCallback<Array<Uri>>? by remember { mutableStateOf(null) }
@@ -72,27 +72,25 @@ fun ShowRegistrationScreen(
         webView?.setBridgeManager(
             BridgeManager(
                 callbackHandler = object : BridgeCallbackHandler {
-                    override fun fetchToken(): TokenDto = TokenDto("test")
+                    override suspend fun fetchToken(): TokenDto {
+                        val accessToken = viewModel.refreshAndGetToken()
+                        return TokenDto(token = accessToken.token)
+                    }
+
+                    override fun navigateTo(route: String, navigateOption: NavigateOption) {
+                        when (navigateOption) {
+                            NavigateOption.PUSH -> navigateTo(route)
+                            NavigateOption.HOME -> navigateToHome()
+                            NavigateOption.CLOSE_AND_OPEN -> {
+                                onClickBack()
+                                navigateTo(route)
+                            }
+                        }
+                    }
                 },
                 scope = scope,
             )
         )
-    }
-
-    LaunchedEffect(Unit) {
-        CookieManager.getInstance().removeAllCookies(null)
-        WebStorage.getInstance().deleteAllData()
-
-        viewModel.tokens
-            .filterNotNull()
-            .filter { it.isLoggedIn }
-            .collect { tokens ->
-                with(CookieManager.getInstance()) {
-                    setCookie(url, "x-access-token=${tokens.accessToken}")
-                    setCookie(url, "x-refresh-token=${tokens.refreshToken}")
-                    flush()
-                }
-            }
     }
 
     BackHandler {

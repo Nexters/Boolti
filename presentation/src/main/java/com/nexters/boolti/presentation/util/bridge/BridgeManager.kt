@@ -1,14 +1,19 @@
 package com.nexters.boolti.presentation.util.bridge
 
+import com.nexters.boolti.presentation.screen.MainDestination
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
+import timber.log.Timber
 
 class BridgeManager(
     private val callbackHandler: BridgeCallbackHandler,
@@ -33,8 +38,25 @@ class BridgeManager(
 
         when (data.command) {
             CommandType.REQUEST_TOKEN -> {
-                val token = callbackHandler.fetchToken()
-                callbackToWeb(data, json.encodeToJsonElement(token))
+                scope.launch {
+                    val token = callbackHandler.fetchToken()
+                    callbackToWeb(data, json.encodeToJsonElement(token))
+                }
+            }
+
+            CommandType.NAVIGATE_TO_SHOW_DETAIL -> {
+                data.data?.jsonObject?.get("showId")?.toString()?.let { showId ->
+                    scope.launch {
+                        withContext(Dispatchers.Main) {
+                            Timber.tag("bridge").d("공연 상세 화면으로 이동 $showId")
+                            callbackHandler.navigateTo(
+                                route = MainDestination.ShowDetail.createRoute(showId),
+                                navigateOption = NavigateOption.CLOSE_AND_OPEN,
+                            )
+                        }
+                    }
+                } ?: Timber.tag("bridge").d("공연 상세 화면으로 이동 실패: showId 없음")
+                callbackToWeb(data, null)
             }
 
             else -> callbackToWeb(data, null)

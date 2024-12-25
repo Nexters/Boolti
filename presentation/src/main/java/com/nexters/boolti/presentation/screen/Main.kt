@@ -298,6 +298,8 @@ fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName:
         addShowRegistration(
             modifier = modifier,
             popBackStack = navController::popBackStack,
+            navigateTo = navController::navigateTo,
+            navigateToHome = navController::navigateToHome,
         )
     }
 }

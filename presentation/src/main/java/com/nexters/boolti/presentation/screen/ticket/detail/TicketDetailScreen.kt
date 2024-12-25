@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -79,6 +78,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -192,13 +192,21 @@ private fun TicketDetailScreen(
         }
     }
 
+    LaunchedEffect(pullToRefreshState.isRefreshing) {
+        if (pullToRefreshState.isRefreshing) {
+            viewModel.refresh().invokeOnCompletion {
+                pullToRefreshState.endRefresh()
+            }
+        }
+    }
+
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }
             .collect(viewModel::syncCurrentPage)
     }
 
     Scaffold(
-        modifier = modifier.statusBarsPadding(),
+        modifier = modifier,
         topBar = {
             BtBackAppBar(
                 title = stringResource(R.string.ticket_detail_title),
@@ -206,20 +214,19 @@ private fun TicketDetailScreen(
             )
         },
     ) { innerPadding ->
-        if (pullToRefreshState.isRefreshing) {
-            viewModel.refresh().invokeOnCompletion {
-                pullToRefreshState.endRefresh()
-            }
-        }
-
         Box(
             modifier = Modifier
+                .padding(innerPadding)
                 .nestedScroll(pullToRefreshState.nestedScrollConnection)
-                .padding(top = 16.dp)
         ) {
+            PullToRefreshContainer(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .zIndex(1f),
+                state = pullToRefreshState,
+            )
             Column(
                 modifier = Modifier
-                    .padding(innerPadding)
                     .padding(horizontal = 29.dp)
                     .verticalScroll(scrollState),
             ) {
@@ -236,6 +243,7 @@ private fun TicketDetailScreen(
                             contentWidth = coordinates.size.width.toFloat()
                             ticketSectionHeight = coordinates.size.height.toFloat()
                         }
+                        .padding(top = 16.dp)
                         .clip(ticketShape)
                         .border(
                             width = 1.dp,
@@ -386,10 +394,6 @@ private fun TicketDetailScreen(
                     )
                 }
             }
-            PullToRefreshContainer(
-                modifier = Modifier.align(Alignment.TopCenter),
-                state = pullToRefreshState,
-            )
         }
     }
 
@@ -486,6 +490,7 @@ private fun QrCodes(
                 .clip(RoundedCornerShape(8.dp))
                 .background(White),
             state = pagerState,
+            userScrollEnabled = pagerState.pageCount > 1,
             pageSpacing = 8.dp,
         ) { i ->
             val ticket = ticketGroup.tickets[i]

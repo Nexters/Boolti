@@ -57,7 +57,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -81,7 +80,6 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
-import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -144,9 +142,6 @@ fun ShowDetailScreen(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
-    val window = LocalContext.current.requireActivity().window
-    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
-
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -176,7 +171,6 @@ fun ShowDetailScreen(
                 navigateToReport = navigateToReport,
             )
         },
-        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -193,9 +187,7 @@ fun ShowDetailScreen(
 
             var buttonsHeight by remember { mutableStateOf(0.dp) }
 
-            LazyColumn(
-                modifier = Modifier,
-            ) {
+            LazyColumn {
                 item {
                     val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 

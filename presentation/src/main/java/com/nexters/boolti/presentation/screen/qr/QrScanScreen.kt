@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -76,9 +75,20 @@ fun QrScanScreen(
                 val (iconId, errMessage) = when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.ShowNotToday -> Pair(R.drawable.ic_warning, notTodayErrMessage)
-                            QrErrorType.UsedTicket -> Pair(R.drawable.ic_error, usedTicketErrMessage)
-                            QrErrorType.TicketNotFound -> Pair(R.drawable.ic_error, notMatchedErrMessage)
+                            QrErrorType.ShowNotToday -> Pair(
+                                R.drawable.ic_warning,
+                                notTodayErrMessage
+                            )
+
+                            QrErrorType.UsedTicket -> Pair(
+                                R.drawable.ic_error,
+                                usedTicketErrMessage
+                            )
+
+                            QrErrorType.TicketNotFound -> Pair(
+                                R.drawable.ic_error,
+                                notMatchedErrMessage
+                            )
                         }
                     }
 
@@ -91,7 +101,6 @@ fun QrScanScreen(
     }
 
     Scaffold(
-        modifier = Modifier.statusBarsPadding(),
         topBar = {
             BtCloseableAppBar(
                 title = uiState.showName,
@@ -174,7 +183,10 @@ private fun EntryCodeDialog(
     onDismiss: () -> Unit,
 ) {
     BTDialog(showCloseButton = false, onDismiss = onDismiss, onClickPositiveButton = onDismiss) {
-        Text(text = stringResource(R.string.manager_code), style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.manager_code),
+            style = MaterialTheme.typography.titleLarge
+        )
         Text(
             modifier = Modifier
                 .padding(top = 24.dp)

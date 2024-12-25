@@ -77,7 +77,7 @@ fun MyScreen(
         onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
-        onClickRegisterShow = navigateToShowRegistration,
+        onClickRegisterShow = if (user != null) navigateToShowRegistration else requireLogin,
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }

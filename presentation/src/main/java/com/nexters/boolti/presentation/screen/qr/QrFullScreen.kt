@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.qr
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -69,7 +69,6 @@ fun NavGraphBuilder.QrFullScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QrFullScreen(
     modifier: Modifier = Modifier,
@@ -81,12 +80,17 @@ fun QrFullScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { Toolbar(onClose = onClose) },
+        topBar = {
+            Toolbar(
+                modifier = Modifier.statusBarsPadding(),
+                onClose = onClose,
+            )
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(White)
                 .padding(innerPadding),
         ) {
             HorizontalPager(

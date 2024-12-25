@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -58,6 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.ShowFeed
+import com.nexters.boolti.presentation.component.StatusBarCover
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -68,6 +71,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ShowScreen(
     navigateToBusiness: () -> Unit,
@@ -116,6 +120,7 @@ fun ShowScreen(
         modifier = modifier.nestedScroll(nestedScrollConnection),
         contentAlignment = Alignment.TopCenter,
     ) {
+        StatusBarCover()
         LazyVerticalGrid(
             modifier = Modifier
                 .padding(horizontal = marginHorizontal),
@@ -191,6 +196,7 @@ fun ShowAppBar(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = marginHorizontal)
     ) {

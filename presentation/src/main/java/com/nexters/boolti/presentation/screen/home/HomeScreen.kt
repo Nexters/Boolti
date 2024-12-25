@@ -141,7 +141,7 @@ fun HomeScreen(
                 )
             ) {
                 ShowScreen(
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                     onClickShowItem = onClickShowItem,
                     navigateToBusiness = navigateToBusiness,
                     navigateToShowRegistration = {

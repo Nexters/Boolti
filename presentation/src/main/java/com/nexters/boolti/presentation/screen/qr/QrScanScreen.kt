@@ -3,7 +3,7 @@ package com.nexters.boolti.presentation.screen.qr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,10 +38,12 @@ import com.nexters.boolti.presentation.QrScanEvent
 import com.nexters.boolti.presentation.QrScanViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BtCloseableAppBar
+import com.nexters.boolti.presentation.component.BtAppBar
+import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.CircleBgIcon
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.Error
+import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.Warning
@@ -91,9 +93,20 @@ fun QrScanScreen(
 
     Scaffold(
         topBar = {
-            BtCloseableAppBar(
+            BtAppBar(
                 title = uiState.showName,
-                onClickClose = onClickClose,
+                navigateButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        onClick = onClickClose,
+                        iconRes = R.drawable.ic_arrow_back,
+                    )
+                },
+                actionButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        onClick = {},
+                        iconRes = R.drawable.ic_camera_flip,
+                    )
+                }
             )
         },
         bottomBar = {
@@ -136,12 +149,20 @@ fun QrScanScreen(
 
 @Composable
 private fun QrScanBottombar(onClick: () -> Unit) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Text(
+            modifier = Modifier.padding(top = 20.dp),
+            text = stringResource(R.string.entry_code_notice),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = Grey50,
+            ),
+        )
         Row(
             modifier = Modifier
                 .clickable(onClick = onClick)
@@ -154,13 +175,13 @@ private fun QrScanBottombar(onClick: () -> Unit) {
                     .size(20.dp)
                     .padding(end = 4.dp),
                 painter = painterResource(id = R.drawable.ic_book),
-                tint = Grey50,
+                tint = Grey30,
                 contentDescription = stringResource(R.string.show_entry_code),
             )
             Text(
                 text = stringResource(id = R.string.show_entry_code),
                 style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
+                color = Grey30,
             )
         }
     }

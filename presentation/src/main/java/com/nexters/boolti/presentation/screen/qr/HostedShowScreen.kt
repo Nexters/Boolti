@@ -35,7 +35,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey60
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -94,7 +94,7 @@ private fun HostedShowItem(
     onClick: (showId: String, showName: String) -> Unit,
 ) {
     val enable = LocalDate.now().toEpochDay() <= show.date.toLocalDate().toEpochDay()
-    val tint = if (enable) White else Grey60
+    val tint = if (enable) White else Grey50
 
     Row(
         modifier = Modifier
@@ -114,18 +114,6 @@ private fun HostedShowItem(
             tint = tint,
             contentDescription = stringResource(R.string.description_qr_icon),
         )
-    }
-}
-
-@Preview
-@Composable
-fun HostedShowItemPreview() {
-    BooltiTheme {
-        Surface {
-            HostedShowItem(
-                Show("", "hello world", LocalDateTime.now(), LocalDate.now(), LocalDate.now(), "")
-            ) { _, _ -> }
-        }
     }
 }
 
@@ -158,6 +146,37 @@ fun EmptyHostedShow(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.size(28.dp))
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HostedShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            HostedShowItem(
+                Show("", "hello world", LocalDateTime.now(), LocalDate.now(), LocalDate.now(), "")
+            ) { _, _ -> }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun OutDatedHostedShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            HostedShowItem(
+                Show(
+                    "",
+                    "hello world",
+                    LocalDateTime.now().minusDays(1),
+                    LocalDate.now(),
+                    LocalDate.now(),
+                    ""
+                )
+            ) { _, _ -> }
         }
     }
 }

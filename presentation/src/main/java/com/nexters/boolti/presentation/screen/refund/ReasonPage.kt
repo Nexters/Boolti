@@ -1,17 +1,13 @@
 package com.nexters.boolti.presentation.screen.refund
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
@@ -27,17 +23,7 @@ fun ReasonPage(
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Column(
-        modifier = modifier.clickable(
-            interactionSource = interactionSource,
-            indication = null
-        ) {
-            keyboardController?.hide()
-        }
-    ) {
+    Column(modifier = modifier) {
         Text(
             modifier = Modifier
                 .padding(top = 20.dp)
@@ -48,10 +34,11 @@ fun ReasonPage(
         BTTextField(
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(max = 300.dp)
                 .padding(horizontal = marginHorizontal)
-                .height(160.dp)
                 .padding(top = 20.dp),
             text = reason,
+            minHeight = 160.dp,
             onValueChanged = onReasonChanged,
             placeholder = stringResource(id = R.string.refund_reason_hint),
         )
@@ -64,7 +51,7 @@ fun ReasonPage(
                 .padding(bottom = 8.dp),
             onClick = onNextClick,
             enabled = reason.isNotBlank(),
-            label = stringResource(id = R.string.next)
+            label = stringResource(id = R.string.next),
         )
     }
 }

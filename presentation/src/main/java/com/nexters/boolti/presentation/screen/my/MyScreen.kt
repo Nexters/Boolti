@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.my
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,7 +64,6 @@ fun MyScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
 
     val domain = BuildConfig.DOMAIN
-    val registrationUrl = "https://${domain}/show/add"
     val homeUrl = "https://${domain}/home"
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current

@@ -63,7 +63,8 @@ fun MyScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
 
     val domain = BuildConfig.DOMAIN
-    val url = "https://${domain}/show/add"
+    val registrationUrl = "https://${domain}/show/add"
+    val homeUrl = "https://${domain}/home"
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
 
@@ -78,6 +79,10 @@ fun MyScreen(
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
         onClickRegisterShow = if (user != null) navigateToShowRegistration else requireLogin,
+        onClickManageShow = {
+            uriHandler.openUri(homeUrl)
+            Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
+        }, // TODO 추후 인앱 공연 관리 반영 시 처리
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }
@@ -89,7 +94,8 @@ fun MyScreen(
     onClickHeaderButton: () -> Unit = {},
     onClickAccountSetting: () -> Unit = {},
     onClickReservations: () -> Unit = {},
-    onClickRegisterShow: () -> Unit = { },
+    onClickManageShow: () -> Unit = {},
+    onClickRegisterShow: () -> Unit = {},
     onClickQrScan: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
@@ -145,6 +151,11 @@ fun MyScreen(
                         iconRes = R.drawable.ic_plus_ticket,
                         label = stringResource(R.string.my_register_show),
                         onClick = onClickRegisterShow,
+                    )
+                    MyMenu(
+                        iconRes = R.drawable.ic_manage_show,
+                        label = stringResource(R.string.my_manage_show),
+                        onClick = onClickManageShow,
                     )
                     MyMenu(
                         iconRes = R.drawable.ic_qr_simple,

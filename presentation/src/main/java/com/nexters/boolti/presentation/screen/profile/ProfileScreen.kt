@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.profile
 
 import android.content.ActivityNotFoundException
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,8 +12,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -32,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,6 +44,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,6 +68,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -128,13 +135,19 @@ fun ProfileScreen(
     val invalidUrlMsg = stringResource(R.string.invalid_link)
 
     val scrollState = rememberScrollState()
+    val appBarBgColor by animateColorAsState(
+        targetValue = if (scrollState.canScrollBackward) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            Color.Transparent
+        },
+        label = "appBarBgColor",
+    )
 
     var backDialogMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val invalidUserMessage = stringResource(R.string.profile_invalid_user_message)
     val withdrawUserMessage = stringResource(R.string.profile_withdraw_user_message)
     val reportFinishedMessage = stringResource(R.string.report_finished)
-
-    var showContextMenu by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(event) {
         event.collectLatest {
@@ -148,31 +161,29 @@ fun ProfileScreen(
     Scaffold(
         modifier = modifier,
     ) { innerPadding ->
+        ProfileAppBar(
+            onClickBack = onClickBack,
+            isMine = isMine,
+            bgColor = appBarBgColor,
+            navigateToProfileEdit = navigateToProfileEdit,
+            onReportFinished = { snackbarHostState.showMessage(reportFinishedMessage) },
+        )
         Column(
             modifier = modifier
                 .verticalScroll(scrollState)
                 .padding(innerPadding),
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ProfileAppBar(
-                    onClickBack = onClickBack,
-                    isMine = isMine,
-                    navigateToProfileEdit = navigateToProfileEdit,
-                    onReportFinished = { snackbarHostState.showMessage(reportFinishedMessage) },
-                )
-                ProfileHeader(
-                    user = user,
-                    onClickSns = { sns ->
-                        try {
-                            uriHandler.openUri(sns.url.toValidUrlString())
-                        } catch (e: ActivityNotFoundException) {
-                            snackbarHostState.showMessage(invalidUrlMsg)
-                        }
-                    },
-                )
-            }
+            ProfileHeader(
+                modifier = Modifier.fillMaxWidth(),
+                user = user,
+                onClickSns = { sns ->
+                    try {
+                        uriHandler.openUri(sns.url.toValidUrlString())
+                    } catch (e: ActivityNotFoundException) {
+                        snackbarHostState.showMessage(invalidUrlMsg)
+                    }
+                },
+            )
 
             if (user.link.isNotEmpty() || user.performedShow.isNotEmpty()) {
                 Spacer(Modifier.size(8.dp))
@@ -265,6 +276,7 @@ fun ProfileScreen(
 private fun ProfileAppBar(
     onClickBack: () -> Unit,
     isMine: Boolean,
+    bgColor: Color,
     navigateToProfileEdit: () -> Unit,
     onReportFinished: () -> Unit,
 ) {
@@ -273,7 +285,7 @@ private fun ProfileAppBar(
     BtAppBar(
         modifier = Modifier.zIndex(1f),
         title = stringResource(R.string.profile_title),
-        colors = BtAppBarDefaults.appBarColors(containerColor = Color.Transparent),
+        colors = BtAppBarDefaults.appBarColors(containerColor = bgColor),
         navigateButtons = {
             BtAppBarDefaults.AppBarIconButton(
                 iconRes = R.drawable.ic_arrow_back,
@@ -334,37 +346,55 @@ private fun ProfileHeader(
         bottomStart = 20.dp,
         bottomEnd = 20.dp,
     )
+    var contentHeight by remember {
+        mutableStateOf(0.dp)
+    }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val density = LocalDensity.current
+    val profileHeight = contentHeight.coerceAtMost(screenWidth)
+
+    val defaultProfile = painterResource(R.drawable.ic_profile_placeholder)
+
     Box(
-        modifier = modifier.background(MaterialTheme.colorScheme.background),
+        modifier = modifier
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surface),
     ) {
-        val defaultImage = R.drawable.ic_fallback_profile
-        AsyncImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-            model = user.photo,
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = defaultImage),
-            fallback = painterResource(id = defaultImage),
-            contentDescription = stringResource(R.string.description_user_thumbnail),
-        )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(Color(0x33121318), Color(0xFF121318)),
+                .height(profileHeight),
+        ) {
+            AsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                model = user.photo,
+                contentScale = ContentScale.Crop,
+                placeholder = defaultProfile,
+                fallback = defaultProfile,
+                contentDescription = stringResource(R.string.description_user_thumbnail),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            listOf(Color(0x33121318), Color(0xFF121318)),
+                        ),
                     ),
-                )
-        )
+            )
+        }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(marginHorizontal)
-                .padding(top = 232.dp, bottom = 32.dp)
-                .clip(shape),
+                .onSizeChanged {
+                    contentHeight = it.height.toDp(density)
+                }
+                .padding(horizontal = marginHorizontal)
+                .padding(
+                    top = 188.dp,
+                    bottom = 32.dp,
+                ), // TODO StatusBar 까지 확장되면 StatusBar 높이 추가되어야 함
         ) {
             Text(
                 modifier = Modifier.padding(top = 20.dp),
@@ -526,7 +556,7 @@ private fun ProfileScreenPreview() {
         email = "mangbaam@boolti.com",
         photo = null,
         userCode = "oratio",
-        introduction = "안녕하세요",
+        introduction = "안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n",
         sns = listOf(
             Sns("1", Sns.SnsType.INSTAGRAM, "hey__suun"),
             Sns("1", Sns.SnsType.YOUTUBE, "tune_official"),

@@ -33,6 +33,7 @@ import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
+import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
@@ -44,10 +45,10 @@ import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.showDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
+import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
-import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -160,7 +161,6 @@ fun MainNavigation(
             )
             qrFullScreen(
                 navController = navController,
-                popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )
         }
@@ -216,6 +216,8 @@ fun MainNavigation(
                 popBackStack = navController::popBackStack,
             )
         }
+
+        performedShowsScreen(navController = navController)
 
         addShowRegistration(
             modifier = modifier,

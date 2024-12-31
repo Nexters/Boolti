@@ -2,8 +2,6 @@ package com.nexters.boolti.presentation.screen.home
 
 import android.net.Uri
 import android.widget.Toast
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,7 +32,6 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
@@ -148,6 +144,7 @@ fun HomeScreen(
                 navigateToAccountSetting = navigateToAccountSetting,
                 navigateToReservations = navigateToReservations,
                 navigateToProfile = navigateToProfile,
+                navigateToShowRegistration = navigateToShowRegistration,
                 navigateToQrScan = navigateToQrScan,
             )
         }

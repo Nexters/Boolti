@@ -9,6 +9,7 @@ import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 fun NavGraphBuilder.showScreen(
     navigateToShowDetail: (showId: String) -> Unit,
     navigateToBusiness: () -> Unit,
+    navigateToShowRegistration: () -> Unit,
 ) {
     composable<HomeRoute.Show>(
         deepLinks = listOf(
@@ -21,6 +22,7 @@ fun NavGraphBuilder.showScreen(
         ShowScreen(
             onClickShowItem = navigateToShowDetail,
             navigateToBusiness = navigateToBusiness,
+            navigateToShowRegistration = navigateToShowRegistration,
         )
     }
 }

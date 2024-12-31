@@ -9,6 +9,7 @@ fun NavGraphBuilder.myScreen(
     navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
+    navigateToShowRegistration: () -> Unit,
     navigateToQrScan: () -> Unit,
 ) {
     composable<HomeRoute.My> {
@@ -17,6 +18,7 @@ fun NavGraphBuilder.myScreen(
             onClickAccountSetting = navigateToAccountSetting,
             navigateToReservations = navigateToReservations,
             navigateToProfile = navigateToProfile,
+            navigateToShowRegistration = navigateToShowRegistration,
             onClickQrScan = navigateToQrScan,
         )
     }

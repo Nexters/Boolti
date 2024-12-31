@@ -1,13 +1,14 @@
 package com.nexters.boolti.presentation.screen.perforemdshows
 
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.PerformedShowsScreen(
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.performedShowsScreen(
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
     composable(
@@ -17,9 +18,9 @@ fun NavGraphBuilder.PerformedShowsScreen(
         PerformedShowsScreen(
             modifier = modifier,
             onClickShow = { show ->
-                navigateTo(MainDestination.ShowDetail.createRoute(show.id))
+                navController.navigate(MainRoute.ShowDetail(showId = show.id))
             },
-            onClickBack = popBackStack,
+            onClickBack = navController::popBackStack,
         )
     }
 }

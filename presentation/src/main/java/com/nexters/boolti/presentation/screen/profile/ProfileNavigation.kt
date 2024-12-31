@@ -30,7 +30,7 @@ fun NavGraphBuilder.profileScreen(
                 }
             },
             navigateToProfileEdit = { navController.navigate(MainDestination.ProfileEdit.route) },
-            navigateToShow = { showId -> navController.navigate(MainDestination.ShowDetail.createRoute(showId)) },
+            navigateToShow = { showId -> navController.navigate(MainRoute.ShowDetail(showId = showId)) },
         )
     }
 }

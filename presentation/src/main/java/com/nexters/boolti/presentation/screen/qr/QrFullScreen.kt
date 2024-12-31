@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.qr
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -57,7 +56,6 @@ import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
 fun NavGraphBuilder.qrFullScreen(
     navController: NavHostController,
-    popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -67,11 +65,11 @@ fun NavGraphBuilder.qrFullScreen(
         QrFullScreen(
             modifier = modifier,
             viewModel = getSharedViewModel(entry),
-        ) { popBackStack() }
+            onClose = navController::popBackStack,
+        )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QrFullScreen(
     modifier: Modifier = Modifier,

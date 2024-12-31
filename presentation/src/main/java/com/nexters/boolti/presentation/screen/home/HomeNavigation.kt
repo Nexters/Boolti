@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 
 fun NavGraphBuilder.homeScreen(
     modifier: Modifier = Modifier,
@@ -15,7 +16,7 @@ fun NavGraphBuilder.homeScreen(
         HomeScreen(
             modifier = modifier,
             navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
-            navigateToTicketDetail = { navController.navigate("${MainDestination.TicketDetail.route}/$it") },
+            navigateToTicketDetail = { navController.navigate(TicketRoute.TicketRoot(ticketId = it)) },
             navigateToQrScan = { navController.navigate(MainRoute.HostedShows) },
             navigateToAccountSetting = { navController.navigate(MainRoute.AccountSetting) },
             navigateToReservations = { navController.navigate(MainRoute.Reservations) },

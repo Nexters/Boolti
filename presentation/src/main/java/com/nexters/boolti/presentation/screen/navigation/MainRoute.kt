@@ -38,14 +38,6 @@ sealed interface MainRoute {
     ) : MainRoute
 
     @Serializable
-    data class TicketDetail(
-        val ticketId: String,
-    )
-
-    @Serializable
-    data object Qr : MainRoute
-
-    @Serializable
     data object Reservations : MainRoute
 
     @Serializable
@@ -78,16 +70,6 @@ sealed interface MainRoute {
     @Serializable
     data class Profile(
         val userCode: String? = null
-    ) : MainRoute
-
-    @Serializable
-    data object ProfileEdit : MainRoute
-
-    @Serializable
-    data class ProfileLinkEdit(
-        val linkId: String?,
-        val linkTitle: String?,
-        val url: String?
     ) : MainRoute
 
     @Serializable

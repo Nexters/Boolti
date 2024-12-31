@@ -34,6 +34,7 @@ import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
@@ -141,16 +142,14 @@ fun MainNavigation(
 
         ticketingScreen()
 
-        navigation(
-            route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+        navigation<TicketRoute.TicketRoot>(
+            startDestination = TicketRoute.TicketDetail,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "https://app.boolti.in/tickets/{ticketId}"
                     action = Intent.ACTION_VIEW
                 }
             ),
-            startDestination = "detail",
-            arguments = MainDestination.TicketDetail.arguments,
         ) {
             ticketDetailScreen(
                 getSharedViewModel = { entry -> entry.sharedViewModel() },

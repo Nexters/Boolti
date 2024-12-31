@@ -217,8 +217,9 @@ private fun TicketDetailScreen(
     ) { innerPadding ->
         Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                .nestedScroll(pullToRefreshState.nestedScrollConnection),
         ) {
             PullToRefreshContainer(
                 modifier = Modifier
@@ -229,8 +230,9 @@ private fun TicketDetailScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 29.dp)
-                    .padding(bottom = 20.dp)
                     .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 val ticketShape = TicketShape(
                     width = contentWidth,
@@ -241,11 +243,11 @@ private fun TicketDetailScreen(
                 )
                 Box(
                     modifier = Modifier
+                        .padding(top = 16.dp)
                         .onGloballyPositioned { coordinates ->
                             contentWidth = coordinates.size.width.toFloat()
                             ticketSectionHeight = coordinates.size.height.toFloat()
                         }
-                        .padding(top = 16.dp)
                         .clip(ticketShape)
                         .border(
                             width = 1.dp,
@@ -361,7 +363,6 @@ private fun TicketDetailScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
                 if (
@@ -370,8 +371,6 @@ private fun TicketDetailScreen(
                 ) {
                     Text(
                         modifier = Modifier
-                            .padding(top = 20.dp)
-                            .align(Alignment.CenterHorizontally)
                             .clickable { showEnterCodeDialog = true },
                         text = stringResource(R.string.input_enter_code_button),
                         style = MaterialTheme.typography.bodySmall,
@@ -383,8 +382,6 @@ private fun TicketDetailScreen(
                 if (uiState.isRefundableGift) {
                     Text(
                         modifier = Modifier
-                            .padding(top = 20.dp)
-                            .align(Alignment.CenterHorizontally)
                             .clickable { showRefundGiftTicket = true },
                         text = stringResource(R.string.cancel_registered_gift_button),
                         style = MaterialTheme.typography.bodySmall,
@@ -392,6 +389,8 @@ private fun TicketDetailScreen(
                         textDecoration = TextDecoration.Underline,
                     )
                 }
+
+                Spacer(Modifier.size(20.dp))
             }
         }
     }

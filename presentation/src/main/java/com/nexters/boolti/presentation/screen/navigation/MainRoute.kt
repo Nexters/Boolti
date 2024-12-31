@@ -91,6 +91,11 @@ sealed interface MainRoute {
     ) : MainRoute
 
     @Serializable
+    data class LinkList(
+        val userCode: String? = null,
+    ) : MainRoute
+
+    @Serializable
     data class PerformedShows(
         val userCode: String? = null,
     ) : MainRoute

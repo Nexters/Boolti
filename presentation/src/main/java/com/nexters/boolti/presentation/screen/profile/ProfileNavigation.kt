@@ -16,18 +16,10 @@ fun NavGraphBuilder.profileScreen(
             modifier = modifier,
             onClickBack = navController::popBackStack,
             navigateToLinks = { userCode ->
-                if (userCode != null) {
-                    navController.navigate(MainDestination.LinkList.createRoute(userCode))
-                } else {
-                    navController.navigate(MainDestination.LinkList.createRoute())
-                }
+                navController.navigate(MainRoute.LinkList(userCode))
             },
             navigateToPerformedShows = { userCode ->
-                if (userCode != null) {
-                    navController.navigate(MainRoute.PerformedShows(userCode))
-                } else {
-                    navController.navigate(MainRoute.PerformedShows())
-                }
+                navController.navigate(MainRoute.PerformedShows(userCode))
             },
             navigateToProfileEdit = { navController.navigate(MainDestination.ProfileEdit.route) },
             navigateToShow = { showId -> navController.navigate(MainRoute.ShowDetail(showId = showId)) },

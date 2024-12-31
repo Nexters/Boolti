@@ -29,6 +29,7 @@ import com.nexters.boolti.presentation.screen.business.businessScreen
 import com.nexters.boolti.presentation.screen.gift.giftScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
+import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
@@ -216,6 +217,7 @@ fun MainNavigation(
             )
         }
 
+        linkListScreen(navController = navController)
         performedShowsScreen(navController = navController)
 
         addShowRegistration(

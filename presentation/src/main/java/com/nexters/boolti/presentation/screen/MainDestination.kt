@@ -56,18 +56,6 @@ sealed class MainDestination(val route: String) {
             "profileLinkEdit?id=${link.id}&title=${link.name}&url=${link.url}"
     }
 
-    data object LinkList : MainDestination(route = "linkList?userCode={$userCode}") {
-        val arguments = listOf(
-            navArgument(userCode) {
-                type = NavType.StringType
-                nullable = true
-            },
-        )
-
-        fun createRoute(): String = "linkList"
-        fun createRoute(userCode: String) = "linkList?userCode=$userCode"
-    }
-
     data object ShowRegistration : MainDestination(route = "webView")
 }
 
@@ -77,7 +65,6 @@ sealed class MainDestination(val route: String) {
 const val showId = "showId"
 const val ticketId = "ticketId"
 const val ticketName = "ticketName"
-const val userCode = "userCode"
 const val linkId = "linkId"
 const val linkTitle = "linkTitle"
 const val url = "url"

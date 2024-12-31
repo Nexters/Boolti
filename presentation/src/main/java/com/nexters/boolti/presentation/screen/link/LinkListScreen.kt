@@ -102,7 +102,9 @@ private fun LinkListScreen(
             }
             if (loading) {
                 BtCircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
                 )
             }
         }

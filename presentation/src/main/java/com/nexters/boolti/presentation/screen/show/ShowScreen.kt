@@ -70,6 +70,7 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
+import com.nexters.boolti.presentation.theme.statusBarHeight
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -128,7 +129,7 @@ fun ShowScreen(
             columns = GridCells.Adaptive(minSize = 150.dp),
             horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalArrangement = Arrangement.spacedBy(28.dp),
-            contentPadding = PaddingValues(top = 12.dp + appbarHeight),
+            contentPadding = PaddingValues(top = statusBarHeight + appbarHeight + 12.dp),
         ) {
             items(
                 count = uiState.shows.size.coerceAtMost(4),

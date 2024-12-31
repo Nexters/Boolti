@@ -1,12 +1,12 @@
 package com.nexters.boolti.presentation.screen.refund
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -29,11 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
-import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey15
@@ -41,7 +39,6 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RefundScreen(
     isGift: Boolean,
@@ -84,18 +81,19 @@ fun RefundScreen(
                 onClickBack = onBackPressed,
             )
         },
-        modifier = Modifier,
+        modifier = Modifier.navigationBarsPadding(),
     ) { innerPadding ->
         val reservation = uiState.reservation ?: return@Scaffold
 
         HorizontalPager(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             state = pagerState,
             userScrollEnabled = false,
         ) { index ->
             if (index == 0 && !isGift) {
                 ReasonPage(
-                    modifier = Modifier.padding(innerPadding),
                     onNextClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(1)
@@ -108,9 +106,6 @@ fun RefundScreen(
                 RefundInfoPage(
                     uiState = uiState,
                     refundPolicy = refundPolicy,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
                     reservation = reservation,
                     onRequest = { openDialog = true },
                     onRefundPolicyChecked = viewModel::toggleRefundPolicyCheck,

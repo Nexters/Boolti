@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.signout
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -42,13 +43,14 @@ fun SignoutScreen(
     }
 
     Scaffold(
+        modifier = Modifier.navigationBarsPadding(),
         topBar = { BtBackAppBar(title = stringResource(R.string.signout), onClickBack = navigateBack) },
         bottomBar = {
             MainButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
-                    .padding(bottom = 42.dp),
+                    .padding(bottom = 20.dp),
                 label = if (firstPage) stringResource(R.string.next) else stringResource(R.string.signout_button),
                 enabled = firstPage || reason.isNotBlank(),
                 onClick = {

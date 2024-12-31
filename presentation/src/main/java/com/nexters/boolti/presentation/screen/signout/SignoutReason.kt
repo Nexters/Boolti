@@ -39,9 +39,10 @@ fun SignoutReason(
         BTTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 160.dp, max = 300.dp)
+                .heightIn(max = 300.dp)
                 .padding(horizontal = marginHorizontal),
             text = reason,
+            minHeight = 160.dp,
             placeholder = stringResource(R.string.signout_reason_placeholder),
             onValueChanged = viewModel::setReason,
         )

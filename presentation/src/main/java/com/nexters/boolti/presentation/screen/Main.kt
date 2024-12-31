@@ -8,6 +8,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -22,7 +23,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
@@ -60,11 +60,16 @@ val LocalSnackbarController = staticCompositionLocalOf {
     SnackbarController(SnackbarHostState())
 }
 
+val LocalNavController = compositionLocalOf<NavHostController> {
+    error("No NavController provided")
+}
+
 @Composable
 fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val rootNavController = rememberNavControllerWithLog()
 
     BooltiTheme {
         Surface(modifier) {
@@ -79,8 +84,9 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
                 CompositionLocalProvider(
                     LocalSnackbarController provides SnackbarController(
                         snackbarHostState,
-                        scope
-                    )
+                        scope,
+                    ),
+                    LocalNavController provides rootNavController,
                 ) {
                     MainNavigation(
                         modifier = modifier.padding(innerPadding),
@@ -96,19 +102,20 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
 fun MainNavigation(
     onClickQrScan: (showId: String, showName: String) -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavControllerWithLog(),
 ) {
+    val navController = LocalNavController.current
+
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = MainRoute.Home,
     ) {
-        homeScreen(navController = navController)
-        loginScreen(navController = navController)
-        signoutScreen(navController = navController)
-        reservationsScreen(navController = navController)
-        reservationDetailScreen(navController = navController)
-        refundScreen(navController = navController)
+        homeScreen()
+        loginScreen()
+        signoutScreen()
+        reservationsScreen()
+        reservationDetailScreen()
+        refundScreen()
 
         navigation<MainRoute.ShowDetail>(
             startDestination = ShowRoute.Detail,
@@ -120,30 +127,19 @@ fun MainNavigation(
             ),
         ) {
             showDetailScreen(
-                navController = navController,
                 navigateTo = navController::navigateTo,
-                popBackStack = navController::popBackStack,
-                navigateToHome = navController::navigateToHome,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+                getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
             showImagesScreen(
-                navController = navController,
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+                getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
             showDetailContentScreen(
-                navController = navController,
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+                getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
-            reportScreen(
-                navController = navController,
-                navigateToHome = navController::navigateToHome,
-                popBackStack = navController::popBackStack,
-            )
+            reportScreen()
         }
 
-        ticketingScreen(navController = navController)
+        ticketingScreen()
 
         navigation(
             route = "${MainDestination.TicketDetail.route}/{$ticketId}",
@@ -157,49 +153,42 @@ fun MainNavigation(
             arguments = MainDestination.TicketDetail.arguments,
         ) {
             ticketDetailScreen(
-                navController = navController,
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
             qrFullScreen(
-                navController = navController,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
         }
 
-        giftScreen(navController = navController)
+        giftScreen()
 
         hostedShowScreen(
-            navController = navController,
             onClickShow = onClickQrScan,
         )
 
-        paymentCompleteScreen(navController = navController)
-        giftCompleteScreen(navController = navController)
-        businessScreen(navController = navController)
-        accountSettingScreen(navController = navController)
-        profileScreen(navController = navController)
+        paymentCompleteScreen()
+        giftCompleteScreen()
+        businessScreen()
+        accountSettingScreen()
+        profileScreen()
         navigation<ProfileRoute.ProfileRoot>(
             startDestination = ProfileRoute.ProfileEdit,
         ) {
-            profileEditScreen(navController = navController)
-            profileSnsEditScreen(navController = navController)
-            profileLinkEditScreen(navController = navController)
+            profileEditScreen()
+            profileSnsEditScreen()
+            profileLinkEditScreen()
         }
 
-        linkListScreen(navController = navController)
-        performedShowsScreen(navController = navController)
+        linkListScreen()
+        performedShowsScreen()
 
-        addShowRegistration(
-            modifier = modifier,
-            popBackStack = navController::popBackStack,
-        )
+        addShowRegistration()
     }
 }
 
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
-    navController: NavController,
+    navController: NavController = LocalNavController.current,
 ): T {
     val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
     val parentEntry = remember(this) {

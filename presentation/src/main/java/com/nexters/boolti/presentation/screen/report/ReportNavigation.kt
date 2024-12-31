@@ -2,21 +2,20 @@ package com.nexters.boolti.presentation.screen.report
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.screen.LocalNavController
 
 fun NavGraphBuilder.reportScreen(
-    navController: NavHostController,
-    navigateToHome: () -> Unit,
-    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable(
         route = "report/{showId}",
     ) {
+        val navController = LocalNavController.current
         ReportScreen(
-            onBackPressed = popBackStack,
-            popupToHome = navigateToHome,
+            onBackPressed = navController::popBackStack,
+            popupToHome = navController::navigateToHome,
             modifier = modifier,
         )
     }

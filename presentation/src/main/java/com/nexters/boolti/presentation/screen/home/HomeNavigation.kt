@@ -2,16 +2,16 @@ package com.nexters.boolti.presentation.screen.home
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
 fun NavGraphBuilder.homeScreen(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
     composable<MainRoute.Home> {
+        val navController = LocalNavController.current
         HomeScreen(
             modifier = modifier,
             navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },

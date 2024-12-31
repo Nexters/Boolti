@@ -2,15 +2,15 @@ package com.nexters.boolti.presentation.screen.profileedit.link
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 
 fun NavGraphBuilder.profileLinkEditScreen(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
     composable<ProfileRoute.ProfileLinkEdit> {
+        val navController = LocalNavController.current
         LinkEditScreen(
             modifier = modifier,
             onAddLink = { linkName, url ->

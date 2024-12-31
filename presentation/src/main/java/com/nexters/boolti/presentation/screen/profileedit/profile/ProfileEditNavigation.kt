@@ -2,10 +2,10 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -14,10 +14,11 @@ import kotlinx.coroutines.flow.zip
 import java.util.UUID
 
 fun NavGraphBuilder.profileEditScreen(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
     composable<ProfileRoute.ProfileEdit> { backStackEntry ->
+        val navController = LocalNavController.current
+
         // 새 링크 추가
         val newLinkName = backStackEntry.savedStateHandle
             .getStateFlow<String?>("newLinkName", null).filterNotNull()

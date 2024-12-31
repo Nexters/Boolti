@@ -1,14 +1,13 @@
 package com.nexters.boolti.presentation.reservationdetail
 
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.reservationDetailScreen(
-    navController: NavHostController,
-) {
+fun NavGraphBuilder.reservationDetailScreen() {
     composable<MainRoute.ReservationDetail> {
+        val navController = LocalNavController.current
         ReservationDetailScreen(
             onBackPressed = navController::popBackStack,
             navigateToRefund = { id, isGift ->

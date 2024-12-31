@@ -82,7 +82,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.TicketGroup
@@ -95,6 +94,7 @@ import com.nexters.boolti.presentation.component.InstagramIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
@@ -114,17 +114,16 @@ import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
 fun NavGraphBuilder.ticketDetailScreen(
-    navController: NavHostController,
-    popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
     composable(
         route = "detail",
     ) { entry ->
+        val navController = LocalNavController.current
         TicketDetailScreen(
             modifier = modifier,
-            onBackClicked = popBackStack,
+            onBackClicked = navController::popBackStack,
             onClickQr = { navController.navigate(MainRoute.Qr) },
             navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
             viewModel = getSharedViewModel(entry),

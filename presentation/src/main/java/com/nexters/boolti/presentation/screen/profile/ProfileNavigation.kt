@@ -24,9 +24,9 @@ fun NavGraphBuilder.profileScreen(
             },
             navigateToPerformedShows = { userCode ->
                 if (userCode != null) {
-                    navController.navigate(MainDestination.PerformedShows.createRoute(userCode))
+                    navController.navigate(MainRoute.PerformedShows(userCode))
                 } else {
-                    navController.navigate(MainDestination.PerformedShows.createRoute())
+                    navController.navigate(MainRoute.PerformedShows())
                 }
             },
             navigateToProfileEdit = { navController.navigate(MainDestination.ProfileEdit.route) },

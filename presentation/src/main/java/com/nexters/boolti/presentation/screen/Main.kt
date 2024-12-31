@@ -155,7 +155,6 @@ fun MainNavigation(
         ) {
             ticketDetailScreen(
                 navController = navController,
-                navigateTo = navController::navigateTo,
                 popBackStack = navController::popBackStack,
                 getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
             )

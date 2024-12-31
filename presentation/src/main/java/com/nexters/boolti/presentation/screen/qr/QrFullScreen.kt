@@ -44,7 +44,7 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.InstagramIndicator
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailViewModel
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
@@ -59,9 +59,7 @@ fun NavGraphBuilder.qrFullScreen(
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Qr.route,
-    ) { entry ->
+    composable<MainRoute.Qr> { entry ->
         QrFullScreen(
             modifier = modifier,
             viewModel = getSharedViewModel(entry),

@@ -96,7 +96,6 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -116,7 +115,6 @@ import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
 fun NavGraphBuilder.ticketDetailScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
     popBackStack: () -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
@@ -127,9 +125,7 @@ fun NavGraphBuilder.ticketDetailScreen(
         TicketDetailScreen(
             modifier = modifier,
             onBackClicked = popBackStack,
-            onClickQr = {
-                navigateTo(MainDestination.Qr.route)
-            },
+            onClickQr = { navController.navigate(MainRoute.Qr) },
             navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
             viewModel = getSharedViewModel(entry),
         )

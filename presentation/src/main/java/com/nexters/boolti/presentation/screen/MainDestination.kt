@@ -11,8 +11,6 @@ sealed class MainDestination(val route: String) {
         val arguments = listOf(navArgument(ticketId) { type = NavType.StringType })
     }
 
-    data object Qr : MainDestination(route = "qr")
-
     data object ProfileEdit : MainDestination(route = "profileEdit")
     data object ProfileSnsEdit :
         MainDestination(route = "profileSnsEdit?sns={$snsType}&id={$linkId}&title={$linkTitle}&username={$username}") {

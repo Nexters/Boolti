@@ -50,7 +50,7 @@ fun SignoutScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
-                    .padding(bottom = 42.dp),
+                    .padding(bottom = 20.dp),
                 label = if (firstPage) stringResource(R.string.next) else stringResource(R.string.signout_button),
                 enabled = firstPage || reason.isNotBlank(),
                 onClick = {

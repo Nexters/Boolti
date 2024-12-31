@@ -86,13 +86,14 @@ fun RefundScreen(
         val reservation = uiState.reservation ?: return@Scaffold
 
         HorizontalPager(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             state = pagerState,
             userScrollEnabled = false,
         ) { index ->
             if (index == 0 && !isGift) {
                 ReasonPage(
-                    modifier = Modifier.padding(innerPadding),
                     onNextClick = {
                         scope.launch {
                             pagerState.animateScrollToPage(1)
@@ -105,9 +106,6 @@ fun RefundScreen(
                 RefundInfoPage(
                     uiState = uiState,
                     refundPolicy = refundPolicy,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
                     reservation = reservation,
                     onRequest = { openDialog = true },
                     onRefundPolicyChecked = viewModel::toggleRefundPolicyCheck,

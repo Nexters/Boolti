@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,7 @@ fun ReasonPage(
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.navigationBarsPadding()) {
         Text(
             modifier = Modifier
                 .padding(top = 20.dp)
@@ -48,7 +49,7 @@ fun ReasonPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 8.dp),
+                .padding(bottom = 20.dp),
             onClick = onNextClick,
             enabled = reason.isNotBlank(),
             label = stringResource(id = R.string.next),

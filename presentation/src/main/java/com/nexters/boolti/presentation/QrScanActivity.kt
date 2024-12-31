@@ -57,9 +57,8 @@ class QrScanActivity : ComponentActivity() {
 
         requestPermission(Manifest.permission.CAMERA, 100)
 
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
-        )
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
+
         setContent {
             BooltiTheme {
                 QrScanScreen(

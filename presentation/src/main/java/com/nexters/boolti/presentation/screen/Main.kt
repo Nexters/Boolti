@@ -184,34 +184,7 @@ fun MainNavigation(
         ) {
             profileEditScreen(navController = navController)
             profileSnsEditScreen(navController = navController)
-            profileLinkEditScreen(
-                navController = navController,
-                onAddLink = { linkName, url ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("newLinkName", linkName)
-                            set("newLinkUrl", url)
-                        }
-                    navController.popBackStack()
-                },
-                onEditLink = { id, linkName, url ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("editLinkId", id)
-                            set("editLinkName", linkName)
-                            set("editLinkUrl", url)
-                        }
-                    navController.popBackStack()
-                },
-                onRemoveLink = { id ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("removeLinkId", id)
-                    navController.popBackStack()
-                },
-            )
+            profileLinkEditScreen(navController = navController)
         }
 
         linkListScreen(navController = navController)

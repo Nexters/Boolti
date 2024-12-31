@@ -4,24 +4,40 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 
 fun NavGraphBuilder.profileLinkEditScreen(
     navController: NavHostController,
-    onAddLink: (linkName: String, url: String) -> Unit,
-    onEditLink: (id: String, linkName: String, url: String) -> Unit,
-    onRemoveLink: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.ProfileLinkEdit.route,
-        arguments = MainDestination.ProfileLinkEdit.arguments,
-    ) {
+    composable<ProfileRoute.ProfileLinkEdit> {
         LinkEditScreen(
             modifier = modifier,
-            onAddLink = onAddLink,
-            onEditLink = onEditLink,
-            onRemoveLink = onRemoveLink,
+            onAddLink = { linkName, url ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("newLinkName", linkName)
+                        set("newLinkUrl", url)
+                    }
+                navController.popBackStack()
+            },
+            onEditLink = { id, linkName, url ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("editLinkId", id)
+                        set("editLinkName", linkName)
+                        set("editLinkUrl", url)
+                    }
+                navController.popBackStack()
+            },
+            onRemoveLink = { id ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("removeLinkId", id)
+                navController.popBackStack()
+            },
             navigateBack = navController::popBackStack,
         )
     }

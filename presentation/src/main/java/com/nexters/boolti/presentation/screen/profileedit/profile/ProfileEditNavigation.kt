@@ -114,11 +114,7 @@ fun NavGraphBuilder.profileEditScreen(
                 navController.navigate(ProfileRoute.ProfileSnsEdit(sns))
             },
             navigateToLinkEdit = { link ->
-                /*link?.let {
-                    navigateTo(MainDestination.ProfileLinkEdit.createRoute(it))
-                } ?: run {
-                    navigateTo(MainDestination.ProfileLinkEdit.createRoute())
-                }*/
+                navController.navigate(ProfileRoute.ProfileLinkEdit(link))
             },
             newLinkCallback = newLink,
             editLinkCallback = editLink,

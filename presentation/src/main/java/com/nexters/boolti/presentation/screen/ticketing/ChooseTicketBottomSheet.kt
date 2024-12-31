@@ -99,10 +99,8 @@ fun ChooseTicketBottomSheet(
         contentColor = MaterialTheme.colorScheme.surfaceTint,
         containerColor = Grey85,
     ) {
-        Column(
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-                .heightIn(max = 564.dp)
+        Box(
+            modifier = Modifier.heightIn(max = 564.dp)
         ) {
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
@@ -138,7 +136,9 @@ private fun ChooseTicketBottomSheetContent1(
     onSelectItem: (TicketWithQuantity) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    Column {
+    Column(
+        modifier = Modifier.padding(bottom = 20.dp),
+    ) {
         Text(
             text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
             style = MaterialTheme.typography.titleLarge.copy(color = Grey30),

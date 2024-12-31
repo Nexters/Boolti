@@ -4,8 +4,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 
 fun NavGraphBuilder.profileScreen(
     navController: NavHostController,
@@ -21,7 +21,7 @@ fun NavGraphBuilder.profileScreen(
             navigateToPerformedShows = { userCode ->
                 navController.navigate(MainRoute.PerformedShows(userCode))
             },
-            navigateToProfileEdit = { navController.navigate(MainDestination.ProfileEdit.route) },
+            navigateToProfileEdit = { navController.navigate(ProfileRoute.ProfileEdit) },
             navigateToShow = { showId -> navController.navigate(MainRoute.ShowDetail(showId = showId)) },
         )
     }

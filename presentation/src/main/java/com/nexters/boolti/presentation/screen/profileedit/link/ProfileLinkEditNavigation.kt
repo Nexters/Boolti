@@ -11,7 +11,6 @@ fun NavGraphBuilder.profileLinkEditScreen(
     onAddLink: (linkName: String, url: String) -> Unit,
     onEditLink: (id: String, linkName: String, url: String) -> Unit,
     onRemoveLink: (id: String) -> Unit,
-    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable(
@@ -23,7 +22,7 @@ fun NavGraphBuilder.profileLinkEditScreen(
             onAddLink = onAddLink,
             onEditLink = onEditLink,
             onRemoveLink = onRemoveLink,
-            navigateBack = popBackStack,
+            navigateBack = navController::popBackStack,
         )
     }
 }

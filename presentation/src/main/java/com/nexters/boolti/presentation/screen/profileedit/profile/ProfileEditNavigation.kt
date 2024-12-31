@@ -6,21 +6,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.zip
 import java.util.UUID
 
 fun NavGraphBuilder.profileEditScreen(
     navController: NavHostController,
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(route = MainDestination.ProfileEdit.route) { backStackEntry ->
+    composable<ProfileRoute.ProfileEdit> { backStackEntry ->
         // 새 링크 추가
         val newLinkName = backStackEntry.savedStateHandle
             .getStateFlow<String?>("newLinkName", null).filterNotNull()
@@ -66,8 +63,7 @@ fun NavGraphBuilder.profileEditScreen(
 
         // 새 SNS 추가
         val newSnsType = backStackEntry.savedStateHandle
-            .getStateFlow<String?>("newSnsType", null)
-            .map(Sns.SnsType::fromString)
+            .getStateFlow<Sns.SnsType?>("newSnsType", null)
             .filterNotNull()
 
         val newSnsUsername = backStackEntry.savedStateHandle
@@ -80,7 +76,7 @@ fun NavGraphBuilder.profileEditScreen(
                 username = username,
             )
         }.onEach {
-            backStackEntry.savedStateHandle.remove<String>("newSnsType")
+            backStackEntry.savedStateHandle.remove<Sns.SnsType>("newSnsType")
             backStackEntry.savedStateHandle.remove<String>("newSnsUsername")
         }
 
@@ -88,8 +84,7 @@ fun NavGraphBuilder.profileEditScreen(
         val editSnsId = backStackEntry.savedStateHandle
             .getStateFlow<String?>("editSnsId", null).filterNotNull()
         val editSnsType = backStackEntry.savedStateHandle
-            .getStateFlow<String?>("editSnsType", null)
-            .map(Sns.SnsType::fromString)
+            .getStateFlow<Sns.SnsType?>("editSnsType", null)
             .filterNotNull()
         val editSnsUsername = backStackEntry.savedStateHandle
             .getStateFlow<String?>("editSnsUsername", null).filterNotNull()
@@ -101,7 +96,7 @@ fun NavGraphBuilder.profileEditScreen(
             Sns(id = id, type = type, username = username)
         }.onEach {
             backStackEntry.savedStateHandle.remove<String>("editSnsId")
-            backStackEntry.savedStateHandle.remove<String>("editSnsType")
+            backStackEntry.savedStateHandle.remove<Sns.SnsType>("editSnsType")
             backStackEntry.savedStateHandle.remove<String>("editSnsUsername")
         }
 
@@ -114,20 +109,16 @@ fun NavGraphBuilder.profileEditScreen(
 
         ProfileEditScreen(
             modifier = modifier,
-            navigateBack = popBackStack,
+            navigateBack = navController::popBackStack,
             navigateToSnsEdit = { sns ->
-                sns?.let {
-                    navigateTo(MainDestination.ProfileSnsEdit.createRoute(it))
-                } ?: run {
-                    navigateTo(MainDestination.ProfileSnsEdit.createRoute())
-                }
+                navController.navigate(ProfileRoute.ProfileSnsEdit(sns))
             },
             navigateToLinkEdit = { link ->
-                link?.let {
+                /*link?.let {
                     navigateTo(MainDestination.ProfileLinkEdit.createRoute(it))
                 } ?: run {
                     navigateTo(MainDestination.ProfileLinkEdit.createRoute())
-                }
+                }*/
             },
             newLinkCallback = newLink,
             editLinkCallback = editLink,

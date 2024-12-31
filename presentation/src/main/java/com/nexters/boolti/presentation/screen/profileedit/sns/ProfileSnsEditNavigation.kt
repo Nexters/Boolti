@@ -1,28 +1,46 @@
 package com.nexters.boolti.presentation.screen.profileedit.sns
 
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.domain.model.Sns
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 
-fun NavGraphBuilder.ProfileSnsEditScreen(
-    onAddSns: (type: Sns.SnsType, username: String) -> Unit,
-    onEditSns: (id: String, type: Sns.SnsType, username: String) -> Unit,
-    onRemoveSns: (id: String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.profileSnsEditScreen(
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.ProfileSnsEdit.route,
-        arguments = MainDestination.ProfileSnsEdit.arguments,
-    ) {
+    composable<ProfileRoute.ProfileSnsEdit> {
         SnsEditScreen(
             modifier = modifier,
-            onAddSns = onAddSns,
-            onEditSns = onEditSns,
-            onRemoveSns = onRemoveSns,
-            navigateBack = popBackStack,
+            onAddSns = { type, username ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("newSnsType", type)
+                        set("newSnsUsername", username)
+                    }
+                navController.popBackStack()
+            },
+            onEditSns = { id, type, username ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("editSnsId", id)
+                        set("editSnsType", type)
+                        set("editSnsUsername", username)
+                    }
+                navController.popBackStack()
+            },
+            onRemoveSns = { id ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("removeSnsId", id)
+                    }
+                navController.popBackStack()
+            },
+            navigateBack = navController::popBackStack,
         )
     }
 }

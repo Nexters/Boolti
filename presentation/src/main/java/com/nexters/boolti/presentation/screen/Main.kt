@@ -32,12 +32,14 @@ import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.sns.profileSnsEditScreen
 import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.qrFullScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
@@ -177,15 +179,11 @@ fun MainNavigation(
         businessScreen(navController = navController)
         accountSettingScreen(navController = navController)
         profileScreen(navController = navController)
-        navigation(
-            route = "profileEditNavigation",
-            startDestination = MainDestination.ProfileEdit.route,
+        navigation<ProfileRoute.ProfileRoot>(
+            startDestination = ProfileRoute.ProfileEdit,
         ) {
-            profileEditScreen(
-                navController = navController,
-                navigateTo = navController::navigate,
-                popBackStack = navController::popBackStack,
-            )
+            profileEditScreen(navController = navController)
+            profileSnsEditScreen(navController = navController)
             profileLinkEditScreen(
                 navController = navController,
                 onAddLink = { linkName, url ->
@@ -213,7 +211,6 @@ fun MainNavigation(
                         ?.set("removeLinkId", id)
                     navController.popBackStack()
                 },
-                popBackStack = navController::popBackStack,
             )
         }
 

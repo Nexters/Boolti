@@ -118,17 +118,16 @@ fun MainNavigation(
         reservationDetailScreen()
         refundScreen()
 
-        navigation<MainRoute.ShowDetail>(
+        navigation<ShowRoute.ShowRoot>(
             startDestination = ShowRoute.Detail,
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "https://preview.boolti.in/show/{$showId}"
+                    uriPattern = "https://preview.boolti.in/show/{showId}"
                     action = Intent.ACTION_VIEW
                 },
             ),
         ) {
             showDetailScreen(
-                navigateTo = navController::navigateTo,
                 getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
             showImagesScreen(
@@ -195,5 +194,3 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
     }
     return hiltViewModel(parentEntry)
 }
-
-private fun NavController.navigateTo(route: String) = navigate(route)

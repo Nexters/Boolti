@@ -7,11 +7,6 @@ sealed interface MainRoute {
     data object Home : MainRoute
 
     @Serializable
-    data class ShowDetail(
-        val showId: String,
-    ) : MainRoute
-
-    @Serializable
     data class Ticketing(
         val showId: String,
         val salesTicketId: String,

@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 
 fun NavGraphBuilder.homeScreen(
@@ -15,7 +16,7 @@ fun NavGraphBuilder.homeScreen(
         val navController = LocalNavController.current
         HomeScreen(
             modifier = modifier,
-            navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
+            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
             navigateToTicketDetail = { navController.navigate(TicketRoute.TicketRoot(ticketId = it)) },
             navigateToQrScan = { navController.navigate(MainRoute.HostedShows) },
             navigateToAccountSetting = { navController.navigate(MainRoute.AccountSetting) },

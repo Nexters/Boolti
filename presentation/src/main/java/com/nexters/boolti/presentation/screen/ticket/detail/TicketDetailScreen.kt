@@ -96,7 +96,7 @@ import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -124,7 +124,7 @@ fun NavGraphBuilder.ticketDetailScreen(
             modifier = modifier,
             onBackClicked = navController::popBackStack,
             onClickQr = { navController.navigate(TicketRoute.Qr) },
-            navigateToShowDetail = { navController.navigate(MainRoute.ShowDetail(showId = it)) },
+            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
             viewModel = getSharedViewModel(entry),
         )
     }

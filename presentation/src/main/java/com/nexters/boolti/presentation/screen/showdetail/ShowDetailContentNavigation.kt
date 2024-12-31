@@ -6,14 +6,13 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
 fun NavGraphBuilder.showDetailContentScreen(
     getSharedViewModel: @Composable (NavBackStackEntry) -> ShowDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = "content",
-    ) { entry ->
+    composable<ShowRoute.Content> { entry ->
         val navController = LocalNavController.current
         val showViewModel: ShowDetailViewModel = getSharedViewModel(entry)
 

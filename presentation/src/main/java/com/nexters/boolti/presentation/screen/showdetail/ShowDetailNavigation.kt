@@ -11,7 +11,6 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
 fun NavGraphBuilder.showDetailScreen(
-    navigateTo: (String) -> Unit,
     getSharedViewModel: @Composable (NavBackStackEntry) -> ShowDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -23,7 +22,7 @@ fun NavGraphBuilder.showDetailScreen(
             modifier = modifier,
             onBack = navController::popBackStack,
             onClickHome = navController::navigateToHome,
-            onClickContent = { navigateTo("content") },
+            onClickContent = { navController.navigate(ShowRoute.Content) },
             onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
                 navController.navigate(
                     MainRoute.Ticketing(
@@ -45,10 +44,10 @@ fun NavGraphBuilder.showDetailScreen(
             },
             viewModel = showViewModel,
             navigateToLogin = { navController.navigate(MainRoute.Login) },
-            navigateToImages = { index -> navigateTo("images/$index") },
+            navigateToImages = { index -> navController.navigate(ShowRoute.Images(index)) },
             navigateToReport = {
                 val showId = entry.arguments?.getString("showId")
-                navigateTo("report/$showId")
+                navController.navigate(ShowRoute.Report(showId))
             },
             navigateToProfile = { userCode ->
                 navController.navigate(MainRoute.Profile(userCode = userCode))

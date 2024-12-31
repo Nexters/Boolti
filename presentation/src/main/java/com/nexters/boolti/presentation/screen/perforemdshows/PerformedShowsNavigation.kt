@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
 fun NavGraphBuilder.performedShowsScreen(
     modifier: Modifier = Modifier,
@@ -14,7 +15,7 @@ fun NavGraphBuilder.performedShowsScreen(
         PerformedShowsScreen(
             modifier = modifier,
             onClickShow = { show ->
-                navController.navigate(MainRoute.ShowDetail(showId = show.id))
+                navController.navigate(ShowRoute.ShowRoot(showId = show.id))
             },
             onClickBack = navController::popBackStack,
         )

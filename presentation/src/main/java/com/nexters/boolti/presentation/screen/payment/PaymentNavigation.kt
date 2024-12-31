@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
 fun NavGraphBuilder.paymentCompleteScreen() {
     composable<MainRoute.PaymentComplete> { entry ->
@@ -17,8 +18,8 @@ fun NavGraphBuilder.paymentCompleteScreen() {
         PaymentCompleteScreen(
             onClickHome = navController::navigateToHome,
             onClickClose = {
-                navController.popBackStack<MainRoute.ShowDetail>(inclusive = true)
-                navController.navigate(MainRoute.ShowDetail(showId = showId))
+                navController.popBackStack<ShowRoute.ShowRoot>(inclusive = true)
+                navController.navigate(ShowRoute.ShowRoot(showId = showId))
             },
             navigateToReservation = { reservation ->
                 navController.navigate(

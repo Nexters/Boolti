@@ -3,10 +3,12 @@ package com.nexters.boolti.presentation.screen.showdetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ShowRepository
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +29,7 @@ class ShowDetailViewModel @Inject constructor(
     private val showRepository: ShowRepository,
     authRepository: AuthRepository,
 ) : ViewModel() {
-    val showId: String = checkNotNull(savedStateHandle["showId"])
+    val showId: String = checkNotNull(savedStateHandle.toRoute<ShowRoute.ShowRoot>().showId)
 
     private val _uiState = MutableStateFlow(ShowDetailUiState())
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()

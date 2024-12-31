@@ -3,6 +3,12 @@ package com.nexters.boolti.presentation.screen.showdetail
 import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,11 +30,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -37,6 +45,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,13 +58,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,28 +77,40 @@ import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
+import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.extension.showDateString
+import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
+import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.UrlParser
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.format.DateTimeFormatter
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.math.ceil
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShowDetailScreen(
     onBack: () -> Unit,
@@ -114,11 +137,9 @@ fun ShowDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
 
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
-
-    val window = LocalContext.current.requireActivity().window
-    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
+    BackHandler {
+        viewModel.sendEvent(ShowDetailEvent.PopBackStack)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -135,124 +156,206 @@ fun ShowDetailScreen(
         }
     }
 
-    BackHandler {
-        viewModel.sendEvent(ShowDetailEvent.PopBackStack)
-    }
-
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            ShowDetailAppBar(
-                showId = uiState.showDetail.id,
-                onBack = { viewModel.sendEvent(ShowDetailEvent.PopBackStack) },
-                onClickHome = onClickHome,
-                navigateToReport = navigateToReport,
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
-
-            val host = stringResource(
-                id = R.string.ticketing_host_format,
-                uiState.showDetail.hostName,
-                uiState.showDetail.hostPhoneNumber,
-            )
-            LazyColumn(
-                modifier = Modifier,
-            ) {
-                item {
-                    Poster(
-                        modifier = modifier.fillMaxWidth(),
-                        navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-                        title = uiState.showDetail.name,
-                        images = uiState.showDetail.images.map { it.originImage }
-                    )
+    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                ShowDetailAppBar(
+                    showDetail = uiState.showDetail,
+                    onBack = onBack,
+                    onClickHome = onClickHome,
+                    navigateToReport = navigateToReport,
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+        ) { innerPadding ->
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BtCircularProgressIndicator()
                 }
-
-                item {
-                    TicketReservationPeriod(
-                        modifier = Modifier.padding(vertical = 40.dp, horizontal = 20.dp),
-                        startDate = uiState.showDetail.salesStartDate,
-                        endDate = uiState.showDetail.salesEndDate,
-                    )
-                }
-                item {
-                    ContentTabRow(
-                        selectedTabIndex = uiState.selectedTab,
-                        onSelectTab = viewModel::selectTab,
-                    )
-                }
-
-                when (uiState.selectedTab) {
-                    0 -> ShowInfoTab(
-                        showDetail = uiState.showDetail,
-                        host = host,
-                        onClickContent = onClickContent,
-                    )
-
-                    1 -> CastTab(
-                        teams = uiState.castTeams,
-                        onClickMember = navigateToProfile,
-                    )
-                }
-
-                item { Spacer(modifier = Modifier.size(114.dp)) }
+            } else if (uiState.showDetail != null) {
+                ShowDetailScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    showDetail = uiState.showDetail!!,
+                    castTeams = uiState.castTeams,
+                    selectedTab = uiState.selectedTab,
+                    onClickContent = onClickContent,
+                    navigateToLogin = navigateToLogin,
+                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                    onTicketSelected = onTicketSelected,
+                    onGiftTicketSelected = onGiftTicketSelected,
+                    navigateToProfile = navigateToProfile,
+                    isLoggedIn = isLoggedIn == true,
+                    onSelectTab = viewModel::selectTab,
+                )
             }
-
-            val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
-                scope.launch {
-                    if (isLoggedIn == true) {
-                        showBottomSheet = type
-                    } else {
-                        navigateToLogin()
-                    }
-                }
-            }
-
-            ShowDetailButtons(
-                showState = uiState.showDetail.state,
-                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) }
-            )
-        }
-
-        showBottomSheet?.let { type ->
-            ChooseTicketBottomSheet(
-                ticketType = type,
-                onTicketingClicked = { ticket, count ->
-                    Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
-                    onTicketSelected(
-                        uiState.showDetail.id,
-                        ticket.id,
-                        count,
-                        ticket.isInviteTicket,
-                    )
-                    showBottomSheet = null
-                },
-                onGiftTicketClicked = { ticket, count ->
-                    onGiftTicketSelected(
-                        uiState.showDetail.id,
-                        ticket.id,
-                        count,
-                    )
-                    showBottomSheet = null
-                },
-                onDismissRequest = {
-                    showBottomSheet = null
-                }
-            )
         }
     }
 }
 
 @Composable
+fun ShowDetailScreen(
+    showDetail: ShowDetail,
+    castTeams: List<CastTeams>,
+    selectedTab: Int,
+    onClickContent: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToImages: (index: Int) -> Unit,
+    onTicketSelected: (
+        showId: String,
+        ticketId: String,
+        ticketCount: Int,
+        isInviteTicket: Boolean,
+    ) -> Unit,
+    onGiftTicketSelected: (
+        showId: String,
+        ticketId: String,
+        ticketCount: Int,
+    ) -> Unit,
+    navigateToProfile: (userCode: String) -> Unit,
+    isLoggedIn: Boolean,
+    onSelectTab: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val showState by flow {
+        while (true) {
+            emit(showDetail.state)
+            delay(200)
+        }
+    }.collectAsStateWithLifecycle(showDetail.state)
+
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
+
+    val window = LocalContext.current.requireActivity().window
+    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        val showCountdownBanner =
+            showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
+        val host = stringResource(
+            id = R.string.ticketing_host_format,
+            showDetail.hostName,
+            showDetail.hostPhoneNumber,
+        )
+
+        var buttonsHeight by remember { mutableStateOf(0.dp) }
+
+        LazyColumn(
+            modifier = Modifier,
+        ) {
+            item {
+                val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
+
+                Poster(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .clip(
+                            shape = RoundedCornerShape(
+                                bottomStart = 20.dp,
+                                bottomEnd = 20.dp
+                            )
+                        )
+                        .background(color = MaterialTheme.colorScheme.surface)
+                        .padding(top = paddingTop),
+                    navigateToImages = navigateToImages,
+                    title = showDetail.name,
+                    images = showDetail.images.map { it.originImage }
+                )
+            }
+
+            item {
+                ContentTabRow(
+                    modifier = Modifier.padding(top = 20.dp),
+                    selectedTabIndex = selectedTab,
+                    onSelectTab = onSelectTab,
+                )
+            }
+
+            when (selectedTab) {
+                0 -> ShowInfoTab(
+                    showDetail = showDetail,
+                    host = host,
+                    onClickContent = onClickContent,
+                )
+
+                1 -> CastTab(
+                    teams = castTeams,
+                    onClickMember = navigateToProfile,
+                )
+            }
+
+            item { Spacer(modifier = Modifier.size(buttonsHeight)) }
+        }
+
+        val onTicketClicked: (TicketBottomSheetType) -> Unit = { type ->
+            scope.launch {
+                if (isLoggedIn) {
+                    showBottomSheet = type
+                } else {
+                    navigateToLogin()
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            visible = !showState.isClosedOrFinished,
+            enter = EnterTransition.None,
+            exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter),
+        ) {
+            ShowDetailButtons(
+                showState = showState,
+                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
+                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
+                onHeightChanged = { buttonsHeight = it },
+            )
+        }
+
+        if (showCountdownBanner) {
+            CountDownBanner(
+                deadlineDateTime = showDetail.salesEndDateTime,
+            )
+        }
+    }
+
+    showBottomSheet?.let { type ->
+        ChooseTicketBottomSheet(
+            ticketType = type,
+            onTicketingClicked = { ticket, count ->
+                Timber.tag("MANGBAAM-(TicketScreen)").d("선택된 티켓: $ticket")
+                onTicketSelected(
+                    showDetail.id,
+                    ticket.id,
+                    count,
+                    ticket.isInviteTicket,
+                )
+                showBottomSheet = null
+            },
+            onGiftTicketClicked = { ticket, count ->
+                onGiftTicketSelected(
+                    showDetail.id,
+                    ticket.id,
+                    count,
+                )
+                showBottomSheet = null
+            },
+            onDismissRequest = {
+                showBottomSheet = null
+            }
+        )
+    }
+
+}
+
+@Composable
 private fun ShowDetailAppBar(
-    showId: String,
+    showDetail: ShowDetail?,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
@@ -261,6 +364,7 @@ private fun ShowDetailAppBar(
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
+
     BtAppBar(
         colors = BtAppBarDefaults.appBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -278,28 +382,39 @@ private fun ShowDetailAppBar(
             )
         },
         actionButtons = {
-            BtAppBarDefaults.AppBarIconButton(
-                iconRes = R.drawable.ic_share,
-                description = stringResource(id = R.string.ticketing_share),
-                onClick = {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(
-                            Intent.EXTRA_TEXT,
-                            "https://preview.boolti.in/show/$showId"
-                        )
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
+            if (showDetail != null) {
+                val dateString = "${showDetail.date.showDateTimeString} -"
+                val addressString =
+                    "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
+                val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
+                val sharingText = stringResource(
+                    R.string.show_share_format,
+                    showDetail.name,
+                    dateString,
+                    addressString,
+                    previewUrl
+                )
 
-                    context.startActivity(shareIntent)
-                },
-            )
-            BtAppBarDefaults.AppBarIconButton(
-                iconRes = R.drawable.ic_verticle_more,
-                description = stringResource(id = R.string.description_more_menu),
-                onClick = { isContextMenuVisible = true },
-            )
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_share,
+                    description = stringResource(id = R.string.ticketing_share),
+                    onClick = {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, sharingText)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+
+                        context.startActivity(shareIntent)
+                    },
+                )
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_verticle_more,
+                    description = stringResource(id = R.string.description_more_menu),
+                    onClick = { isContextMenuVisible = true },
+                )
+            }
         },
     )
 
@@ -407,24 +522,89 @@ private fun LazyListScope.ShowInfoTab(
 ) {
     val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
 
+    // 최상단 섹션의 상단 패딩
+    item { Spacer(Modifier.size(8.dp)) }
+
+    // 티켓 판매 섹션
     item {
-        // 일시
-        val daysOfWeek = stringArrayResource(id = R.array.days_of_week)
-        val indexOfDay = showDetail.date.dayOfWeek.value - 1
-        val minute = stringResource(id = R.string.ticketing_minutes)
-        // ex. 2024.01.20 (토) / 18:00 (150분)
-        val formatter =
-            DateTimeFormatter.ofPattern("yyyy.MM.dd (${daysOfWeek[indexOfDay]}) / HH:mm (${showDetail.runningTime}${minute})")
+        val startDate = showDetail.salesStartDate
+        val endDate = showDetail.salesEndDateTime.toLocalDate()
+
         Section(
-            modifier = paddingModifier.padding(top = 8.dp),
-            title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = { SectionContent(text = showDetail.date.format(formatter)) },
+            modifier = paddingModifier,
+            title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
+            // ex. 2023.12.01 (토) - 2024.01.20 (월)
+            content = {
+                Column {
+                    Text(
+                        text = "${startDate.showDateString} - ${endDate.showDateString}",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30)
+                    )
+                    if (showDetail.state.isClosedOrFinished) {
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(20.dp),
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_ticket),
+                                tint = Grey30,
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = stringResource(
+                                    R.string.show_sold_ticket_count,
+                                    showDetail.salesTicketCount
+                                ),
+                                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                            )
+                        }
+                    }
+                }
+            }
         )
     }
 
     item { Divider(paddingModifier) }
 
-    // 장소
+    // 일시 섹션
+    item {
+        // 일시
+        // ex. 2024.01.20 (토) / 18:00 (150분)
+        val minute = stringResource(id = R.string.ticketing_minutes)
+        Section(
+            modifier = paddingModifier,
+            title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
+            content = {
+                Row {
+                    Text(
+                        text = showDetail.date.showDateTimeString,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Grey50,
+                                shape = CircleShape,
+                            )
+                            .padding(horizontal = 12.dp, vertical = 3.dp),
+                    ) {
+                        Text(
+                            text = "${showDetail.runningTime}${minute}",
+                            style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
+                        )
+                    }
+                }
+            },
+        )
+    }
+
+    item { Divider(paddingModifier) }
+
+    // 장소 섹션
     item {
         val snackbarController = LocalSnackbarController.current
 
@@ -437,7 +617,7 @@ private fun LazyListScope.ShowInfoTab(
                     SectionTitle(stringResource(id = R.string.ticketing_place))
                     Spacer(modifier = Modifier.weight(1.0f))
                     val clipboardManager = LocalClipboardManager.current
-                    val copiedMessage =
+                    val copySuccessMessage =
                         stringResource(id = R.string.ticketing_address_copied_message)
                     SmallButton(
                         iconRes = R.drawable.ic_copy,
@@ -445,7 +625,7 @@ private fun LazyListScope.ShowInfoTab(
                         onClick = {
                             clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
                             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                snackbarController.showMessage(copiedMessage)
+                                snackbarController.showMessage(copySuccessMessage)
                             }
                         }
                     )
@@ -464,7 +644,7 @@ private fun LazyListScope.ShowInfoTab(
     }
     item { Divider(paddingModifier) }
 
-    // 공연 내용
+    // 내용 섹션
     item {
         Section(
             modifier = paddingModifier,
@@ -491,7 +671,7 @@ private fun LazyListScope.ShowInfoTab(
     }
     item { Divider(paddingModifier) }
 
-    // 주최자
+    // 주최 섹션
     item {
         Section(
             modifier = paddingModifier,
@@ -504,8 +684,12 @@ private fun LazyListScope.ShowInfoTab(
             },
         )
     }
+
+    // 최하단 섹션의 하단 패딩
+    item { Spacer(Modifier.size(8.dp)) }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName")
 fun LazyListScope.CastTab(
     teams: List<CastTeams>,
@@ -537,7 +721,7 @@ fun LazyListScope.CastTab(
         }
     } else {
         itemsIndexed(teams) { index, team ->
-            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(16.dp))
+            if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
             Section(
                 modifier = paddingModifier,
                 title = { SectionTitle(title = team.teamName) },
@@ -560,11 +744,15 @@ fun LazyListScope.CastTab(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         items(team.members) { member ->
-                            Cast(memberHeight, member, onClick = { onClickMember(member.userCode) })
+                            Cast(
+                                memberHeight,
+                                member,
+                                onClick = { onClickMember(member.userCode) })
                         }
                     }
                 }
             )
+            if (index == teams.lastIndex) Spacer(modifier = Modifier.size(8.dp))
         }
     }
 }
@@ -577,11 +765,7 @@ private fun Poster(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-            .background(color = MaterialTheme.colorScheme.surface)
-            .padding(top = 16.dp)
-            .padding(horizontal = 38.dp)
+        modifier = modifier.padding(horizontal = 38.dp)
     ) {
         SwipeableImage(
             modifier = Modifier
@@ -604,7 +788,7 @@ private fun Section(
     title: @Composable () -> Unit,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    paddingVertical: Dp = 32.dp,
+    paddingVertical: Dp = 24.dp,
     space: Dp = 16.dp,
 ) {
     Column(modifier.padding(vertical = paddingVertical)) {
@@ -693,4 +877,67 @@ private fun Cast(
 @Composable
 private fun Divider(modifier: Modifier = Modifier) {
     HorizontalDivider(modifier = modifier, color = Grey85)
+}
+
+@Composable
+private fun CountDownBanner(
+    deadlineDateTime: LocalDateTime,
+) {
+    val remainingTime by flow {
+        while (true) {
+            val duration = Duration.between(
+                LocalDateTime.now(),
+                deadlineDateTime
+            )
+            emit(maxOf(duration, Duration.ZERO))
+            if (duration <= Duration.ZERO) break
+            delay(200L)
+        }
+    }.collectAsStateWithLifecycle(Duration.ZERO)
+
+    Box(
+        modifier = Modifier
+            .height(40.dp)
+            .fillMaxWidth()
+            .background(Grey05),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = R.string.show_ticketing_deadline_countdown) + " " + remainingTime.asString(),
+            style = MaterialTheme.typography.titleMedium.copy(color = Grey90)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ShowDetailScreenPreview() {
+    BooltiTheme {
+        ShowDetailScreen(
+            showDetail = ShowDetail(),
+            castTeams = emptyList(),
+            selectedTab = 0,
+            onClickContent = {},
+            navigateToLogin = {},
+            navigateToImages = {},
+            onTicketSelected = { _, _, _, _ -> },
+            onGiftTicketSelected = { _, _, _ -> },
+            navigateToProfile = {},
+            isLoggedIn = true,
+            onSelectTab = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CountDownBannerPreview() {
+    BooltiTheme {
+        CountDownBanner(
+            deadlineDateTime = LocalDateTime.now()
+                .plusHours(0)
+                .plusMinutes(5)
+                .plusSeconds(12),
+        )
+    }
 }

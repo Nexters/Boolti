@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.request.EditProfileRequest
@@ -26,10 +27,7 @@ class ProfileEditViewModel @Inject constructor(
 ) : BaseViewModel() {
     private var initialState = ProfileEditState()
     val isDataChanged: Boolean
-        get() = initialState.nickname != uiState.value.nickname ||
-                initialState.introduction != uiState.value.introduction ||
-                initialState.thumbnail != uiState.value.thumbnail ||
-                initialState.links != uiState.value.links
+        get() = initialState != uiState.value
 
     private val _uiState = MutableStateFlow(ProfileEditState())
     val uiState = _uiState.asStateFlow()
@@ -43,6 +41,7 @@ class ProfileEditViewModel @Inject constructor(
                 thumbnail = user.photo ?: "",
                 nickname = user.nickname,
                 introduction = user.introduction,
+                snsList = user.sns,
                 links = user.link,
             )
             _uiState.update {
@@ -50,10 +49,11 @@ class ProfileEditViewModel @Inject constructor(
                     thumbnail = user.photo ?: "",
                     nickname = user.nickname,
                     introduction = user.introduction,
+                    snsList = user.sns,
                     links = user.link,
                 )
             }
-        }
+        } ?: event(ProfileEditEvent.UnAuthorized)
     }
 
     fun changeNickname(nickname: String) {
@@ -65,17 +65,17 @@ class ProfileEditViewModel @Inject constructor(
     }
 
     fun onNewLinkAdded(newLink: Link) {
-        _uiState.update { it.copy(links = listOf(newLink) + it.links) }
+        _uiState.update { it.copy(links = it.links + listOf(newLink)) }
         event(ProfileEditEvent.OnLinkAdded)
     }
 
-    fun onLinkEditted(link: Link) {
+    fun onLinkEdited(link: Link) {
         val newLinks = uiState.value.links.toMutableList().apply {
             val index = indexOfFirst { it.id == link.id }
             set(index, link)
         }
         _uiState.update { it.copy(links = newLinks) }
-        event(ProfileEditEvent.OnLinkEditted)
+        event(ProfileEditEvent.OnLinkEdited)
     }
 
     fun onLinkRemoved(id: String) {
@@ -84,6 +84,28 @@ class ProfileEditViewModel @Inject constructor(
         }
         _uiState.update { it.copy(links = newLinks) }
         event(ProfileEditEvent.OnLinkRemoved)
+    }
+
+    fun onSnsAdded(sns: Sns) {
+        _uiState.update { it.copy(snsList = it.snsList + listOf(sns)) }
+        event(ProfileEditEvent.OnSnsAdded)
+    }
+
+    fun onSnsEdited(sns: Sns) {
+        val newSnsList = uiState.value.snsList.toMutableList().apply {
+            val index = indexOfFirst { it.id == sns.id }
+            set(index, sns)
+        }
+        _uiState.update { it.copy(snsList = newSnsList) }
+        event(ProfileEditEvent.OnSnsEdited)
+    }
+
+    fun onSnsRemoved(id: String) {
+        val newSnsList = uiState.value.snsList.toMutableList().apply {
+            removeIf { it.id == id }
+        }
+        _uiState.update { it.copy(snsList = newSnsList) }
+        event(ProfileEditEvent.OnSnsRemoved)
     }
 
     fun completeEdits(thumbnailFile: File?) {
@@ -99,10 +121,13 @@ class ProfileEditViewModel @Inject constructor(
                     nickname = uiState.value.nickname,
                     profileImagePath = newThumbnailUrl ?: uiState.value.thumbnail,
                     introduction = uiState.value.introduction,
+                    sns = uiState.value.snsList.map { it.toDto() },
                     link = uiState.value.links.map { it.toDto() },
                 )
             ).onSuccess {
                 event(ProfileEditEvent.OnSuccessEditProfile)
+            }.onFailure {
+                event(ProfileEditEvent.EditFailed)
             }
             _uiState.update { it.copy(saving = false) }
         }

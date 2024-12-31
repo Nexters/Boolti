@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,28 +13,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.extension.asString
+import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import java.time.Duration
 
 @Composable
 fun ShowDetailButtons(
     showState: ShowState,
     onTicketingClicked: () -> Unit,
     onGiftClicked: () -> Unit,
+    onHeightChanged: (height: Dp) -> Unit = {},
 ) {
+    val density = LocalDensity.current
     Column(
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.onSizeChanged {
+            onHeightChanged(it.height.toDp(density))
+        },
     ) {
-        Spacer(modifier = Modifier.weight(1.0f))
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,9 +101,14 @@ private fun TicketingButton(
 ) {
     val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
-        is ShowState.WaitingTicketing -> stringResource(
-            id = R.string.ticketing_button_upcoming_ticket, showState.dDay
-        )
+        is ShowState.WaitingTicketing -> {
+            val days = showState.remainingTime.toDays()
+
+            stringResource(
+                id = R.string.ticketing_button_ticket_countdown,
+                days
+            ) + " " + showState.remainingTime.asString()
+        }
 
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
@@ -128,10 +141,12 @@ fun ShowDetailButtonsPreview() {
 
 @Preview(heightDp = 100)
 @Composable
-fun ExpiredShowDetailButtonPreview() {
+fun ShowDetailButtonsBeforeTicketingPreview() {
     BooltiTheme {
         ShowDetailButtons(
-            showState = ShowState.ClosedTicketing,
+            showState = ShowState.WaitingTicketing(
+                Duration.ofSeconds(1 * 86400 + 2 * 3600 + 17)
+            ),
             onTicketingClicked = {},
             onGiftClicked = {}
         )

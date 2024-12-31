@@ -47,7 +47,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -74,6 +73,7 @@ import com.nexters.boolti.presentation.theme.point4
 fun ShowScreen(
     navigateToBusiness: () -> Unit,
     onClickShowItem: (showId: String) -> Unit,
+    navigateToShowRegistration: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowViewModel = hiltViewModel()
 ) {
@@ -144,7 +144,8 @@ fun ShowScreen(
                     span = { GridItemSpan(2) },
                 ) {
                     Banner(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        navigateToShowRegistration = navigateToShowRegistration,
                     )
                 }
 
@@ -274,14 +275,13 @@ fun SearchBar(
 
 @Composable
 private fun Banner(
+    navigateToShowRegistration: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val uriHandler = LocalUriHandler.current
-
     Box(
         modifier = modifier
             .clickable {
-                uriHandler.openUri("https://boolti.in/login")
+                navigateToShowRegistration()
             },
     ) {
         Image(

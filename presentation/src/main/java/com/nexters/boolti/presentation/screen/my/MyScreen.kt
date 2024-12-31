@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.my
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -54,12 +56,18 @@ fun MyScreen(
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
+    navigateToShowRegistration: () -> Unit,
     onClickQrScan: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyViewModel = hiltViewModel(),
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
+
+    val domain = BuildConfig.DOMAIN
+    val registrationUrl = "https://${domain}/show/add"
+    val homeUrl = "https://${domain}/home"
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.fetchMyInfo()
@@ -71,10 +79,14 @@ fun MyScreen(
         onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
+        onClickManageShow = {
+            uriHandler.openUri(homeUrl)
+            Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
+        }, // TODO 추후 인앱 공연 관리 반영 시 처리
         onClickRegisterShow = {
-            val url = if (user != null) "https://boolti.in/home" else "https://boolti.in/login"
-            uriHandler.openUri(url)
-        },
+            uriHandler.openUri(registrationUrl)
+            Toast.makeText(context, "공연 등록을 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
+        },// navigateToShowRegistration, // TODO 추후 인앱 공연 등록 반영 시 주석 해제
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }
@@ -86,7 +98,8 @@ fun MyScreen(
     onClickHeaderButton: () -> Unit = {},
     onClickAccountSetting: () -> Unit = {},
     onClickReservations: () -> Unit = {},
-    onClickRegisterShow: () -> Unit = { },
+    onClickManageShow: () -> Unit = {},
+    onClickRegisterShow: () -> Unit = {},
     onClickQrScan: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
@@ -142,6 +155,11 @@ fun MyScreen(
                         iconRes = R.drawable.ic_plus_ticket,
                         label = stringResource(R.string.my_register_show),
                         onClick = onClickRegisterShow,
+                    )
+                    MyMenu(
+                        iconRes = R.drawable.ic_manage_show,
+                        label = stringResource(R.string.my_manage_show),
+                        onClick = onClickManageShow,
                     )
                     MyMenu(
                         iconRes = R.drawable.ic_qr_simple,

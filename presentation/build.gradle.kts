@@ -20,13 +20,13 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "PACKAGE_NAME", "\"${libs.versions.packageName.get()}\"")
         buildConfigField("String", "VERSION_NAME", "\"${libs.versions.versionName.get()}\"")
-        buildConfigField("String", "DEV_SUBDOMAIN", getLocalProperty("DEV_SUBDOMAIN"))
     }
 
     buildTypes {
         debug {
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("DEV_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
+            buildConfigField("String", "DOMAIN", getLocalProperty("DEV_DOMAIN"))
         }
         release {
             isMinifyEnabled = false
@@ -34,6 +34,7 @@ android {
 
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
+            buildConfigField("String", "DOMAIN", getLocalProperty("PROD_DOMAIN"))
         }
     }
     compileOptions {

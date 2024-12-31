@@ -51,10 +51,10 @@ import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.SecondaryButton
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.component.dummyReservationDetail
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
-import com.nexters.boolti.presentation.screen.payment.TicketSummarySection
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
@@ -226,8 +226,8 @@ fun sendMessage(
     dateText: String,
     buttonText: String
 ) {
-    val subDomain = if (BuildConfig.DEBUG) BuildConfig.DEV_SUBDOMAIN else ""
-    val giftUrl = "https://${subDomain}boolti.in/gift/$giftUuid"
+    val domain = BuildConfig.DOMAIN
+    val giftUrl = "https://${domain}/gift/$giftUuid"
 
     val defaultFeed = FeedTemplate(
         content = Content(
@@ -379,8 +379,8 @@ private fun ShowInformation(
                 )
             }",
         )
-        TicketSummarySection(
-            Modifier.fillMaxWidth(),
+        ShowItem(
+            modifier = Modifier.fillMaxWidth(),
             poster = reservation.showImage,
             showName = reservation.showName,
             showDate = reservation.showDate,

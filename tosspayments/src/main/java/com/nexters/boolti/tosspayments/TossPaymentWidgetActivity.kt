@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nexters.boolti.tosspayments.databinding.ActivityTossPaymentWidgetBinding
+import com.nexters.boolti.tosspayments.extension.convertQuotes
 import com.nexters.boolti.tosspayments.extension.toCurrency
 import com.tosspayments.paymentsdk.PaymentWidget
 import com.tosspayments.paymentsdk.model.AgreementStatus
@@ -253,20 +254,22 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             variantKey: String? = null,
             redirectUrl: String? = null,
         ): Intent {
-            return Intent(context, TossPaymentWidgetActivity::class.java)
+            return getCommonIntent(
+                context = context,
+                amount = amount,
+                clientKey = clientKey,
+                customerKey = customerKey,
+                orderId = orderId,
+                orderName = orderName,
+                currency = currency,
+                countryCode = countryCode,
+                showId = showId,
+                salesTicketTypeId = salesTicketTypeId,
+                ticketCount = ticketCount,
+            )
                 .putExtra(EXTRA_KEY_ORDER_TYPE, OrderType.TICKETING)
-                .putExtra(EXTRA_KEY_AMOUNT, amount)
-                .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
-                .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
-                .putExtra(EXTRA_KEY_ORDER_ID, orderId)
-                .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
-                .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
-                .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
                 .putExtra(EXTRA_KEY_VARIANT_KEY, variantKey)
                 .putExtra(EXTRA_KEY_REDIRECT_URL, redirectUrl)
-                .putExtra(EXTRA_KEY_SHOW_ID, showId)
-                .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
-                .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
                 .putExtra(EXTRA_KEY_RESERVATION_NAME, reservationName)
                 .putExtra(EXTRA_KEY_RESERVATION_PHONE_NUMBER, reservationPhoneNumber)
                 .putExtra(EXTRA_KEY_DEPOSITOR_NAME, depositorName)
@@ -292,18 +295,20 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
             message: String,
             imageId: String,
         ): Intent {
-            return Intent(context, TossPaymentWidgetActivity::class.java)
+            return getCommonIntent(
+                context = context,
+                amount = amount,
+                clientKey = clientKey,
+                customerKey = customerKey,
+                orderId = orderId,
+                orderName = orderName,
+                currency = currency,
+                countryCode = countryCode,
+                showId = showId,
+                salesTicketTypeId = salesTicketTypeId,
+                ticketCount = ticketCount,
+            )
                 .putExtra(EXTRA_KEY_ORDER_TYPE, OrderType.GIFT)
-                .putExtra(EXTRA_KEY_AMOUNT, amount)
-                .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
-                .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
-                .putExtra(EXTRA_KEY_ORDER_ID, orderId)
-                .putExtra(EXTRA_KEY_ORDER_NAME, orderName)
-                .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
-                .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
-                .putExtra(EXTRA_KEY_SHOW_ID, showId)
-                .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
-                .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
                 .putExtra(EXTRA_KEY_SENDER_NAME, senderName)
                 .putExtra(EXTRA_KEY_SENDER_PHONE_NUMBER, senderContact)
                 .putExtra(EXTRA_KEY_RECEIVER_NAME, receiverName)
@@ -311,5 +316,29 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 .putExtra(EXTRA_KEY_MESSAGE, message)
                 .putExtra(EXTRA_KEY_IMAGE_ID, imageId)
         }
+
+        private fun getCommonIntent(
+            context: Context,
+            amount: Number,
+            clientKey: String,
+            customerKey: String,
+            orderId: String,
+            orderName: String,
+            currency: String,
+            countryCode: String,
+            showId: String,
+            salesTicketTypeId: String,
+            ticketCount: Int,
+        ): Intent = Intent(context, TossPaymentWidgetActivity::class.java)
+            .putExtra(EXTRA_KEY_AMOUNT, amount)
+            .putExtra(EXTRA_KEY_CLIENT_KEY, clientKey)
+            .putExtra(EXTRA_KEY_CUSTOMER_KEY, customerKey)
+            .putExtra(EXTRA_KEY_ORDER_ID, orderId)
+            .putExtra(EXTRA_KEY_ORDER_NAME, orderName.convertQuotes())
+            .putExtra(EXTRA_KEY_CURRENCY, currency.toCurrency())
+            .putExtra(EXTRA_KEY_COUNTRY_CODE, countryCode)
+            .putExtra(EXTRA_KEY_SHOW_ID, showId)
+            .putExtra(EXTRA_KEY_SALES_TICKET_ID, salesTicketTypeId)
+            .putExtra(EXTRA_KEY_TICKET_COUNT, ticketCount)
     }
 }

@@ -40,7 +40,9 @@ internal class AuthDataSource @Inject constructor(
                         imgPath = it.photo,
                         userCode = it.userCode,
                         introduction = it.profileIntroduction,
+                        sns = it.profileSns,
                         link = it.profileLink,
+                        performedShow = it.performedShow,
                     )
                 }
             }
@@ -71,6 +73,7 @@ internal class AuthDataSource @Inject constructor(
                 photo = null,
                 userCode = null,
                 profileIntroduction = "",
+                profileSns = emptyList(),
                 profileLink = emptyList(),
                 accessToken = "",
                 refreshToken = "",
@@ -94,7 +97,9 @@ internal class AuthDataSource @Inject constructor(
                 photo = user.imgPath,
                 userCode = user.userCode,
                 profileIntroduction = user.introduction,
+                profileSns = user.sns,
                 profileLink = user.link,
+                performedShow = user.performedShow,
             )
         }
         Firebase.analytics.apply {
@@ -102,4 +107,9 @@ internal class AuthDataSource @Inject constructor(
             setUserProperty("nickname", user.nickname)
         }
     }
+
+    /**
+     * @return [accessToken, refreshToken]
+     */
+    fun getTokens(): Flow<Pair<String, String>> = data.map { it.accessToken to it.refreshToken }
 }

@@ -58,11 +58,13 @@
     <string name="btn_goto_login">로그인 하러 가기</string>
     <string name="btn_delete">삭제하기</string>
     <string name="btn_exit">나가기</string>
+    <string name="btn_finish">종료하기</string>
     <string name="login">로그인</string>
-    <string name="message_unknown_error">알 수 없는 에러가 발생했습니다</string>
+    <string name="message_unknown_error">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="copy">복사</string>
     <string name="next">다음</string>
     <string name="show">보기</string>
+    <string name="show_all">전체보기</string>
 
     <string name="ticket_holder">방문자</string>
     <string name="depositor">결제자</string>
@@ -73,11 +75,14 @@
     <string name="stepper_plus_description">증가</string>
 
     <string name="complete">완료</string>
+    <string name="edit">편집</string>
 
     <string name="input_lower_limit_text">%d자 이상 입력해 주세요</string>
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>
 
     <string name="input_limit">%d/%d자</string>
+
+    <string name="error_network">네트워크 오류가 발생했어요</string>
 
     <!-- 로그인 -->
     <string name="catch_phrase">지금 불티에 로그인하고\n당신의 공연을 시작해 보세요!</string>
@@ -124,20 +129,21 @@
     <!-- 예매 -->
     <string name="choose_ticket_bottomsheet_title">옵션 선택</string>
     <string name="ticketing_share">공유하기</string>
-    <string name="ticketing_period">티켓 예매 기간</string>
+    <string name="ticketing_period">티켓 판매</string>
     <string name="ticketing_datetime">일시</string>
     <string name="ticketing_minutes">분</string>
     <string name="ticketing_place">장소</string>
     <string name="ticketing_copy_address">주소복사</string>
-    <string name="ticketing_content">공연 내용</string>
+    <string name="ticketing_content">내용</string>
     <string name="ticketing_all_content">전체보기</string>
     <string name="ticketing_all_content_title">공연 내용</string>
-    <string name="ticketing_host">공연 관련 문의</string>
+    <string name="ticketing_host">주최</string>
     <string name="ticketing_button_label">예매하기</string>
     <string name="ticketing_give_a_gift">선물하기</string>
     <string name="ticketing_button_purchased_ticket">이미 예매한 공연</string>
     <string name="ticketing_button_purchased_ticket_message">1인 1매만 예매할 수 있어요</string>
     <string name="ticketing_button_upcoming_ticket">예매 시작 D-%d</string>
+    <string name="ticketing_button_ticket_countdown">판매 시작까지 %d일</string>
     <string name="ticketing_button_closed_ticket">예매 종료</string>
     <string name="ticketing_button_finished_show">공연 종료</string>
     <string name="ticketing_limit_per_person">1인 %d매</string>
@@ -207,7 +213,7 @@
     <string name="gift_successfully_registered">선물이 등록되었어요</string>
     <string name="gift_need_login">로그인 후 선물 등록이 가능합니다.\n로그인해 주세요.</string>
     <string name="gift_register">등록하기</string>
-    <string name="gift_register_dialog">선물을 등록하면\n선물 취소 및 환불이 불가합니다.\n등록하시겠습니까?</string>
+    <string name="gift_register_dialog">선물을 등록하시겠습니까?</string>
     <string name="gift_self_dialog">본인이 결제한 선물입니다.\n선물을 등록하면 다른 분께 보낼 수 없습니다. 등록하시겠습니까?</string>
     <string name="gift_registration_failed">선물 등록에 실패했어요</string>
     <string name="gift_registration_failed_dialog">선물 등록 중 오류가 발생했습니다.\n웹 링크에서 선물 상태를 확인 후 다시 시도해 주세요</string>
@@ -219,17 +225,25 @@
     <string name="show_text_to_ask">문자 문의하기</string>
     <string name="show_tab_info">공연 정보</string>
     <string name="show_tab_cast">출연진</string>
+    <string name="show_sold_ticket_count">%d매 판매 완료</string>
+    <string name="show_ticketing_deadline_countdown">🔥 판매 종료까지</string>
     <string name="empty_cast_title">COMING SOON</string>
     <string name="empty_cast_desc">조금만 기다려주세요!</string>
+    <string name="show_share_format">
+        공연 정보를 공유드려요!\n\n- 공연명 : %s\n- 일시 : %s\n- 장소 : %s\n\n공연 상세 정보 ▼\n%s
+    </string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>
+    <string name="cancel_registered_gift_button">받은 선물 취소하기</string>
     <string name="enter_code_dialog_title">입장 코드로 입장 확인</string>
     <string name="enter_code_dialog_desc">입장 코드는 주최자 계정의 마이 > QR 스캔 > 해당 공연 스캐너에서 확인 가능해요.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_mismatch">올바른 입장 코드를 입력해 주세요</string>
     <string name="show_entry_code">입장코드 보기</string>
+    <string name="copy_code_label">코드 복사</string>
+    <string name="code_copy_success_message">식별 코드를 복사했어요</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
@@ -249,9 +263,11 @@
     <string name="my_login_sub">원하는 공연 티켓을 예매해보세요!</string>
     <string name="my_logout">로그아웃</string>
     <string name="my_ticketing_history">결제 내역</string>
+    <string name="my_manage_show">공연 관리</string>
     <string name="my_scan_qr">입장 확인</string>
     <string name="my_logout_popup">정말 로그아웃 하시겠어요?</string>
     <string name="my_register_show">공연 등록</string>
+    <string name="exit_register_msg">공연 등록을 종료하시겠어요?</string>
     <string name="show_profile_button">프로필 보기</string>
     <string name="account_setting">계정 설정</string>
     <string name="my_show">내 공연</string>
@@ -259,7 +275,9 @@
 
     <!-- 프로필 & 프로필 편집 & 링크 편집 -->
     <string name="profile_title">프로필</string>
-    <string name="profile_links_title">SNS 링크</string>
+    <string name="profile_links_title">링크</string>
+    <string name="performed_shows">출연한 공연</string>
+    <string name="profile_edit_sns_title">SNS</string>
     <string name="profile_edit">프로필 편집</string>
     <string name="profile_edit_button_label">프로필 편집</string>
     <string name="profile_edit_nickname_placeholder">닉네임을 입력해 주세요 (20자 이내)</string>
@@ -270,6 +288,21 @@
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
+
+    <string name="sns">SNS</string>
+    <string name="username">Username</string>
+    <string name="sns_add">SNS 추가</string>
+    <string name="sns_edit">SNS 편집</string>
+    <string name="sns_delete">SNS 삭제</string>
+    <string name="sns_delete_message">SNS를 삭제하시겠어요?</string>
+    <string name="sns_add_msg">SNS를 추가했어요</string>
+    <string name="sns_edit_msg">SNS를 편집했어요</string>
+    <string name="sns_remove_msg">SNS를 삭제했어요</string>
+    <string name="sns_username_placeholder">ex) boolti_official</string>
+    <string name="sns_username_contains_at_error">\@을 제외한 Username을 입력해 주세요</string>
+    <string name="contains_unsupported_char_error">지원하지 않는 특수문자가 포함되어 있습니다</string>
+    <string name="sns_select_instagram_description">인스타그램 선택</string>
+    <string name="sns_select_youtube_description">유튜브 선택</string>
 
     <string name="label_nickname">닉네임</string>
     <string name="label_introduction">소개</string>
@@ -285,7 +318,7 @@
     <string name="link_add_msg">링크를 추가했어요</string>
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
-    <string name="invalid_link">링크를 열 수 없습니다</string>
+    <string name="invalid_link">유효한 링크가 아니에요</string>
 
     <!-- QR 스캔 -->
     <string name="hostedShowsTitle">QR 스캔</string>
@@ -343,6 +376,9 @@
     <string name="refund_method">환불 수단</string>
     <string name="refund_confirm_policy">취소/환불 규정을 확인했습니다</string>
     <string name="refund_error">"알 수 없는 오류로 환불에 실패했어요"</string>
+    <string name="refund_registered_ticket_dialog">취소 시 선물을 보낸 분께 알림이 발송되며 결제가 자동 취소됩니다. 취소하시겠습니까?</string>
+    <string name="refund_complete_ticket_refund">받은 선물을 취소했어요</string>
+    <string name="refund_failed_to_registered_gift">받은 선물 취소 중 오류가 발생했어요</string>
 
     <!-- 신고 -->
     <string name="report">신고하기</string>

@@ -1,6 +1,7 @@
 package com.nexters.boolti.domain.repository
 
 import com.nexters.boolti.domain.model.LoginUserState
+import com.nexters.boolti.domain.model.TokenPair
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
@@ -28,4 +29,6 @@ interface AuthRepository {
     val cachedUser: Flow<User.My?>
 
     suspend fun editProfile(editProfileRequest: EditProfileRequest): Result<Unit>
+
+    fun getTokens(): Flow<TokenPair>
 }

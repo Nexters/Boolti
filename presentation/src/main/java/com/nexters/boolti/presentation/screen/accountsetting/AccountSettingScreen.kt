@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,12 +28,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,11 +47,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
+import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.KakaoYellow
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.copyToClipboard
 
 @Composable
 fun AccountSettingScreen(
@@ -83,6 +90,9 @@ fun AccountSettingScreen(
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val clipboardManager = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier,
@@ -90,6 +100,12 @@ fun AccountSettingScreen(
             BtBackAppBar(
                 title = stringResource(R.string.account_setting),
                 onClickBack = onClickBack,
+            )
+        },
+        snackbarHost = {
+            ToastSnackbarHost(
+                modifier = Modifier.padding(bottom = 54.dp),
+                hostState = snackbarHostState,
             )
         }
     ) { innerPadding ->
@@ -106,13 +122,30 @@ fun AccountSettingScreen(
                     modifier = Modifier.padding(top = 20.dp),
                 ) {
                     Title(stringResource(R.string.user_code))
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        text = "#$userCode",
-                        color = Grey30,
-                    )
+                    Row(
+                        modifier = Modifier.padding(top = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "#$userCode",
+                            color = Grey30,
+                        )
+
+                        val copySuccessMessage = stringResource(R.string.code_copy_success_message)
+                        SmallButton(
+                            label = stringResource(R.string.copy_code_label),
+                            iconRes = R.drawable.ic_copy,
+                            backgroundColor = Grey80,
+                        ) {
+                            userCode.copyToClipboard(
+                                copySuccessMessage = copySuccessMessage,
+                                snackbarHostState = snackbarHostState,
+                                clipboardManager = clipboardManager,
+                                scope = scope,
+                            )
+                        }
+                    }
                 }
 
                 Section {

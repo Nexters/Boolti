@@ -47,6 +47,7 @@ import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
+import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -215,6 +216,11 @@ fun MainNavigation(
                 popBackStack = navController::popBackStack,
             )
         }
+
+        addShowRegistration(
+            modifier = modifier,
+            popBackStack = navController::popBackStack,
+        )
     }
 }
 

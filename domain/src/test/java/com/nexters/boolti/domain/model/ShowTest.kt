@@ -2,6 +2,7 @@ package com.nexters.boolti.domain.model
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -27,10 +28,10 @@ class ShowTest : BehaviorSpec() {
 
             `when`("공연 상태를 계산했을 때") {
                 val results = shows.map { it.state }
-                then("Waiting 상태 및 d-day를 반환한다.") {
-                    results[0] shouldBe ShowState.WaitingTicketing(1)
-                    results[1] shouldBe ShowState.WaitingTicketing(30)
-                    results[2] shouldBe ShowState.WaitingTicketing(365)
+                then("Waiting 상태가 반환한다.") {
+                    results.forEach {
+                        it.shouldBeInstanceOf<ShowState.WaitingTicketing>()
+                    }
                 }
             }
         }

@@ -2,23 +2,21 @@ package com.nexters.boolti.presentation.screen.giftcomplete
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
-fun NavGraphBuilder.addGiftCompleteScreen(
-    navigateTo: (String) -> Unit,
-    navigateToHome: () -> Unit,
-    popBackStack: () -> Unit,
-) {
-    composable(
-        route = MainDestination.GiftComplete.route,
-    ) {
+fun NavGraphBuilder.giftCompleteScreen() {
+    composable<MainRoute.GiftComplete> {
+        val navController = LocalNavController.current
         GiftCompleteScreen(
-            onClickClose = popBackStack,
-            onClickHome = navigateToHome,
+            onClickClose = { navController.popBackStack<ShowRoute.Detail>(false) },
+            onClickHome = navController::navigateToHome,
             navigateToReservation = { reservation ->
-                navigateTo(
-                    MainDestination.ReservationDetail.createRoute(
-                        id = reservation.id,
+                navController.navigate(
+                    MainRoute.ReservationDetail(
+                        reservationId = reservation.id,
                         isGift = true,
                     )
                 )

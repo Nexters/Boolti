@@ -21,7 +21,14 @@ fun rememberNavControllerWithLog(
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow
             .collect {
-                val screenName = it.destination.route?.substringBefore('/') ?: ""
+                // ex1) report/{showId}
+                // ex2) com.nexters.boolti.presentation.screen.navigation.MainRoute.Home
+                val screenName =
+                    it.destination.route
+                        ?.substringBefore('/')
+                        ?.substringAfterLast(".")
+                        ?: ""
+
                 val args = it.arguments?.keySet()?.fold(mutableMapOf<String, String>()) { map, key ->
                     if (key == "android-support-nav:controller:deepLinkIntent") return@fold map
                     map.apply {

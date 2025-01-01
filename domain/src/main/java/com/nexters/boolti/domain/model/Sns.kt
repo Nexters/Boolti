@@ -1,10 +1,13 @@
 package com.nexters.boolti.domain.model
 
+import kotlinx.serialization.Serializable
+
 data class Sns(
     val id: String,
     val type: SnsType,
     val username: String,
 ) {
+    @Serializable
     enum class SnsType {
         INSTAGRAM, YOUTUBE;
 

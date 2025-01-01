@@ -94,8 +94,10 @@ import com.nexters.boolti.presentation.component.InstagramIndicator
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
@@ -112,22 +114,17 @@ import com.nexters.boolti.presentation.util.UrlParser
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
-fun NavGraphBuilder.TicketDetailScreen(
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.ticketDetailScreen(
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = "detail",
-    ) { entry ->
+    composable<TicketRoute.TicketDetail> { entry ->
+        val navController = LocalNavController.current
         TicketDetailScreen(
             modifier = modifier,
-            onBackClicked = popBackStack,
-            onClickQr = {
-                navigateTo(MainDestination.Qr.route)
-            },
-            navigateToShowDetail = { navigateTo("${MainDestination.ShowDetail.route}/$it") },
+            onBackClicked = navController::popBackStack,
+            onClickQr = { navController.navigate(TicketRoute.Qr) },
+            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
             viewModel = getSharedViewModel(entry),
         )
     }
@@ -270,7 +267,7 @@ private fun TicketDetailScreen(
                                         brush = Brush.verticalGradient(
                                             listOf(
                                                 Black.copy(alpha = 0f),
-                                                Black
+                                                Black,
                                             )
                                         ),
                                     )

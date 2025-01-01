@@ -3,23 +3,20 @@ package com.nexters.boolti.presentation.screen.gift
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.addGiftScreen(
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.giftScreen(
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Gift.route,
-        arguments = MainDestination.Gift.arguments,
-    ) {
+    composable<MainRoute.Gift> {
+        val navController = LocalNavController.current
         GiftScreen(
             modifier = modifier,
-            popBackStack = popBackStack,
-            navigateToBusiness = { navigateTo(MainDestination.Business.route) },
+            popBackStack = navController::popBackStack,
+            navigateToBusiness = { navController.navigate(MainRoute.Business) },
             navigateToComplete = { giftId ->
-                navigateTo(MainDestination.GiftComplete.createRoute(giftId))
+                navController.navigate(MainRoute.GiftComplete(giftId = giftId))
             }
         )
     }

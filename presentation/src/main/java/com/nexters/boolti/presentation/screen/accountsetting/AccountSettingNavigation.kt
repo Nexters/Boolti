@@ -2,18 +2,15 @@ package com.nexters.boolti.presentation.screen.accountsetting
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.AccountSettingScreen(
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
-) {
-    composable(
-        route = MainDestination.AccountSetting.route,
-    ) {
+fun NavGraphBuilder.accountSettingScreen() {
+    composable<MainRoute.AccountSetting> {
+        val navController = LocalNavController.current
         AccountSettingScreen(
-            navigateBack = popBackStack,
-            onClickResign = { navigateTo(MainDestination.SignOut.route) },
+            navigateBack = navController::popBackStack,
+            onClickResign = { navController.navigate(MainRoute.SignOut) },
         )
     }
 }

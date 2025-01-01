@@ -50,7 +50,7 @@ import timber.log.Timber
 fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
-    navigateTo: (route: String) -> Unit,
+    navigateTo: (route: Any) -> Unit,
     navigateToHome: () -> Unit,
     viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
@@ -81,7 +81,7 @@ fun ShowRegistrationScreen(
                         return TokenDto(token = accessToken.token)
                     }
 
-                    override fun navigateTo(route: String, navigateOption: NavigateOption) {
+                    override fun <T : Any> navigate(route: T, navigateOption: NavigateOption) {
                         when (navigateOption) {
                             NavigateOption.PUSH -> navigateTo(route)
                             NavigateOption.HOME -> navigateToHome()

@@ -1,7 +1,7 @@
 package com.nexters.boolti.presentation.util.bridge
 
 import androidx.compose.material3.SnackbarDuration
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -50,8 +50,8 @@ class BridgeManager(
                     scope.launch {
                         withContext(Dispatchers.Main) {
                             Timber.tag("bridge").d("공연 상세 화면으로 이동 $showId")
-                            callbackHandler.navigateTo(
-                                route = MainDestination.ShowDetail.createRoute(showId),
+                            callbackHandler.navigate(
+                                route = ShowRoute.ShowRoot(showId),
                                 navigateOption = NavigateOption.CLOSE_AND_OPEN,
                             )
                         }

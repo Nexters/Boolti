@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  */
 interface BridgeCallbackHandler {
     suspend fun fetchToken(): TokenDto
-    fun navigateTo(route: String, navigateOption: NavigateOption = NavigateOption.PUSH)
+    fun <T : Any> navigate(route: T, navigateOption: NavigateOption = NavigateOption.PUSH)
     fun showSnackbar(message: String, duration: SnackbarDuration = SnackbarDuration.Short)
 }
 

@@ -17,6 +17,7 @@ fun NavGraphBuilder.addShowRegistration(
         ShowRegistrationScreen(
             modifier = modifier,
             onClickBack = navController::popBackStack,
+            navigateTo = navController::navigate,
             navigateToHome = navController::navigateToHome,
         )
     }

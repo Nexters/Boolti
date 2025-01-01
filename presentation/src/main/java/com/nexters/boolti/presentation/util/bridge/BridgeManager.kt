@@ -57,14 +57,14 @@ class BridgeManager(
                         }
                     }
                 } ?: Timber.tag("bridge").d("공연 상세 화면으로 이동 실패: showId 없음")
-                callbackToWeb(data, null)
+                callbackToWeb(data)
             }
 
             CommandType.SHOW_TOAST -> {
                 data.data?.jsonObject?.let {
                     val message = it["message"]?.toString() ?: run {
                         Timber.tag("bridge").d("토스트 메시지 출력 실패: message 없음")
-                        callbackToWeb(data, null)
+                        callbackToWeb(data)
                         return@let
                     }
                     val duration = it["duration"]?.toString()?.let { durationStr ->
@@ -77,10 +77,10 @@ class BridgeManager(
 
                     callbackHandler.showSnackbar(message, duration)
                 }
-                callbackToWeb(data, null)
+                callbackToWeb(data)
             }
 
-            else -> callbackToWeb(data, null)
+            else -> callbackToWeb(data)
         }
     }
 
@@ -107,10 +107,10 @@ class BridgeManager(
      */
     private fun callbackToWeb(
         originData: BridgeDto,
-        responseData: JsonElement?
+        responseData: JsonElement? = null,
     ) {
         val responseDto = originData.copy(
-            data = responseData,
+            data = responseData ?: originData.data,
             timestamp = System.currentTimeMillis(),
         )
         val json = json.encodeToString(responseDto)

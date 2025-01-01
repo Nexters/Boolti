@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.util.bridge
 
+import androidx.compose.material3.SnackbarDuration
 import com.nexters.boolti.presentation.screen.MainDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +57,26 @@ class BridgeManager(
                         }
                     }
                 } ?: Timber.tag("bridge").d("공연 상세 화면으로 이동 실패: showId 없음")
+                callbackToWeb(data, null)
+            }
+
+            CommandType.SHOW_TOAST -> {
+                data.data?.jsonObject?.let {
+                    val message = it["message"]?.toString() ?: run {
+                        Timber.tag("bridge").d("토스트 메시지 출력 실패: message 없음")
+                        callbackToWeb(data, null)
+                        return@let
+                    }
+                    val duration = it["duration"]?.toString()?.let { durationStr ->
+                        if (durationStr.equals("long", true)) {
+                            SnackbarDuration.Long
+                        } else {
+                            SnackbarDuration.Short
+                        }
+                    } ?: SnackbarDuration.Short
+
+                    callbackHandler.showSnackbar(message, duration)
+                }
                 callbackToWeb(data, null)
             }
 

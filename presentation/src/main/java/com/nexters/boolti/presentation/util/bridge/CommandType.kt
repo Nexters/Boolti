@@ -7,6 +7,7 @@ enum class CommandType {
     NAVIGATE_TO_SHOW_DETAIL,
     NAVIGATE_BACK,
     REQUEST_TOKEN,
+    SHOW_TOAST,
     UNKNOWN;
 
     companion object {

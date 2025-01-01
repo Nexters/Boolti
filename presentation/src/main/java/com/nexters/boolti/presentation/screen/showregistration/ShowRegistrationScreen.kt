@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +37,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
 import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import com.nexters.boolti.presentation.util.bridge.NavigateOption
@@ -68,6 +70,8 @@ fun ShowRegistrationScreen(
     var webviewProgress by remember { mutableIntStateOf(0) }
     val loading by remember { derivedStateOf { webviewProgress < 100 } }
 
+    val snackbarHostState = LocalSnackbarController.current
+
     LaunchedEffect(webView != null) {
         webView?.setBridgeManager(
             BridgeManager(
@@ -86,6 +90,10 @@ fun ShowRegistrationScreen(
                                 navigateTo(route)
                             }
                         }
+                    }
+
+                    override fun showSnackbar(message: String, duration: SnackbarDuration) {
+                        snackbarHostState.showMessage(message = message, duration = duration)
                     }
                 },
                 scope = scope,

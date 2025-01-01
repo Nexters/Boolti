@@ -1,7 +1,8 @@
 package com.nexters.boolti.presentation.screen.home
 
 import android.net.Uri
-import android.widget.Toast
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,7 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +32,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.nexters.boolti.presentation.BuildConfig
+import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -65,9 +65,6 @@ fun HomeScreen(
     val currentBackStack by navController.currentBackStackEntryAsState()
 
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
-    val domain = BuildConfig.DOMAIN
-    val url = "https://${domain}/show/add"
-    val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
@@ -127,10 +124,7 @@ fun HomeScreen(
             showScreen(
                 navigateToShowDetail = navigateToShowDetail,
                 navigateToBusiness = navigateToBusiness,
-                navigateToShowRegistration = {
-                    uriHandler.openUri(url)
-                    Toast.makeText(context, "공연 등록을 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
-                }  // navigateToShowRegistration,  // TODO 추후 인앱 공연 등록 반영 시 주석 해제,
+                navigateToShowRegistration = navigateToShowRegistration,
             )
 
             ticketScreen(

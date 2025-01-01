@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.zoomable)
     kapt(libs.hilt.compiler)
 
+    implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.lottie)
     implementation(libs.bundles.coil)
     api(libs.kakao.login)

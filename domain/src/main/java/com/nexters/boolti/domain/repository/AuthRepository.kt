@@ -1,7 +1,8 @@
 package com.nexters.boolti.domain.repository
 
+import com.nexters.boolti.domain.model.AccessToken
 import com.nexters.boolti.domain.model.LoginUserState
-import com.nexters.boolti.domain.model.TokenPair
+import com.nexters.boolti.domain.model.TokenPairs
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
@@ -30,5 +31,7 @@ interface AuthRepository {
 
     suspend fun editProfile(editProfileRequest: EditProfileRequest): Result<Unit>
 
-    fun getTokens(): Flow<TokenPair>
+    fun getTokens(): Flow<TokenPairs>
+    fun refreshToken(): Flow<AccessToken>
 }
+

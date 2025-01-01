@@ -2,10 +2,11 @@ package com.nexters.boolti.presentation.screen.link
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
-import com.nexters.boolti.presentation.screen.userCode
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,7 @@ class LinkListViewModel @Inject constructor(
     }
 
     private fun initLoad() {
-        savedStateHandle.get<String?>(userCode)?.let { userCode ->
+        savedStateHandle.toRoute<MainRoute.LinkList>().userCode?.let { userCode ->
             fetchOthersLinks(userCode)
         } ?: run {
             fetchMyLinks()
@@ -49,6 +50,9 @@ class LinkListViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
+                _uiState.update {
+                    it.copy(loading = false)
+                }
                 event(LinkListEvent.LoadFailed)
             }
         }

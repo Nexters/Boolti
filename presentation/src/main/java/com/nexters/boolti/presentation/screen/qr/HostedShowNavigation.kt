@@ -3,20 +3,19 @@ package com.nexters.boolti.presentation.screen.qr
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.HostedShowScreen(
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.hostedShowScreen(
     onClickShow: (showId: String, showName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.HostedShows.route
-    ) {
+    composable<MainRoute.HostedShows> {
+        val navController = LocalNavController.current
         HostedShowScreen(
             modifier = modifier,
             onClickShow = onClickShow,
-            onClickBack = popBackStack
+            onClickBack = navController::popBackStack
         )
     }
 }

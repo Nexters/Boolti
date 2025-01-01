@@ -2,18 +2,16 @@ package com.nexters.boolti.presentation.screen.signout
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.extension.navigateToHome
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.SignoutScreen(
-    navigateToHome: () -> Unit,
-    popBackStack: () -> Unit,
-) {
-    composable(
-        route = MainDestination.SignOut.route,
-    ) {
+fun NavGraphBuilder.signoutScreen() {
+    composable<MainRoute.SignOut> {
+        val navController = LocalNavController.current
         SignoutScreen(
-            navigateToHome = navigateToHome,
-            navigateBack = popBackStack,
+            navigateToHome = navController::navigateToHome,
+            navigateBack = navController::popBackStack,
         )
     }
 }

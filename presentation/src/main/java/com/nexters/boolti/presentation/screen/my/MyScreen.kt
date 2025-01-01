@@ -52,14 +52,14 @@ import com.nexters.boolti.presentation.theme.point3
 
 @Composable
 fun MyScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MyViewModel = hiltViewModel(),
     requireLogin: () -> Unit,
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToShowRegistration: () -> Unit,
     onClickQrScan: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MyViewModel = hiltViewModel(),
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
 

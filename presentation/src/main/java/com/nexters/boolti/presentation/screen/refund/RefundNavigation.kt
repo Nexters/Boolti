@@ -2,21 +2,18 @@ package com.nexters.boolti.presentation.screen.refund
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
-import com.nexters.boolti.presentation.screen.reservationId
+import androidx.navigation.toRoute
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.RefundScreen(
-    popBackStack: () -> Unit,
-) {
-    composable(
-        route = MainDestination.Refund.route,
-        arguments = MainDestination.Refund.arguments,
-    ) { entry ->
-        val isGift = entry.arguments?.getBoolean("isGift")
+fun NavGraphBuilder.refundScreen() {
+    composable<MainRoute.Refund> { entry ->
+        val navController = LocalNavController.current
+        val route = entry.toRoute<MainRoute.Refund>()
 
         RefundScreen(
-            isGift = isGift ?: false,
-            onBackPressed = popBackStack,
+            isGift = route.isGift,
+            onBackPressed = navController::popBackStack,
         )
     }
 }

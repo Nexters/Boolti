@@ -54,6 +54,7 @@ fun QrScanScreen(
     barcodeView: DecoratedBarcodeView,
     viewModel: QrScanViewModel = hiltViewModel(),
     onClickClose: () -> Unit,
+    onClickSwitchCamera: () -> Unit,
 ) {
     var showEntryCodeDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -103,7 +104,7 @@ fun QrScanScreen(
                 },
                 actionButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = {},
+                        onClick = onClickSwitchCamera,
                         iconRes = R.drawable.ic_camera_flip,
                     )
                 }

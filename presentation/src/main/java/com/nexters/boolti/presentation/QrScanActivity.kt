@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation
 
 import android.Manifest
 import android.content.Context
+import android.hardware.Camera
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class QrScanActivity : ComponentActivity() {
+    var isBackCamera = true
 
     private val barcodeView: DecoratedBarcodeView by lazy {
         DecoratedBarcodeView(this).apply {
@@ -78,7 +80,8 @@ class QrScanActivity : ComponentActivity() {
             BooltiTheme {
                 QrScanScreen(
                     barcodeView = barcodeView,
-                    onClickClose = { finish() }
+                    onClickClose = { finish() },
+                    onClickSwitchCamera = ::switchCamera
                 )
             }
         }
@@ -96,5 +99,16 @@ class QrScanActivity : ComponentActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return barcodeView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
+    }
+
+    private fun switchCamera() {
+        barcodeView.pause()
+        isBackCamera = !isBackCamera
+        barcodeView.cameraSettings.requestedCameraId = if (isBackCamera) {
+            Camera.CameraInfo.CAMERA_FACING_BACK
+        } else {
+            Camera.CameraInfo.CAMERA_FACING_FRONT
+        }
+        barcodeView.resume()
     }
 }

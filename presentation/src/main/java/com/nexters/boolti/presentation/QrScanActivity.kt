@@ -1,7 +1,12 @@
 package com.nexters.boolti.presentation
 
 import android.Manifest
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +45,21 @@ class QrScanActivity : ComponentActivity() {
     private val callback = BarcodeCallback { result: BarcodeResult ->
         result.text ?: return@BarcodeCallback
         viewModel.scan(result.text)
+
+        val vibrator =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+            } else {
+                getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
+
+        vibrator.vibrate(
+            VibrationEffect.createOneShot(
+                100,
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
+        )
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 barcodeView.pause()

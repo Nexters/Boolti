@@ -233,7 +233,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
             )
             Text(
                 text = stringResource(id = R.string.show_entry_code),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.titleSmall,
                 color = Grey30,
             )
         }

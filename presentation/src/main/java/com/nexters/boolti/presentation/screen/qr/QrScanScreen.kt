@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.qr
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +53,7 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.Warning
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,7 +66,6 @@ fun QrScanScreen(
     var showEntryCodeDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     var snackbarIconId by remember { mutableStateOf<Int?>(null) }
-    val scope = rememberCoroutineScope()
 
     val successMessage = stringResource(R.string.message_ticket_validated)
     val notTodayErrMessage = stringResource(R.string.error_show_not_today)
@@ -71,38 +74,53 @@ fun QrScanScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var bottomPadding by remember { mutableStateOf(0.dp) }
+    var borderColor: Color by remember { mutableStateOf(Color.Transparent) }
 
     LaunchedEffect(barcodeView) {
         barcodeView.resume()
     }
 
     LaunchedEffect(viewModel.event) {
-        scope.launch {
-            viewModel.event.collect { event ->
-                val (iconId, errMessage) = when (event) {
-                    is QrScanEvent.ScanError -> {
-                        when (event.errorType) {
-                            QrErrorType.ShowNotToday -> Pair(
-                                R.drawable.ic_warning,
-                                notTodayErrMessage
-                            )
+        viewModel.event.collect { event ->
+            val (iconId, errMessage, color) = when (event) {
+                is QrScanEvent.ScanError -> {
+                    when (event.errorType) {
+                        QrErrorType.ShowNotToday -> Triple(
+                            R.drawable.ic_warning,
+                            notTodayErrMessage,
+                            Warning
+                        )
 
-                            QrErrorType.UsedTicket -> Pair(
-                                R.drawable.ic_error,
-                                usedTicketErrMessage
-                            )
+                        QrErrorType.UsedTicket -> Triple(
+                            R.drawable.ic_error,
+                            usedTicketErrMessage,
+                            Error
+                        )
 
-                            QrErrorType.TicketNotFound -> Pair(
-                                R.drawable.ic_error,
-                                notMatchedErrMessage
-                            )
-                        }
+                        QrErrorType.TicketNotFound -> Triple(
+                            R.drawable.ic_error,
+                            notMatchedErrMessage,
+                            Error
+                        )
                     }
-
-                    is QrScanEvent.ScanSuccess -> Pair(R.drawable.ic_error, successMessage)
                 }
-                snackbarIconId = iconId
+
+                is QrScanEvent.ScanSuccess -> Triple(
+                    R.drawable.ic_error,
+                    successMessage,
+                    Success
+                )
+            }
+            snackbarIconId = iconId
+
+            launch {
                 snackbarHostState.showSnackbar(errMessage)
+            }
+
+            launch {
+                borderColor = color
+                delay(4000L)
+                borderColor = Color.Transparent
             }
         }
     }
@@ -136,7 +154,12 @@ fun QrScanScreen(
                 ToastSnackbarHost(
                     modifier = Modifier
                         .offset { // Scaffold의 inner padding 만큼 상단을 뚫고 나가는 문제가 있음. 해당 값 보정.
-                            IntOffset(0, bottomPadding.toPx().toInt())
+                            IntOffset(
+                                0,
+                                bottomPadding
+                                    .toPx()
+                                    .toInt()
+                            )
                         }
                         .padding(top = 18.dp + 44.dp), // 44.dp 는 top bar 높이 값 수동 계산
                     hostState = snackbarHostState,
@@ -163,7 +186,8 @@ fun QrScanScreen(
         AndroidView(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .border(width = 2.dp, color = borderColor),
             factory = { barcodeView },
         )
 

@@ -3,10 +3,12 @@ package com.nexters.boolti.presentation.screen.qr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -67,6 +70,7 @@ fun QrScanScreen(
     val notMatchedErrMessage = stringResource(R.string.error_ticket_not_matched)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var bottomPadding by remember { mutableStateOf(0.dp) }
 
     LaunchedEffect(barcodeView) {
         barcodeView.resume()
@@ -78,9 +82,20 @@ fun QrScanScreen(
                 val (iconId, errMessage) = when (event) {
                     is QrScanEvent.ScanError -> {
                         when (event.errorType) {
-                            QrErrorType.ShowNotToday -> Pair(R.drawable.ic_warning, notTodayErrMessage)
-                            QrErrorType.UsedTicket -> Pair(R.drawable.ic_error, usedTicketErrMessage)
-                            QrErrorType.TicketNotFound -> Pair(R.drawable.ic_error, notMatchedErrMessage)
+                            QrErrorType.ShowNotToday -> Pair(
+                                R.drawable.ic_warning,
+                                notTodayErrMessage
+                            )
+
+                            QrErrorType.UsedTicket -> Pair(
+                                R.drawable.ic_error,
+                                usedTicketErrMessage
+                            )
+
+                            QrErrorType.TicketNotFound -> Pair(
+                                R.drawable.ic_error,
+                                notMatchedErrMessage
+                            )
                         }
                     }
 
@@ -114,24 +129,37 @@ fun QrScanScreen(
             QrScanBottombar { showEntryCodeDialog = true }
         },
         snackbarHost = {
-            ToastSnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = 100.dp),
-                leadingIcon = {
-                    snackbarIconId?.let {
-                        CircleBgIcon(
-                            painter = painterResource(it),
-                            bgColor = when (it) {
-                                R.drawable.ic_check -> Success
-                                R.drawable.ic_error -> Error
-                                else -> Warning
-                            }
-                        )
-                    }
-                },
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                ToastSnackbarHost(
+                    modifier = Modifier
+                        .offset { // Scaffold의 inner padding 만큼 상단을 뚫고 나가는 문제가 있음. 해당 값 보정.
+                            IntOffset(0, bottomPadding.toPx().toInt())
+                        }
+                        .padding(top = 18.dp + 44.dp), // 44.dp 는 top bar 높이 값 수동 계산
+                    hostState = snackbarHostState,
+                    leadingIcon = {
+                        snackbarIconId?.let {
+                            CircleBgIcon(
+                                painter = painterResource(it),
+                                bgColor = when (it) {
+                                    R.drawable.ic_check -> Success
+                                    R.drawable.ic_error -> Error
+                                    else -> Warning
+                                }
+                            )
+                        }
+                    },
+                )
+            }
         },
     ) { innerPadding ->
+        LaunchedEffect(innerPadding) {
+            bottomPadding = innerPadding.calculateBottomPadding()
+        }
+
         AndroidView(
             modifier = Modifier
                 .padding(innerPadding)
@@ -194,7 +222,10 @@ private fun EntryCodeDialog(
     onDismiss: () -> Unit,
 ) {
     BTDialog(showCloseButton = false, onDismiss = onDismiss, onClickPositiveButton = onDismiss) {
-        Text(text = stringResource(R.string.manager_code), style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.manager_code),
+            style = MaterialTheme.typography.titleLarge
+        )
         Text(
             modifier = Modifier
                 .padding(top = 24.dp)

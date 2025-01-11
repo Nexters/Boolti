@@ -169,9 +169,9 @@ fun ProfileScreen(
             onReportFinished = { snackbarHostState.showMessage(reportFinishedMessage) },
         )
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .verticalScroll(scrollState)
-                .padding(innerPadding),
+                .padding(bottom = innerPadding.calculateBottomPadding()),
         ) {
             ProfileHeader(
                 modifier = Modifier.fillMaxWidth(),

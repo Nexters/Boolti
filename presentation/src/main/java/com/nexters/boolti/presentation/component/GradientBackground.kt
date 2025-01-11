@@ -32,13 +32,16 @@ fun TopGradientBackground(
     modifier: Modifier = Modifier,
     bgColor: Color = MaterialTheme.colorScheme.background,
     gradientHeight: Dp = 16.dp,
+    onHeightChanged: (Dp) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val density = LocalDensity.current
     var contentWidthDp by remember { mutableStateOf(0.dp) }
 
     Column(
-        modifier = modifier,
+        modifier = modifier.onGloballyPositioned {
+            onHeightChanged(it.size.height.toDp(density))
+        },
     ) {
         Box(
             Modifier

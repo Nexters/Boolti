@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -72,7 +71,6 @@ import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.theme.statusBarHeight
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ShowScreen(
     navigateToBusiness: () -> Unit,

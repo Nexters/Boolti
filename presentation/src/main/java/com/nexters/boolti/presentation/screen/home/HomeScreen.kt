@@ -120,11 +120,12 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         NavHost(
-            modifier = modifier.padding(innerPadding),
+            modifier = modifier,
             navController = navController,
             startDestination = HomeRoute.Show,
         ) {
             showScreen(
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                 navigateToShowDetail = navigateToShowDetail,
                 navigateToBusiness = navigateToBusiness,
                 navigateToShowRegistration = {
@@ -134,12 +135,14 @@ fun HomeScreen(
             )
 
             ticketScreen(
+                modifier = Modifier.padding(innerPadding),
                 isLoggedIn = isLoggedIn,
                 navigateToLogin = navigateToLogin,
                 navigateToTicketDetail = navigateToTicketDetail,
             )
 
             myScreen(
+                modifier = Modifier.padding(innerPadding),
                 navigateToLogin = navigateToLogin,
                 navigateToAccountSetting = navigateToAccountSetting,
                 navigateToReservations = navigateToReservations,

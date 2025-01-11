@@ -1,7 +1,6 @@
 package com.nexters.boolti.data.network
 
-import com.nexters.boolti.data.datasource.AuthDataSource
-import com.nexters.boolti.data.datasource.TokenDataSource
+import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -10,27 +9,11 @@ import okhttp3.Route
 import javax.inject.Inject
 
 internal class AuthAuthenticator @Inject constructor(
-    private val tokenDataSource: TokenDataSource,
-    private val authDataSource: AuthDataSource,
+    private val authTokenDataSource: AuthTokenDataSource,
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        val accessToken = runBlocking { getNewAccessToken() } ?: return null
+        val accessToken = runBlocking { authTokenDataSource.getNewAccessToken() } ?: return null
 
         return response.request.newBuilder().header("Authorization", "Bearer $accessToken").build()
-    }
-
-    private suspend fun getNewAccessToken(): String? {
-        val response = authDataSource.refresh()
-        val newToken = response.getOrNull()
-        return newToken?.let {
-            tokenDataSource.saveTokens(
-                accessToken = it.accessToken,
-                refreshToken = it.refreshToken,
-            )
-            it.accessToken
-        } ?: run {
-            authDataSource.logout()
-            null
-        }
     }
 }

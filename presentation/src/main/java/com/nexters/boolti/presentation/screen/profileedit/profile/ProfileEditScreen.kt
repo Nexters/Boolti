@@ -374,7 +374,10 @@ fun ProfileEditScreen(
                         }
                     }
                 }
+
+                Spacer(Modifier.size(32.dp))
             }
+
             if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
         if (showExitAlertDialog) {

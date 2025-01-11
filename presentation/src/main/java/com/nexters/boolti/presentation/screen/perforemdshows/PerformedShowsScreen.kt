@@ -78,7 +78,7 @@ private fun PerformedShowsScreen(
             modifier = Modifier.padding(innerPadding),
         ) {
             LazyColumn(
-                contentPadding = PaddingValues(vertical = 20.dp),
+                contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(shows) { show ->

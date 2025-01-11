@@ -390,7 +390,7 @@ private fun TicketDetailScreen(
                     )
                 }
 
-                Spacer(Modifier.size(20.dp))
+                Spacer(Modifier.size(32.dp))
             }
         }
     }
@@ -728,7 +728,6 @@ private fun Section(
 ) {
     Column(
         modifier
-            .padding(bottom = 12.dp)
             .fillMaxWidth()
             .border(1.dp, color = White.copy(alpha = .15f), shape = RoundedCornerShape(8.dp))
             .padding(start = 20.dp, end = 20.dp, bottom = if (contentVisible) 20.dp else 0.dp)

@@ -1,14 +1,14 @@
 package com.nexters.boolti.presentation.util.bridge
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.material3.SnackbarDuration
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -47,14 +47,12 @@ class BridgeManager(
 
             CommandType.NAVIGATE_TO_SHOW_DETAIL -> {
                 data.data?.jsonObject?.get("showId")?.toString()?.let { showId ->
-                    scope.launch {
-                        withContext(Dispatchers.Main) {
-                            Timber.tag("bridge").d("공연 상세 화면으로 이동 $showId")
-                            callbackHandler.navigate(
-                                route = ShowRoute.ShowRoot(showId),
-                                navigateOption = NavigateOption.CLOSE_AND_OPEN,
-                            )
-                        }
+                    Handler(Looper.getMainLooper()).post {
+                        Timber.tag("bridge").d("공연 상세 화면으로 이동 $showId")
+                        callbackHandler.navigate(
+                            route = ShowRoute.ShowRoot(showId),
+                            navigateOption = NavigateOption.CLOSE_AND_OPEN,
+                        )
                     }
                 } ?: Timber.tag("bridge").d("공연 상세 화면으로 이동 실패: showId 없음")
                 callbackToWeb(data)
@@ -80,7 +78,8 @@ class BridgeManager(
                 callbackToWeb(data)
             }
 
-            else -> callbackToWeb(data)
+            CommandType.NAVIGATE_BACK -> callbackToWeb(data)
+            CommandType.UNKNOWN -> callbackToWeb(data)
         }
     }
 

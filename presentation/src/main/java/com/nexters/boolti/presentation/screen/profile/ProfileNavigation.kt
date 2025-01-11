@@ -3,36 +3,27 @@ package com.nexters.boolti.presentation.screen.profile
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
-fun NavGraphBuilder.ProfileScreen(
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.profileScreen(
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Profile.route,
-        arguments = MainDestination.Profile.arguments,
-    ) {
+    composable<MainRoute.Profile> {
+        val navController = LocalNavController.current
         ProfileScreen(
             modifier = modifier,
-            onClickBack = popBackStack,
+            onClickBack = navController::popBackStack,
             navigateToLinks = { userCode ->
-                if (userCode != null) {
-                    navigateTo(MainDestination.LinkList.createRoute(userCode))
-                } else {
-                    navigateTo(MainDestination.LinkList.createRoute())
-                }
+                navController.navigate(MainRoute.LinkList(userCode))
             },
             navigateToPerformedShows = { userCode ->
-                if (userCode != null) {
-                    navigateTo(MainDestination.PerformedShows.createRoute(userCode))
-                } else {
-                    navigateTo(MainDestination.PerformedShows.createRoute())
-                }
+                navController.navigate(MainRoute.PerformedShows(userCode))
             },
-            navigateToProfileEdit = { navigateTo(MainDestination.ProfileEdit.route) },
-            navigateToShow = { showId -> navigateTo(MainDestination.ShowDetail.createRoute(showId)) },
+            navigateToProfileEdit = { navController.navigate(ProfileRoute.ProfileEdit) },
+            navigateToShow = { showId -> navController.navigate(ShowRoute.ShowRoot(showId = showId)) },
         )
     }
 }

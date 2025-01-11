@@ -44,7 +44,8 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.InstagramIndicator
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailViewModel
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
@@ -54,18 +55,17 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
-fun NavGraphBuilder.QrFullScreen(
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.qrFullScreen(
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Qr.route,
-    ) { entry ->
+    composable<TicketRoute.Qr> { entry ->
+        val navController = LocalNavController.current
         QrFullScreen(
             modifier = modifier,
             viewModel = getSharedViewModel(entry),
-        ) { popBackStack() }
+            onClose = navController::popBackStack,
+        )
     }
 }
 

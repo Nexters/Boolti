@@ -70,7 +70,7 @@ private fun PerformedShowsScreen(
         topBar = {
             BtBackAppBar(
                 title = stringResource(R.string.performed_shows),
-                onClickBack = onClickBack
+                onClickBack = onClickBack,
             )
         },
     ) { innerPadding ->
@@ -93,7 +93,9 @@ private fun PerformedShowsScreen(
 
             if (loading) {
                 BtCircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
                 )
             }
         }

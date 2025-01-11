@@ -3,25 +3,42 @@ package com.nexters.boolti.presentation.screen.profileedit.link
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 
-fun NavGraphBuilder.ProfileLinkEditScreen(
-    onAddLink: (linkName: String, url: String) -> Unit,
-    onEditLink: (id: String, linkName: String, url: String) -> Unit,
-    onRemoveLink: (id: String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.profileLinkEditScreen(
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.ProfileLinkEdit.route,
-        arguments = MainDestination.ProfileLinkEdit.arguments,
-    ) {
+    composable<ProfileRoute.ProfileLinkEdit> {
+        val navController = LocalNavController.current
         LinkEditScreen(
             modifier = modifier,
-            onAddLink = onAddLink,
-            onEditLink = onEditLink,
-            onRemoveLink = onRemoveLink,
-            navigateBack = popBackStack,
+            onAddLink = { linkName, url ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("newLinkName", linkName)
+                        set("newLinkUrl", url)
+                    }
+                navController.popBackStack()
+            },
+            onEditLink = { id, linkName, url ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.apply {
+                        set("editLinkId", id)
+                        set("editLinkName", linkName)
+                        set("editLinkUrl", url)
+                    }
+                navController.popBackStack()
+            },
+            onRemoveLink = { id ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("removeLinkId", id)
+                navController.popBackStack()
+            },
+            navigateBack = navController::popBackStack,
         )
     }
 }

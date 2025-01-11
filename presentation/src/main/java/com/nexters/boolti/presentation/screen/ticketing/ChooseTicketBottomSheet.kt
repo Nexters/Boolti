@@ -137,7 +137,7 @@ private fun ChooseTicketBottomSheetContent1(
 ) {
     val listState = rememberLazyListState()
     Column(
-        modifier = Modifier.padding(bottom = 20.dp),
+        modifier = Modifier.padding(bottom = 32.dp),
     ) {
         Text(
             text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
@@ -250,7 +250,7 @@ private fun ChooseTicketBottomSheetContent2(
             label = stringResource(buttonTextId),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
+                .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp)
                 .height(48.dp),
             onClick = { onTicketingClicked(ticket, ticketCount) },
         )

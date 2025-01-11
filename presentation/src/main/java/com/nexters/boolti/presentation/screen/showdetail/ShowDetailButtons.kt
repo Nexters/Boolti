@@ -2,18 +2,13 @@ package com.nexters.boolti.presentation.screen.showdetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +18,7 @@ import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -39,24 +35,11 @@ fun ShowDetailButtons(
     onHeightChanged: (height: Dp) -> Unit = {},
 ) {
     val density = LocalDensity.current
-    Column(
-        modifier = Modifier.onSizeChanged {
-            onHeightChanged(it.height.toDp(density))
-        },
+    TopGradientBackground(
+        modifier = Modifier.onGloballyPositioned { coord ->
+            onHeightChanged(coord.size.height.toDp(density))
+        }
     ) {
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(16.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.background,
-                        )
-                    )
-                )
-        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

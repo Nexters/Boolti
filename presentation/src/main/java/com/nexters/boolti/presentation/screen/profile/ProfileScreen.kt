@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.profile
 
 import android.content.ActivityNotFoundException
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,10 +12,11 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -32,22 +34,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
@@ -57,7 +68,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ShowItem
-import com.nexters.boolti.presentation.component.UserThumbnail
+import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -69,6 +80,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun ProfileScreen(
@@ -123,13 +135,19 @@ fun ProfileScreen(
     val invalidUrlMsg = stringResource(R.string.invalid_link)
 
     val scrollState = rememberScrollState()
+    val appBarBgColor by animateColorAsState(
+        targetValue = if (scrollState.canScrollBackward) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            Color.Transparent
+        },
+        label = "appBarBgColor",
+    )
 
     var backDialogMessage by rememberSaveable { mutableStateOf<String?>(null) }
     val invalidUserMessage = stringResource(R.string.profile_invalid_user_message)
     val withdrawUserMessage = stringResource(R.string.profile_withdraw_user_message)
     val reportFinishedMessage = stringResource(R.string.report_finished)
-
-    var showContextMenu by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(event) {
         event.collectLatest {
@@ -142,65 +160,21 @@ fun ProfileScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            BtAppBar(
-                title = stringResource(R.string.profile_title),
-                colors = BtAppBarDefaults.appBarColors(containerColor = MaterialTheme.colorScheme.surface),
-                navigateButtons = {
-                    BtAppBarDefaults.AppBarIconButton(
-                        iconRes = R.drawable.ic_arrow_back,
-                        onClick = onClickBack,
-                    )
-                },
-                actionButtons = {
-                    if (isMine) {
-                        BtAppBarDefaults.AppBarTextButton(
-                            label = stringResource(R.string.edit),
-                            onClick = navigateToProfileEdit,
-                        )
-                    } else {
-                        BtAppBarDefaults.AppBarIconButton(
-                            iconRes = R.drawable.ic_verticle_more,
-                            description = stringResource(R.string.description_more_menu),
-                            onClick = { showContextMenu = true },
-                        )
-                    }
-                },
-            )
-            if (showContextMenu) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentSize(Alignment.TopEnd),
-                ) {
-                    DropdownMenu(
-                        modifier = Modifier.background(Grey20),
-                        expanded = showContextMenu,
-                        onDismissRequest = { showContextMenu = false },
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = stringResource(id = R.string.report),
-                                    color = Color.Black,
-                                )
-                            },
-                            onClick = {
-                                showContextMenu = false
-                                snackbarHostState.showMessage(reportFinishedMessage)
-                            },
-                        )
-                    }
-                }
-            }
-        }
     ) { innerPadding ->
+        ProfileAppBar(
+            onClickBack = onClickBack,
+            isMine = isMine,
+            bgColor = appBarBgColor,
+            navigateToProfileEdit = navigateToProfileEdit,
+            onReportFinished = { snackbarHostState.showMessage(reportFinishedMessage) },
+        )
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .verticalScroll(scrollState)
-                .padding(innerPadding),
+                .padding(bottom = innerPadding.calculateBottomPadding()),
         ) {
             ProfileHeader(
+                modifier = Modifier.fillMaxWidth(),
                 user = user,
                 onClickSns = { sns ->
                     try {
@@ -298,6 +272,69 @@ fun ProfileScreen(
     }
 }
 
+@Composable
+private fun ProfileAppBar(
+    onClickBack: () -> Unit,
+    isMine: Boolean,
+    bgColor: Color,
+    navigateToProfileEdit: () -> Unit,
+    onReportFinished: () -> Unit,
+) {
+    var showContextMenu by rememberSaveable { mutableStateOf(false) }
+
+    BtAppBar(
+        modifier = Modifier.zIndex(1f),
+        title = stringResource(R.string.profile_title),
+        colors = BtAppBarDefaults.appBarColors(containerColor = bgColor),
+        navigateButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_arrow_back,
+                onClick = onClickBack,
+            )
+        },
+        actionButtons = {
+            if (isMine) {
+                BtAppBarDefaults.AppBarTextButton(
+                    label = stringResource(R.string.edit),
+                    onClick = navigateToProfileEdit,
+                )
+            } else {
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_verticle_more,
+                    description = stringResource(R.string.description_more_menu),
+                    onClick = { showContextMenu = true },
+                )
+            }
+        },
+    )
+    if (showContextMenu) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.TopEnd),
+        ) {
+            DropdownMenu(
+                modifier = Modifier.background(Grey20),
+                expanded = showContextMenu,
+                onDismissRequest = { showContextMenu = false },
+            ) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.report),
+                            color = Color.Black,
+                        )
+                    },
+                    onClick = {
+                        showContextMenu = false
+                        onReportFinished()
+                    },
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileHeader(
@@ -306,48 +343,85 @@ private fun ProfileHeader(
     onClickSns: (Sns) -> Unit,
 ) {
     val shape = RoundedCornerShape(
-        bottomStart = 12.dp,
-        bottomEnd = 12.dp,
+        bottomStart = 20.dp,
+        bottomEnd = 20.dp,
     )
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = marginHorizontal)
-            .padding(bottom = 32.dp),
-    ) {
-        UserThumbnail(
-            modifier = Modifier.padding(top = 40.dp),
-            size = 70.dp,
-            model = user.photo,
-        )
-        Text(
-            modifier = Modifier.padding(top = 20.dp),
-            text = user.nickname,
-            style = point3,
-            fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+    var contentHeight by remember {
+        mutableStateOf(0.dp)
+    }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val density = LocalDensity.current
+    val profileHeight = contentHeight.coerceAtMost(screenWidth)
 
-        if (user.introduction.isNotBlank()) {
-            Text(
-                modifier = Modifier.padding(top = 2.dp),
-                text = user.introduction,
-                color = Grey30,
-                style = MaterialTheme.typography.bodyLarge,
+    val defaultProfile = painterResource(R.drawable.ic_profile_placeholder)
+
+    Box(
+        modifier = modifier
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surface),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(profileHeight),
+        ) {
+            AsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                model = user.photo,
+                contentScale = ContentScale.Crop,
+                placeholder = defaultProfile,
+                fallback = defaultProfile,
+                contentDescription = stringResource(R.string.description_user_thumbnail),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            listOf(Color(0x33121318), Color(0xFF121318)),
+                        ),
+                    ),
             )
         }
-        if (user.sns.isNotEmpty()) {
-            FlowRow(
-                modifier = Modifier.padding(top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                user.sns.forEach { sns -> SnsChip(sns) { onClickSns(sns) } }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onSizeChanged {
+                    contentHeight = it.height.toDp(density)
+                }
+                .padding(horizontal = marginHorizontal)
+                .padding(
+                    top = 188.dp,
+                    bottom = 32.dp,
+                ), // TODO StatusBar 까지 확장되면 StatusBar 높이 추가되어야 함
+        ) {
+            Text(
+                modifier = Modifier.padding(top = 20.dp),
+                text = user.nickname,
+                style = point3,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            if (user.introduction.isNotBlank()) {
+                Text(
+                    modifier = Modifier.padding(top = 2.dp),
+                    text = user.introduction,
+                    color = Grey30,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+            if (user.sns.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier.padding(top = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    user.sns.forEach { sns -> SnsChip(sns) { onClickSns(sns) } }
+                }
             }
         }
     }
@@ -470,5 +544,36 @@ private fun SectionPreview() {
             title = "링크",
             onClickShowAll = {},
         ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileScreenPreview() {
+    val user = User.My(
+        id = "",
+        nickname = "mangbaam",
+        email = "mangbaam@boolti.com",
+        photo = null,
+        userCode = "oratio",
+        introduction = "안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n안녕하세요\n",
+        sns = listOf(
+            Sns("1", Sns.SnsType.INSTAGRAM, "hey__suun"),
+            Sns("1", Sns.SnsType.YOUTUBE, "tune_official"),
+        ),
+        link = listOf(),
+        performedShow = listOf(),
+    )
+    BooltiTheme {
+        ProfileScreen(
+            user = user,
+            isMine = false,
+            event = emptyFlow(),
+            onClickBack = {},
+            navigateToProfileEdit = {},
+            navigateToLinks = {},
+            navigateToShow = {},
+            navigateToPerformedShows = {},
+        )
     }
 }

@@ -1,10 +1,13 @@
 package com.nexters.boolti.presentation
 
 import android.Manifest
+import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -53,6 +56,8 @@ class QrScanActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         requestPermission(Manifest.permission.CAMERA, 100)
+
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
 
         setContent {
             BooltiTheme {

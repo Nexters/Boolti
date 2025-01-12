@@ -44,8 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -72,6 +70,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.PolicyBottomSheet
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
+import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
@@ -91,6 +90,8 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun TicketingScreen(
@@ -100,14 +101,57 @@ fun TicketingScreen(
     onReserved: (reservationId: String, showId: String) -> Unit,
     navigateToBusiness: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    TicketingScreen(
+        showId = viewModel.showId,
+        salesTicketTypeId = viewModel.salesTicketTypeId,
+        uiState = uiState,
+        event = viewModel.event,
+        onBackClicked = onBackClicked,
+        onReserved = onReserved,
+        navigateToBusiness = navigateToBusiness,
+        onChangeReservationName = viewModel::setReservationName,
+        onChangeReservationPhoneNumber = viewModel::setReservationPhoneNumber,
+        onChangeDepositorName = viewModel::setDepositorName,
+        onChangeDepositorPhoneNumber = viewModel::setDepositorPhoneNumber,
+        onToggleIsSameContactInfo = viewModel::toggleIsSameContactInfo,
+        onClickCheckInviteCode = viewModel::checkInviteCode,
+        onInviteCodeChanged = viewModel::setInviteCode,
+        onToggleAgreement = viewModel::toggleAgreement,
+        onClickReservation = viewModel::reservation,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TicketingScreen(
+    showId: String,
+    salesTicketTypeId: String,
+    uiState: TicketingState,
+    event: Flow<TicketingEvent>,
+    onBackClicked: () -> Unit = {},
+    onReserved: (reservationId: String, showId: String) -> Unit,
+    navigateToBusiness: () -> Unit,
+    onChangeReservationName: (String) -> Unit,
+    onChangeReservationPhoneNumber: (String) -> Unit,
+    onChangeDepositorName: (String) -> Unit,
+    onChangeDepositorPhoneNumber: (String) -> Unit,
+    onToggleIsSameContactInfo: () -> Unit,
+    onClickCheckInviteCode: () -> Unit,
+    onInviteCodeChanged: (String) -> Unit,
+    onToggleAgreement: () -> Unit,
+    onClickReservation: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showPaymentFailureDialog by remember { mutableStateOf(false) }
     var showTicketSoldOutDialog by remember { mutableStateOf(false) }
     var policyPageUrl: String? by remember { mutableStateOf(null) }
     val context = LocalContext.current
+    var bottomButtonHeight by remember { mutableStateOf(0.dp) }
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -117,7 +161,7 @@ fun TicketingScreen(
                     val reservationId =
                         intent.getStringExtra("reservationId")
                             ?: return@rememberLauncherForActivityResult
-                    onReserved(reservationId, viewModel.showId)
+                    onReserved(reservationId, showId)
                 }
 
                 RESULT_SOLD_OUT -> showTicketSoldOutDialog = true
@@ -125,8 +169,8 @@ fun TicketingScreen(
             }
         }
 
-    LaunchedEffect(viewModel.event) {
-        viewModel.event.collect {
+    LaunchedEffect(event) {
+        event.collect {
             when (it) {
                 is TicketingEvent.TicketingSuccess -> {
                     showConfirmDialog = false
@@ -141,11 +185,11 @@ fun TicketingScreen(
                             clientKey = BuildConfig.TOSS_CLIENT_KEY,
                             customerKey = "user-${it.userId}",
                             orderId = it.orderId,
-                            orderName = "${viewModel.showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
+                            orderName = "${showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
                             currency = Currency.KRW.name,
                             countryCode = "KR",
-                            showId = viewModel.showId,
-                            salesTicketTypeId = viewModel.salesTicketTypeId,
+                            showId = showId,
+                            salesTicketTypeId = salesTicketTypeId,
                             ticketCount = uiState.ticketCount,
                             reservationName = uiState.reservationName,
                             reservationPhoneNumber = uiState.reservationContact,
@@ -199,8 +243,8 @@ fun TicketingScreen(
                     name = uiState.reservationName,
                     phoneNumber = uiState.reservationContact,
                     isSameContactInfo = uiState.isSameContactInfo,
-                    onNameChanged = viewModel::setReservationName,
-                    onPhoneNumberChanged = viewModel::setReservationPhoneNumber,
+                    onNameChanged = onChangeReservationName,
+                    onPhoneNumberChanged = onChangeReservationPhoneNumber,
                 )
 
                 // 입금자 정보
@@ -209,9 +253,9 @@ fun TicketingScreen(
                         name = uiState.depositorName,
                         phoneNumber = uiState.depositorContact,
                         isSameContactInfo = uiState.isSameContactInfo,
-                        onClickSameContact = viewModel::toggleIsSameContactInfo,
-                        onNameChanged = viewModel::setDepositorName,
-                        onPhoneNumberChanged = viewModel::setDepositorPhoneNumber,
+                        onClickSameContact = onToggleIsSameContactInfo,
+                        onNameChanged = onChangeDepositorName,
+                        onPhoneNumberChanged = onChangeDepositorPhoneNumber,
                     )
                 }
 
@@ -229,8 +273,8 @@ fun TicketingScreen(
                     InviteCodeSection(
                         uiState.inviteCode,
                         uiState.inviteCodeStatus,
-                        onClickCheckInviteCode = viewModel::checkInviteCode,
-                        onInviteCodeChanged = viewModel::setInviteCode,
+                        onClickCheckInviteCode = onClickCheckInviteCode,
+                        onInviteCodeChanged = onInviteCodeChanged,
                     )
                 }
 
@@ -240,7 +284,7 @@ fun TicketingScreen(
                 OrderAgreementSection(
                     totalAgreed = uiState.orderAgreed,
                     agreement = uiState.orderAgreement,
-                    onClickTotalAgree = viewModel::toggleAgreement,
+                    onClickTotalAgree = onToggleAgreement,
                     onClickShow = {
                         when (it) {
                             0 -> policyPageUrl = "https://boolti.in/site-policy/privacy"
@@ -263,26 +307,13 @@ fun TicketingScreen(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = navigateToBusiness
                 )
-                Spacer(modifier = Modifier.height(120.dp))
+                Spacer(modifier = Modifier.height(bottomButtonHeight))
             }
 
-            Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
+            TopGradientBackground(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onHeightChanged = { bottomButtonHeight = it },
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0F),
-                                    MaterialTheme.colorScheme.background,
-                                )
-                            ),
-                            shape = RectangleShape,
-                        )
-                )
                 MainButton(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -309,7 +340,7 @@ fun TicketingScreen(
                 ticketName = uiState.ticketName,
                 ticketCount = uiState.ticketCount,
                 totalPrice = uiState.totalPrice,
-                onClick = viewModel::reservation,
+                onClick = onClickReservation,
                 onDismiss = { showConfirmDialog = false },
             )
         }
@@ -789,11 +820,30 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 @Preview
 @Composable
 private fun TicketingDetailScreenPreview() {
+    val uiState = TicketingState(
+        showName = "2024 TOGETHER LUCKY CLUB",
+        ticketName = "일반 티켓 B",
+        ticketCount = 2,
+        totalPrice = 5000,
+    )
     BooltiTheme {
         Surface {
             TicketingScreen(
+                showId = "",
+                salesTicketTypeId = "",
+                uiState = uiState,
+                event = emptyFlow(),
                 onReserved = { _, _ -> },
-                navigateToBusiness = {}
+                navigateToBusiness = {},
+                onChangeReservationName = {},
+                onChangeReservationPhoneNumber = {},
+                onChangeDepositorName = {},
+                onChangeDepositorPhoneNumber = {},
+                onToggleIsSameContactInfo = {},
+                onToggleAgreement = {},
+                onClickCheckInviteCode = {},
+                onInviteCodeChanged = {},
+                onClickReservation = {},
             )
         }
     }

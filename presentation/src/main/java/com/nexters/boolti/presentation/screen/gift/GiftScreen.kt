@@ -26,8 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -45,6 +43,7 @@ import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.PolicyBottomSheet
 import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.screen.ticketing.InputRow
 import com.nexters.boolti.presentation.screen.ticketing.OrderAgreementSection
 import com.nexters.boolti.presentation.screen.ticketing.PaymentFailureDialog
@@ -73,6 +72,7 @@ fun GiftScreen(
     var showTicketSoldOutDialog by remember { mutableStateOf(false) }
     var showPaymentFailureDialog by remember { mutableStateOf(false) }
     var policyPageUrl: String? by remember { mutableStateOf(null) }
+    var bottomButtonHeight by remember { mutableStateOf(0.dp) }
 
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -231,26 +231,13 @@ fun GiftScreen(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = navigateToBusiness
                 )
-                Spacer(modifier = Modifier.height(120.dp))
+                Spacer(modifier = Modifier.height(bottomButtonHeight))
             }
 
-            Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
+            TopGradientBackground(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onHeightChanged = { bottomButtonHeight = it },
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0F),
-                                    MaterialTheme.colorScheme.background,
-                                )
-                            ),
-                            shape = RectangleShape,
-                        )
-                )
                 MainButton(
                     modifier = Modifier
                         .fillMaxWidth()

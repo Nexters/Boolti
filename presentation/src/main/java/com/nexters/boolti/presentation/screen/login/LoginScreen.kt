@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -138,7 +139,9 @@ private fun SignUpBottomSheet(
     val spanOffset = Pair(term.indexOf(tag), tag.length)
 
     Column(
-        modifier = modifier.padding(horizontal = 24.dp),
+        modifier = modifier
+            .padding(horizontal = 24.dp)
+            .navigationBarsPadding(),
     ) {
         Text(
             modifier = Modifier
@@ -171,7 +174,7 @@ private fun SignUpBottomSheet(
                 .fillMaxWidth()
                 .padding(top = 18.dp)
                 .padding(vertical = 8.dp)
-                .padding(bottom = 34.dp),
+                .padding(bottom = 20.dp),
             label = stringResource(id = R.string.signup_with_agreement),
             onClick = signUp,
         )

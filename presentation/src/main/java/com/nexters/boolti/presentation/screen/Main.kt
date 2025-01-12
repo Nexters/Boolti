@@ -1,13 +1,14 @@
 package com.nexters.boolti.presentation.screen
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -17,39 +18,41 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.extension.navigateToHome
-import com.nexters.boolti.presentation.reservationdetail.ReservationDetailScreen
-import com.nexters.boolti.presentation.screen.MainDestination.Home
-import com.nexters.boolti.presentation.screen.MainDestination.ShowDetail
-import com.nexters.boolti.presentation.screen.accountsetting.AccountSettingScreen
-import com.nexters.boolti.presentation.screen.business.BusinessScreen
-import com.nexters.boolti.presentation.screen.gift.addGiftScreen
-import com.nexters.boolti.presentation.screen.giftcomplete.addGiftCompleteScreen
-import com.nexters.boolti.presentation.screen.home.HomeScreen
-import com.nexters.boolti.presentation.screen.link.LinkListScreen
-import com.nexters.boolti.presentation.screen.login.LoginScreen
-import com.nexters.boolti.presentation.screen.payment.PaymentCompleteScreen
-import com.nexters.boolti.presentation.screen.perforemdshows.PerformedShowsScreen
-import com.nexters.boolti.presentation.screen.profile.ProfileScreen
-import com.nexters.boolti.presentation.screen.profileedit.link.ProfileLinkEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.profile.ProfileEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.sns.ProfileSnsEditScreen
-import com.nexters.boolti.presentation.screen.qr.HostedShowScreen
-import com.nexters.boolti.presentation.screen.qr.QrFullScreen
-import com.nexters.boolti.presentation.screen.refund.RefundScreen
-import com.nexters.boolti.presentation.screen.report.ReportScreen
-import com.nexters.boolti.presentation.screen.reservations.ReservationsScreen
-import com.nexters.boolti.presentation.screen.showdetail.ShowDetailContentScreen
-import com.nexters.boolti.presentation.screen.showdetail.ShowDetailScreen
-import com.nexters.boolti.presentation.screen.showdetail.ShowImagesScreen
+import com.nexters.boolti.presentation.reservationdetail.reservationDetailScreen
+import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
+import com.nexters.boolti.presentation.screen.business.businessScreen
+import com.nexters.boolti.presentation.screen.gift.giftScreen
+import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
+import com.nexters.boolti.presentation.screen.home.homeScreen
+import com.nexters.boolti.presentation.screen.link.linkListScreen
+import com.nexters.boolti.presentation.screen.login.loginScreen
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
+import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
+import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
+import com.nexters.boolti.presentation.screen.profile.profileScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.sns.profileSnsEditScreen
+import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
+import com.nexters.boolti.presentation.screen.qr.qrFullScreen
+import com.nexters.boolti.presentation.screen.refund.refundScreen
+import com.nexters.boolti.presentation.screen.report.reportScreen
+import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
+import com.nexters.boolti.presentation.screen.showdetail.showDetailContentScreen
+import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
+import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
 import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
-import com.nexters.boolti.presentation.screen.signout.SignoutScreen
-import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailScreen
-import com.nexters.boolti.presentation.screen.ticketing.TicketingScreen
+import com.nexters.boolti.presentation.screen.signout.signoutScreen
+import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
+import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -58,253 +61,131 @@ val LocalSnackbarController = staticCompositionLocalOf {
     SnackbarController(SnackbarHostState())
 }
 
+val LocalNavController = compositionLocalOf<NavHostController> {
+    error("No NavController provided")
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val rootNavController = rememberNavControllerWithLog()
 
     BooltiTheme {
-        Surface(modifier) {
-            Scaffold(
-                snackbarHost = {
-                    ToastSnackbarHost(
-                        modifier = Modifier.padding(bottom = 80.dp),
-                        hostState = snackbarHostState,
-                    )
-                },
-            ) { innerPadding ->
-                CompositionLocalProvider(
-                    LocalSnackbarController provides SnackbarController(
-                        snackbarHostState,
-                        scope
-                    )
-                ) {
-                    MainNavigation(
-                        modifier = modifier.padding(innerPadding),
-                        onClickQrScan = onClickQrScan,
-                    )
-                }
+        Scaffold(
+            snackbarHost = {
+                ToastSnackbarHost(
+                    modifier = Modifier.padding(bottom = 80.dp),
+                    hostState = snackbarHostState,
+                )
+            },
+        ) {
+            CompositionLocalProvider(
+                LocalSnackbarController provides SnackbarController(
+                    snackbarHostState,
+                    scope,
+                ),
+                LocalNavController provides rootNavController,
+            ) {
+                MainNavigation(
+                    modifier = modifier,
+                    onClickQrScan = onClickQrScan,
+                )
             }
         }
     }
 }
 
 @Composable
-fun MainNavigation(modifier: Modifier, onClickQrScan: (showId: String, showName: String) -> Unit) {
-    val navController = rememberNavControllerWithLog()
+fun MainNavigation(
+    onClickQrScan: (showId: String, showName: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val navController = LocalNavController.current
 
     NavHost(
+        modifier = modifier,
         navController = navController,
-        startDestination = Home.route,
+        startDestination = MainRoute.Home,
     ) {
-        HomeScreen(modifier = modifier, navigateTo = navController::navigateTo)
-        LoginScreen(modifier = modifier, popBackStack = navController::popBackStack)
-        SignoutScreen(
-            navigateToHome = navController::navigateToHome,
-            popBackStack = navController::popBackStack
-        )
-        ReservationsScreen(
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack
-        )
-        ReservationDetailScreen(
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack
-        )
-        RefundScreen(popBackStack = navController::popBackStack)
+        homeScreen()
+        loginScreen()
+        signoutScreen()
+        reservationsScreen()
+        reservationDetailScreen()
+        refundScreen()
 
-        navigation(
-            route = "${ShowDetail.route}/{$showId}",
-            startDestination = "detail",
-            arguments = ShowDetail.arguments,
+        navigation<ShowRoute.ShowRoot>(
+            startDestination = ShowRoute.Detail,
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "https://preview.boolti.in/show/{$showId}"
+                    uriPattern = "https://preview.boolti.in/show/{showId}"
                     action = Intent.ACTION_VIEW
                 },
             ),
         ) {
-            ShowDetailScreen(
-                modifier = modifier,
-                navigateTo = navController::navigateTo,
-                popBackStack = navController::popBackStack,
-                navigateToHome = navController::navigateToHome,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            showDetailScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
-            ShowImagesScreen(
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            showImagesScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
-            ShowDetailContentScreen(
-                modifier = modifier,
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) }
+            showDetailContentScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
-            ReportScreen(
-                modifier = modifier,
-                navigateToHome = navController::navigateToHome,
-                popBackStack = navController::popBackStack,
-            )
+            reportScreen()
         }
 
-        TicketingScreen(
-            modifier = modifier,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack,
-        )
+        ticketingScreen()
 
-        navigation(
-            route = "${MainDestination.TicketDetail.route}/{$ticketId}",
+        navigation<TicketRoute.TicketRoot>(
+            startDestination = TicketRoute.TicketDetail,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern = "https://app.boolti.in/tickets/{ticketId}"
                     action = Intent.ACTION_VIEW
                 }
             ),
-            startDestination = "detail",
-            arguments = MainDestination.TicketDetail.arguments,
         ) {
-            TicketDetailScreen(
-                modifier = modifier,
-                navigateTo = navController::navigateTo,
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+            ticketDetailScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
-            QrFullScreen(
-                modifier = modifier,
-                popBackStack = navController::popBackStack,
-                getSharedViewModel = { entry -> entry.sharedViewModel(navController) },
+            qrFullScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
         }
 
-        addGiftScreen(
-            modifier = modifier,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack,
-        )
+        giftScreen()
 
-        HostedShowScreen(
-            modifier = modifier,
+        hostedShowScreen(
             onClickShow = onClickQrScan,
-            popBackStack = navController::popBackStack,
         )
 
-        PaymentCompleteScreen(
-            navigateTo = navController::navigateTo,
-            navigateByDeepLink = navController::navigate,
-            popBackStack = navController::popBackStack,
-            popInclusiveBackStack = { route ->
-                navController.popBackStack(
-                    route = route,
-                    inclusive = true,
-                )
-            },
-            navigateToHome = navController::navigateToHome,
-        )
-        addGiftCompleteScreen(
-            navigateTo = navController::navigateTo,
-            navigateToHome = navController::navigateToHome,
-            popBackStack = { navController.popBackStack(MainDestination.Gift.route, true) }
-        )
-        BusinessScreen(popBackStack = navController::popBackStack)
-        AccountSettingScreen(
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack,
-        )
-        ProfileScreen(
-            modifier = modifier,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack,
-        )
-        LinkListScreen(
-            modifier = modifier,
-            popBackStack = navController::popBackStack,
-        )
-        PerformedShowsScreen(
-            modifier = modifier,
-            navigateTo = navController::navigateTo,
-            popBackStack = navController::popBackStack,
-        )
-        navigation(
-            route = "profileEditNavigation",
-            startDestination = MainDestination.ProfileEdit.route,
+        paymentCompleteScreen()
+        giftCompleteScreen()
+        businessScreen()
+        accountSettingScreen()
+        profileScreen()
+        navigation<ProfileRoute.ProfileRoot>(
+            startDestination = ProfileRoute.ProfileEdit,
         ) {
-            ProfileEditScreen(
-                modifier = modifier,
-                navigateTo = navController::navigate,
-                popBackStack = navController::popBackStack,
-            )
-            ProfileSnsEditScreen(
-                modifier = modifier,
-                onAddSns = { type, username ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("newSnsType", type.name)
-                            set("newSnsUsername", username)
-                        }
-                    navController.popBackStack()
-                },
-                onEditSns = { id, type, username ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("editSnsId", id)
-                            set("editSnsType", type.name)
-                            set("editSnsUsername", username)
-                        }
-                    navController.popBackStack()
-                },
-                onRemoveSns = { id ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("removeSnsId", id)
-                    navController.popBackStack()
-                },
-                popBackStack = navController::popBackStack,
-            )
-            ProfileLinkEditScreen(
-                modifier = modifier,
-                onAddLink = { linkName, url ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("newLinkName", linkName)
-                            set("newLinkUrl", url)
-                        }
-                    navController.popBackStack()
-                },
-                onEditLink = { id, linkName, url ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.apply {
-                            set("editLinkId", id)
-                            set("editLinkName", linkName)
-                            set("editLinkUrl", url)
-                        }
-                    navController.popBackStack()
-                },
-                onRemoveLink = { id ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("removeLinkId", id)
-                    navController.popBackStack()
-                },
-                popBackStack = navController::popBackStack,
-            )
+            profileEditScreen()
+            profileSnsEditScreen()
+            profileLinkEditScreen()
         }
 
-        addShowRegistration(
-            modifier = modifier,
-            popBackStack = navController::popBackStack,
-        )
+        linkListScreen()
+        performedShowsScreen()
+
+        addShowRegistration()
     }
 }
 
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
-    navController: NavController,
+    navController: NavController = LocalNavController.current,
 ): T {
     val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
     val parentEntry = remember(this) {
@@ -312,5 +193,3 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
     }
     return hiltViewModel(parentEntry)
 }
-
-private fun NavController.navigateTo(route: String) = navigate(route)

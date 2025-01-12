@@ -17,8 +17,11 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -72,6 +75,11 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.ReorderableState
+import org.burnoutcrew.reorderable.detectReorder
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -147,6 +155,8 @@ fun ProfileEditScreen(
         onClickAddLink = { navigateToLinkEdit(null) },
         onClickEditSns = { sns -> navigateToSnsEdit(sns) },
         onClickEditLink = { link -> navigateToLinkEdit(link) },
+        onReorderSns = viewModel::reorderSns,
+        onReorderLink = viewModel::reorderLink,
     )
 }
 
@@ -170,6 +180,8 @@ fun ProfileEditScreen(
     onClickAddLink: () -> Unit,
     onClickEditSns: (Sns) -> Unit,
     onClickEditLink: (Link) -> Unit,
+    onReorderSns: (from: Int, to: Int) -> Unit,
+    onReorderLink: (from: Int, to: Int) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = LocalSnackbarController.current
@@ -334,47 +346,98 @@ fun ProfileEditScreen(
                     )
                 }
 
+                val snsReorderState = rememberReorderableLazyListState(
+                    onMove = { from, to ->
+                        onReorderSns(from.index - 1, to.index - 1)
+                    },
+                )
                 Section(
                     modifier = Modifier.padding(top = 12.dp),
                     title = stringResource(R.string.profile_edit_sns_title),
                 ) {
-                    Column {
-                        LinkAddButton(
-                            modifier = Modifier.padding(top = 4.dp),
-                            label = stringResource(R.string.sns_add),
-                            onClick = onClickAddSns,
-                            enabled = !saving,
-                        )
-                        snsList.forEach { sns ->
-                            SnsItem(
-                                modifier = Modifier.padding(top = 12.dp),
-                                sns = sns,
-                            ) { if (!saving) onClickEditSns(sns) }
+                    LazyColumn(
+                        state = snsReorderState.listState,
+                        modifier = Modifier
+                            .heightIn(max = 100.dp * (snsList.size + 1)) // 대충 넉넉하게 잡은 높이
+                            .reorderable(snsReorderState),
+                    ) {
+                        item(
+                            contentType = "SnsAddButton",
+                        ) {
+                            LinkAddButton(
+                                modifier = Modifier.padding(top = 4.dp),
+                                label = stringResource(R.string.sns_add),
+                                onClick = onClickAddSns,
+                                enabled = !saving,
+                            )
+                        }
+                        items(
+                            items = snsList,
+                            key = { it.id },
+                            contentType = { "SnsItem" },
+                        ) { sns ->
+                            ReorderableItem(
+                                state = snsReorderState,
+                                key = sns.id,
+                            ) {
+                                SnsItem(
+                                    modifier = Modifier.padding(top = 12.dp),
+                                    sns = sns,
+                                    reorderableState = snsReorderState,
+                                ) { if (!saving) onClickEditSns(sns) }
+                            }
                         }
                     }
                 }
 
+                val linkReorderState = rememberReorderableLazyListState(
+                    onMove = { from, to ->
+                        onReorderLink(from.index - 1, to.index - 1)
+                    },
+                )
                 Section(
                     modifier = Modifier.padding(top = 12.dp),
                     title = stringResource(R.string.label_links),
                 ) {
-                    Column {
-                        LinkAddButton(
-                            modifier = Modifier.padding(top = 4.dp),
-                            label = stringResource(R.string.link_add_btn),
-                            onClick = onClickAddLink,
-                            enabled = !saving,
-                        )
-                        links.forEach { link ->
-                            LinkItem(
-                                modifier = Modifier.padding(top = 12.dp),
-                                title = link.name,
-                                url = link.url,
-                            ) { if (!saving) onClickEditLink(link) }
+                    LazyColumn(
+                        state = linkReorderState.listState,
+                        modifier = Modifier
+                            .heightIn(max = 100.dp * (links.size + 1)) // 대충 넉넉하게 잡은 높이
+                            .reorderable(linkReorderState),
+                    ) {
+                        item(
+                            contentType = "LinkAddButton",
+                        ) {
+                            LinkAddButton(
+                                modifier = Modifier.padding(top = 4.dp),
+                                label = stringResource(R.string.link_add_btn),
+                                onClick = onClickAddLink,
+                                enabled = !saving,
+                            )
+                        }
+                        items(
+                            items = links,
+                            key = { it.id },
+                            contentType = { "LinkItem" },
+                        ) { link ->
+                            ReorderableItem(
+                                state = linkReorderState,
+                                key = link.id,
+                            ) {
+                                LinkItem(
+                                    modifier = Modifier.padding(top = 12.dp),
+                                    title = link.name,
+                                    url = link.url,
+                                    reorderableState = linkReorderState,
+                                ) { if (!saving) onClickEditLink(link) }
+                            }
                         }
                     }
                 }
+
+                Spacer(Modifier.size(32.dp))
             }
+
             if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
         if (showExitAlertDialog) {
@@ -451,6 +514,7 @@ private fun LinkAddButton(
 private fun SnsItem(
     sns: Sns,
     modifier: Modifier = Modifier,
+    reorderableState: ReorderableState<*>,
     onClickEdit: () -> Unit,
 ) {
     Row(
@@ -485,10 +549,13 @@ private fun SnsItem(
             color = Grey15,
         )
         Icon(
-            modifier = Modifier.size(20.dp),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_edit_pen),
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .size(20.dp)
+                .detectReorder(reorderableState),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
             tint = Grey50,
-            contentDescription = stringResource(R.string.link_edit),
+            contentDescription = stringResource(R.string.sns_reorder_description),
         )
     }
 }
@@ -497,6 +564,7 @@ private fun SnsItem(
 private fun LinkItem(
     title: String,
     url: String,
+    reorderableState: ReorderableState<*>,
     modifier: Modifier = Modifier,
     onClickEdit: () -> Unit,
 ) {
@@ -530,10 +598,11 @@ private fun LinkItem(
         Icon(
             modifier = Modifier
                 .padding(start = 20.dp)
-                .size(20.dp),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_edit_pen),
+                .size(20.dp)
+                .detectReorder(reorderableState),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
             tint = Grey50,
-            contentDescription = stringResource(R.string.link_edit),
+            contentDescription = stringResource(R.string.link_reorder_description),
         )
     }
 }

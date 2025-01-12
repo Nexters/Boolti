@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
@@ -78,9 +79,12 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.material3.android)
     implementation(libs.zoomable)
     kapt(libs.hilt.compiler)
+
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.lottie)
     implementation(libs.bundles.coil)
@@ -89,6 +93,7 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.reorderable)
 
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))

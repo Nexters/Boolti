@@ -70,7 +70,7 @@ private fun PerformedShowsScreen(
         topBar = {
             BtBackAppBar(
                 title = stringResource(R.string.performed_shows),
-                onClickBack = onClickBack
+                onClickBack = onClickBack,
             )
         },
     ) { innerPadding ->
@@ -78,7 +78,7 @@ private fun PerformedShowsScreen(
             modifier = Modifier.padding(innerPadding),
         ) {
             LazyColumn(
-                contentPadding = PaddingValues(vertical = 20.dp),
+                contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(shows) { show ->
@@ -93,7 +93,9 @@ private fun PerformedShowsScreen(
 
             if (loading) {
                 BtCircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
                 )
             }
         }

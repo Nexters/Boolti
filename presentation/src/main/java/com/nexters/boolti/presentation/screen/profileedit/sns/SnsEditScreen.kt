@@ -175,7 +175,9 @@ private fun SnsEditScreen(
                 Spacer(Modifier.weight(1f))
                 if (isEditMode) {
                     MainButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
                         colors = MainButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             contentColor = Grey90,
@@ -234,7 +236,7 @@ private fun SnsEditPreview() {
 
     BooltiTheme {
         SnsEditScreen(
-            isEditMode = false,
+            isEditMode = true,
             selectedSns = selectedSns,
             username = username,
             usernameHasError = usernameHasError,

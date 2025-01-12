@@ -2,12 +2,13 @@ package com.nexters.boolti.presentation.screen.profile
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
-import com.nexters.boolti.presentation.screen.userCode
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,7 @@ class ProfileViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
 ) : BaseViewModel() {
-    private val _userCode: String? = savedStateHandle[userCode]
+    private val _userCode: String? = savedStateHandle.toRoute<MainRoute.Profile>().userCode
     private val myProfile: User.My = getUserUsecase() ?: User.My("-999")
     private val isMyProfile = _userCode?.equals(myProfile.userCode) ?: true
 

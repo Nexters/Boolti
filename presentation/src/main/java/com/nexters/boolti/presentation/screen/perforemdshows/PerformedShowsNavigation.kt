@@ -3,23 +3,21 @@ package com.nexters.boolti.presentation.screen.perforemdshows
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
-fun NavGraphBuilder.PerformedShowsScreen(
-    navigateTo: (String) -> Unit,
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.performedShowsScreen(
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.PerformedShows.route,
-        arguments = MainDestination.PerformedShows.arguments,
-    ) {
+    composable<MainRoute.PerformedShows> {
+        val navController = LocalNavController.current
         PerformedShowsScreen(
             modifier = modifier,
             onClickShow = { show ->
-                navigateTo(MainDestination.ShowDetail.createRoute(show.id))
+                navController.navigate(ShowRoute.ShowRoot(showId = show.id))
             },
-            onClickBack = popBackStack,
+            onClickBack = navController::popBackStack,
         )
     }
 }

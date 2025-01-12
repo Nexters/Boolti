@@ -6,12 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -102,14 +99,8 @@ fun ChooseTicketBottomSheet(
         contentColor = MaterialTheme.colorScheme.surfaceTint,
         containerColor = Grey85,
     ) {
-        Column(
-            modifier = Modifier
-                .padding(
-                    bottom = 20.dp + WindowInsets.navigationBars
-                        .asPaddingValues()
-                        .calculateBottomPadding()
-                )
-                .heightIn(max = 564.dp)
+        Box(
+            modifier = Modifier.heightIn(max = 564.dp)
         ) {
             uiState.selected?.let {
                 ChooseTicketBottomSheetContent2(
@@ -145,7 +136,9 @@ private fun ChooseTicketBottomSheetContent1(
     onSelectItem: (TicketWithQuantity) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    Column {
+    Column(
+        modifier = Modifier.padding(bottom = 32.dp),
+    ) {
         Text(
             text = stringResource(id = R.string.choose_ticket_bottomsheet_title),
             style = MaterialTheme.typography.titleLarge.copy(color = Grey30),
@@ -257,7 +250,7 @@ private fun ChooseTicketBottomSheetContent2(
             label = stringResource(buttonTextId),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 24.dp)
+                .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp)
                 .height(48.dp),
             onClick = { onTicketingClicked(ticket, ticketCount) },
         )

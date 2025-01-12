@@ -73,7 +73,7 @@ fun GiftCompleteScreen(
     onClickClose: () -> Unit,
     navigateToReservation: (reservation: ReservationDetail) -> Unit,
     viewModel: GiftCompleteViewModel = hiltViewModel(),
-)  {
+) {
     val reservationState by viewModel.reservation.collectAsStateWithLifecycle()
     val reservation = reservationState
 
@@ -110,11 +110,14 @@ fun GiftCompleteScreen(
             PaymentToolbar(onClickHome = onClickHome, onClickClose = onClickClose)
         },
     ) { innerPadding ->
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = marginHorizontal),
+        ) {
             Column(
                 modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(horizontal = marginHorizontal)
                     .verticalScroll(rememberScrollState())
             ) {
                 val month = reservation.salesEndDateTime.month.value
@@ -185,15 +188,15 @@ fun GiftCompleteScreen(
                 ShowInformation(
                     reservation = reservation
                 )
-                SecondaryButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                        .padding(vertical = 8.dp),
-                    label = stringResource(R.string.show_reservation),
-                ) {
-                    navigateToReservation(reservation)
-                }
+            }
+            SecondaryButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 20.dp),
+                label = stringResource(R.string.show_reservation),
+            ) {
+                navigateToReservation(reservation)
             }
         }
     }

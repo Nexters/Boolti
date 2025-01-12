@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.qr
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -44,7 +44,8 @@ import androidx.navigation.compose.composable
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.InstagramIndicator
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.ticket.detail.TicketDetailViewModel
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
@@ -54,22 +55,20 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
 
-fun NavGraphBuilder.QrFullScreen(
-    popBackStack: () -> Unit,
+fun NavGraphBuilder.qrFullScreen(
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.Qr.route,
-    ) { entry ->
+    composable<TicketRoute.Qr> { entry ->
+        val navController = LocalNavController.current
         QrFullScreen(
             modifier = modifier,
             viewModel = getSharedViewModel(entry),
-        ) { popBackStack() }
+            onClose = navController::popBackStack,
+        )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QrFullScreen(
     modifier: Modifier = Modifier,
@@ -81,12 +80,17 @@ fun QrFullScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { Toolbar(onClose = onClose) },
+        topBar = {
+            Toolbar(
+                modifier = Modifier.statusBarsPadding(),
+                onClose = onClose,
+            )
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(White)
                 .padding(innerPadding),
         ) {
             HorizontalPager(

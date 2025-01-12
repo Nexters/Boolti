@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,12 +36,14 @@ fun BtAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
     colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
+    statusBarPadding: Boolean = true,
     navigateButtons: @Composable (RowScope.() -> Unit)? = null,
     actionButtons: @Composable (RowScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .background(color = colors.containerColor)
+            .let { if (statusBarPadding) it.statusBarsPadding() else it }
             .fillMaxWidth()
             .height(44.dp)
             .padding(horizontal = 8.dp),
@@ -80,6 +83,7 @@ fun BtAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
     colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
+    statusBarPadding: Boolean = true,
     navigationButtons: List<Pair<Int, () -> Unit>> = emptyList(),
     actionButtons: List<Pair<Int, () -> Unit>> = emptyList(),
 ) {
@@ -87,6 +91,7 @@ fun BtAppBar(
         modifier = modifier,
         title = title,
         colors = colors,
+        statusBarPadding = statusBarPadding,
         navigateButtons = if (navigationButtons.isNotEmpty()) {
             {
                 navigationButtons.forEach { (res, onClick) ->
@@ -113,6 +118,7 @@ fun BtBackAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
     colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
+    statusBarPadding: Boolean = true,
     onClickBack: () -> Unit,
 ) {
     BtAppBar(
@@ -125,6 +131,7 @@ fun BtBackAppBar(
             )
         },
         colors = colors,
+        statusBarPadding = statusBarPadding,
     )
 }
 
@@ -133,6 +140,7 @@ fun BtCloseableAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
     colors: BtAppBarColors = BtAppBarDefaults.appBarColors(),
+    statusBarPadding: Boolean = true,
     onClickClose: () -> Unit,
 ) {
     BtAppBar(
@@ -146,6 +154,7 @@ fun BtCloseableAppBar(
             )
         },
         colors = colors,
+        statusBarPadding = statusBarPadding,
     )
 }
 

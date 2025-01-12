@@ -93,6 +93,7 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.reorderable)
 
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))

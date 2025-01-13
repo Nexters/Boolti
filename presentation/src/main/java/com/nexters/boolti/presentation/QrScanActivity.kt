@@ -1,14 +1,10 @@
 package com.nexters.boolti.presentation
 
 import android.Manifest
-import android.content.Context
-import android.hardware.Camera
-import android.os.Build
 import android.graphics.Color
+import android.hardware.Camera
 import android.os.Bundle
 import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -34,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class QrScanActivity : ComponentActivity() {
-    var isBackCamera = true
+    private var isBackCamera = true
 
     private val barcodeView: DecoratedBarcodeView by lazy {
         DecoratedBarcodeView(this).apply {

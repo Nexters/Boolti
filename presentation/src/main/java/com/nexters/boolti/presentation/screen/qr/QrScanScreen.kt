@@ -1,5 +1,8 @@
 package com.nexters.boolti.presentation.screen.qr
 
+import android.content.Context
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,15 +12,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,13 +27,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -80,6 +83,9 @@ fun QrScanScreen(
     var bottomPadding by remember { mutableStateOf(0.dp) }
     var borderColor: Color by remember { mutableStateOf(Color.Transparent) }
     var showingBorderJob: Job? = null
+
+    val context = LocalContext.current
+    val cameraSwitchable = rememberSaveable { hasBothSidesCameras(context) }
 
     LaunchedEffect(barcodeView) {
         barcodeView.resume()
@@ -144,10 +150,12 @@ fun QrScanScreen(
                     )
                 },
                 actionButtons = {
-                    BtAppBarDefaults.AppBarIconButton(
-                        onClick = onClickSwitchCamera,
-                        iconRes = R.drawable.ic_camera_flip,
-                    )
+                    if (cameraSwitchable) {
+                        BtAppBarDefaults.AppBarIconButton(
+                            onClick = onClickSwitchCamera,
+                            iconRes = R.drawable.ic_camera_flip,
+                        )
+                    }
                 }
             )
         },
@@ -270,4 +278,27 @@ private fun EntryCodeDialog(
             style = MaterialTheme.typography.bodyLarge,
         )
     }
+}
+
+private fun hasBothSidesCameras(context: Context): Boolean {
+    val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+    val cameraIds = cameraManager.cameraIdList
+
+    var hasFrontCamera = false
+    var hasBackCamera = false
+
+    for (cameraId in cameraIds) {
+        val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+        val lensFacing = characteristics.get(CameraCharacteristics.LENS_FACING)
+
+        if (lensFacing == CameraCharacteristics.LENS_FACING_FRONT) {
+            hasFrontCamera = true
+        }
+
+        if (lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+            hasBackCamera = true
+        }
+    }
+
+    return hasFrontCamera && hasBackCamera
 }

@@ -54,6 +54,7 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.Warning
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -76,6 +77,7 @@ fun QrScanScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var bottomPadding by remember { mutableStateOf(0.dp) }
     var borderColor: Color by remember { mutableStateOf(Color.Transparent) }
+    var showingBorderJob: Job? = null
 
     LaunchedEffect(barcodeView) {
         barcodeView.resume()
@@ -115,10 +117,12 @@ fun QrScanScreen(
             snackbarIconId = iconId
 
             launch {
+                snackbarHostState.currentSnackbarData?.dismiss()
                 snackbarHostState.showSnackbar(errMessage)
             }
 
-            launch {
+            showingBorderJob?.cancel()
+            showingBorderJob = launch {
                 borderColor = color
                 delay(4000L)
                 borderColor = Color.Transparent

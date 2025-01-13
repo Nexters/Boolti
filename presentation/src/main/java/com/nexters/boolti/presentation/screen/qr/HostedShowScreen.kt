@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -60,7 +61,9 @@ fun HostedShowScreen(
         }
     ) { innerPadding ->
         if (uiState.shows.isEmpty()) {
-            EmptyHostedShow(modifier = modifier.padding(innerPadding))
+            EmptyHostedShow(modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize())
         } else {
             HostedShows(
                 modifier = modifier
@@ -179,6 +182,18 @@ fun OutDatedHostedShowItemPreview() {
                     ""
                 )
             ) { _, _ -> }
+        }
+    }
+}
+
+@Preview(widthDp = 360, heightDp = 760)
+@Composable
+fun EmptyShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            EmptyHostedShow(
+                Modifier
+            )
         }
     }
 }

@@ -25,6 +25,7 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import com.nexters.boolti.presentation.extension.requestPermission
+import com.nexters.boolti.presentation.extension.vibrator
 import com.nexters.boolti.presentation.screen.qr.QrScanScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,13 +51,6 @@ class QrScanActivity : ComponentActivity() {
     private val callback = BarcodeCallback { result: BarcodeResult ->
         result.text ?: return@BarcodeCallback
         viewModel.scan(result.text)
-
-        val vibrator =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-            } else {
-                getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            }
 
         vibrator.vibrate(
             VibrationEffect.createOneShot(

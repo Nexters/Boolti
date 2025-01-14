@@ -2,7 +2,9 @@ package com.nexters.boolti.presentation
 
 import android.Manifest
 import android.graphics.Color
+import android.hardware.Camera
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -19,6 +21,7 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import com.nexters.boolti.presentation.extension.requestPermission
+import com.nexters.boolti.presentation.extension.vibrator
 import com.nexters.boolti.presentation.screen.qr.QrScanScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +30,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class QrScanActivity : ComponentActivity() {
+    private var isBackCamera = true
 
     private val barcodeView: DecoratedBarcodeView by lazy {
         DecoratedBarcodeView(this).apply {
@@ -43,6 +47,14 @@ class QrScanActivity : ComponentActivity() {
     private val callback = BarcodeCallback { result: BarcodeResult ->
         result.text ?: return@BarcodeCallback
         viewModel.scan(result.text)
+
+        vibrator.vibrate(
+            VibrationEffect.createOneShot(
+                100,
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
+        )
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 barcodeView.pause()
@@ -63,7 +75,8 @@ class QrScanActivity : ComponentActivity() {
             BooltiTheme {
                 QrScanScreen(
                     barcodeView = barcodeView,
-                    onClickClose = { finish() }
+                    onClickClose = { finish() },
+                    onClickSwitchCamera = ::switchCamera
                 )
             }
         }
@@ -81,5 +94,16 @@ class QrScanActivity : ComponentActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         return barcodeView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)
+    }
+
+    private fun switchCamera() {
+        barcodeView.pause()
+        isBackCamera = !isBackCamera
+        barcodeView.cameraSettings.requestedCameraId = if (isBackCamera) {
+            Camera.CameraInfo.CAMERA_FACING_BACK
+        } else {
+            Camera.CameraInfo.CAMERA_FACING_FRONT
+        }
+        barcodeView.resume()
     }
 }

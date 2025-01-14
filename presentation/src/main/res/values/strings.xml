@@ -18,7 +18,7 @@
     <string name="description_clear_button">모두 지우기</string>
 
     <string name="error_show_not_today">아직 공연일이 아니에요</string>
-    <string name="error_used_ticket">이미 사용된 티켓이에요</string>
+    <string name="error_used_ticket">이미 입장에 사용한 티켓이에요</string>
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>
     <string name="error_ticket_not_found">존재하지 않는 티켓이에요</string>
 
@@ -241,7 +241,8 @@
     <string name="enter_code_dialog_desc">입장 코드는 주최자 계정의 마이 > QR 스캔 > 해당 공연 스캐너에서 확인 가능해요.</string>
     <string name="enter_code_dialog_placeholder">입장 코드를 입력해 주세요</string>
     <string name="enter_code_dialog_error_mismatch">올바른 입장 코드를 입력해 주세요</string>
-    <string name="show_entry_code">입장코드 보기</string>
+    <string name="show_entry_code">입장 코드 보기</string>
+    <string name="entry_code_notice">QR 코드가 인식되지 않을 경우 티켓 화면 하단의\n\'입장 코드 입력하기\'에 아래 입장 코드를 입력해 주세요.</string>
     <string name="copy_code_label">코드 복사</string>
     <string name="code_copy_success_message">식별 코드를 복사했어요</string>
 
@@ -322,11 +323,11 @@
     <string name="link_remove_msg">링크를 삭제했어요</string>
     <string name="invalid_link">유효한 링크가 아니에요</string>
 
-    <!-- QR 스캔 -->
-    <string name="hostedShowsTitle">QR 스캔</string>
-    <string name="hosted_shows_empty_label">주최한 공연이 없어요</string>
-    <string name="hosted_shows_empty_desc">공연을 주최하고 QR 스캐너로\n관객 입장을 관리해 보세요</string>
-    <string name="message_ticket_validated">사용되었어요</string>
+    <!-- 입장 확인 -->
+    <string name="hostedShowsTitle">입장 확인</string>
+    <string name="hosted_shows_empty_label">입장을 확인할 공연이 없어요</string>
+    <string name="hosted_shows_empty_desc">공연을 주최하고 QR 코드로\n관객 입장을 확인해 보세요</string>
+    <string name="message_ticket_validated">입장을 확인했어요</string>
 
     <!-- 결제 내역 -->
     <string name="reservations_empty">결제 내역이 없어요</string>

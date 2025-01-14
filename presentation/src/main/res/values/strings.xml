@@ -7,6 +7,7 @@
 
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
+    <string name="description_event_poster">이벤트 포스터</string>
     <string name="description_user_thumbnail">유저 섬네일</string>
     <string name="description_close_button">닫기</string>
     <string name="description_toolbar_home">홈으로 이동</string>

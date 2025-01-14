@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 internal data class PopupResponse(
     val id: String,
     val type: PopupType,
+    val eventUrl: String?,
+    val view: String?,
     val noticeTitle: String?,
     val description: String,
     val startDate: String,
@@ -18,7 +20,8 @@ internal data class PopupResponse(
             id = id,
             startDate = startDate.toLocalDateTime(),
             endDate = endDate.toLocalDateTime(),
-            imageUrl = description
+            imageUrl = description,
+            eventUrl = eventUrl,
         )
 
         PopupType.NOTICE -> Popup.Notice(

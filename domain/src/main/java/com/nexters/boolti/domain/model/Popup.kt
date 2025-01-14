@@ -12,6 +12,7 @@ sealed interface Popup {
         override val startDate: LocalDateTime,
         override val endDate: LocalDateTime,
         val imageUrl: String,
+        val eventUrl: String?,
     ) : Popup
 
     data class Notice(

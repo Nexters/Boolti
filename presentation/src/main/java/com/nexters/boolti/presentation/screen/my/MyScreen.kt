@@ -64,7 +64,6 @@ fun MyScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
 
     val domain = BuildConfig.DOMAIN
-    val registrationUrl = "https://${domain}/show/add"
     val homeUrl = "https://${domain}/home"
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
@@ -79,14 +78,11 @@ fun MyScreen(
         onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
         onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
         onClickReservations = if (user != null) navigateToReservations else requireLogin,
+        onClickRegisterShow = if (user != null) navigateToShowRegistration else requireLogin,
         onClickManageShow = {
             uriHandler.openUri(homeUrl)
             Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
         }, // TODO 추후 인앱 공연 관리 반영 시 처리
-        onClickRegisterShow = {
-            uriHandler.openUri(registrationUrl)
-            Toast.makeText(context, "공연 등록을 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
-        },// navigateToShowRegistration, // TODO 추후 인앱 공연 등록 반영 시 주석 해제
         onClickQrScan = if (user != null) onClickQrScan else requireLogin,
     )
 }

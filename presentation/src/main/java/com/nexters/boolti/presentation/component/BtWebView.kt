@@ -4,12 +4,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.AttributeSet
+import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.nexters.boolti.presentation.util.bridge.BridgeDto
+import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import timber.log.Timber
 
 class BtWebView @JvmOverloads constructor(
     context: Context,
@@ -53,6 +60,38 @@ class BtWebView @JvmOverloads constructor(
             onProgressChanged = { _progress.value = it },
         )
     }
+
+    suspend fun setBridgeManager(bridgeManager: BridgeManager) {
+        addJavascriptInterface(
+            object {
+                @JavascriptInterface
+                fun postMessage(message: String) {
+                    Timber.tag("webview_bridge").d("(WEB -> APP) $message 수신")
+                    try {
+                        // JSON 메시지 파싱
+                        val dto = Json.decodeFromString(BridgeDto.serializer(), message)
+                        bridgeManager.handleIncomingData(dto)
+                    } catch (e: SerializationException) {
+                        Timber.tag("webview_bridge")
+                            .e(e, "(WEB -> APP) 유효하지 않은 JSON 포맷: $message")
+                    } catch (e: IllegalArgumentException) {
+                        Timber.tag("webview_bridge")
+                            .e(e, "(WEB -> APP) BridgeDto 타입으로 파싱 실패: $message")
+                    } catch (e: Exception) {
+                        Timber.tag("webview_bridge")
+                            .e(e, "(WEB -> APP) 알 수 없는 에러")
+                        e.printStackTrace() // 에러 처리
+                    }
+                }
+            },
+            bridgeManager.bridgeName,
+        )
+        bridgeManager.dataToSendWeb.collect {
+            evaluateJavascript(it) { result ->
+                Timber.tag("webview_bridge").d("(APP -> WEB)\n\t$it\n전송 결과:\n\t$result")
+            }
+        }
+    }
 }
 
 class BtWebViewClient : WebViewClient()
@@ -77,6 +116,12 @@ class BtWebChromeClient(
 
         launchActivity()
 
+        return true
+    }
+
+    override fun onConsoleMessage(message: ConsoleMessage?): Boolean {
+        Timber.tag("webview_console Message bridge")
+            .d("${message?.message()} -- From line ${message?.lineNumber()} of ${message?.sourceId()}")
         return true
     }
 }

@@ -36,6 +36,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
+import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun LinkEditScreen(
@@ -171,7 +172,8 @@ fun LinkEditScreen(
                 MainButton(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .padding(marginHorizontal)
+                        .padding(bottom = 20.dp)
                         .fillMaxWidth(),
                     label = stringResource(R.string.link_remove),
                     colors = ButtonDefaults.buttonColors(

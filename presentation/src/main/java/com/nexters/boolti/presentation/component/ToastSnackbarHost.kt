@@ -38,7 +38,7 @@ fun ToastSnackbarHost(
             ) {
                 if (leadingIcon != null) {
                     leadingIcon()
-                    Spacer(modifier = Modifier.padding(end = 12.dp))
+                    Spacer(modifier = Modifier.padding(end = 8.dp))
                 }
                 Text(
                     modifier = Modifier.padding(vertical = 12.dp),

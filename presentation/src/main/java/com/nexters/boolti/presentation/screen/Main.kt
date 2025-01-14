@@ -1,11 +1,11 @@
 package com.nexters.boolti.presentation.screen
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -65,6 +65,7 @@ val LocalNavController = compositionLocalOf<NavHostController> {
     error("No NavController provided")
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val modifier = Modifier.fillMaxSize()
@@ -73,27 +74,25 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
     val rootNavController = rememberNavControllerWithLog()
 
     BooltiTheme {
-        Surface(modifier) {
-            Scaffold(
-                snackbarHost = {
-                    ToastSnackbarHost(
-                        modifier = Modifier.padding(bottom = 80.dp),
-                        hostState = snackbarHostState,
-                    )
-                },
-            ) { innerPadding ->
-                CompositionLocalProvider(
-                    LocalSnackbarController provides SnackbarController(
-                        snackbarHostState,
-                        scope,
-                    ),
-                    LocalNavController provides rootNavController,
-                ) {
-                    MainNavigation(
-                        modifier = modifier.padding(innerPadding),
-                        onClickQrScan = onClickQrScan,
-                    )
-                }
+        Scaffold(
+            snackbarHost = {
+                ToastSnackbarHost(
+                    modifier = Modifier.padding(bottom = 80.dp),
+                    hostState = snackbarHostState,
+                )
+            },
+        ) {
+            CompositionLocalProvider(
+                LocalSnackbarController provides SnackbarController(
+                    snackbarHostState,
+                    scope,
+                ),
+                LocalNavController provides rootNavController,
+            ) {
+                MainNavigation(
+                    modifier = modifier,
+                    onClickQrScan = onClickQrScan,
+                )
             }
         }
     }

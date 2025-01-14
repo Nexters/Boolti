@@ -118,7 +118,7 @@ private fun ReservationsContent(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(top = 20.dp)
+        contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
     ) {
         items(
             count = reservations.size,

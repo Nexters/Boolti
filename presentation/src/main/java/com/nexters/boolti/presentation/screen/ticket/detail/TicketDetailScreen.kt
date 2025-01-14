@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -78,6 +79,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -188,12 +190,21 @@ private fun TicketDetailScreen(
         }
     }
 
+    LaunchedEffect(pullToRefreshState.isRefreshing) {
+        if (pullToRefreshState.isRefreshing) {
+            viewModel.refresh().invokeOnCompletion {
+                pullToRefreshState.endRefresh()
+            }
+        }
+    }
+
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }
             .collect(viewModel::syncCurrentPage)
     }
 
     Scaffold(
+        modifier = modifier.navigationBarsPadding(),
         topBar = {
             BtBackAppBar(
                 title = stringResource(R.string.ticket_detail_title),
@@ -201,22 +212,24 @@ private fun TicketDetailScreen(
             )
         },
     ) { innerPadding ->
-        if (pullToRefreshState.isRefreshing) {
-            viewModel.refresh().invokeOnCompletion {
-                pullToRefreshState.endRefresh()
-            }
-        }
-
         Box(
             modifier = Modifier
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
-                .padding(top = 16.dp)
+                .fillMaxSize()
+                .padding(innerPadding)
+                .nestedScroll(pullToRefreshState.nestedScrollConnection),
         ) {
+            PullToRefreshContainer(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .zIndex(1f),
+                state = pullToRefreshState,
+            )
             Column(
-                modifier = modifier
-                    .padding(innerPadding)
+                modifier = Modifier
                     .padding(horizontal = 29.dp)
                     .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 val ticketShape = TicketShape(
                     width = contentWidth,
@@ -225,8 +238,9 @@ private fun TicketDetailScreen(
                     cornerRadius = 8.dp.toPx(),
                     bottomAreaHeight = ticketSectionHeightUntilTicketInfo,
                 )
-                Column(
+                Box(
                     modifier = Modifier
+                        .padding(top = 16.dp)
                         .onGloballyPositioned { coordinates ->
                             contentWidth = coordinates.size.width.toFloat()
                             ticketSectionHeight = coordinates.size.height.toFloat()
@@ -243,113 +257,109 @@ private fun TicketDetailScreen(
                             shape = ticketShape,
                         ),
                 ) {
-                    Box {
-                        // 배경 블러된 이미지
-                        Box(contentAlignment = Alignment.BottomCenter) {
-                            AsyncImage(
-                                model = asyncImageBlurModel(
-                                    context,
-                                    ticketGroup.poster,
-                                    radius = 24
-                                ),
-                                modifier = Modifier
-                                    .width(contentWidth.toDp())
-                                    .aspectRatio(317 / 570f)
-                                    .alpha(.8f),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null,
-                            )
-                            Box(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(317 / 125f)
-                                    .background(
-                                        brush = Brush.verticalGradient(
-                                            listOf(
-                                                Black.copy(alpha = 0f),
-                                                Black,
-                                            )
-                                        ),
-                                    )
-                            )
-                        }
-                        Column(
+                    // 배경 블러된 이미지
+                    Box(contentAlignment = Alignment.BottomCenter) {
+                        AsyncImage(
+                            model = asyncImageBlurModel(
+                                context,
+                                ticketGroup.poster,
+                                radius = 24
+                            ),
                             modifier = Modifier
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(
-                                            Color(0xCCC5CACD),
-                                            Grey95.copy(alpha = .8f)
-                                        ),
-                                    ),
-                                    shape = ticketShape,
-                                )
-                        ) {
-                            Title(showName = ticketGroup.showName)
-
-                            QrCodes(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 20.dp)
-                                    .padding(horizontal = marginHorizontal),
-                                ticketGroup = ticketGroup,
-                                pagerState = pagerState,
-                                onClickQr = onClickQr,
-                            )
-
-                            DottedDivider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 28.dp)
-                                    .padding(horizontal = marginHorizontal),
-                                color = White.copy(alpha = 0.3f),
-                                thickness = 2.dp
-                            )
-
-                            Column(
-                                modifier = Modifier
-                                    .onGloballyPositioned { coordinates ->
-                                        ticketSectionHeightUntilTicketInfo =
-                                            coordinates.size.height.toFloat()
-                                    }
-                            ) {
-                                Notice(notice = ticketGroup.ticketNotice)
-
-                                val copySuccessMessage =
-                                    stringResource(id = R.string.ticketing_address_copied_message)
-                                Inquiry(
-                                    hostName = ticketGroup.hostName,
-                                    hostPhoneNumber = ticketGroup.hostPhoneNumber,
-                                    onClickCopyPlace = {
-                                        clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
-                                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                            snackbarHostController.showMessage(copySuccessMessage)
-                                        }
-                                    },
-                                    onClickNavigateToShowDetail = {
-                                        navigateToShowDetail(ticketGroup.showId)
-                                    }
-                                )
-                            }
-                        }
-
-                        // 티켓 좌상단 꼭지점 그라데이션
+                                .width(contentWidth.toDp())
+                                .aspectRatio(317 / 570f)
+                                .alpha(.8f),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null,
+                        )
                         Box(
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                                .size(105.dp)
-                                .alpha(.45f)
+                            Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(317 / 125f)
                                 .background(
-                                    Brush.linearGradient(
-                                        colors = listOf(White, White.copy(alpha = 0f)),
-                                        end = Offset(50f, 50f),
-                                    )
-                                ),
+                                    brush = Brush.verticalGradient(
+                                        listOf(
+                                            Black.copy(alpha = 0f),
+                                            Black
+                                        )
+                                    ),
+                                )
                         )
                     }
+                    Column(
+                        modifier = Modifier
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xCCC5CACD),
+                                        Grey95.copy(alpha = .8f)
+                                    ),
+                                ),
+                                shape = ticketShape,
+                            )
+                    ) {
+                        Title(showName = ticketGroup.showName)
+
+                        QrCodes(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp)
+                                .padding(horizontal = marginHorizontal),
+                            ticketGroup = ticketGroup,
+                            pagerState = pagerState,
+                            onClickQr = onClickQr,
+                        )
+
+                        DottedDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 28.dp)
+                                .padding(horizontal = marginHorizontal),
+                            color = White.copy(alpha = 0.3f),
+                            thickness = 2.dp
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .onGloballyPositioned { coordinates ->
+                                    ticketSectionHeightUntilTicketInfo =
+                                        coordinates.size.height.toFloat()
+                                }
+                        ) {
+                            Notice(notice = ticketGroup.ticketNotice)
+
+                            val copySuccessMessage =
+                                stringResource(id = R.string.ticketing_address_copied_message)
+                            Inquiry(
+                                hostName = ticketGroup.hostName,
+                                hostPhoneNumber = ticketGroup.hostPhoneNumber,
+                                onClickCopyPlace = {
+                                    clipboardManager.setText(AnnotatedString(ticketGroup.streetAddress))
+                                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                                        snackbarHostController.showMessage(copySuccessMessage)
+                                    }
+                                },
+                                onClickNavigateToShowDetail = {
+                                    navigateToShowDetail(ticketGroup.showId)
+                                }
+                            )
+                        }
+                    }
+                    // 티켓 좌상단 꼭지점 그라데이션
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .size(105.dp)
+                            .alpha(.45f)
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(White, White.copy(alpha = 0f)),
+                                    end = Offset(50f, 50f),
+                                )
+                            ),
+                    )
                 }
 
-                Spacer(modifier = Modifier.size(20.dp))
                 RefundPolicySection(uiState.refundPolicy)
 
                 if (
@@ -358,8 +368,6 @@ private fun TicketDetailScreen(
                 ) {
                     Text(
                         modifier = Modifier
-                            .padding(top = 20.dp, bottom = 60.dp)
-                            .align(Alignment.CenterHorizontally)
                             .clickable { showEnterCodeDialog = true },
                         text = stringResource(R.string.input_enter_code_button),
                         style = MaterialTheme.typography.bodySmall,
@@ -371,8 +379,6 @@ private fun TicketDetailScreen(
                 if (uiState.isRefundableGift) {
                     Text(
                         modifier = Modifier
-                            .padding(top = 20.dp, bottom = 60.dp)
-                            .align(Alignment.CenterHorizontally)
                             .clickable { showRefundGiftTicket = true },
                         text = stringResource(R.string.cancel_registered_gift_button),
                         style = MaterialTheme.typography.bodySmall,
@@ -380,11 +386,9 @@ private fun TicketDetailScreen(
                         textDecoration = TextDecoration.Underline,
                     )
                 }
+
+                Spacer(Modifier.size(32.dp))
             }
-            PullToRefreshContainer(
-                modifier = Modifier.align(Alignment.TopCenter),
-                state = pullToRefreshState,
-            )
         }
     }
 
@@ -481,6 +485,7 @@ private fun QrCodes(
                 .clip(RoundedCornerShape(8.dp))
                 .background(White),
             state = pagerState,
+            userScrollEnabled = pagerState.pageCount > 1,
             pageSpacing = 8.dp,
         ) { i ->
             val ticket = ticketGroup.tickets[i]
@@ -720,7 +725,6 @@ private fun Section(
 ) {
     Column(
         modifier
-            .padding(bottom = 12.dp)
             .fillMaxWidth()
             .border(1.dp, color = White.copy(alpha = .15f), shape = RoundedCornerShape(8.dp))
             .padding(start = 20.dp, end = 20.dp, bottom = if (contentVisible) 20.dp else 0.dp)

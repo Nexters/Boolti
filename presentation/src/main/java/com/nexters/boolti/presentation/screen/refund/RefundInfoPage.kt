@@ -136,8 +136,7 @@ fun RefundInfoPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(top = 16.dp)
-                .padding(vertical = 8.dp),
+                .padding(top = 16.dp, bottom = 20.dp),
             onClick = onRequest,
             enabled = uiState.isAbleToRequest,
             label = stringResource(id = R.string.refund_button)

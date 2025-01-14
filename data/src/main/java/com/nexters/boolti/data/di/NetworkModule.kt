@@ -2,7 +2,7 @@ package com.nexters.boolti.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.nexters.boolti.data.BuildConfig
-import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
@@ -115,7 +115,8 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideTicketingService(@Named("auth") retrofit: Retrofit): TicketingService = retrofit.create()
+    fun provideTicketingService(@Named("auth") retrofit: Retrofit): TicketingService =
+        retrofit.create()
 
     @Singleton
     @Provides
@@ -127,7 +128,8 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideReservationService(@Named("auth") retrofit: Retrofit): ReservationService = retrofit.create()
+    fun provideReservationService(@Named("auth") retrofit: Retrofit): ReservationService =
+        retrofit.create()
 
     @Singleton
     @Provides
@@ -135,7 +137,8 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideAuthFileService(@Named("auth") retrofit: Retrofit): AuthFileService = retrofit.create()
+    fun provideAuthFileService(@Named("auth") retrofit: Retrofit): AuthFileService =
+        retrofit.create()
 
     @Singleton
     @Provides
@@ -143,7 +146,8 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideMemberService(@Named("non-auth") retrofit: Retrofit): MemberService = retrofit.create()
+    fun provideMemberService(@Named("non-auth") retrofit: Retrofit): MemberService =
+        retrofit.create()
 
     @Singleton
     @Provides
@@ -152,7 +156,10 @@ internal object NetworkModule {
     @Singleton
     @Provides
     @Named("auth")
-    fun provideAuthOkHttpClient(interceptor: AuthInterceptor, authenticator: AuthAuthenticator): OkHttpClient {
+    fun provideAuthOkHttpClient(
+        interceptor: AuthInterceptor,
+        authenticator: AuthAuthenticator
+    ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
@@ -207,12 +214,12 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideAuthInterceptor(tokenDataSource: TokenDataSource): AuthInterceptor = AuthInterceptor(tokenDataSource)
+    fun provideAuthInterceptor(tokenDataSource: TokenDataSource): AuthInterceptor =
+        AuthInterceptor(tokenDataSource)
 
     @Singleton
     @Provides
     fun provideAuthenticator(
-        tokenDataSource: TokenDataSource,
-        authDataSource: AuthDataSource,
-    ): AuthAuthenticator = AuthAuthenticator(tokenDataSource, authDataSource)
+        authTokenDataSource: AuthTokenDataSource
+    ): AuthAuthenticator = AuthAuthenticator(authTokenDataSource)
 }

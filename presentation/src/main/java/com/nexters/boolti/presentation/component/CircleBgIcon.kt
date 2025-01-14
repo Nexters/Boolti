@@ -9,11 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun CircleBgIcon(
     modifier: Modifier = Modifier,
-    painter: Painter,
+    imageVector: ImageVector,
     bgColor: Color,
 ) {
     Box(
@@ -21,6 +22,6 @@ fun CircleBgIcon(
             .clip(CircleShape)
             .background(bgColor)
     ) {
-        Icon(painter = painter, contentDescription = null)
+        Icon(imageVector = imageVector, contentDescription = null)
     }
 }

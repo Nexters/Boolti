@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,7 +37,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey60
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.point1
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -50,6 +52,7 @@ fun HostedShowScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
+        modifier = Modifier.navigationBarsPadding(),
         topBar = {
             BtBackAppBar(
                 title = stringResource(R.string.hostedShowsTitle),
@@ -58,7 +61,9 @@ fun HostedShowScreen(
         }
     ) { innerPadding ->
         if (uiState.shows.isEmpty()) {
-            EmptyHostedShow(modifier = modifier.padding(innerPadding))
+            EmptyHostedShow(modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize())
         } else {
             HostedShows(
                 modifier = modifier
@@ -79,7 +84,7 @@ fun HostedShows(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(vertical = 12.dp),
+        contentPadding = PaddingValues(top = 12.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(shows, key = { show -> show.id }) { show ->
@@ -94,7 +99,7 @@ private fun HostedShowItem(
     onClick: (showId: String, showName: String) -> Unit,
 ) {
     val enable = LocalDate.now().toEpochDay() <= show.date.toLocalDate().toEpochDay()
-    val tint = if (enable) White else Grey60
+    val tint = if (enable) White else Grey50
 
     Row(
         modifier = Modifier
@@ -114,18 +119,6 @@ private fun HostedShowItem(
             tint = tint,
             contentDescription = stringResource(R.string.description_qr_icon),
         )
-    }
-}
-
-@Preview
-@Composable
-fun HostedShowItemPreview() {
-    BooltiTheme {
-        Surface {
-            HostedShowItem(
-                Show("", "hello world", LocalDateTime.now(), LocalDate.now(), LocalDate.now(), "")
-            ) { _, _ -> }
-        }
     }
 }
 
@@ -158,6 +151,49 @@ fun EmptyHostedShow(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.size(28.dp))
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HostedShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            HostedShowItem(
+                Show("", "hello world", LocalDateTime.now(), LocalDate.now(), LocalDate.now(), "")
+            ) { _, _ -> }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun OutDatedHostedShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            HostedShowItem(
+                Show(
+                    "",
+                    "hello world",
+                    LocalDateTime.now().minusDays(1),
+                    LocalDate.now(),
+                    LocalDate.now(),
+                    ""
+                )
+            ) { _, _ -> }
+        }
+    }
+}
+
+@Preview(widthDp = 360, heightDp = 760)
+@Composable
+fun EmptyShowItemPreview() {
+    BooltiTheme {
+        Surface {
+            EmptyHostedShow(
+                Modifier
+            )
         }
     }
 }

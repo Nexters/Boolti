@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -74,7 +76,7 @@ fun ReservationDetailScreen(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.navigationBarsPadding(),
         topBar = {
             BtBackAppBar(
                 title = stringResource(id = R.string.reservation_detail),
@@ -143,7 +145,8 @@ fun ReservationDetailScreen(
             if (state.reservation.isRefundable) {
                 MainButton(
                     modifier = modifier
-                        .padding(horizontal = marginHorizontal, vertical = 8.dp)
+                        .padding(horizontal = marginHorizontal)
+                        .padding(top = 8.dp, bottom = 20.dp)
                         .fillMaxWidth(),
                     colors = MainButtonDefaults.buttonColors(
                         containerColor = Grey15,
@@ -159,6 +162,8 @@ fun ReservationDetailScreen(
                     }
                 )
             }
+
+            Spacer(Modifier.size(32.dp))
         }
 
         if (showRefundDialog) {

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -79,12 +80,17 @@ fun QrFullScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { Toolbar(onClose = onClose) },
+        topBar = {
+            Toolbar(
+                modifier = Modifier.statusBarsPadding(),
+                onClose = onClose,
+            )
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(White)
                 .padding(innerPadding),
         ) {
             HorizontalPager(

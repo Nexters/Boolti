@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -57,7 +58,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -82,7 +82,6 @@ import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
-import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -158,7 +157,7 @@ fun ShowDetailScreen(
 
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         Scaffold(
-            modifier = modifier,
+            modifier = modifier.navigationBarsPadding(),
             topBar = {
                 ShowDetailAppBar(
                     showDetail = uiState.showDetail,
@@ -167,12 +166,13 @@ fun ShowDetailScreen(
                     navigateToReport = navigateToReport,
                 )
             },
-            containerColor = MaterialTheme.colorScheme.background,
         ) { innerPadding ->
             if (uiState.isLoading) {
                 Box(
-                    modifier = Modifier.padding(innerPadding).fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center,
                 ) {
                     BtCircularProgressIndicator()
                 }
@@ -230,9 +230,6 @@ fun ShowDetailScreen(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
-    val window = LocalContext.current.requireActivity().window
-    window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
-
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -246,9 +243,7 @@ fun ShowDetailScreen(
 
         var buttonsHeight by remember { mutableStateOf(0.dp) }
 
-        LazyColumn(
-            modifier = Modifier,
-        ) {
+        LazyColumn {
             item {
                 val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 
@@ -350,7 +345,6 @@ fun ShowDetailScreen(
             }
         )
     }
-
 }
 
 @Composable
@@ -747,7 +741,8 @@ fun LazyListScope.CastTab(
                             Cast(
                                 memberHeight,
                                 member,
-                                onClick = { onClickMember(member.userCode) })
+                                onClick = { onClickMember(member.userCode) },
+                            )
                         }
                     }
                 }

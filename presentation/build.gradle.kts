@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.zoomable)
     kapt(libs.hilt.compiler)
 
+    implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.lottie)
     implementation(libs.bundles.coil)
     api(libs.kakao.login)
@@ -91,6 +93,7 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.reorderable)
 
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))

@@ -88,7 +88,7 @@ private fun LinkListScreen(
                     .padding(horizontal = marginHorizontal)
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 20.dp),
+                contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
             ) {
                 items(links) { link ->
                     LinkItem(link = link) {

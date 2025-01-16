@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.ShowFeed
@@ -106,11 +108,13 @@ fun ShowScreen(
             }
         }
     }
+    var popupToShow: Popup? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 ShowEvent.Search -> appbarOffsetHeightPx = 0f
+                is ShowEvent.ShowPopup -> popupToShow = event.popup
             }
         }
     }
@@ -181,6 +185,23 @@ fun ShowScreen(
             onKeywordChanged = viewModel::updateKeyword,
             search = viewModel::search,
         )
+
+        val popup = popupToShow
+        if (popup != null) {
+            when (popup) {
+                is Popup.Event -> {
+                    EventDialog(
+                        imageUrl = popup.imageUrl,
+                        actionUrl = popup.eventUrl,
+                        onDismiss = { popupToShow = null },
+                    )
+                }
+
+                is Popup.Notice -> {
+                    TODO("implement notice dialog")
+                }
+            }
+        }
     }
 }
 

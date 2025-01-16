@@ -42,7 +42,7 @@ import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey95
 
 @Composable
-fun BTDialog(
+fun EventDialog(
     imageUrl: String,
     actionUrl: String?,
     onDismiss: (hideToday: Boolean) -> Unit,
@@ -135,7 +135,7 @@ fun BTDialog(
 fun BTDialogPreview() {
     BooltiTheme {
         Surface {
-            BTDialog(
+            EventDialog(
                 imageUrl = "",
                 actionUrl = "",
                 onDismiss = {}

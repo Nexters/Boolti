@@ -5,9 +5,11 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.PolicyDataSource
+import com.nexters.boolti.data.datasource.PopupDataSource
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.network.api.LoginService
+import com.nexters.boolti.data.network.api.PopupService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,7 +34,8 @@ internal object DataSourceModule {
 
     @Singleton
     @Provides
-    fun provideTokenDataSource(@ApplicationContext context: Context): TokenDataSource = TokenDataSource(context)
+    fun provideTokenDataSource(@ApplicationContext context: Context): TokenDataSource =
+        TokenDataSource(context)
 
     @Singleton
     @Provides
@@ -46,5 +49,11 @@ internal object DataSourceModule {
 
     @Singleton
     @Provides
-    fun providePolicyDataSource(@ApplicationContext context: Context): PolicyDataSource = PolicyDataSource(context)
+    fun providePolicyDataSource(@ApplicationContext context: Context): PolicyDataSource =
+        PolicyDataSource(context)
+
+    @Singleton
+    @Provides
+    fun providePopupDataSource(service: PopupService, @ApplicationContext context: Context) =
+        PopupDataSource(service, context)
 }

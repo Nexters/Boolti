@@ -3,9 +3,11 @@ package com.nexters.boolti.presentation.screen.show
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -13,15 +15,21 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class ShowViewModel @Inject constructor(
     private val showRepository: ShowRepository,
+    private val popupRepository: PopupRepository,
     authRepository: AuthRepository,
 ) : BaseViewModel() {
     val user: StateFlow<User.My?> = authRepository.cachedUser.stateIn(
@@ -38,6 +46,7 @@ class ShowViewModel @Inject constructor(
 
     init {
         search()
+        fetchPopup()
     }
 
     private fun sendEvent(event: ShowEvent) {
@@ -59,5 +68,15 @@ class ShowViewModel @Inject constructor(
 
     fun updateKeyword(newKeyword: String) {
         _uiState.update { it.copy(keyword = newKeyword) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun fetchPopup() {
+        popupRepository
+            .shouldShowPopup()
+            .filter { it }
+            .flatMapLatest { popupRepository.getPopup() }
+            .onEach { popup -> sendEvent(ShowEvent.ShowPopup(popup)) }
+            .launchIn(viewModelScope + recordExceptionHandler)
     }
 }

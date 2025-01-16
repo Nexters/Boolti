@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter
 
 private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
+// 2024-12-29T00:00:00
 internal fun String.toLocalDate(): LocalDate = this.toLocalDateTime().toLocalDate()
 
 internal fun String.toLocalDateTime(): LocalDateTime = LocalDateTime.parse(this.format(formatter))

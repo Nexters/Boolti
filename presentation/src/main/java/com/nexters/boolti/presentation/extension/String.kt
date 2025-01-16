@@ -81,3 +81,16 @@ fun String.toValidUrlString(): String = runCatching {
         this
     }
 }.getOrElse { this }
+
+fun String.extractEmphasizedText(): Pair<String, String> {
+    val regex = Regex("`([^`]*)`") // 백틱으로 감싸진 텍스트를 찾는 정규 표현식
+    val matchResult = regex.find(this) // 첫 번째 매치를 찾음
+
+    return if (matchResult != null) {
+        val emphasizedText = matchResult.groupValues[1]
+        val remainingText = this.replaceFirst(regex, "").trim()
+        emphasizedText to remainingText
+    } else {
+        "" to this
+    }
+}

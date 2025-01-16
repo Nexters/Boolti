@@ -121,8 +121,11 @@ fun NoticeDialog(
     title: String,
     content: String,
     emphasizedText: String = "",
+    onDismiss: () -> Unit,
 ) {
-    BTDialog {
+    BTDialog(
+        onDismiss = onDismiss,
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -196,6 +199,7 @@ fun NoticeDialogPreview() {
             NoticeDialog(
                 title = "맴뱀페이 결제 불가 안내",
                 content = "이용에 불편을 드려 죄송합니다. 서비스가 정상화되는 즉시 다시 안내드릴 예정이오니, 다른 결제수단을 이용해 주시면 감사하겠습니다.",
+                onDismiss = {}
             )
         }
     }
@@ -210,6 +214,7 @@ fun NoticeEmphasizedDialogPreview() {
                 title = "맴뱀페이 결제 불가 안내",
                 content = "이용에 불편을 드려 죄송합니다. 서비스가 정상화되는 즉시 다시 안내드릴 예정이오니, 다른 결제수단을 이용해 주시면 감사하겠습니다.",
                 emphasizedText = "현재 야근 중인 관계로 코딩이 영구적으로 불가합니다.",
+                onDismiss = {}
             )
         }
     }

@@ -5,9 +5,9 @@ import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
+import com.nexters.boolti.domain.usecase.GetPopupUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -30,6 +28,7 @@ import javax.inject.Inject
 class ShowViewModel @Inject constructor(
     private val showRepository: ShowRepository,
     private val popupRepository: PopupRepository,
+    private val getPopupUseCase: GetPopupUseCase,
     authRepository: AuthRepository,
 ) : BaseViewModel() {
     val user: StateFlow<User.My?> = authRepository.cachedUser.stateIn(
@@ -70,13 +69,15 @@ class ShowViewModel @Inject constructor(
         _uiState.update { it.copy(keyword = newKeyword) }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun fetchPopup() {
-        popupRepository
-            .shouldShowPopup()
-            .filter { it }
-            .flatMapLatest { popupRepository.getPopup() }
+        getPopupUseCase()
             .onEach { popup -> sendEvent(ShowEvent.ShowPopup(popup)) }
+            .launchIn(viewModelScope + recordExceptionHandler)
+    }
+
+    fun hideEventToday() {
+        popupRepository
+            .hideEventToday()
             .launchIn(viewModelScope + recordExceptionHandler)
     }
 }

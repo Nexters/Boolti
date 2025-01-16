@@ -60,8 +60,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
+import com.nexters.boolti.presentation.component.NoticeDialog
 import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.component.StatusBarCover
+import com.nexters.boolti.presentation.extension.extractEmphasizedText
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -193,12 +195,22 @@ fun ShowScreen(
                     EventDialog(
                         imageUrl = popup.imageUrl,
                         actionUrl = popup.eventUrl,
-                        onDismiss = { popupToShow = null },
+                        onDismiss = { hideToday ->
+                            popupToShow = null
+                            if (hideToday) viewModel.hideEventToday()
+                        },
                     )
                 }
 
                 is Popup.Notice -> {
-                    TODO("implement notice dialog")
+                    val (emphasizedText, remainingText) = popup.description.extractEmphasizedText()
+
+                    NoticeDialog(
+                        title = popup.title,
+                        emphasizedText = emphasizedText,
+                        content = remainingText,
+                        onDismiss = { popupToShow = null },
+                    )
                 }
             }
         }

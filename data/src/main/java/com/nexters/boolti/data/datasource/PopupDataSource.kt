@@ -20,7 +20,7 @@ internal class PopupDataSource @Inject constructor(
     suspend fun getPopup(): PopupResponse = service.getPopup()
 
     fun shouldShowEvent(): Flow<Boolean> = dataStore.data.map {
-        it.dateHidingEvent == null || LocalDate.now() > it.dateHidingEvent.toLocalDate()
+        it.dateHidingEvent.isNullOrBlank() || LocalDate.now() > it.dateHidingEvent.toLocalDate()
     }
 
 

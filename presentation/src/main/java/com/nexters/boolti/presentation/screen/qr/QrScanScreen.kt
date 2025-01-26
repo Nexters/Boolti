@@ -235,7 +235,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
         Row(
             modifier = Modifier
                 .clickable(onClick = onClick)
-                .padding(20.dp),
+                .padding(top = 20.dp, bottom = 32.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {

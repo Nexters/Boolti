@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -169,6 +170,7 @@ fun QrScanScreen(
             ) {
                 ToastSnackbarHost(
                     modifier = Modifier
+                        .statusBarsPadding()
                         .offset { // Scaffold의 inner padding 만큼 상단을 뚫고 나가는 문제가 있음. 해당 값 보정.
                             IntOffset(
                                 0,
@@ -235,7 +237,7 @@ private fun QrScanBottombar(onClick: () -> Unit) {
         Row(
             modifier = Modifier
                 .clickable(onClick = onClick)
-                .padding(20.dp),
+                .padding(top = 20.dp, bottom = 32.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {

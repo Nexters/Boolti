@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.reservationdetail
+package com.nexters.boolti.presentation.screen.reservationdetail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState

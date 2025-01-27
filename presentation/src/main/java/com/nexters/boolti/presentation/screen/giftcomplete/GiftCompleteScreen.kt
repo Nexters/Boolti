@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +56,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.component.dummyReservationDetail
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.screen.payment.PaymentToolbar
@@ -102,6 +107,7 @@ fun GiftCompleteScreen(
     reservation: ReservationDetail,
 ) {
     val context = LocalContext.current
+    var bottomButtonHeight by remember { mutableStateOf(0.dp) }
 
     BackHandler(onBack = onClickClose)
 
@@ -188,15 +194,21 @@ fun GiftCompleteScreen(
                 ShowInformation(
                     reservation = reservation
                 )
+                Spacer(modifier = Modifier.height(bottomButtonHeight))
             }
-            SecondaryButton(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 20.dp),
-                label = stringResource(R.string.show_reservation),
+            TopGradientBackground(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onHeightChanged = { bottomButtonHeight = it },
             ) {
-                navigateToReservation(reservation)
+                SecondaryButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    label = stringResource(R.string.show_reservation),
+                ) {
+                    navigateToReservation(reservation)
+                }
             }
         }
     }
@@ -392,6 +404,7 @@ private fun ShowInformation(
 }
 
 @Composable
+@Preview(device = "spec:width=1080px,height=1340px,dpi=440")
 @Preview
 fun GiftCompleteScreenPreview(
 ) {

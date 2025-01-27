@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +35,7 @@ import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -113,9 +115,10 @@ fun LinkEditScreen(
                 .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(horizontal = 20.dp),
             ) {
                 Row(
+                    modifier = Modifier.padding(top = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -141,7 +144,7 @@ fun LinkEditScreen(
                     )
                 }
                 Row(
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(top = 16.dp, bottom = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -199,5 +202,22 @@ fun LinkEditScreen(
                 Text(stringResource(R.string.remove_link_dialog_message))
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun LinkEditScreenPreview() {
+    BooltiTheme {
+        LinkEditScreen(
+            isEditMode = true,
+            linkName = "링크 이름",
+            linkUrl = "링크 URL",
+            onClickBack = {},
+            onClickComplete = {},
+            onChangeLinkName = {},
+            onChangeLinkUrl = {},
+            requireRemove = {},
+        )
     }
 }

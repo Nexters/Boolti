@@ -321,7 +321,7 @@ private fun TicketingScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.background)
-                        .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
+                        .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp),
                     enabled = uiState.reservationButtonEnabled,
                     label = stringResource(
                         R.string.ticketing_payment_button_label,

@@ -172,9 +172,7 @@ private fun SignUpBottomSheet(
         MainButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 18.dp)
-                .padding(vertical = 8.dp)
-                .padding(bottom = 20.dp),
+                .padding(top = 18.dp, bottom = 20.dp),
             label = stringResource(id = R.string.signup_with_agreement),
             onClick = signUp,
         )

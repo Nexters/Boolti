@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -236,8 +237,10 @@ private fun QrScanBottombar(onClick: () -> Unit) {
         )
         Row(
             modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(top = 20.dp, bottom = 32.dp),
+                .padding(bottom = 12.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .clickable(onClick = onClick, role = Role.Button)
+                .padding(vertical = 20.dp, horizontal = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {

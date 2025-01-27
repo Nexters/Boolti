@@ -146,7 +146,7 @@ fun ReservationDetailScreen(
                 MainButton(
                     modifier = modifier
                         .padding(horizontal = marginHorizontal)
-                        .padding(top = 8.dp, bottom = 20.dp)
+                        .padding(top = 8.dp, bottom = 32.dp)
                         .fillMaxWidth(),
                     colors = MainButtonDefaults.buttonColors(
                         containerColor = Grey15,
@@ -161,9 +161,9 @@ fun ReservationDetailScreen(
                         }
                     }
                 )
+            } else {
+                Spacer(Modifier.size(32.dp))
             }
-
-            Spacer(Modifier.size(32.dp))
         }
 
         if (showRefundDialog) {

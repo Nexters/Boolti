@@ -231,7 +231,7 @@ fun ShowDetailScreen(
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         val showCountdownBanner =
             showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
@@ -248,7 +248,7 @@ fun ShowDetailScreen(
                 val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 
                 Poster(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .clip(
                             shape = RoundedCornerShape(

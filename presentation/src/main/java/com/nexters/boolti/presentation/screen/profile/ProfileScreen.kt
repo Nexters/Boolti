@@ -246,6 +246,8 @@ fun ProfileScreen(
                     }
                 }
             }
+
+            Spacer(Modifier.size(32.dp))
         }
 
         backDialogMessage?.let { msg ->

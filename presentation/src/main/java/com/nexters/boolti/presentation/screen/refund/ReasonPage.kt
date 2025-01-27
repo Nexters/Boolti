@@ -49,7 +49,7 @@ fun ReasonPage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = marginHorizontal)
-                .padding(bottom = 20.dp),
+                .padding(bottom = 32.dp),
             onClick = onNextClick,
             enabled = reason.isNotBlank(),
             label = stringResource(id = R.string.next),

@@ -18,6 +18,8 @@
     <string name="description_qr_icon">QR 스캔 아이콘</string>
     <string name="description_clear_button">모두 지우기</string>
 
+    <string name="dialog_hide_today">오늘 하루 그만 보기</string>
+
     <string name="error_show_not_today">아직 공연일이 아니에요</string>
     <string name="error_used_ticket">이미 입장에 사용한 티켓이에요</string>
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>

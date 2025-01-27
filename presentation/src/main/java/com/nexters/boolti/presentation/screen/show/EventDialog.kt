@@ -107,7 +107,7 @@ fun EventDialog(
                             )
                         }
                         Text(
-                            text = "오늘 하루 그만 보기",
+                            text = stringResource(R.string.dialog_hide_today),
                             style = MaterialTheme.typography.bodyLarge.copy(color = Grey50)
                         )
                     }

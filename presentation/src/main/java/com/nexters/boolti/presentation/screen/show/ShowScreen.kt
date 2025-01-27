@@ -188,8 +188,7 @@ fun ShowScreen(
             search = viewModel::search,
         )
 
-        val popup = popupToShow
-        if (popup != null) {
+        popupToShow?.let { popup ->
             when (popup) {
                 is Popup.Event -> {
                     EventDialog(

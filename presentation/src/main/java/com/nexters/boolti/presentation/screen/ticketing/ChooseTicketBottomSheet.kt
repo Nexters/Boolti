@@ -250,8 +250,8 @@ private fun ChooseTicketBottomSheetContent2(
             label = stringResource(buttonTextId),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
-                .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 32.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 32.dp)
+                .height(48.dp),
             onClick = { onTicketingClicked(ticket, ticketCount) },
         )
     }

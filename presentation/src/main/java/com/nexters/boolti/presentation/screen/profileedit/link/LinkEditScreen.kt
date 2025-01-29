@@ -175,7 +175,7 @@ fun LinkEditScreen(
                 MainButton(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(marginHorizontal)
+                        .padding(horizontal = marginHorizontal)
                         .padding(bottom = 20.dp)
                         .fillMaxWidth(),
                     label = stringResource(R.string.link_remove),

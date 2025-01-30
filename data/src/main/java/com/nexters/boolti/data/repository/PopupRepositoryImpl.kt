@@ -10,10 +10,10 @@ internal class PopupRepositoryImpl @Inject constructor(
     private val dataSource: PopupDataSource,
 ) : PopupRepository {
 
-    override fun shouldShowEvent(): Flow<Boolean> = dataSource.shouldShowEvent()
+    override fun shouldShowEvent(id: String): Flow<Boolean> = dataSource.shouldShowEvent(id)
 
-    override fun hideEventToday(): Flow<Unit> = flow {
-        dataSource.hideEventToday()
+    override fun hideEventToday(id: String): Flow<Unit> = flow {
+        dataSource.hideEventToday(id)
     }
 
     override fun getPopup() = flow {

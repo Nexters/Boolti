@@ -196,7 +196,7 @@ fun ShowScreen(
                         actionUrl = popup.eventUrl,
                         onDismiss = { hideToday ->
                             popupToShow = null
-                            if (hideToday) viewModel.hideEventToday()
+                            if (hideToday) viewModel.hideEventToday(popup.id)
                         },
                     )
                 }

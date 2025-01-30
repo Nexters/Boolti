@@ -19,14 +19,13 @@ internal class PopupDataSource @Inject constructor(
 
     suspend fun getPopup(): PopupResponse = service.getPopup()
 
-    fun shouldShowEvent(): Flow<Boolean> = dataStore.data.map {
-        it.dateHidingEvent.isNullOrBlank() || LocalDate.now() > it.dateHidingEvent.toLocalDate()
+    fun shouldShowEvent(id: String): Flow<Boolean> = dataStore.data.map {
+        LocalDate.now() > (it.dateHidingEvent?.get(id)?.toLocalDate() ?: LocalDate.MIN)
     }
 
-
-    suspend fun hideEventToday() {
-        dataStore.updateData {
-            it.copy(dateHidingEvent = LocalDateTime.now().toString())
-        }
+    suspend fun hideEventToday(id: String) = dataStore.updateData {
+        val newDateHidingEvent = it.dateHidingEvent?.toMutableMap() ?: mutableMapOf()
+        newDateHidingEvent[id] = LocalDate.now().toEpochDay()
+        it.copy(dateHidingEvent = newDateHidingEvent)
     }
 }

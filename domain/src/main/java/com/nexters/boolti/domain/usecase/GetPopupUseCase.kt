@@ -15,6 +15,6 @@ class GetPopupUseCase @Inject constructor(
     operator fun invoke(): Flow<Popup> = popupRepository
         .getPopup()
         .filter { popup ->
-            popup is Popup.Notice || popupRepository.shouldShowEvent().first()
+            popup is Popup.Notice || popupRepository.shouldShowEvent(popup.id).first()
         }
 }

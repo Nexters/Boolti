@@ -26,7 +26,7 @@ internal data class AppSettings(
     val accessToken: String = "",
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),
-    val dateHidingEvent: String? = null,
+    val dateHidingEvent: Map<String, Long>? = null, // id - date
 )
 
 internal object AppSettingsSerializer : Serializer<AppSettings> {

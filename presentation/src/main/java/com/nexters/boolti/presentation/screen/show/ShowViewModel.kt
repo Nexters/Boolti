@@ -75,9 +75,9 @@ class ShowViewModel @Inject constructor(
             .launchIn(viewModelScope + recordExceptionHandler)
     }
 
-    fun hideEventToday() {
+    fun hideEventToday(popupId: String) {
         popupRepository
-            .hideEventToday()
+            .hideEventToday(popupId)
             .launchIn(viewModelScope + recordExceptionHandler)
     }
 }

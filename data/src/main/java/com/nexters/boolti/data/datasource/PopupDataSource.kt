@@ -8,7 +8,6 @@ import com.nexters.boolti.data.util.toLocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 internal class PopupDataSource @Inject constructor(
@@ -23,9 +22,13 @@ internal class PopupDataSource @Inject constructor(
         LocalDate.now() > (it.dateHidingEvent?.get(id)?.toLocalDate() ?: LocalDate.MIN)
     }
 
-    suspend fun hideEventToday(id: String) = dataStore.updateData {
-        val newDateHidingEvent = it.dateHidingEvent?.toMutableMap() ?: mutableMapOf()
+    suspend fun hideEventToday(id: String) = dataStore.updateData { appSetting ->
+        val newDateHidingEvent =
+            appSetting.dateHidingEvent
+                ?.filter { it.value == LocalDate.now().toEpochDay() }
+                ?.toMutableMap()
+                ?: mutableMapOf()
         newDateHidingEvent[id] = LocalDate.now().toEpochDay()
-        it.copy(dateHidingEvent = newDateHidingEvent)
+        appSetting.copy(dateHidingEvent = newDateHidingEvent)
     }
 }

@@ -12,8 +12,8 @@ import javax.inject.Singleton
 class GetPopupUseCase @Inject constructor(
     private val popupRepository: PopupRepository,
 ) {
-    operator fun invoke(): Flow<Popup> = popupRepository
-        .getPopup()
+    operator fun invoke(view: String): Flow<Popup> = popupRepository
+        .getPopup(view)
         .filter { popup ->
             popup is Popup.Notice || popupRepository.shouldShowEvent(popup.id).first()
         }

@@ -70,7 +70,7 @@ class ShowViewModel @Inject constructor(
     }
 
     private fun fetchPopup() {
-        getPopupUseCase()
+        getPopupUseCase("HOME")
             .onEach { popup -> sendEvent(ShowEvent.ShowPopup(popup)) }
             .launchIn(viewModelScope + recordExceptionHandler)
     }

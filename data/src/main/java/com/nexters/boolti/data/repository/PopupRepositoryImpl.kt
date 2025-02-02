@@ -16,7 +16,7 @@ internal class PopupRepositoryImpl @Inject constructor(
         dataSource.hideEventToday(id)
     }
 
-    override fun getPopup() = flow {
-        emit(dataSource.getPopup().toDomain())
+    override fun getPopup(view: String) = flow {
+        emit(dataSource.getPopup(view).toDomain())
     }
 }

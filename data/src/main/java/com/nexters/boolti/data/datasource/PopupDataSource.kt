@@ -16,7 +16,7 @@ internal class PopupDataSource @Inject constructor(
 ) {
     private val dataStore = context.dataStore
 
-    suspend fun getPopup(): PopupResponse = service.getPopup()
+    suspend fun getPopup(view: String): PopupResponse = service.getPopup(view)
 
     fun shouldShowEvent(id: String): Flow<Boolean> = dataStore.data.map {
         LocalDate.now() > (it.dateHidingEvent?.get(id)?.toLocalDate() ?: LocalDate.MIN)

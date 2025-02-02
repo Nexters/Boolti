@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface PopupRepository {
     fun shouldShowEvent(id: String): Flow<Boolean>
     fun hideEventToday(id: String): Flow<Unit>
-    fun getPopup(): Flow<Popup>
+    fun getPopup(view: String): Flow<Popup>
 }

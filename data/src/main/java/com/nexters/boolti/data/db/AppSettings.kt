@@ -8,6 +8,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
+import java.time.LocalDate
 
 @Serializable
 internal data class AppSettings(
@@ -25,6 +26,7 @@ internal data class AppSettings(
     val accessToken: String = "",
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),
+    val dateHidingEvent: Map<String, Long>? = null, // id - date
 )
 
 internal object AppSettingsSerializer : Serializer<AppSettings> {

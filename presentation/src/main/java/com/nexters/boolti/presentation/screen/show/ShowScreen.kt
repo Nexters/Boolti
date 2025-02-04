@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,10 +57,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
+import com.nexters.boolti.presentation.component.NoticeDialog
 import com.nexters.boolti.presentation.component.ShowFeed
 import com.nexters.boolti.presentation.component.StatusBarCover
+import com.nexters.boolti.presentation.extension.extractEmphasizedText
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -106,11 +110,13 @@ fun ShowScreen(
             }
         }
     }
+    var popupToShow: Popup? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 ShowEvent.Search -> appbarOffsetHeightPx = 0f
+                is ShowEvent.ShowPopup -> popupToShow = event.popup
             }
         }
     }
@@ -181,6 +187,32 @@ fun ShowScreen(
             onKeywordChanged = viewModel::updateKeyword,
             search = viewModel::search,
         )
+
+        popupToShow?.let { popup ->
+            when (popup) {
+                is Popup.Event -> {
+                    EventDialog(
+                        imageUrl = popup.imageUrl,
+                        actionUrl = popup.eventUrl,
+                        onDismiss = { hideToday ->
+                            popupToShow = null
+                            if (hideToday) viewModel.hideEventToday(popup.id)
+                        },
+                    )
+                }
+
+                is Popup.Notice -> {
+                    val (emphasizedText, remainingText) = popup.description.extractEmphasizedText()
+
+                    NoticeDialog(
+                        title = popup.title,
+                        emphasizedText = emphasizedText,
+                        content = remainingText,
+                        onDismiss = { popupToShow = null },
+                    )
+                }
+            }
+        }
     }
 }
 

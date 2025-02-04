@@ -7,6 +7,7 @@
 
     <string name="description_navigate_back">뒤로 가기</string>
     <string name="description_poster">포스터 사진</string>
+    <string name="description_event_poster">이벤트 포스터</string>
     <string name="description_user_thumbnail">유저 섬네일</string>
     <string name="description_close_button">닫기</string>
     <string name="description_toolbar_home">홈으로 이동</string>
@@ -16,6 +17,8 @@
     <string name="description_expand">확장하기</string>
     <string name="description_qr_icon">QR 스캔 아이콘</string>
     <string name="description_clear_button">모두 지우기</string>
+
+    <string name="dialog_hide_today">오늘 하루 그만 보기</string>
 
     <string name="error_show_not_today">아직 공연일이 아니에요</string>
     <string name="error_used_ticket">이미 입장에 사용한 티켓이에요</string>

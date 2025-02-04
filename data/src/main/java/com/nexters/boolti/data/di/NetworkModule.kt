@@ -13,6 +13,7 @@ import com.nexters.boolti.data.network.api.GiftService
 import com.nexters.boolti.data.network.api.HostService
 import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.api.MemberService
+import com.nexters.boolti.data.network.api.PopupService
 import com.nexters.boolti.data.network.api.ReservationService
 import com.nexters.boolti.data.network.api.ShowService
 import com.nexters.boolti.data.network.api.SignUpService
@@ -147,6 +148,10 @@ internal object NetworkModule {
     @Provides
     fun provideMemberService(@Named("non-auth") retrofit: Retrofit): MemberService =
         retrofit.create()
+
+    @Singleton
+    @Provides
+    fun providePopupService(@Named("non-auth") retrofit: Retrofit): PopupService = retrofit.create()
 
     @Singleton
     @Provides

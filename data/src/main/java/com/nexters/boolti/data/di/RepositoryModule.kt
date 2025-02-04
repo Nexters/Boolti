@@ -6,6 +6,7 @@ import com.nexters.boolti.data.repository.FileRepositoryImpl
 import com.nexters.boolti.data.repository.GiftRepositoryImpl
 import com.nexters.boolti.data.repository.HostRepositoryImpl
 import com.nexters.boolti.data.repository.MemberRepositoryImpl
+import com.nexters.boolti.data.repository.PopupRepositoryImpl
 import com.nexters.boolti.data.repository.ReservationRepositoryImpl
 import com.nexters.boolti.data.repository.ShowRepositoryImpl
 import com.nexters.boolti.data.repository.TicketRepositoryImpl
@@ -16,6 +17,7 @@ import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.HostRepository
 import com.nexters.boolti.domain.repository.MemberRepository
+import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.domain.repository.TicketRepository
@@ -57,4 +59,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindMemberRepository(repository: MemberRepositoryImpl): MemberRepository
+
+    @Binds
+    abstract fun bindPopupRepository(repository: PopupRepositoryImpl): PopupRepository
 }

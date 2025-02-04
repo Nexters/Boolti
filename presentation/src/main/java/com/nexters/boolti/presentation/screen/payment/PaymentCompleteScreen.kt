@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +22,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +42,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.SecondaryButton
 import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
@@ -80,6 +86,7 @@ private fun PaymentCompleteScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    var bottomButtonHeight by remember { mutableStateOf(0.dp) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -161,27 +168,35 @@ private fun PaymentCompleteScreen(
                 showName = reservation.showName,
                 showDate = reservation.showDate,
             )
+
+            Spacer(modifier = Modifier.height(bottomButtonHeight))
         }
 
-        Row(
+        TopGradientBackground(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = marginHorizontal)
-                .padding(bottom = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .align(Alignment.BottomCenter),
+            onHeightChanged = { bottomButtonHeight = it },
         ) {
-            SecondaryButton(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.show_reservation),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = marginHorizontal)
+                    .padding(bottom = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                navigateToReservation(reservation)
-            }
-            MainButton(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.show_ticket),
-            ) {
-                navigateToTicketDetail(reservation)
+                SecondaryButton(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.show_reservation),
+                ) {
+                    navigateToReservation(reservation)
+                }
+                MainButton(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.show_ticket),
+                ) {
+                    navigateToTicketDetail(reservation)
+                }
             }
         }
     }

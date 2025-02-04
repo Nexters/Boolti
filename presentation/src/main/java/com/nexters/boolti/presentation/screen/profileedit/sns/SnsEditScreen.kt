@@ -123,11 +123,12 @@ private fun SnsEditScreen(
                 .fillMaxSize(),
         ) {
             Column(
-                modifier = Modifier.padding(marginHorizontal),
+                modifier = Modifier.padding(horizontal = marginHorizontal),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 // SNS
                 Row(
+                    modifier = Modifier.padding(top = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Label(stringResource(R.string.sns))
@@ -147,7 +148,9 @@ private fun SnsEditScreen(
                 }
 
                 // Username
-                Row {
+                Row(
+                    modifier = Modifier.padding(bottom = 20.dp),
+                ) {
                     Label(
                         label = stringResource(R.string.username),
                         modifier = Modifier.centerToTop(top = 24.dp),

@@ -1,15 +1,14 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -20,7 +19,6 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.asString
-import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
@@ -34,18 +32,14 @@ fun ShowDetailButtons(
     onGiftClicked: () -> Unit,
     onHeightChanged: (height: Dp) -> Unit = {},
 ) {
-    val density = LocalDensity.current
     TopGradientBackground(
-        modifier = Modifier.onGloballyPositioned { coord ->
-            onHeightChanged(coord.size.height.toDp(density))
-        }
+        onHeightChanged = onHeightChanged,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.background)
                 .padding(horizontal = marginHorizontal)
-                .padding(top = 8.dp, bottom = 20.dp),
+                .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
         ) {
             if (showState == ShowState.TicketingInProgress) {
@@ -114,11 +108,14 @@ private fun TicketingButton(
 @Composable
 fun ShowDetailButtonsPreview() {
     BooltiTheme {
-        ShowDetailButtons(
-            showState = ShowState.TicketingInProgress,
-            onTicketingClicked = {},
-            onGiftClicked = {}
-        )
+        Column {
+            Spacer(Modifier.weight(1f))
+            ShowDetailButtons(
+                showState = ShowState.TicketingInProgress,
+                onTicketingClicked = {},
+                onGiftClicked = {}
+            )
+        }
     }
 }
 
@@ -126,12 +123,15 @@ fun ShowDetailButtonsPreview() {
 @Composable
 fun ShowDetailButtonsBeforeTicketingPreview() {
     BooltiTheme {
-        ShowDetailButtons(
-            showState = ShowState.WaitingTicketing(
-                Duration.ofSeconds(1 * 86400 + 2 * 3600 + 17)
-            ),
-            onTicketingClicked = {},
-            onGiftClicked = {}
-        )
+        Column {
+            Spacer(Modifier.weight(1f))
+            ShowDetailButtons(
+                showState = ShowState.WaitingTicketing(
+                    Duration.ofSeconds(1 * 86400 + 2 * 3600 + 17)
+                ),
+                onTicketingClicked = {},
+                onGiftClicked = {}
+            )
+        }
     }
 }

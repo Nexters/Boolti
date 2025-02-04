@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation
 
+import android.Manifest
 import android.graphics.Color
 import android.hardware.Camera
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import com.nexters.boolti.presentation.extension.requestPermission
 import com.nexters.boolti.presentation.extension.vibrator
 import com.nexters.boolti.presentation.screen.qr.QrScanScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -64,6 +66,8 @@ class QrScanActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestPermission(Manifest.permission.CAMERA, 100)
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),

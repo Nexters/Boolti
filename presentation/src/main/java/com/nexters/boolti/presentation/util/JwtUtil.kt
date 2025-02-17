@@ -5,7 +5,7 @@ import java.util.Base64
 class JwtUtil {
     fun decodePayload(jwt: String): Map<String, String> {
         val originPayload = jwt.split(".")[1]
-        val decodedPayload = Base64.getDecoder()
+        val decodedPayload = Base64.getUrlDecoder()
             .decode(originPayload)
             .toString(Charsets.UTF_8)
         val resultMap = mutableMapOf<String, String>()

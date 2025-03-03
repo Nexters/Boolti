@@ -456,56 +456,62 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
         dragHandle = {
             Box(
                 modifier = Modifier
-                    .padding(top = 12.dp)
+                    .padding(top = 12.dp, bottom = 24.dp)
                     .size(45.dp, 4.dp)
                     .clip(CircleShape)
-                    .background(Grey85),
+                    .background(Grey70),
             )
         },
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(58.dp)
-                .clickable {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, previewUrl)
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-
-                    context.startActivity(shareIntent)
-                }
+        Column(
+            modifier = Modifier.padding(bottom = 28.dp)
         ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = stringResource(R.string.ticketing_share_only_url),
-                style = MaterialTheme.typography.bodyLarge,
-                color = Grey10,
-            )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(58.dp)
-                .clickable {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, sharingText)
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .clickable {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, previewUrl)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
 
-                    context.startActivity(shareIntent)
-                }
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = stringResource(R.string.ticketing_share_with_info),
-                style = MaterialTheme.typography.bodyLarge,
-                color = Grey10,
-            )
+                        context.startActivity(shareIntent)
+                    },
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(R.string.ticketing_share_only_url),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Grey10,
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .clickable {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, sharingText)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+
+                        context.startActivity(shareIntent)
+                    },
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(R.string.ticketing_share_with_info),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Grey10,
+                )
+            }
         }
     }
 }

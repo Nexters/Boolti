@@ -133,7 +133,7 @@
     <string name="choose_ticket_bottomsheet_title">옵션 선택</string>
     <string name="ticketing_share">공유하기</string>
     <string name="ticketing_share_only_url">URL만 공유하기</string>
-    <string name="ticketing_share_with_info">공연 정보 함게 공유하기</string>
+    <string name="ticketing_share_with_info">공연 정보 함께 공유하기</string>
     <string name="ticketing_period">티켓 판매</string>
     <string name="ticketing_datetime">일시</string>
     <string name="ticketing_minutes">분</string>

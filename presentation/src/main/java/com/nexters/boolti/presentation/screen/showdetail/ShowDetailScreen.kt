@@ -74,7 +74,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
@@ -352,7 +351,6 @@ fun ShowDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowDetailAppBar(
     showDetail: ShowDetail?,
@@ -360,7 +358,6 @@ private fun ShowDetailAppBar(
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
 ) {
-    val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
@@ -426,77 +423,89 @@ private fun ShowDetailAppBar(
     }
 
     if (showShareBottomSheet && showDetail != null) {
-        val dateString = "${showDetail.date.showDateTimeString} -"
-        val addressString =
-            "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
-        val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
-        val sharingText = stringResource(
-            R.string.show_share_format,
-            showDetail.name,
-            dateString,
-            addressString,
-            previewUrl
+        ShareBottomSheet(
+            showDetail = showDetail,
+            onDismiss = {
+                showShareBottomSheet = false
+            }
         )
+    }
+}
 
-        ModalBottomSheet(
-            containerColor = Grey85,
-            onDismissRequest = { showShareBottomSheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            dragHandle = {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                        .size(45.dp, 4.dp)
-                        .clip(CircleShape)
-                        .background(Grey85),
-                )
-            },
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val dateString = "${showDetail.date.showDateTimeString} -"
+    val addressString =
+        "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
+    val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
+    val sharingText = stringResource(
+        R.string.show_share_format,
+        showDetail.name,
+        dateString,
+        addressString,
+        previewUrl
+    )
+
+    ModalBottomSheet(
+        containerColor = Grey85,
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .size(45.dp, 4.dp)
+                    .clip(CircleShape)
+                    .background(Grey85),
+            )
+        },
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(58.dp)
+                .clickable {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, previewUrl)
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+
+                    context.startActivity(shareIntent)
+                }
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(58.dp)
-                    .clickable {
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, previewUrl)
-                            type = "text/plain"
-                        }
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-
-                        context.startActivity(shareIntent)
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                text = stringResource(R.string.ticketing_share_only_url),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey10,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(58.dp)
+                .clickable {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, sharingText)
+                        type = "text/plain"
                     }
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(R.string.ticketing_share_only_url),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Grey10,
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(58.dp)
-                    .clickable {
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, sharingText)
-                            type = "text/plain"
-                        }
-                        val shareIntent = Intent.createChooser(sendIntent, null)
+                    val shareIntent = Intent.createChooser(sendIntent, null)
 
-                        context.startActivity(shareIntent)
-                    }
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(R.string.ticketing_share_with_info),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Grey10,
-                )
-            }
+                    context.startActivity(shareIntent)
+                }
+        ) {
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                text = stringResource(R.string.ticketing_share_with_info),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey10,
+            )
         }
     }
 }

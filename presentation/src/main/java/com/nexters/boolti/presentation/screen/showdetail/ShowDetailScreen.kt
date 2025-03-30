@@ -1,7 +1,11 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
+import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -24,6 +28,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -69,6 +74,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
@@ -508,6 +514,7 @@ private fun ContentTab(
     )
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
     showDetail: ShowDetail,
@@ -656,9 +663,36 @@ private fun LazyListScope.ShowInfoTab(
                 }
             },
             content = {
-                SectionContent(
-                    showDetail.notice,
-                    overflow = TextOverflow.Ellipsis,
+                val url = "https://dev.preview.boolti.in/show/${showDetail.id}/notice" // TODO: compose에서 변수를 이렇게 둬도 되는지 확인하기 
+
+                // TODO: 길이가 긴 경우에 일부를 자른 뒤 전체 보기를 눌러야 펼쳐지게 만들어야 한다.
+                AndroidView(
+                    modifier = paddingModifier.fillMaxWidth(),
+                    factory = { context ->
+                        WebView(context).apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
+                            // TODO : 그리고 순간적으로 webview의 크기가 화면 전체를 덮는다.
+                            loadUrl(url) // TODO: compose는 스크롤 직전에 렌더링하여 성능을 최적화하는데, webview가 길어질 경우 성능 이슈는 없는지 확인하기
+                            // FIXME: 이거 스크롤를 위로 올렸다가 내리면 다시 불리는 거 같다.
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                            )
+                            settings.javaScriptEnabled = true
+                            settings.domStorageEnabled = true
+                            evaluateJavascript("document.body.style.backgroundColor = '#090A0B';", null) // TODO: color code 팔레트에서 가져올 수 있는지 확인하기
+                            webViewClient = object : WebViewClient() { // TODO: webview를 기존에 사용하던 것을 재활용할 수 있을지 확인하기
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    super.onPageFinished(view, url)
+                                    view?.evaluateJavascript(
+                                        "document.body.style.backgroundColor = '#090A0B';", null
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    update = {
+                        it.loadUrl(url) // TODO: update 가 무슨 역할을 하는지 알아보기
+                    }
                 )
             },
         )

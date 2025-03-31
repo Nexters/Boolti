@@ -235,6 +235,8 @@ fun ShowDetailScreen(
         }
     }.collectAsStateWithLifecycle(showDetail.state)
 
+    val context = LocalContext.current
+    val webView by remember { mutableStateOf(WebView(context)) }
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
@@ -282,6 +284,7 @@ fun ShowDetailScreen(
 
             when (selectedTab) {
                 0 -> ShowInfoTab(
+                    webView = webView,
                     showDetail = showDetail,
                     host = host,
                     onClickContent = onClickContent,
@@ -519,6 +522,7 @@ private fun ContentTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
+    webView: WebView,
     showDetail: ShowDetail,
     host: String,
     onClickContent: () -> Unit,
@@ -669,14 +673,14 @@ private fun LazyListScope.ShowInfoTab(
 
                 // TODO: 길이가 긴 경우에 일부를 자른 뒤 전체 보기를 눌러야 펼쳐지게 만들어야 한다.
                 // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
+                // FIXME: LazyColumn 특성 상 재스크롤하면 웹뷰를 다시 렌더링한다. WebView를 보존시켜서 어느정도 개선을 이뤘지만 여전히 더더 개선해야 한다.
                 AndroidView(
                     modifier = Modifier.fillMaxWidth(),
                     factory = { context ->
                         val cssBackgroundColor = Grey95.toCssColor()
-                        WebView(context).apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
-                            // TODO : 그리고 순간적으로 webview의 크기가 화면 전체를 덮는다.
-                            loadUrl(url) // TODO: compose는 스크롤 직전에 렌더링하여 성능을 최적화하는데, webview가 길어질 경우 성능 이슈는 없는지 확인하기
-                            // FIXME: 이거 스크롤를 위로 올렸다가 내리면 다시 불리는 거 같다.
+                        webView.apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
+                            // TODO : 순간적으로 webview의 크기가 화면 전체를 덮는다.
+                            loadUrl(url)
                             layoutParams = ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -694,9 +698,7 @@ private fun LazyListScope.ShowInfoTab(
                             }
                         }
                     },
-                    update = {
-                        it.loadUrl(url) // TODO: update 가 무슨 역할을 하는지 알아보기
-                    }
+                    update = {}
                 )
             },
         )

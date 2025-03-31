@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
@@ -30,3 +31,6 @@ val Grey90 = Color(0xFF121318)
 val Grey95 = Color(0xFF090A0B)
 
 val KakaoYellow = Color(0XFFFFE833)
+
+// Color(0xFF090A0B)를 #090A0B 형태로 변형해 준다.
+fun Color.toCssColor() = String.format("#%06X", 0xFFFFFF and toArgb())

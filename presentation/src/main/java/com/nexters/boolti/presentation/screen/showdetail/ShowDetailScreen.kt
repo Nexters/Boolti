@@ -102,9 +102,11 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
+import com.nexters.boolti.presentation.theme.toCssColor
 import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -670,6 +672,7 @@ private fun LazyListScope.ShowInfoTab(
                 AndroidView(
                     modifier = Modifier.fillMaxWidth(),
                     factory = { context ->
+                        val cssBackgroundColor = Grey95.toCssColor()
                         WebView(context).apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
                             // TODO : 그리고 순간적으로 webview의 크기가 화면 전체를 덮는다.
                             loadUrl(url) // TODO: compose는 스크롤 직전에 렌더링하여 성능을 최적화하는데, webview가 길어질 경우 성능 이슈는 없는지 확인하기
@@ -680,12 +683,12 @@ private fun LazyListScope.ShowInfoTab(
                             )
                             settings.javaScriptEnabled = true
                             settings.domStorageEnabled = true
-                            evaluateJavascript("document.body.style.backgroundColor = '#090A0B';", null) // TODO: color code 팔레트에서 가져올 수 있는지 확인하기
+                            evaluateJavascript("document.body.style.backgroundColor = ${cssBackgroundColor};", null)
                             webViewClient = object : WebViewClient() { // TODO: webview를 기존에 사용하던 것을 재활용할 수 있을지 확인하기
                                 override fun onPageFinished(view: WebView?, url: String?) {
                                     super.onPageFinished(view, url)
                                     view?.evaluateJavascript(
-                                        "document.body.style.backgroundColor = '#090A0B';", null
+                                        "document.body.style.backgroundColor = '${cssBackgroundColor}';", null
                                     )
                                 }
                             }

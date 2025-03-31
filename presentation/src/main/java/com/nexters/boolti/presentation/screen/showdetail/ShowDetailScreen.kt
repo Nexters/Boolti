@@ -666,8 +666,9 @@ private fun LazyListScope.ShowInfoTab(
                 val url = "https://dev.preview.boolti.in/show/${showDetail.id}/notice" // TODO: compose에서 변수를 이렇게 둬도 되는지 확인하기 
 
                 // TODO: 길이가 긴 경우에 일부를 자른 뒤 전체 보기를 눌러야 펼쳐지게 만들어야 한다.
+                // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
                 AndroidView(
-                    modifier = paddingModifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     factory = { context ->
                         WebView(context).apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
                             // TODO : 그리고 순간적으로 webview의 크기가 화면 전체를 덮는다.

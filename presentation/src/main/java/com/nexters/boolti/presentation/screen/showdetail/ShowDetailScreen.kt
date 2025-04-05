@@ -2,10 +2,8 @@ package com.nexters.boolti.presentation.screen.showdetail
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.view.ViewGroup
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -28,7 +26,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -36,13 +33,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -63,13 +58,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -84,13 +75,10 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
-import com.nexters.boolti.presentation.component.ShowInquiry
-import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
-import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.extension.showDateTimeString
-import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -235,8 +223,13 @@ fun ShowDetailScreen(
         }
     }.collectAsStateWithLifecycle(showDetail.state)
 
+    val url = "https://dev.preview.boolti.in/show/${showDetail.id}/info"
     val context = LocalContext.current
-    val webView by remember { mutableStateOf(WebView(context)) }
+    val webView by remember {
+        mutableStateOf(BtWebView(context).apply {
+            loadUrl(url)
+        })
+    }
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
@@ -285,9 +278,6 @@ fun ShowDetailScreen(
             when (selectedTab) {
                 0 -> ShowInfoTab(
                     webView = webView,
-                    showDetail = showDetail,
-                    host = host,
-                    onClickContent = onClickContent,
                 )
 
                 1 -> CastTab(
@@ -523,44 +513,24 @@ private fun ContentTab(
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
     webView: WebView,
-    showDetail: ShowDetail,
-    host: String,
-    onClickContent: () -> Unit,
 ) {
-    val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
-
     // 최상단 섹션의 상단 패딩
     item { Spacer(Modifier.size(8.dp)) }
 
     item {
-        val url = "https://dev.preview.boolti.in/show/${showDetail.id}/info"
-
-        // TODO: 길이가 긴 경우에 일부를 자른 뒤 전체 보기를 눌러야 펼쳐지게 만들어야 한다.
         // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
-        // FIXME: LazyColumn 특성 상 재스크롤하면 웹뷰를 다시 렌더링한다. WebView를 보존시켜서 어느정도 개선을 이뤘지만 여전히 더더 개선해야 한다.
+        // FIXME: 유튜브 등 링크가 클릭되었을 때 새로운 브라우저로 띄워주기
+        // FIXME: 웹뷰일 때 달라지는 사용자 경험 식별하고 개선하기. (롱클릭 시 복사 등)
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->
                 val cssBackgroundColor = Grey95.toCssColor()
-                webView.apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
+                webView.apply {
                     // TODO : 순간적으로 webview의 크기가 화면 전체를 덮는다.
-                    loadUrl(url)
-                            layoutParams = ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT,
-                            )
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    evaluateJavascript("document.body.style.backgroundColor = ${cssBackgroundColor};", null)
-
-                    webViewClient = object : WebViewClient() { // TODO: webview를 기존에 사용하던 것을 재활용할 수 있을지 확인하기
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-                            view?.evaluateJavascript(
-                                "document.body.style.backgroundColor = '${cssBackgroundColor}';", null
-                            )
-                        }
-                    }
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                    )
                 }
             },
             update = {}

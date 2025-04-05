@@ -532,195 +532,43 @@ private fun LazyListScope.ShowInfoTab(
     // 최상단 섹션의 상단 패딩
     item { Spacer(Modifier.size(8.dp)) }
 
-    // 티켓 판매 섹션
     item {
-        val startDate = showDetail.salesStartDate
-        val endDate = showDetail.salesEndDateTime.toLocalDate()
+        val url = "https://dev.preview.boolti.in/show/${showDetail.id}/info"
 
-        Section(
-            modifier = paddingModifier,
-            title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
-            // ex. 2023.12.01 (토) - 2024.01.20 (월)
-            content = {
-                Column {
-                    Text(
-                        text = "${startDate.showDateString} - ${endDate.showDateString}",
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30)
-                    )
-                    if (showDetail.state.isClosedOrFinished) {
-                        Row(
-                            modifier = Modifier.padding(top = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(20.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.ic_ticket),
-                                tint = Grey30,
-                                contentDescription = null,
-                            )
-                            Text(
-                                text = stringResource(
-                                    R.string.show_sold_ticket_count,
-                                    showDetail.salesTicketCount
-                                ),
-                                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                            )
-                        }
-                    }
-                }
-            }
-        )
-    }
-
-    item { Divider(paddingModifier) }
-
-    // 일시 섹션
-    item {
-        // 일시
-        // ex. 2024.01.20 (토) / 18:00 (150분)
-        val minute = stringResource(id = R.string.ticketing_minutes)
-        Section(
-            modifier = paddingModifier,
-            title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = {
-                Row {
-                    Text(
-                        text = showDetail.date.showDateTimeString,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 6.dp)
-                            .border(
-                                width = 1.dp,
-                                color = Grey50,
-                                shape = CircleShape,
-                            )
-                            .padding(horizontal = 12.dp, vertical = 3.dp),
-                    ) {
-                        Text(
-                            text = "${showDetail.runningTime}${minute}",
-                            style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
-                        )
-                    }
-                }
-            },
-        )
-    }
-
-    item { Divider(paddingModifier) }
-
-    // 장소 섹션
-    item {
-        val snackbarController = LocalSnackbarController.current
-
-        Section(
-            modifier = paddingModifier,
-            title = {
-                Row(
-                    modifier = Modifier.height(30.dp)
-                ) {
-                    SectionTitle(stringResource(id = R.string.ticketing_place))
-                    Spacer(modifier = Modifier.weight(1.0f))
-                    val clipboardManager = LocalClipboardManager.current
-                    val copySuccessMessage =
-                        stringResource(id = R.string.ticketing_address_copied_message)
-                    SmallButton(
-                        iconRes = R.drawable.ic_copy,
-                        label = stringResource(id = R.string.ticketing_copy_address),
-                        onClick = {
-                            clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                snackbarController.showMessage(copySuccessMessage)
-                            }
-                        }
-                    )
-                }
-            },
-            content = {
-                Column {
-                    Text(showDetail.placeName, style = MaterialTheme.typography.bodyLarge)
-                    SectionContent(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "${showDetail.streetAddress} / ${showDetail.detailAddress}"
-                    )
-                }
-            },
-        )
-    }
-    item { Divider(paddingModifier) }
-
-    // 내용 섹션
-    item {
-        Section(
-            modifier = paddingModifier,
-            title = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    SectionTitle(stringResource(id = R.string.ticketing_content))
-                    Text(
-                        modifier = Modifier.clickable(onClick = onClickContent),
-                        text = stringResource(id = R.string.ticketing_all_content),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
-                    )
-                }
-            },
-            content = {
-                val url = "https://dev.preview.boolti.in/show/${showDetail.id}/notice" // TODO: compose에서 변수를 이렇게 둬도 되는지 확인하기 
-
-                // TODO: 길이가 긴 경우에 일부를 자른 뒤 전체 보기를 눌러야 펼쳐지게 만들어야 한다.
-                // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
-                // FIXME: LazyColumn 특성 상 재스크롤하면 웹뷰를 다시 렌더링한다. WebView를 보존시켜서 어느정도 개선을 이뤘지만 여전히 더더 개선해야 한다.
-                AndroidView(
-                    modifier = Modifier.fillMaxWidth(),
-                    factory = { context ->
-                        val cssBackgroundColor = Grey95.toCssColor()
-                        webView.apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
-                            // TODO : 순간적으로 webview의 크기가 화면 전체를 덮는다.
-                            loadUrl(url)
+        // TODO: 길이가 긴 경우에 일부를 자른 뒤 전체 보기를 눌러야 펼쳐지게 만들어야 한다.
+        // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
+        // FIXME: LazyColumn 특성 상 재스크롤하면 웹뷰를 다시 렌더링한다. WebView를 보존시켜서 어느정도 개선을 이뤘지만 여전히 더더 개선해야 한다.
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                val cssBackgroundColor = Grey95.toCssColor()
+                webView.apply { // TODO: loading이 끝날 때까지 흰 배경이 보이는 문제 해결하기. 이왕이면 스크롤하기 전에 렌더링 해 두는 편이...
+                    // TODO : 순간적으로 webview의 크기가 화면 전체를 덮는다.
+                    loadUrl(url)
                             layoutParams = ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                             )
-                            settings.javaScriptEnabled = true
-                            settings.domStorageEnabled = true
-                            evaluateJavascript("document.body.style.backgroundColor = ${cssBackgroundColor};", null)
-                            webViewClient = object : WebViewClient() { // TODO: webview를 기존에 사용하던 것을 재활용할 수 있을지 확인하기
-                                override fun onPageFinished(view: WebView?, url: String?) {
-                                    super.onPageFinished(view, url)
-                                    view?.evaluateJavascript(
-                                        "document.body.style.backgroundColor = '${cssBackgroundColor}';", null
-                                    )
-                                }
-                            }
-                        }
-                    },
-                    update = {}
-                )
-            },
-        )
-    }
-    item { Divider(paddingModifier) }
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    evaluateJavascript("document.body.style.backgroundColor = ${cssBackgroundColor};", null)
 
-    // 주최 섹션
-    item {
-        Section(
-            modifier = paddingModifier,
-            title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
-            content = {
-                ShowInquiry(
-                    hostName = host.substringBefore("("),
-                    hostNumber = host.substringAfter("(").substringBefore(")")
-                )
+                    webViewClient = object : WebViewClient() { // TODO: webview를 기존에 사용하던 것을 재활용할 수 있을지 확인하기
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
+                            view?.evaluateJavascript(
+                                "document.body.style.backgroundColor = '${cssBackgroundColor}';", null
+                            )
+                        }
+                    }
+                }
             },
+            update = {}
         )
     }
 
     // 최하단 섹션의 하단 패딩
-    item { Spacer(Modifier.size(8.dp)) }
+    item { Spacer(Modifier.size(16.dp)) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -110,7 +110,6 @@ import kotlin.math.ceil
 fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
-    onClickContent: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToImages: (index: Int) -> Unit,
     onTicketSelected: (
@@ -178,7 +177,6 @@ fun ShowDetailScreen(
                     showDetail = uiState.showDetail!!,
                     castTeams = uiState.castTeams,
                     selectedTab = uiState.selectedTab,
-                    onClickContent = onClickContent,
                     navigateToLogin = navigateToLogin,
                     navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
                     onTicketSelected = onTicketSelected,
@@ -197,7 +195,6 @@ fun ShowDetailScreen(
     showDetail: ShowDetail,
     castTeams: List<CastTeams>,
     selectedTab: Int,
-    onClickContent: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToImages: (index: Int) -> Unit,
     onTicketSelected: (
@@ -238,11 +235,6 @@ fun ShowDetailScreen(
     ) {
         val showCountdownBanner =
             showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
-        val host = stringResource(
-            id = R.string.ticketing_host_format,
-            showDetail.hostName,
-            showDetail.hostPhoneNumber,
-        )
 
         var buttonsHeight by remember { mutableStateOf(0.dp) }
 
@@ -520,7 +512,7 @@ private fun LazyListScope.ShowInfoTab(
             factory = { context ->
                 val cssBackgroundColor = Grey95.toCssColor()
                 webView.apply {
-                    // TODO : 순간적으로 webview의 크기가 화면 전체를 덮는다.
+                    // FIXME: 순간적으로 webview의 크기가 화면 전체를 덮는다.
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -659,32 +651,6 @@ private fun SectionTitle(
 }
 
 @Composable
-private fun SectionContent(
-    text: String,
-    modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE,
-    overflow: TextOverflow = TextOverflow.Clip,
-) {
-    val uriHandler = LocalUriHandler.current
-    val urlParser = UrlParser(text)
-
-    ClickableText(
-        modifier = modifier.heightIn(0.dp, 246.dp),
-        text = urlParser.annotatedString,
-        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-        maxLines = maxLines,
-        overflow = overflow,
-    ) { offset ->
-        val urlOffset = urlParser.urlOffsets.find { (start, end) -> offset in start..<end }
-        if (urlOffset == null) return@ClickableText
-        val (start, end) = urlOffset
-        val url = text.substring(start, end)
-
-        uriHandler.openUri(url)
-    }
-}
-
-@Composable
 private fun Cast(
     memberHeight: Dp,
     member: Cast,
@@ -765,7 +731,6 @@ private fun ShowDetailScreenPreview() {
             showDetail = ShowDetail(),
             castTeams = emptyList(),
             selectedTab = 0,
-            onClickContent = {},
             navigateToLogin = {},
             navigateToImages = {},
             onTicketSelected = { _, _, _, _ -> },

@@ -46,7 +46,6 @@ import com.nexters.boolti.presentation.screen.qr.qrFullScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
 import com.nexters.boolti.presentation.screen.report.reportScreen
 import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
-import com.nexters.boolti.presentation.screen.showdetail.showDetailContentScreen
 import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
 import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
@@ -130,9 +129,6 @@ fun MainNavigation(
                 getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
             showImagesScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() }
-            )
-            showDetailContentScreen(
                 getSharedViewModel = { entry -> entry.sharedViewModel() }
             )
             reportScreen()

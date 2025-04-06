@@ -22,7 +22,6 @@ fun NavGraphBuilder.showDetailScreen(
             modifier = modifier,
             onBack = navController::popBackStack,
             onClickHome = navController::navigateToHome,
-            onClickContent = { navController.navigate(ShowRoute.Content) },
             onTicketSelected = { showId, ticketId, ticketCount, isInviteTicket ->
                 navController.navigate(
                     MainRoute.Ticketing(

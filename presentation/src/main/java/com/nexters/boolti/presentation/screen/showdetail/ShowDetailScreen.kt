@@ -514,9 +514,6 @@ private fun ContentTab(
 private fun LazyListScope.ShowInfoTab(
     webView: WebView,
 ) {
-    // 최상단 섹션의 상단 패딩
-    item { Spacer(Modifier.size(8.dp)) }
-
     item {
         // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
         // FIXME: 웹뷰일 때 달라지는 사용자 경험 식별하고 개선하기. (롱클릭 시 복사 등)
@@ -530,6 +527,7 @@ private fun LazyListScope.ShowInfoTab(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                     )
+                    setOnLongClickListener { true }
                 }
             },
             update = {}

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,11 +32,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -48,6 +48,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,9 +59,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -95,7 +97,6 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.theme.toCssColor
-import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -254,8 +255,7 @@ fun ShowDetailScreen(
                         .background(color = MaterialTheme.colorScheme.surface)
                         .padding(top = paddingTop),
                     navigateToImages = navigateToImages,
-                    title = showDetail.name,
-                    images = showDetail.images.map { it.originImage }
+                    showDetail = showDetail,
                 )
             }
 
@@ -599,11 +599,12 @@ fun LazyListScope.CastTab(
 
 @Composable
 private fun Poster(
-    images: List<String>,
-    title: String,
+    showDetail: ShowDetail,
     navigateToImages: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val images by remember { derivedStateOf { showDetail.images.map { it.originImage } } }
+
     Column(
         modifier = modifier.padding(horizontal = 38.dp)
     ) {
@@ -616,10 +617,61 @@ private fun Poster(
             onImageClick = navigateToImages,
         )
         Text(
-            modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),
-            text = title,
+            modifier = Modifier.padding(top = 24.dp),
+            text = showDetail.name,
             style = point3,
         )
+        Row(
+            modifier = Modifier.padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_time),
+                tint = Grey50,
+                contentDescription = null,
+            )
+            Text(
+                modifier = Modifier.padding(start = 6.dp),
+                text = showDetail.date.showDateTimeString,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+            )
+            Box(
+                modifier = Modifier
+                    .padding(start = 6.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Grey50,
+                        shape = CircleShape,
+                    )
+                    .padding(horizontal = 12.dp, vertical = 3.dp),
+            ) {
+                // 일시
+                // ex. 2024.01.20 (토) / 18:00 (150분)
+                val minute = stringResource(id = R.string.ticketing_minutes)
+                Text(
+                    text = "${showDetail.runningTime}${minute}",
+                    style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_place),
+                tint = Grey50,
+                contentDescription = null,
+            )
+            Text(
+                modifier = Modifier.padding(start = 6.dp),
+                text = showDetail.placeName,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+            )
+        }
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 

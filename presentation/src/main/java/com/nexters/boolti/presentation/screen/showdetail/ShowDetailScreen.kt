@@ -515,8 +515,6 @@ private fun LazyListScope.ShowInfoTab(
     webView: WebView,
 ) {
     item {
-        // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
-        // FIXME: 웹뷰일 때 달라지는 사용자 경험 식별하고 개선하기. (롱클릭 시 복사 등)
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->

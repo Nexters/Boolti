@@ -2,14 +2,17 @@ package com.nexters.boolti.presentation.component
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.AttributeSet
 import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.net.toUri
 import com.nexters.boolti.presentation.util.bridge.BridgeDto
 import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import java.net.URI
 
 class BtWebView @JvmOverloads constructor(
     context: Context,
@@ -94,7 +98,24 @@ class BtWebView @JvmOverloads constructor(
     }
 }
 
-class BtWebViewClient : WebViewClient()
+class BtWebViewClient : WebViewClient() {
+    override fun shouldOverrideUrlLoading(
+        view: WebView?,
+        request: WebResourceRequest?
+    ): Boolean {
+        val url = request?.url.toString()
+        val domain = URI(url).host
+        val context = view?.context
+
+        if (url != "null" && !domain.contains("boolti.in") && context != null) {
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            context.startActivity(intent)
+            return true
+        }
+
+        return false
+    }
+}
 
 class BtWebChromeClient(
     private val launchActivity: () -> Unit,
@@ -124,4 +145,6 @@ class BtWebChromeClient(
             .d("${message?.message()} -- From line ${message?.lineNumber()} of ${message?.sourceId()}")
         return true
     }
+
+
 }

@@ -519,7 +519,6 @@ private fun LazyListScope.ShowInfoTab(
 
     item {
         // TODO: 웹뷰 내의 링크를 누르면 새 창에서 띄워야 한다.
-        // FIXME: 유튜브 등 링크가 클릭되었을 때 새로운 브라우저로 띄워주기
         // FIXME: 웹뷰일 때 달라지는 사용자 경험 식별하고 개선하기. (롱클릭 시 복사 등)
         AndroidView(
             modifier = Modifier.fillMaxWidth(),

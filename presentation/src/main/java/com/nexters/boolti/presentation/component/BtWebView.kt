@@ -104,10 +104,29 @@ class BtWebViewClient : WebViewClient() {
         request: WebResourceRequest?
     ): Boolean {
         val url = request?.url.toString()
-        val domain = URI(url).host
+        // tel:010-1010-1101과 같이 들어오면 domain이 null일 수도 있다.
+        val domain: String? = URI(url).host
         val context = view?.context
 
-        if (url != "null" && !domain.contains("boolti.in") && context != null) {
+        // tel:010-1010-1101
+        val telSchemes = listOf("tel:", "telprompt:")
+        if (telSchemes.any { scheme -> url.startsWith(scheme) }) {
+            val contact = url.filter { it.isDigit() }
+            val intent = Intent(Intent.ACTION_DIAL).setData("tel:$contact".toUri())
+            context?.startActivity(intent)
+            return true
+        }
+
+        // sms:010-1010-1101
+        val textSchemes = listOf("sms:", "smsto:", "mms:", "mmsto:")
+        if (textSchemes.any { scheme -> url.startsWith(scheme) }) {
+            val contact = url.filter { it.isDigit() }
+            val intent = Intent(Intent.ACTION_SENDTO).setData("smsto:$contact".toUri())
+            context?.startActivity(intent)
+            return true
+        }
+
+        if (url != "null" && domain != null && !domain.contains("boolti.in") && context != null) {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             context.startActivity(intent)
             return true

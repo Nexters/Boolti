@@ -73,6 +73,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -496,7 +497,8 @@ private fun LazyListScope.ShowInfoTab(
     showId: String,
 ) {
     item {
-        val url = "https://dev.preview.boolti.in/show/${showId}/info"
+        val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
+        val url = "https://${host}/show/${showId}/info"
         val context = LocalContext.current
         val webView by remember {
             mutableStateOf(BtWebView(context).apply {

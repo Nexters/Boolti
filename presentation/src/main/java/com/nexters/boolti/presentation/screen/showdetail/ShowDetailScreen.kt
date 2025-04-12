@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.showdetail
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.ViewGroup
-import android.webkit.WebView
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -22,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -219,14 +219,6 @@ fun ShowDetailScreen(
         }
     }.collectAsStateWithLifecycle(showDetail.state)
 
-    val url = "https://dev.preview.boolti.in/show/${showDetail.id}/info"
-    val context = LocalContext.current
-    val webView by remember {
-        mutableStateOf(BtWebView(context).apply {
-            loadUrl(url)
-            setBackgroundColor(android.graphics.Color.TRANSPARENT)
-        })
-    }
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
 
@@ -267,9 +259,7 @@ fun ShowDetailScreen(
             }
 
             when (selectedTab) {
-                0 -> ShowInfoTab(
-                    webView = webView,
-                )
+                0 -> ShowInfoTab(showDetail.id)
 
                 1 -> CastTab(
                     teams = castTeams,
@@ -503,23 +493,40 @@ private fun ContentTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
-    webView: WebView,
+    showId: String,
 ) {
     item {
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
-                webView.apply {
-                    // FIXME: 순간적으로 webview의 크기가 화면 전체를 덮는다.
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                    )
-                    setOnLongClickListener { true }
-                }
-            },
-            update = {}
-        )
+        val url = "https://dev.preview.boolti.in/show/${showId}/info"
+        val context = LocalContext.current
+        val webView by remember {
+            mutableStateOf(BtWebView(context).apply {
+                loadUrl(url)
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            })
+        }
+
+        Box(
+            modifier = Modifier
+                .heightIn(min = 96.dp)
+                .fillMaxWidth()
+        ) {
+            BtCircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+            AndroidView(
+                modifier = Modifier.fillMaxWidth(),
+                factory = { context ->
+                    webView.apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                        )
+                        setOnLongClickListener { true }
+                    }
+                },
+                update = {}
+            )
+        }
     }
 
     // 최하단 섹션의 하단 패딩

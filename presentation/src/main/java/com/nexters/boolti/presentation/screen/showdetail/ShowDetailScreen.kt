@@ -92,11 +92,9 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
-import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
-import com.nexters.boolti.presentation.theme.toCssColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -226,6 +224,7 @@ fun ShowDetailScreen(
     val webView by remember {
         mutableStateOf(BtWebView(context).apply {
             loadUrl(url)
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
         })
     }
     val scope = rememberCoroutineScope()
@@ -510,7 +509,6 @@ private fun LazyListScope.ShowInfoTab(
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->
-                val cssBackgroundColor = Grey95.toCssColor()
                 webView.apply {
                     // FIXME: 순간적으로 webview의 크기가 화면 전체를 덮는다.
                     layoutParams = ViewGroup.LayoutParams(

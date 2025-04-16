@@ -23,6 +23,7 @@ import timber.log.Timber
 import java.net.URI
 
 class BtWebView @JvmOverloads constructor(
+    private val preUriLoading: (url: String) -> Boolean = { false },
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -51,7 +52,7 @@ class BtWebView @JvmOverloads constructor(
     }
 
     private fun setupWebViewClient() {
-        webViewClient = BtWebViewClient()
+        webViewClient = BtWebViewClient(preUriLoading)
     }
 
     fun setWebChromeClient(
@@ -98,33 +99,23 @@ class BtWebView @JvmOverloads constructor(
     }
 }
 
-class BtWebViewClient : WebViewClient() {
+/**
+ * @param preUriLoading redirect 될 때 우선적으로 처리돼야 하는 로직. 반환 값은 해당 이벤트의 consume 여부를 의미한다.
+ */
+class BtWebViewClient(
+    private val preUriLoading: (url: String) -> Boolean
+) : WebViewClient() {
     override fun shouldOverrideUrlLoading(
         view: WebView?,
         request: WebResourceRequest?
     ): Boolean {
         val url = request?.url.toString()
+
         // tel:010-1010-1101과 같이 들어오면 domain이 null일 수도 있다.
         val domain: String? = URI(url).host
         val context = view?.context
 
-        // tel:010-1010-1101
-        val telSchemes = listOf("tel:", "telprompt:")
-        if (telSchemes.any { scheme -> url.startsWith(scheme) }) {
-            val contact = url.filter { it.isDigit() }
-            val intent = Intent(Intent.ACTION_DIAL).setData("tel:$contact".toUri())
-            context?.startActivity(intent)
-            return true
-        }
-
-        // sms:010-1010-1101
-        val textSchemes = listOf("sms:", "smsto:", "mms:", "mmsto:")
-        if (textSchemes.any { scheme -> url.startsWith(scheme) }) {
-            val contact = url.filter { it.isDigit() }
-            val intent = Intent(Intent.ACTION_SENDTO).setData("smsto:$contact".toUri())
-            context?.startActivity(intent)
-            return true
-        }
+        if (preUriLoading(url)) return true
 
         if (url != "null" && domain != null && !domain.contains("boolti.in") && context != null) {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -164,6 +155,4 @@ class BtWebChromeClient(
             .d("${message?.message()} -- From line ${message?.lineNumber()} of ${message?.sourceId()}")
         return true
     }
-
-
 }

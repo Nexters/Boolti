@@ -79,6 +79,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.component.InquiryBottomSheet
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.extension.showDateTimeString
@@ -100,6 +101,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.net.URI
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -497,11 +499,25 @@ private fun LazyListScope.ShowInfoTab(
     showId: String,
 ) {
     item {
+        var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
         val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
         val url = "https://${host}/show/${showId}/info"
         val context = LocalContext.current
+
+        // ex. tel:010-1010-1101
+        val telSchemes = listOf("tel", "telprompt")
+        val textSchemes = listOf("sms", "smsto", "mms", "mmsto")
         val webView by remember {
-            mutableStateOf(BtWebView(context).apply {
+            mutableStateOf(BtWebView(preUriLoading = { url ->
+                val scheme = URI(url).scheme
+                if (scheme in telSchemes + textSchemes) {
+                    redirectedInquiryUrl = url
+
+                    return@BtWebView true
+                }
+
+                return@BtWebView false
+            }, context = context).apply {
                 loadUrl(url)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
             })
@@ -527,6 +543,17 @@ private fun LazyListScope.ShowInfoTab(
                     }
                 },
                 update = {}
+            )
+        }
+
+        redirectedInquiryUrl?.let { url ->
+            val contact = url.filter { it.isDigit() }
+            val isPhone = URI(url).scheme in telSchemes
+
+            InquiryBottomSheet(
+                isTelephone = isPhone,
+                onDismissRequest = { redirectedInquiryUrl = null },
+                contact = contact
             )
         }
     }

@@ -77,6 +77,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -439,7 +440,8 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
     val dateString = "${showDetail.date.showDateTimeString} -"
     val addressString =
         "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
-    val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
+    val devPrefix = if (BuildConfig.DEBUG) "dev." else ""
+    val previewUrl = "https://${devPrefix}preview.boolti.in/show/${showDetail.id}"
     val sharingText = stringResource(
         R.string.show_share_format,
         showDetail.name,

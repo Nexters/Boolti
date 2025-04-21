@@ -36,15 +36,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -74,6 +77,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -89,6 +93,7 @@ import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -354,10 +359,10 @@ private fun ShowDetailAppBar(
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
 ) {
-    val context = LocalContext.current
     var isContextMenuVisible by rememberSaveable {
         mutableStateOf(false)
     }
+    var showShareBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     BtAppBar(
         colors = BtAppBarDefaults.appBarColors(
@@ -376,39 +381,20 @@ private fun ShowDetailAppBar(
             )
         },
         actionButtons = {
-            if (showDetail != null) {
-                val dateString = "${showDetail.date.showDateTimeString} -"
-                val addressString =
-                    "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
-                val previewUrl = "https://preview.boolti.in/show/${showDetail.id}"
-                val sharingText = stringResource(
-                    R.string.show_share_format,
-                    showDetail.name,
-                    dateString,
-                    addressString,
-                    previewUrl
-                )
+            if (showDetail == null) return@BtAppBar
 
-                BtAppBarDefaults.AppBarIconButton(
-                    iconRes = R.drawable.ic_share,
-                    description = stringResource(id = R.string.ticketing_share),
-                    onClick = {
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, sharingText)
-                            type = "text/plain"
-                        }
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-
-                        context.startActivity(shareIntent)
-                    },
-                )
-                BtAppBarDefaults.AppBarIconButton(
-                    iconRes = R.drawable.ic_verticle_more,
-                    description = stringResource(id = R.string.description_more_menu),
-                    onClick = { isContextMenuVisible = true },
-                )
-            }
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_share,
+                description = stringResource(id = R.string.ticketing_share),
+                onClick = {
+                    showShareBottomSheet = true
+                },
+            )
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_verticle_more,
+                description = stringResource(id = R.string.description_more_menu),
+                onClick = { isContextMenuVisible = true },
+            )
         },
     )
 
@@ -434,6 +420,100 @@ private fun ShowDetailAppBar(
                     isContextMenuVisible = false
                 },
             )
+        }
+    }
+
+    if (showShareBottomSheet && showDetail != null) {
+        ShareBottomSheet(
+            showDetail = showDetail,
+            onDismiss = {
+                showShareBottomSheet = false
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val dateString = "${showDetail.date.showDateTimeString} -"
+    val addressString =
+        "${showDetail.placeName} / ${showDetail.streetAddress}, ${showDetail.detailAddress}"
+    val devPrefix = if (BuildConfig.DEBUG) "dev." else ""
+    val previewUrl = "https://${devPrefix}preview.boolti.in/show/${showDetail.id}"
+    val sharingText = stringResource(
+        R.string.show_share_format,
+        showDetail.name,
+        dateString,
+        addressString,
+        previewUrl
+    )
+
+    ModalBottomSheet(
+        containerColor = Grey85,
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(top = 12.dp, bottom = 24.dp)
+                    .size(45.dp, 4.dp)
+                    .clip(CircleShape)
+                    .background(Grey70),
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier.padding(bottom = 28.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .clickable {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, previewUrl)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+
+                        context.startActivity(shareIntent)
+                    },
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(R.string.ticketing_share_only_url),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Grey10,
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .clickable {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, sharingText)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+
+                        context.startActivity(shareIntent)
+                    },
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(R.string.ticketing_share_with_info),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Grey10,
+                )
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ fun PolicyBottomSheet(
     ) {
         AndroidView(
             factory = { context ->
-                BtWebView(context).apply {
+                BtWebView(context = context).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT

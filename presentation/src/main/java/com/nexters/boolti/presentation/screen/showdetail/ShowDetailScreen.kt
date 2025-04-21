@@ -1,7 +1,8 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
+import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -33,7 +34,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +51,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,16 +63,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Cast
@@ -82,13 +81,12 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
-import com.nexters.boolti.presentation.component.ShowInquiry
-import com.nexters.boolti.presentation.component.SmallButton
+import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.component.InquiryBottomSheet
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
-import com.nexters.boolti.presentation.extension.showDateString
+import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
-import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -104,11 +102,11 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
-import com.nexters.boolti.presentation.util.UrlParser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.net.URI
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -119,7 +117,6 @@ import kotlin.math.ceil
 fun ShowDetailScreen(
     onBack: () -> Unit,
     onClickHome: () -> Unit,
-    onClickContent: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToImages: (index: Int) -> Unit,
     onTicketSelected: (
@@ -187,7 +184,6 @@ fun ShowDetailScreen(
                     showDetail = uiState.showDetail!!,
                     castTeams = uiState.castTeams,
                     selectedTab = uiState.selectedTab,
-                    onClickContent = onClickContent,
                     navigateToLogin = navigateToLogin,
                     navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
                     onTicketSelected = onTicketSelected,
@@ -206,7 +202,6 @@ fun ShowDetailScreen(
     showDetail: ShowDetail,
     castTeams: List<CastTeams>,
     selectedTab: Int,
-    onClickContent: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToImages: (index: Int) -> Unit,
     onTicketSelected: (
@@ -240,11 +235,6 @@ fun ShowDetailScreen(
     ) {
         val showCountdownBanner =
             showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
-        val host = stringResource(
-            id = R.string.ticketing_host_format,
-            showDetail.hostName,
-            showDetail.hostPhoneNumber,
-        )
 
         var buttonsHeight by remember { mutableStateOf(0.dp) }
 
@@ -264,8 +254,7 @@ fun ShowDetailScreen(
                         .background(color = MaterialTheme.colorScheme.surface)
                         .padding(top = paddingTop),
                     navigateToImages = navigateToImages,
-                    title = showDetail.name,
-                    images = showDetail.images.map { it.originImage }
+                    showDetail = showDetail,
                 )
             }
 
@@ -278,11 +267,7 @@ fun ShowDetailScreen(
             }
 
             when (selectedTab) {
-                0 -> ShowInfoTab(
-                    showDetail = showDetail,
-                    host = host,
-                    onClickContent = onClickContent,
-                )
+                0 -> ShowInfoTab(showDetail.id)
 
                 1 -> CastTab(
                     teams = castTeams,
@@ -588,179 +573,72 @@ private fun ContentTab(
     )
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
-    showDetail: ShowDetail,
-    host: String,
-    onClickContent: () -> Unit,
+    showId: String,
 ) {
-    val paddingModifier = Modifier.padding(horizontal = marginHorizontal)
-
-    // 최상단 섹션의 상단 패딩
-    item { Spacer(Modifier.size(8.dp)) }
-
-    // 티켓 판매 섹션
     item {
-        val startDate = showDetail.salesStartDate
-        val endDate = showDetail.salesEndDateTime.toLocalDate()
+        var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
+        val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
+        val url = "https://${host}/show/${showId}/info"
+        val context = LocalContext.current
 
-        Section(
-            modifier = paddingModifier,
-            title = { SectionTitle(stringResource(id = R.string.ticketing_period)) },
-            // ex. 2023.12.01 (토) - 2024.01.20 (월)
-            content = {
-                Column {
-                    Text(
-                        text = "${startDate.showDateString} - ${endDate.showDateString}",
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30)
-                    )
-                    if (showDetail.state.isClosedOrFinished) {
-                        Row(
-                            modifier = Modifier.padding(top = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(20.dp),
-                                imageVector = ImageVector.vectorResource(R.drawable.ic_ticket),
-                                tint = Grey30,
-                                contentDescription = null,
-                            )
-                            Text(
-                                text = stringResource(
-                                    R.string.show_sold_ticket_count,
-                                    showDetail.salesTicketCount
-                                ),
-                                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                            )
-                        }
-                    }
+        // ex. tel:010-1010-1101
+        val telSchemes = listOf("tel", "telprompt")
+        val textSchemes = listOf("sms", "smsto", "mms", "mmsto")
+        val webView by remember {
+            mutableStateOf(BtWebView(preUriLoading = { url ->
+                val scheme = URI(url).scheme
+                if (scheme in telSchemes + textSchemes) {
+                    redirectedInquiryUrl = url
+
+                    return@BtWebView true
                 }
-            }
-        )
-    }
 
-    item { Divider(paddingModifier) }
+                return@BtWebView false
+            }, context = context).apply {
+                loadUrl(url)
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            })
+        }
 
-    // 일시 섹션
-    item {
-        // 일시
-        // ex. 2024.01.20 (토) / 18:00 (150분)
-        val minute = stringResource(id = R.string.ticketing_minutes)
-        Section(
-            modifier = paddingModifier,
-            title = { SectionTitle(stringResource(id = R.string.ticketing_datetime)) },
-            content = {
-                Row {
-                    Text(
-                        text = showDetail.date.showDateTimeString,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 6.dp)
-                            .border(
-                                width = 1.dp,
-                                color = Grey50,
-                                shape = CircleShape,
-                            )
-                            .padding(horizontal = 12.dp, vertical = 3.dp),
-                    ) {
-                        Text(
-                            text = "${showDetail.runningTime}${minute}",
-                            style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
+        Box(
+            modifier = Modifier
+                .heightIn(min = 96.dp)
+                .fillMaxWidth()
+        ) {
+            BtCircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+            AndroidView(
+                modifier = Modifier.fillMaxWidth(),
+                factory = { context ->
+                    webView.apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
                         )
+                        setOnLongClickListener { true }
                     }
-                }
-            },
-        )
-    }
+                },
+            )
+        }
 
-    item { Divider(paddingModifier) }
+        redirectedInquiryUrl?.let { url ->
+            val contact = url.filterToPhoneNumber()
+            val isPhone = URI(url).scheme in telSchemes
 
-    // 장소 섹션
-    item {
-        val snackbarController = LocalSnackbarController.current
-
-        Section(
-            modifier = paddingModifier,
-            title = {
-                Row(
-                    modifier = Modifier.height(30.dp)
-                ) {
-                    SectionTitle(stringResource(id = R.string.ticketing_place))
-                    Spacer(modifier = Modifier.weight(1.0f))
-                    val clipboardManager = LocalClipboardManager.current
-                    val copySuccessMessage =
-                        stringResource(id = R.string.ticketing_address_copied_message)
-                    SmallButton(
-                        iconRes = R.drawable.ic_copy,
-                        label = stringResource(id = R.string.ticketing_copy_address),
-                        onClick = {
-                            clipboardManager.setText(AnnotatedString(showDetail.streetAddress))
-                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                                snackbarController.showMessage(copySuccessMessage)
-                            }
-                        }
-                    )
-                }
-            },
-            content = {
-                Column {
-                    Text(showDetail.placeName, style = MaterialTheme.typography.bodyLarge)
-                    SectionContent(
-                        modifier = Modifier.padding(top = 8.dp),
-                        text = "${showDetail.streetAddress} / ${showDetail.detailAddress}"
-                    )
-                }
-            },
-        )
-    }
-    item { Divider(paddingModifier) }
-
-    // 내용 섹션
-    item {
-        Section(
-            modifier = paddingModifier,
-            title = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    SectionTitle(stringResource(id = R.string.ticketing_content))
-                    Text(
-                        modifier = Modifier.clickable(onClick = onClickContent),
-                        text = stringResource(id = R.string.ticketing_all_content),
-                        style = MaterialTheme.typography.bodySmall.copy(color = Grey50),
-                    )
-                }
-            },
-            content = {
-                SectionContent(
-                    showDetail.notice,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-        )
-    }
-    item { Divider(paddingModifier) }
-
-    // 주최 섹션
-    item {
-        Section(
-            modifier = paddingModifier,
-            title = { SectionTitle(stringResource(id = R.string.ticketing_host)) },
-            content = {
-                ShowInquiry(
-                    hostName = host.substringBefore("("),
-                    hostNumber = host.substringAfter("(").substringBefore(")")
-                )
-            },
-        )
+            InquiryBottomSheet(
+                isTelephone = isPhone,
+                onDismissRequest = { redirectedInquiryUrl = null },
+                contact = contact
+            )
+        }
     }
 
     // 최하단 섹션의 하단 패딩
-    item { Spacer(Modifier.size(8.dp)) }
+    item { Spacer(Modifier.size(16.dp)) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -834,11 +712,12 @@ fun LazyListScope.CastTab(
 
 @Composable
 private fun Poster(
-    images: List<String>,
-    title: String,
+    showDetail: ShowDetail,
     navigateToImages: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val images by remember { derivedStateOf { showDetail.images.map { it.originImage } } }
+
     Column(
         modifier = modifier.padding(horizontal = 38.dp)
     ) {
@@ -851,10 +730,60 @@ private fun Poster(
             onImageClick = navigateToImages,
         )
         Text(
-            modifier = Modifier.padding(top = 24.dp, bottom = 30.dp),
-            text = title,
+            modifier = Modifier.padding(top = 24.dp),
+            text = showDetail.name,
             style = point3,
         )
+        Row(
+            modifier = Modifier.padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_time),
+                tint = Grey50,
+                contentDescription = null,
+            )
+            Text(
+                text = showDetail.date.showDateTimeString,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+            )
+            Box(
+                modifier = Modifier
+                    .border(
+                        width = 1.dp,
+                        color = Grey50,
+                        shape = CircleShape,
+                    )
+                    .padding(horizontal = 12.dp, vertical = 3.dp),
+            ) {
+                // 일시
+                // ex. 2024.01.20 (토) / 18:00 (150분)
+                val minute = stringResource(id = R.string.ticketing_minutes)
+                Text(
+                    text = "${showDetail.runningTime}${minute}",
+                    style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_place),
+                tint = Grey50,
+                contentDescription = null,
+            )
+            Text(
+                modifier = Modifier.padding(start = 6.dp),
+                text = showDetail.placeName,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
+            )
+        }
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -883,32 +812,6 @@ private fun SectionTitle(
         text = title,
         style = MaterialTheme.typography.titleLarge,
     )
-}
-
-@Composable
-private fun SectionContent(
-    text: String,
-    modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE,
-    overflow: TextOverflow = TextOverflow.Clip,
-) {
-    val uriHandler = LocalUriHandler.current
-    val urlParser = UrlParser(text)
-
-    ClickableText(
-        modifier = modifier.heightIn(0.dp, 246.dp),
-        text = urlParser.annotatedString,
-        style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
-        maxLines = maxLines,
-        overflow = overflow,
-    ) { offset ->
-        val urlOffset = urlParser.urlOffsets.find { (start, end) -> offset in start..<end }
-        if (urlOffset == null) return@ClickableText
-        val (start, end) = urlOffset
-        val url = text.substring(start, end)
-
-        uriHandler.openUri(url)
-    }
 }
 
 @Composable
@@ -992,7 +895,6 @@ private fun ShowDetailScreenPreview() {
             showDetail = ShowDetail(),
             castTeams = emptyList(),
             selectedTab = 0,
-            onClickContent = {},
             navigateToLogin = {},
             navigateToImages = {},
             onTicketSelected = { _, _, _, _ -> },

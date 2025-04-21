@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey70
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +61,9 @@ fun InquiryBottomSheet(
                 .clickable {
                     val uriKey = if (isTelephone) "tel" else "smsto"
                     val action = if (isTelephone) Intent.ACTION_DIAL else Intent.ACTION_SENDTO
-                    val intent = Intent(action).setData(Uri.parse("$uriKey:$contact"))
+                    val intent = Intent(action).setData("$uriKey:$contact".toUri())
                     context.startActivity(intent)
+                    onDismissRequest()
                 }
                 .padding(horizontal = 24.dp, vertical = 18.dp)) {
             Text(

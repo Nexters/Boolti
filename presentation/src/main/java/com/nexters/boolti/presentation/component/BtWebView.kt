@@ -2,14 +2,17 @@ package com.nexters.boolti.presentation.component
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.AttributeSet
 import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.net.toUri
 import com.nexters.boolti.presentation.util.bridge.BridgeDto
 import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +20,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import timber.log.Timber
+import java.net.URI
 
 class BtWebView @JvmOverloads constructor(
+    private val preUriLoading: (url: String) -> Boolean = { false },
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -47,7 +52,7 @@ class BtWebView @JvmOverloads constructor(
     }
 
     private fun setupWebViewClient() {
-        webViewClient = BtWebViewClient()
+        webViewClient = BtWebViewClient(preUriLoading)
     }
 
     fun setWebChromeClient(
@@ -94,7 +99,33 @@ class BtWebView @JvmOverloads constructor(
     }
 }
 
-class BtWebViewClient : WebViewClient()
+/**
+ * @param preUriLoading redirect 될 때 우선적으로 처리돼야 하는 로직. 반환 값은 해당 이벤트의 consume 여부를 의미한다.
+ */
+class BtWebViewClient(
+    private val preUriLoading: (url: String) -> Boolean
+) : WebViewClient() {
+    override fun shouldOverrideUrlLoading(
+        view: WebView?,
+        request: WebResourceRequest?
+    ): Boolean {
+        val url = request?.url.toString()
+
+        // tel:010-1010-1101과 같이 들어오면 domain이 null일 수도 있다.
+        val domain: String? = URI(url).host
+        val context = view?.context
+
+        if (preUriLoading(url)) return true
+
+        if (url != "null" && domain != null && !domain.contains("boolti.in") && context != null) {
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            context.startActivity(intent)
+            return true
+        }
+
+        return false
+    }
+}
 
 class BtWebChromeClient(
     private val launchActivity: () -> Unit,

@@ -82,6 +82,7 @@ import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.component.InquiryBottomSheet
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
+import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
@@ -542,12 +543,11 @@ private fun LazyListScope.ShowInfoTab(
                         setOnLongClickListener { true }
                     }
                 },
-                update = {}
             )
         }
 
         redirectedInquiryUrl?.let { url ->
-            val contact = url.filter { it.isDigit() }
+            val contact = url.filterToPhoneNumber()
             val isPhone = URI(url).scheme in telSchemes
 
             InquiryBottomSheet(
@@ -658,6 +658,7 @@ private fun Poster(
         Row(
             modifier = Modifier.padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Icon(
                 modifier = Modifier.size(20.dp),
@@ -666,13 +667,11 @@ private fun Poster(
                 contentDescription = null,
             )
             Text(
-                modifier = Modifier.padding(start = 6.dp),
                 text = showDetail.date.showDateTimeString,
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
             Box(
                 modifier = Modifier
-                    .padding(start = 6.dp)
                     .border(
                         width = 1.dp,
                         color = Grey50,

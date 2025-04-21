@@ -13,9 +13,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
+import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.QrScanActivity
 import com.nexters.boolti.presentation.R
@@ -24,21 +27,28 @@ import com.nexters.boolti.presentation.extension.startActivity
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var authRepository: AuthRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
         )
         setContent {
+            val user by authRepository.cachedUser.collectAsStateWithLifecycle(null)
+
             BooltiTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     Main(
+                        user = user,
                         onClickQrScan = { showId, showName ->
                             startActivity<QrScanActivity> {
                                 putExtra("showId", showId)

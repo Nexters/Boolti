@@ -4,6 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.LocalUser
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
@@ -14,6 +15,8 @@ fun NavGraphBuilder.homeScreen(
 ) {
     composable<MainRoute.Home> {
         val navController = LocalNavController.current
+        val user = LocalUser.current
+
         HomeScreen(
             modifier = modifier,
             navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
@@ -23,7 +26,12 @@ fun NavGraphBuilder.homeScreen(
             navigateToReservations = { navController.navigate(MainRoute.Reservations) },
             navigateToProfile = { navController.navigate(MainRoute.Profile()) },
             navigateToBusiness = { navController.navigate(MainRoute.Business) },
-            navigateToShowRegistration = { navController.navigate(MainDestination.ShowRegistration.route) },
+            navigateToShowRegistration = {
+                if (user != null)
+                    navController.navigate(MainDestination.ShowRegistration.route)
+                else
+                    navController.navigate(MainRoute.Login)
+            },
             navigateToLogin = { navController.navigate(MainRoute.Login) },
         )
     }

@@ -756,12 +756,11 @@ private fun Poster(
                         color = Grey50,
                         shape = CircleShape,
                     )
-                    .padding(horizontal = 12.dp, vertical = 3.dp),
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
             ) {
-                // 일시
-                // ex. 2024.01.20 (토) / 18:00 (150분)
                 val minute = stringResource(id = R.string.ticketing_minutes)
                 Text(
+                    modifier = Modifier.align(Alignment.Center),
                     text = "${showDetail.runningTime}${minute}",
                     style = MaterialTheme.typography.labelMedium.copy(color = Grey30),
                 )
@@ -783,7 +782,7 @@ private fun Poster(
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 

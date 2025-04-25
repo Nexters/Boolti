@@ -22,8 +22,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
+import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
-import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
 import com.nexters.boolti.presentation.screen.gift.giftScreen
@@ -45,6 +45,7 @@ import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.qrFullScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
 import com.nexters.boolti.presentation.screen.report.reportScreen
+import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
 import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
@@ -64,9 +65,14 @@ val LocalNavController = compositionLocalOf<NavHostController> {
     error("No NavController provided")
 }
 
+val LocalUser = compositionLocalOf<User?> { null }
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
+fun Main(
+    user: User? = null,
+    onClickQrScan: (showId: String, showName: String) -> Unit,
+) {
     val modifier = Modifier.fillMaxSize()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -87,6 +93,7 @@ fun Main(onClickQrScan: (showId: String, showName: String) -> Unit) {
                     scope,
                 ),
                 LocalNavController provides rootNavController,
+                LocalUser provides user,
             ) {
                 MainNavigation(
                     modifier = modifier,

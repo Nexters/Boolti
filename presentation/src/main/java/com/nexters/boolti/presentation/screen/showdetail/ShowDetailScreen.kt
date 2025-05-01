@@ -719,7 +719,7 @@ fun preUriLoading(
             intent,
             PackageManager.MATCH_DEFAULT_ONLY
         ).isNotEmpty()
-        if (true) {
+        if (canHandle) {
             navigateWithIntent(intent)
         } else {
             if (intent.`package` != "com.nhn.android.nmap") return false
@@ -730,9 +730,7 @@ fun preUriLoading(
             val lng = fallbackUri.getQueryParameter("lng")
             val name = fallbackUri.getQueryParameter("name")
 
-            // TODO: v5 search c= 같은 것들은 뭐지?
-            val webUrl = "https://map.naver.com/p?lat=${lat}&lng=${lng}&name=${name}&c=15.00,0,0,0,dh"
-            uriHandler.openUri(webUrl)
+            uriHandler.openUri("https://map.naver.com/?lat=${lat}&lng=${lng}&title=${name}")
         }
         return true
     }

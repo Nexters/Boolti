@@ -714,7 +714,6 @@ fun preUriLoading(
             return false
         }
 
-        // FIXME: 왠지 모르겠으나 네이버 지도 앱이 있어도 내 휴대폰이 인식을 못 함.
         val canHandle = context.packageManager.queryIntentActivities(
             intent,
             PackageManager.MATCH_DEFAULT_ONLY

@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.showdetail
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.text.TextUtils
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
@@ -70,6 +69,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -118,6 +118,8 @@ import java.time.LocalDateTime
 import kotlin.math.ceil
 import androidx.core.net.toUri
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.theme.Grey15
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -591,6 +593,7 @@ private fun LazyListScope.ShowInfoTab(
         val url = "https://${host}/show/${showId}/info"
         val context = LocalContext.current
         val uriHandler = LocalUriHandler.current
+        var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
 
         // ex. tel:010-1010-1101
         val telSchemes = listOf("tel", "telprompt")
@@ -611,7 +614,10 @@ private fun LazyListScope.ShowInfoTab(
                         intent,
                         PackageManager.MATCH_DEFAULT_ONLY
                     ).isNotEmpty()
-                    if (canHandle) {
+                    if (true) {
+                        // TODO: 최초 클릭 시에만 다이얼로그 띄워야 한다.
+                        intentToNavigateTo = intent
+                    } else {
                         if (intent.`package` != "com.nhn.android.nmap") return@BtWebView false
 
                         val fallbackUri = url.substringBefore("#intent").toUri()
@@ -623,9 +629,6 @@ private fun LazyListScope.ShowInfoTab(
                         // TODO: v5 search c= 같은 것들은 뭐지?
                         val webUrl = "https://map.naver.com/p?lat=${lat}&lng=${lng}&name=${name}&c=15.00,0,0,0,dh"
                         uriHandler.openUri(webUrl)
-                    } else {
-                        // TODO: 최초 클릭 시 다이얼로그 띄워야 한다.
-                        context.startActivity(intent)
                     }
                     return@BtWebView true
                 }
@@ -674,6 +677,38 @@ private fun LazyListScope.ShowInfoTab(
                 onDismissRequest = { redirectedInquiryUrl = null },
                 contact = contact
             )
+        }
+
+        if (intentToNavigateTo != null) {
+            BTDialog(
+                onDismiss = {
+                    intentToNavigateTo = null
+                },
+                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+                onClickPositiveButton = {
+                    context.startActivity(intentToNavigateTo)
+                }
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.show_naver_map_dialog_title),
+                        color = Grey15,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        modifier = Modifier.padding(
+                            top = 4.dp
+                        ),
+                        text = stringResource(R.string.show_naver_map_dialog_content),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Grey50,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
         }
     }
 

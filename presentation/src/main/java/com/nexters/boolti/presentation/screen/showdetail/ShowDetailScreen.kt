@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.text.TextUtils
@@ -67,6 +68,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -597,49 +599,14 @@ private fun LazyListScope.ShowInfoTab(
 
         // ex. tel:010-1010-1101
         val telSchemes = listOf("tel", "telprompt")
-        val textSchemes = listOf("sms", "smsto", "mms", "mmsto")
         val webView by remember {
             mutableStateOf(BtWebView(preUriLoading = { url ->
-                val scheme = URI(url).scheme
-
-                if (scheme == "intent") {
-                    var intent = getIntentFromUri(url) ?: return@BtWebView false
-
-                    if (TextUtils.isEmpty(intent.`package`)) {
-                        return@BtWebView false
-                    }
-
-                    // FIXME: 왠지 모르겠으나 네이버 지도 앱이 있어도 내 휴대폰이 인식을 못 함.
-                    val canHandle = context.packageManager.queryIntentActivities(
-                        intent,
-                        PackageManager.MATCH_DEFAULT_ONLY
-                    ).isNotEmpty()
-                    if (true) {
-                        // TODO: 최초 클릭 시에만 다이얼로그 띄워야 한다.
-                        intentToNavigateTo = intent
-                    } else {
-                        if (intent.`package` != "com.nhn.android.nmap") return@BtWebView false
-
-                        val fallbackUri = url.substringBefore("#intent").toUri()
-
-                        val lat = fallbackUri.getQueryParameter("lat")
-                        val lng = fallbackUri.getQueryParameter("lng")
-                        val name = fallbackUri.getQueryParameter("name")
-
-                        // TODO: v5 search c= 같은 것들은 뭐지?
-                        val webUrl = "https://map.naver.com/p?lat=${lat}&lng=${lng}&name=${name}&c=15.00,0,0,0,dh"
-                        uriHandler.openUri(webUrl)
-                    }
-                    return@BtWebView true
-                }
-
-                if (scheme in telSchemes + textSchemes) {
-                    redirectedInquiryUrl = url
-
-                    return@BtWebView true
-                }
-
-                return@BtWebView false
+                preUriLoading(
+                    url = url,
+                    context = context,
+                    uriHandler = uriHandler,
+                    navigateWithUrl = { url -> redirectedInquiryUrl = url },
+                    navigateWithIntent = { intent -> intentToNavigateTo = intent })
             }, context = context).apply {
                 loadUrl(url)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
@@ -714,6 +681,57 @@ private fun LazyListScope.ShowInfoTab(
 
     // 최하단 섹션의 하단 패딩
     item { Spacer(Modifier.size(16.dp)) }
+}
+
+fun preUriLoading(
+    url: String,
+    context: Context,
+    uriHandler: UriHandler,
+    navigateWithIntent: (Intent?) -> Unit,
+    navigateWithUrl: (String) -> Unit,
+): Boolean {
+    val scheme = URI(url).scheme
+
+    if (scheme == "intent") {
+        var intent = getIntentFromUri(url) ?: return false
+
+        if (TextUtils.isEmpty(intent.`package`)) {
+            return false
+        }
+
+        // FIXME: 왠지 모르겠으나 네이버 지도 앱이 있어도 내 휴대폰이 인식을 못 함.
+        val canHandle = context.packageManager.queryIntentActivities(
+            intent,
+            PackageManager.MATCH_DEFAULT_ONLY
+        ).isNotEmpty()
+        if (true) {
+            // TODO: 최초 클릭 시에만 다이얼로그 띄워야 한다.
+            navigateWithIntent(intent)
+        } else {
+            if (intent.`package` != "com.nhn.android.nmap") return false
+
+            val fallbackUri = url.substringBefore("#intent").toUri()
+
+            val lat = fallbackUri.getQueryParameter("lat")
+            val lng = fallbackUri.getQueryParameter("lng")
+            val name = fallbackUri.getQueryParameter("name")
+
+            // TODO: v5 search c= 같은 것들은 뭐지?
+            val webUrl = "https://map.naver.com/p?lat=${lat}&lng=${lng}&name=${name}&c=15.00,0,0,0,dh"
+            uriHandler.openUri(webUrl)
+        }
+        return true
+    }
+
+    val telSchemes = listOf("tel", "telprompt")
+    val textSchemes = listOf("sms", "smsto", "mms", "mmsto")
+    if (scheme in telSchemes + textSchemes) {
+        navigateWithUrl(url)
+
+        return true
+    }
+
+    return false
 }
 
 fun getIntentFromUri(uri: String): Intent? {

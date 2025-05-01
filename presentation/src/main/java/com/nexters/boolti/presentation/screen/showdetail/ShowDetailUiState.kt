@@ -9,6 +9,7 @@ data class ShowDetailUiState(
     val showDetail: ShowDetail? = null,
     val selectedTab: Int = 0,
     val castTeams: List<CastTeams> = emptyList(),
+    val shouldShowNaverMapDialog: Boolean = true,
     val isLoading: Boolean = true
 ) {
     val isError: Boolean = !isLoading && showDetail == null

@@ -202,6 +202,8 @@ fun ShowDetailScreen(
                     navigateToProfile = navigateToProfile,
                     isLoggedIn = isLoggedIn == true,
                     onSelectTab = viewModel::selectTab,
+                    shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
+                    doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
                 )
             }
         }
@@ -229,6 +231,8 @@ fun ShowDetailScreen(
     navigateToProfile: (userCode: String) -> Unit,
     isLoggedIn: Boolean,
     onSelectTab: (index: Int) -> Unit,
+    shouldShowNaverMapDialog: Boolean,
+    doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val showState by flow {
@@ -278,7 +282,11 @@ fun ShowDetailScreen(
             }
 
             when (selectedTab) {
-                0 -> ShowInfoTab(showDetail.id)
+                0 -> ShowInfoTab(
+                    showId = showDetail.id,
+                    shouldShowNaverMapDialog = shouldShowNaverMapDialog,
+                    doNotShowNaverMapDialog = doNotShowNaverMapDialog
+                )
 
                 1 -> CastTab(
                     teams = castTeams,
@@ -588,6 +596,8 @@ private fun ContentTab(
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
     showId: String,
+    shouldShowNaverMapDialog: Boolean,
+    doNotShowNaverMapDialog: () -> Unit,
 ) {
     item {
         var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
@@ -647,34 +657,39 @@ private fun LazyListScope.ShowInfoTab(
         }
 
         if (intentToNavigateTo != null) {
-            BTDialog(
-                onDismiss = {
-                    intentToNavigateTo = null
-                },
-                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
-                onClickPositiveButton = {
-                    context.startActivity(intentToNavigateTo)
-                }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            if (shouldShowNaverMapDialog) {
+                BTDialog(
+                    onDismiss = {
+                        intentToNavigateTo = null
+                    },
+                    positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+                    onClickPositiveButton = {
+                        context.startActivity(intentToNavigateTo)
+                        doNotShowNaverMapDialog()
+                    }
                 ) {
-                    Text(
-                        text = stringResource(R.string.show_naver_map_dialog_title),
-                        color = Grey15,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        modifier = Modifier.padding(
-                            top = 4.dp
-                        ),
-                        text = stringResource(R.string.show_naver_map_dialog_content),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Grey50,
-                        textAlign = TextAlign.Center,
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.show_naver_map_dialog_title),
+                            color = Grey15,
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                        Text(
+                            modifier = Modifier.padding(
+                                top = 4.dp
+                            ),
+                            text = stringResource(R.string.show_naver_map_dialog_content),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Grey50,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                 }
+            } else {
+                context.startActivity(intentToNavigateTo)
             }
         }
     }
@@ -705,7 +720,6 @@ fun preUriLoading(
             PackageManager.MATCH_DEFAULT_ONLY
         ).isNotEmpty()
         if (true) {
-            // TODO: 최초 클릭 시에만 다이얼로그 띄워야 한다.
             navigateWithIntent(intent)
         } else {
             if (intent.`package` != "com.nhn.android.nmap") return false
@@ -1004,6 +1018,8 @@ private fun ShowDetailScreenPreview() {
             navigateToProfile = {},
             isLoggedIn = true,
             onSelectTab = {},
+            shouldShowNaverMapDialog = false,
+            doNotShowNaverMapDialog = {},
         )
     }
 }

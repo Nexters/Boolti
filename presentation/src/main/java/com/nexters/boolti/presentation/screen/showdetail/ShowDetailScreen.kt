@@ -117,6 +117,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
 import androidx.core.net.toUri
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -599,15 +600,7 @@ private fun LazyListScope.ShowInfoTab(
                 val scheme = URI(url).scheme
 
                 if (scheme == "intent") {
-                    var intent: Intent
-
-                    // TODO: try 리팩토링
-                    try {
-                        intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
-                    } catch (e: URISyntaxException) {
-
-                        return@BtWebView false
-                    }
+                    var intent = getIntentFromUri(url) ?: return@BtWebView false
 
                     if (TextUtils.isEmpty(intent.`package`)) {
                         return@BtWebView false
@@ -686,6 +679,15 @@ private fun LazyListScope.ShowInfoTab(
 
     // 최하단 섹션의 하단 패딩
     item { Spacer(Modifier.size(16.dp)) }
+}
+
+fun getIntentFromUri(uri: String): Intent? {
+    try {
+        return Intent.parseUri(uri, Intent.URI_INTENT_SCHEME)
+    } catch (e: URISyntaxException) {
+        FirebaseCrashlytics.getInstance().recordException(e)
+        return null
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

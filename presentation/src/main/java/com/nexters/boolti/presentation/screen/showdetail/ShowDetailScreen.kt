@@ -2,6 +2,9 @@ package com.nexters.boolti.presentation.screen.showdetail
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.text.TextUtils
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -107,10 +110,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
+import java.net.URISyntaxException
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -590,6 +595,29 @@ private fun LazyListScope.ShowInfoTab(
         val webView by remember {
             mutableStateOf(BtWebView(preUriLoading = { url ->
                 val scheme = URI(url).scheme
+
+                if (scheme == "intent") {
+                    var intent: Intent
+                    try {
+                        intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+                    } catch (e: URISyntaxException) {
+                        return@BtWebView false
+                    }
+
+                    if (TextUtils.isEmpty(intent.`package`)) {
+                        return@BtWebView false
+                    }
+
+                    val list = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                    if (list.isEmpty()) {
+                        context.startActivity(Intent(Intent.ACTION_VIEW,
+                            ("market://details?id=" + intent.getPackage()).toUri()))
+                    } else {
+                        context.startActivity(intent)
+                    }
+                    return@BtWebView true
+                }
+
                 if (scheme in telSchemes + textSchemes) {
                     redirectedInquiryUrl = url
 

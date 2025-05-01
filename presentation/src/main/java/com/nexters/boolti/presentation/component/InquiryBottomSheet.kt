@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -65,7 +66,9 @@ fun InquiryBottomSheet(
                     context.startActivity(intent)
                     onDismissRequest()
                 }
-                .padding(horizontal = 24.dp, vertical = 18.dp)) {
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
             Text(
                 text = stringResource(id = textId),
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey10),
@@ -73,8 +76,7 @@ fun InquiryBottomSheet(
         }
         Spacer(
             modifier = Modifier.padding(
-                bottom = 20.dp + WindowInsets.navigationBars.asPaddingValues()
-                    .calculateBottomPadding()
+                bottom = 28.dp
             )
         )
     }

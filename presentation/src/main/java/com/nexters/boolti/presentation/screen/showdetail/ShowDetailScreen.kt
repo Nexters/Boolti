@@ -691,6 +691,7 @@ private fun LazyListScope.ShowInfoTab(
             } else {
                 context.startActivity(intentToNavigateTo)
             }
+            intentToNavigateTo = null
         }
     }
 

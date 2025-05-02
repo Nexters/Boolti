@@ -607,6 +607,13 @@ private fun LazyListScope.ShowInfoTab(
         val uriHandler = LocalUriHandler.current
         var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
 
+        LaunchedEffect(intentToNavigateTo) {
+            if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
+                context.startActivity(intentToNavigateTo)
+                intentToNavigateTo = null
+            }
+        }
+
         // ex. tel:010-1010-1101
         val telSchemes = listOf("tel", "telprompt")
         val webView by remember {
@@ -656,42 +663,38 @@ private fun LazyListScope.ShowInfoTab(
             )
         }
 
-        if (intentToNavigateTo != null) {
-            if (shouldShowNaverMapDialog) {
-                BTDialog(
-                    onDismiss = {
-                        intentToNavigateTo = null
-                    },
-                    positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
-                    onClickPositiveButton = {
-                        context.startActivity(intentToNavigateTo)
-                        doNotShowNaverMapDialog()
-                    }
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.show_naver_map_dialog_title),
-                            color = Grey15,
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                        Text(
-                            modifier = Modifier.padding(
-                                top = 4.dp
-                            ),
-                            text = stringResource(R.string.show_naver_map_dialog_content),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Grey50,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
+        if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
+            BTDialog(
+                onDismiss = {
+                    intentToNavigateTo = null
+                },
+                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+                onClickPositiveButton = {
+                    context.startActivity(intentToNavigateTo)
+                    doNotShowNaverMapDialog()
+                    intentToNavigateTo = null
                 }
-            } else {
-                context.startActivity(intentToNavigateTo)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.show_naver_map_dialog_title),
+                        color = Grey15,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        modifier = Modifier.padding(
+                            top = 4.dp
+                        ),
+                        text = stringResource(R.string.show_naver_map_dialog_content),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Grey50,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
-            intentToNavigateTo = null
         }
     }
 

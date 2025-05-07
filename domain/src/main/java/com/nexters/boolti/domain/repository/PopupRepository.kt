@@ -7,4 +7,6 @@ interface PopupRepository {
     fun shouldShowEvent(id: String): Flow<Boolean>
     fun hideEventToday(id: String): Flow<Unit>
     fun getPopup(view: String): Flow<Popup>
+    fun shouldShowNaverMapDialog(): Flow<Boolean>
+    suspend fun doNotShowNaverMapPopupAnyMore()
 }

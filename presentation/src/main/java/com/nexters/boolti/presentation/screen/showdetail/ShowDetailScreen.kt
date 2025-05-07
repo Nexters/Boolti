@@ -1,7 +1,10 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.text.TextUtils
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -64,8 +67,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -107,10 +113,15 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
+import java.net.URISyntaxException
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
+import androidx.core.net.toUri
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.theme.Grey15
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -191,6 +202,8 @@ fun ShowDetailScreen(
                     navigateToProfile = navigateToProfile,
                     isLoggedIn = isLoggedIn == true,
                     onSelectTab = viewModel::selectTab,
+                    shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
+                    doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
                 )
             }
         }
@@ -218,6 +231,8 @@ fun ShowDetailScreen(
     navigateToProfile: (userCode: String) -> Unit,
     isLoggedIn: Boolean,
     onSelectTab: (index: Int) -> Unit,
+    shouldShowNaverMapDialog: Boolean,
+    doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val showState by flow {
@@ -267,7 +282,11 @@ fun ShowDetailScreen(
             }
 
             when (selectedTab) {
-                0 -> ShowInfoTab(showDetail.id)
+                0 -> ShowInfoTab(
+                    showId = showDetail.id,
+                    shouldShowNaverMapDialog = shouldShowNaverMapDialog,
+                    doNotShowNaverMapDialog = doNotShowNaverMapDialog
+                )
 
                 1 -> CastTab(
                     teams = castTeams,
@@ -577,26 +596,34 @@ private fun ContentTab(
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
     showId: String,
+    shouldShowNaverMapDialog: Boolean,
+    doNotShowNaverMapDialog: () -> Unit,
 ) {
     item {
         var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
         val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
         val url = "https://${host}/show/${showId}/info"
         val context = LocalContext.current
+        val uriHandler = LocalUriHandler.current
+        var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
+
+        LaunchedEffect(intentToNavigateTo) {
+            if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
+                context.startActivity(intentToNavigateTo)
+                intentToNavigateTo = null
+            }
+        }
 
         // ex. tel:010-1010-1101
         val telSchemes = listOf("tel", "telprompt")
-        val textSchemes = listOf("sms", "smsto", "mms", "mmsto")
         val webView by remember {
             mutableStateOf(BtWebView(preUriLoading = { url ->
-                val scheme = URI(url).scheme
-                if (scheme in telSchemes + textSchemes) {
-                    redirectedInquiryUrl = url
-
-                    return@BtWebView true
-                }
-
-                return@BtWebView false
+                preUriLoading(
+                    url = url,
+                    context = context,
+                    uriHandler = uriHandler,
+                    navigateWithUrl = { url -> redirectedInquiryUrl = url },
+                    navigateWithIntent = { intent -> intentToNavigateTo = intent })
             }, context = context).apply {
                 loadUrl(url)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
@@ -635,10 +662,100 @@ private fun LazyListScope.ShowInfoTab(
                 contact = contact
             )
         }
+
+        if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
+            BTDialog(
+                onDismiss = {
+                    intentToNavigateTo = null
+                },
+                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+                onClickPositiveButton = {
+                    context.startActivity(intentToNavigateTo)
+                    doNotShowNaverMapDialog()
+                    intentToNavigateTo = null
+                }
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.show_naver_map_dialog_title),
+                        color = Grey15,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        modifier = Modifier.padding(
+                            top = 4.dp
+                        ),
+                        text = stringResource(R.string.show_naver_map_dialog_content),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Grey50,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
     }
 
     // 최하단 섹션의 하단 패딩
     item { Spacer(Modifier.size(16.dp)) }
+}
+
+fun preUriLoading(
+    url: String,
+    context: Context,
+    uriHandler: UriHandler,
+    navigateWithIntent: (Intent?) -> Unit,
+    navigateWithUrl: (String) -> Unit,
+): Boolean {
+    val scheme = URI(url).scheme
+
+    if (scheme == "intent") {
+        var intent = getIntentFromUri(url) ?: return false
+
+        if (TextUtils.isEmpty(intent.`package`)) {
+            return false
+        }
+
+        val canHandle = context.packageManager.queryIntentActivities(
+            intent,
+            PackageManager.MATCH_DEFAULT_ONLY
+        ).isNotEmpty()
+        if (canHandle) {
+            navigateWithIntent(intent)
+        } else {
+            if (intent.`package` != "com.nhn.android.nmap") return false
+
+            val fallbackUri = url.substringBefore("#intent").toUri()
+
+            val lat = fallbackUri.getQueryParameter("lat")
+            val lng = fallbackUri.getQueryParameter("lng")
+            val name = fallbackUri.getQueryParameter("name")
+
+            uriHandler.openUri("https://map.naver.com/?lat=${lat}&lng=${lng}&title=${name}")
+        }
+        return true
+    }
+
+    val telSchemes = listOf("tel", "telprompt")
+    val textSchemes = listOf("sms", "smsto", "mms", "mmsto")
+    if (scheme in telSchemes + textSchemes) {
+        navigateWithUrl(url)
+
+        return true
+    }
+
+    return false
+}
+
+fun getIntentFromUri(uri: String): Intent? {
+    try {
+        return Intent.parseUri(uri, Intent.URI_INTENT_SCHEME)
+    } catch (e: URISyntaxException) {
+        FirebaseCrashlytics.getInstance().recordException(e)
+        return null
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -901,6 +1018,8 @@ private fun ShowDetailScreenPreview() {
             navigateToProfile = {},
             isLoggedIn = true,
             onSelectTab = {},
+            shouldShowNaverMapDialog = false,
+            doNotShowNaverMapDialog = {},
         )
     }
 }

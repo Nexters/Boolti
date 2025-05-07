@@ -22,6 +22,10 @@ internal class PopupDataSource @Inject constructor(
         LocalDate.now() > (it.dateHidingEvent?.get(id)?.toLocalDate() ?: LocalDate.MIN)
     }
 
+    fun shouldShowNaverMapDialog(): Flow<Boolean> = dataStore.data.map {
+        it.shouldShowNaverMapDialog
+    }
+
     suspend fun hideEventToday(id: String) = dataStore.updateData { appSetting ->
         val newDateHidingEvent =
             appSetting.dateHidingEvent
@@ -30,5 +34,11 @@ internal class PopupDataSource @Inject constructor(
                 ?: mutableMapOf()
         newDateHidingEvent[id] = LocalDate.now().toEpochDay()
         appSetting.copy(dateHidingEvent = newDateHidingEvent)
+    }
+
+    suspend fun doNotShowNaverMapPopupAnyMore() = dataStore.updateData { appSetting ->
+        appSetting.copy(
+            shouldShowNaverMapDialog = false,
+        )
     }
 }

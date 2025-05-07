@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.repository.ConfigRepository
+import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -27,6 +32,7 @@ import javax.inject.Inject
 class ShowDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val showRepository: ShowRepository,
+    private val popupRepository: PopupRepository,
     authRepository: AuthRepository,
 ) : ViewModel() {
     val showId: String = checkNotNull(savedStateHandle.toRoute<ShowRoute.ShowRoot>().showId)
@@ -46,6 +52,7 @@ class ShowDetailViewModel @Inject constructor(
     init {
         fetchShowDetail()
         fetchCastTeams()
+        fetchShoulShowNaverMapDialog()
     }
 
     fun sendEvent(event: ShowDetailEvent) = viewModelScope.launch { _events.send(event) }
@@ -76,6 +83,22 @@ class ShowDetailViewModel @Inject constructor(
                     Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }
+        }
+    }
+
+    private fun fetchShoulShowNaverMapDialog() {
+        popupRepository.shouldShowNaverMapDialog()
+            .onEach { shouldShow ->
+                _uiState.update {
+                    it.copy(shouldShowNaverMapDialog = shouldShow)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun doNotShowNaverMapDialogAnymore() {
+        viewModelScope.launch {
+            popupRepository.doNotShowNaverMapPopupAnyMore()
         }
     }
 

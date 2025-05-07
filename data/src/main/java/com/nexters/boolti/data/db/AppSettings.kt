@@ -27,6 +27,7 @@ internal data class AppSettings(
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),
     val dateHidingEvent: Map<String, Long>? = null, // id - date
+    val shouldShowNaverMapDialog: Boolean = true,
 )
 
 internal object AppSettingsSerializer : Serializer<AppSettings> {

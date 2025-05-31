@@ -22,6 +22,7 @@ internal data class ShowDetailResponse(
     val hostPhoneNumber: String,
     val reservationStatus: Boolean = false,
     val salesTicketCount: Int = 0,
+    val isNonTicketing: Boolean = false,
 ) {
     fun toDomain(): ShowDetail {
         return ShowDetail(
@@ -40,6 +41,7 @@ internal data class ShowDetailResponse(
             hostPhoneNumber = hostPhoneNumber,
             isReserved = reservationStatus,
             salesTicketCount = salesTicketCount,
+            isNonTicketing = isNonTicketing,
         )
     }
 }

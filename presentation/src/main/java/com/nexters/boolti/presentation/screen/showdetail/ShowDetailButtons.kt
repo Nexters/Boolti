@@ -90,6 +90,7 @@ private fun TicketingButton(
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
         ShowState.ClosedTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> stringResource(id = R.string.ticketing_button_finished_show)
+        ShowState.NonTicketing -> stringResource(id = R.string.ticketing_button_closed_ticket) // 티케팅 진행 안 하는 공연은 노출 안 됨
     }
 
     val disabledContentColor =

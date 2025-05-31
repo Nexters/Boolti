@@ -31,10 +31,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
@@ -77,13 +79,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
@@ -98,6 +103,7 @@ import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -118,10 +124,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
-import androidx.core.net.toUri
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.theme.Grey15
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -148,6 +150,7 @@ fun ShowDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
+    val scrollState = rememberLazyListState()
 
     BackHandler {
         viewModel.sendEvent(ShowDetailEvent.PopBackStack)
@@ -177,6 +180,7 @@ fun ShowDetailScreen(
                     onBack = onBack,
                     onClickHome = onClickHome,
                     navigateToReport = navigateToReport,
+                    scrollState = scrollState,
                 )
             },
         ) { innerPadding ->
@@ -204,6 +208,7 @@ fun ShowDetailScreen(
                     onSelectTab = viewModel::selectTab,
                     shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
                     doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
+                    scrollState = scrollState,
                 )
             }
         }
@@ -234,6 +239,7 @@ fun ShowDetailScreen(
     shouldShowNaverMapDialog: Boolean,
     doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
+    scrollState: LazyListState = rememberLazyListState(),
 ) {
     val showState by flow {
         while (true) {
@@ -249,11 +255,14 @@ fun ShowDetailScreen(
         modifier = modifier.fillMaxSize(),
     ) {
         val showCountdownBanner =
-            showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
+            !showState.isClosedOrFinished &&
+                    showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
 
         var buttonsHeight by remember { mutableStateOf(0.dp) }
 
-        LazyColumn {
+        LazyColumn(
+            state = scrollState,
+        ) {
             item {
                 val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 
@@ -359,6 +368,7 @@ fun ShowDetailScreen(
 @Composable
 private fun ShowDetailAppBar(
     showDetail: ShowDetail?,
+    scrollState: LazyListState,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,

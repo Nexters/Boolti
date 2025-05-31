@@ -6,6 +6,7 @@ data class SnsEditState(
     val snsId: String? = null,
     val selectedSns: Sns.SnsType = Sns.SnsType.INSTAGRAM,
     val username: String,
+    val inUseSnsTypes: List<Sns.SnsType> = emptyList(),
 ) {
     val isEditMode: Boolean
         get() = snsId != null

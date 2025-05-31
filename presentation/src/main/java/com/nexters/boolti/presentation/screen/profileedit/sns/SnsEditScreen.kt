@@ -34,11 +34,15 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.SelectableIcon
+import com.nexters.boolti.presentation.component.SelectableSnsStatus
 import com.nexters.boolti.presentation.extension.centerToTop
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun SnsEditScreen(
@@ -55,6 +59,7 @@ fun SnsEditScreen(
         modifier = modifier,
         isEditMode = uiState.isEditMode,
         selectedSns = uiState.selectedSns,
+        inUseSnsTypes = uiState.inUseSnsTypes.toPersistentList(),
         username = uiState.username,
         usernameHasError = uiState.usernameHasError,
         onChangeSns = viewModel::setSns,
@@ -81,7 +86,8 @@ fun SnsEditScreen(
 private fun SnsEditScreen(
     modifier: Modifier = Modifier,
     isEditMode: Boolean = false,
-    selectedSns: Sns.SnsType = Sns.SnsType.INSTAGRAM,
+    selectedSns: Sns.SnsType = Sns.SnsType.YOUTUBE,
+    inUseSnsTypes: ImmutableList<Sns.SnsType> = persistentListOf(),
     username: String = "",
     usernameHasError: Boolean = false,
     onChangeSns: (Sns.SnsType) -> Unit = {},
@@ -132,17 +138,38 @@ private fun SnsEditScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Label(stringResource(R.string.sns))
+
+                    val instagramStatus = when {
+                        selectedSns == Sns.SnsType.INSTAGRAM -> SelectableSnsStatus.ACTIVE
+                        Sns.SnsType.INSTAGRAM in inUseSnsTypes -> SelectableSnsStatus.DISABLE
+                        else -> SelectableSnsStatus.INACTIVE
+                    }
+
+                    val youtubeStatus = when {
+                        selectedSns == Sns.SnsType.YOUTUBE -> SelectableSnsStatus.ACTIVE
+                        Sns.SnsType.YOUTUBE in inUseSnsTypes -> SelectableSnsStatus.DISABLE
+                        else -> SelectableSnsStatus.INACTIVE
+                    }
+
                     SelectableIcon(
-                        selected = selectedSns == Sns.SnsType.INSTAGRAM,
+                        status = instagramStatus,
                         iconRes = R.drawable.ic_logo_instagram,
-                        onClick = { onChangeSns(Sns.SnsType.INSTAGRAM) },
+                        onClick = {
+                            if (instagramStatus == SelectableSnsStatus.INACTIVE) {
+                                onChangeSns(Sns.SnsType.INSTAGRAM)
+                            }
+                        },
                         contentDescription = stringResource(R.string.sns_select_instagram_description),
                     )
                     SelectableIcon(
                         modifier = Modifier.padding(start = 12.dp),
-                        selected = selectedSns == Sns.SnsType.YOUTUBE,
+                        status = youtubeStatus,
                         iconRes = R.drawable.ic_logo_youtube,
-                        onClick = { onChangeSns(Sns.SnsType.YOUTUBE) },
+                        onClick = {
+                            if (youtubeStatus == SelectableSnsStatus.INACTIVE) {
+                                onChangeSns(Sns.SnsType.YOUTUBE)
+                            }
+                        },
                         contentDescription = stringResource(R.string.sns_select_youtube_description),
                     )
                 }

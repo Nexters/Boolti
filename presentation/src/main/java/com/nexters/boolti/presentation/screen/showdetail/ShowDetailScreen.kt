@@ -31,12 +31,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
@@ -150,7 +148,6 @@ fun ShowDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
-    val scrollState = rememberLazyListState()
 
     BackHandler {
         viewModel.sendEvent(ShowDetailEvent.PopBackStack)
@@ -180,7 +177,6 @@ fun ShowDetailScreen(
                     onBack = onBack,
                     onClickHome = onClickHome,
                     navigateToReport = navigateToReport,
-                    scrollState = scrollState,
                 )
             },
         ) { innerPadding ->
@@ -208,7 +204,6 @@ fun ShowDetailScreen(
                     onSelectTab = viewModel::selectTab,
                     shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
                     doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
-                    scrollState = scrollState,
                 )
             }
         }
@@ -239,7 +234,6 @@ fun ShowDetailScreen(
     shouldShowNaverMapDialog: Boolean,
     doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
-    scrollState: LazyListState = rememberLazyListState(),
 ) {
     val showState by flow {
         while (true) {
@@ -254,15 +248,14 @@ fun ShowDetailScreen(
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
-        val showCountdownBanner =
+        val showCountdownBanner = showDetail.salesEndDateTime?.let {
             !showState.isClosedOrFinished &&
-                    showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
+                    it.toLocalDate() == LocalDate.now()
+        } ?: false
 
         var buttonsHeight by remember { mutableStateOf(0.dp) }
 
-        LazyColumn(
-            state = scrollState,
-        ) {
+        LazyColumn {
             item {
                 val paddingTop = if (showCountdownBanner) (38 + 40).dp else 16.dp
 
@@ -332,7 +325,7 @@ fun ShowDetailScreen(
 
         if (showCountdownBanner) {
             CountDownBanner(
-                deadlineDateTime = showDetail.salesEndDateTime,
+                deadlineDateTime = showDetail.salesEndDateTime!!,
             )
         }
     }
@@ -368,7 +361,6 @@ fun ShowDetailScreen(
 @Composable
 private fun ShowDetailAppBar(
     showDetail: ShowDetail?,
-    scrollState: LazyListState,
     onBack: () -> Unit,
     onClickHome: () -> Unit,
     navigateToReport: () -> Unit,
@@ -722,7 +714,7 @@ fun preUriLoading(
     val scheme = URI(url).scheme
 
     if (scheme == "intent") {
-        var intent = getIntentFromUri(url) ?: return false
+        val intent = getIntentFromUri(url) ?: return false
 
         if (TextUtils.isEmpty(intent.`package`)) {
             return false

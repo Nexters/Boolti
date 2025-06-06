@@ -10,8 +10,8 @@ internal data class ShowResponse(
     val id: String,
     val name: String,
     val date: String,
-    val salesStartTime: String,
-    val salesEndTime: String,
+    val salesStartTime: String?,
+    val salesEndTime: String?,
     val showImg: String = "",
 ) {
     fun toDomain(): Show {
@@ -19,8 +19,8 @@ internal data class ShowResponse(
             id = id,
             name = name,
             date = date.toLocalDateTime(),
-            salesStartDate = salesStartTime.toLocalDate(),
-            salesEndDate = salesEndTime.toLocalDate(),
+            salesStartDate = salesStartTime?.toLocalDate(),
+            salesEndDate = salesEndTime?.toLocalDate(),
             thumbnailImage = showImg,
         )
     }

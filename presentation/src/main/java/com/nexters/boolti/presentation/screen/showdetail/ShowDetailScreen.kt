@@ -77,13 +77,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
@@ -98,6 +101,7 @@ import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
@@ -118,10 +122,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
-import androidx.core.net.toUri
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.theme.Grey15
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -248,8 +248,10 @@ fun ShowDetailScreen(
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
-        val showCountdownBanner =
-            showDetail.salesEndDateTime.toLocalDate() == LocalDate.now()
+        val showCountdownBanner = showDetail.salesEndDateTime?.let {
+            !showState.isClosedOrFinished &&
+                    it.toLocalDate() == LocalDate.now()
+        } ?: false
 
         var buttonsHeight by remember { mutableStateOf(0.dp) }
 
@@ -323,7 +325,7 @@ fun ShowDetailScreen(
 
         if (showCountdownBanner) {
             CountDownBanner(
-                deadlineDateTime = showDetail.salesEndDateTime,
+                deadlineDateTime = showDetail.salesEndDateTime!!,
             )
         }
     }
@@ -712,7 +714,7 @@ fun preUriLoading(
     val scheme = URI(url).scheme
 
     if (scheme == "intent") {
-        var intent = getIntentFromUri(url) ?: return false
+        val intent = getIntentFromUri(url) ?: return false
 
         if (TextUtils.isEmpty(intent.`package`)) {
             return false

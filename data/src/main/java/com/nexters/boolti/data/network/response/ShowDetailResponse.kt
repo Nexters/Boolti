@@ -15,13 +15,14 @@ internal data class ShowDetailResponse(
     val streetAddress: String,
     val detailAddress: String,
     val notice: String,
-    val salesStartTime: String,
-    val salesEndTime: String,
+    val salesStartTime: String?,
+    val salesEndTime: String?,
     val showImg: List<ImageResponse>,
     val hostName: String,
     val hostPhoneNumber: String,
     val reservationStatus: Boolean = false,
     val salesTicketCount: Int = 0,
+    val isNonTicketing: Boolean = false,
 ) {
     fun toDomain(): ShowDetail {
         return ShowDetail(
@@ -33,13 +34,14 @@ internal data class ShowDetailResponse(
             streetAddress = streetAddress,
             detailAddress = detailAddress,
             notice = notice,
-            salesStartDate = salesStartTime.toLocalDate(),
-            salesEndDateTime = salesEndTime.toLocalDateTime(),
+            salesStartDate = salesStartTime?.toLocalDate(),
+            salesEndDateTime = salesEndTime?.toLocalDateTime(),
             images = showImg.toDomains(),
             hostName = hostName,
             hostPhoneNumber = hostPhoneNumber,
             isReserved = reservationStatus,
             salesTicketCount = salesTicketCount,
+            isNonTicketing = isNonTicketing,
         )
     }
 }

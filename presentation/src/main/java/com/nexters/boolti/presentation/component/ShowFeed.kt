@@ -121,6 +121,8 @@ private fun ShowBadge(
     showState: ShowState,
     modifier: Modifier = Modifier,
 ) {
+    if (showState == ShowState.NonTicketing) return
+
     var dDay: Int? = null
     val (color, containerColor, labelId) = when (showState) {
         is ShowState.WaitingTicketing -> {
@@ -140,9 +142,9 @@ private fun ShowBadge(
 
         ShowState.ClosedTicketing -> Triple(Grey80, Grey20, R.string.ticketing_button_closed_ticket)
         ShowState.FinishedShow -> Triple(Grey40, Grey80, R.string.finished_show)
+        ShowState.NonTicketing -> return
     }
     val label = if (dDay == null) stringResource(labelId) else stringResource(labelId, dDay)
-
 
     Text(
         text = label,

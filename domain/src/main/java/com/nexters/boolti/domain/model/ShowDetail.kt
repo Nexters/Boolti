@@ -13,13 +13,14 @@ data class ShowDetail(
     val streetAddress: String = "",
     val detailAddress: String = "",
     val notice: String = "",
-    val salesStartDate: LocalDate = LocalDate.now(),
-    val salesEndDateTime: LocalDateTime = LocalDateTime.now(),
+    val salesStartDate: LocalDate? = null,
+    val salesEndDateTime: LocalDateTime? = null,
     val images: List<ImagePair> = emptyList(),
     val hostName: String = "",
     val hostPhoneNumber: String = "",
     val isReserved: Boolean = false,
     val salesTicketCount: Int = 0,
+    private val isNonTicketing: Boolean = false,
 ) {
     val state: ShowState
         get() {
@@ -27,6 +28,8 @@ data class ShowDetail(
 
             return when {
                 now > date.plusMinutes(runningTime.toLong()) -> ShowState.FinishedShow
+                salesStartDate == null || salesEndDateTime == null -> ShowState.NonTicketing
+                isNonTicketing -> ShowState.NonTicketing // FinishedShow 보다 밑에서 검사해야 함
                 now.toLocalDate() < salesStartDate -> ShowState.WaitingTicketing(
                     Duration.between(
                         LocalDateTime.now(),

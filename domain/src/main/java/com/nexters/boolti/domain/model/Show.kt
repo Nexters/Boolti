@@ -8,8 +8,8 @@ data class Show(
     val id: String,
     val name: String,
     val date: LocalDateTime,
-    val salesStartDate: LocalDate,
-    val salesEndDate: LocalDate,
+    val salesStartDate: LocalDate?,
+    val salesEndDate: LocalDate?,
     val thumbnailImage: String,
 ) {
     val state: ShowState
@@ -18,6 +18,7 @@ data class Show(
 
             return when {
                 now > date.toLocalDate() -> ShowState.FinishedShow
+                salesStartDate == null || salesEndDate == null -> ShowState.NonTicketing
                 now < salesStartDate -> ShowState.WaitingTicketing(
                     Duration.between(
                         LocalDateTime.now(),

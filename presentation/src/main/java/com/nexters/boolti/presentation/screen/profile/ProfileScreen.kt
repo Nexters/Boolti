@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profile
 
 import android.content.ActivityNotFoundException
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -132,6 +133,15 @@ fun ProfileScreen(
     val invalidUrlMsg = stringResource(R.string.invalid_link)
 
     val scrollState = rememberScrollState()
+    val appBarTitleAlpha by animateFloatAsState(
+        targetValue = if (scrollState.canScrollBackward) {
+            1f
+        } else {
+            0f
+        },
+        label = "appBarTitleAlpha",
+    )
+
     val appBarBgColor by animateColorAsState(
         targetValue = if (scrollState.canScrollBackward) {
             MaterialTheme.colorScheme.surface
@@ -160,6 +170,7 @@ fun ProfileScreen(
     ) { innerPadding ->
         ProfileAppBar(
             title = user.nickname,
+            titleAlpha = appBarTitleAlpha,
             onClickBack = onClickBack,
             isMine = isMine,
             bgColor = appBarBgColor,
@@ -275,6 +286,7 @@ fun ProfileScreen(
 @Composable
 private fun ProfileAppBar(
     title: String,
+    titleAlpha: Float,
     onClickBack: () -> Unit,
     isMine: Boolean,
     bgColor: Color,
@@ -286,7 +298,10 @@ private fun ProfileAppBar(
     BtAppBar(
         modifier = Modifier.zIndex(1f),
         title = title,
-        colors = BtAppBarDefaults.appBarColors(containerColor = bgColor),
+        colors = BtAppBarDefaults.appBarColors(
+            titleColor = BtAppBarDefaults.appBarColors().titleColor.copy(alpha = titleAlpha),
+            containerColor = bgColor,
+        ),
         navigateButtons = {
             BtAppBarDefaults.AppBarIconButton(
                 iconRes = R.drawable.ic_arrow_back,

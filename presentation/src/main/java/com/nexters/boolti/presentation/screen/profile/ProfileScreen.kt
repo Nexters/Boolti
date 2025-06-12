@@ -159,6 +159,7 @@ fun ProfileScreen(
         modifier = modifier,
     ) { innerPadding ->
         ProfileAppBar(
+            title = user.nickname,
             onClickBack = onClickBack,
             isMine = isMine,
             bgColor = appBarBgColor,
@@ -273,6 +274,7 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileAppBar(
+    title: String,
     onClickBack: () -> Unit,
     isMine: Boolean,
     bgColor: Color,
@@ -283,7 +285,7 @@ private fun ProfileAppBar(
 
     BtAppBar(
         modifier = Modifier.zIndex(1f),
-        title = stringResource(R.string.profile_title),
+        title = title,
         colors = BtAppBarDefaults.appBarColors(containerColor = bgColor),
         navigateButtons = {
             BtAppBarDefaults.AppBarIconButton(

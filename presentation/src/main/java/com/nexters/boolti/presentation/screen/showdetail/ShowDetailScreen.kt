@@ -487,6 +487,7 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
                         val shareIntent = Intent.createChooser(sendIntent, null)
 
                         context.startActivity(shareIntent)
+                        onDismiss()
                     },
                 contentAlignment = Alignment.CenterStart,
             ) {
@@ -510,6 +511,7 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
                         val shareIntent = Intent.createChooser(sendIntent, null)
 
                         context.startActivity(shareIntent)
+                        onDismiss()
                     },
                 contentAlignment = Alignment.CenterStart,
             ) {

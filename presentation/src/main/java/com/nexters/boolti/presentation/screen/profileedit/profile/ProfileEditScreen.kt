@@ -361,15 +361,23 @@ fun ProfileEditScreen(
                             .heightIn(max = 100.dp * (snsList.size + 1)) // 대충 넉넉하게 잡은 높이
                             .reorderable(snsReorderState),
                     ) {
-                        item(
-                            contentType = "SnsAddButton",
-                        ) {
-                            LinkAddButton(
-                                modifier = Modifier.padding(top = 4.dp),
-                                label = stringResource(R.string.sns_add),
-                                onClick = onClickAddSns,
-                                enabled = !saving,
-                            )
+                        val snsAddable = !snsList
+                            .asSequence()
+                            .map { it.type }
+                            .toSet()
+                            .containsAll(Sns.SnsType.entries)
+
+                        if (snsAddable) {
+                            item(
+                                contentType = "SnsAddButton",
+                            ) {
+                                LinkAddButton(
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    label = stringResource(R.string.sns_add),
+                                    onClick = onClickAddSns,
+                                    enabled = !saving,
+                                )
+                            }
                         }
                         items(
                             items = snsList,

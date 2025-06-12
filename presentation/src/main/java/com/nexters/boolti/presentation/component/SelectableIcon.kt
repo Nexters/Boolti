@@ -29,23 +29,45 @@ import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey85
+
+enum class SelectableSnsStatus {
+    ACTIVE, INACTIVE, DISABLE
+}
 
 @Composable
 fun SelectableIcon(
     @DrawableRes iconRes: Int,
-    selected: Boolean,
     modifier: Modifier = Modifier,
+    status: SelectableSnsStatus = SelectableSnsStatus.INACTIVE,
     shape: Shape = CircleShape,
-    backgroundColor: Color = Grey85,
-    iconTint: Color = Grey30,
     iconSize: Dp? = 28.dp,
     contentPadding: Dp = 10.dp,
     contentDescription: String? = null,
     onClick: () -> Unit = {},
 ) {
+    val backgroundColor = remember(status) {
+        when (status) {
+            SelectableSnsStatus.ACTIVE,
+            SelectableSnsStatus.DISABLE -> Grey85
+
+            SelectableSnsStatus.INACTIVE -> Grey80
+        }
+    }
+
+    val iconTint = remember(status) {
+        when (status) {
+            SelectableSnsStatus.ACTIVE,
+            SelectableSnsStatus.INACTIVE -> Grey30
+
+            SelectableSnsStatus.DISABLE -> Grey70
+        }
+    }
+
     SelectableIcon(
-        selected = selected,
+        status = status,
         modifier = modifier,
         shape = shape,
         backgroundColor = backgroundColor,
@@ -63,7 +85,7 @@ fun SelectableIcon(
 
 @Composable
 fun SelectableIcon(
-    selected: Boolean,
+    status: SelectableSnsStatus,
     modifier: Modifier = Modifier,
     shape: Shape = CircleShape,
     iconTint: Color = Grey30,
@@ -76,7 +98,10 @@ fun SelectableIcon(
     Surface(
         modifier = modifier,
         shape = shape,
-        border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null,
+        border = if (status == SelectableSnsStatus.ACTIVE) BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.primary,
+        ) else null,
         color = backgroundColor,
         onClick = onClick,
         contentColor = iconTint,
@@ -105,7 +130,7 @@ private fun SelectableIconPreview() {
         ) {
             // Low Level Composable
             SelectableIcon(
-                selected = selectedSns.value == "instagram",
+                status = SelectableSnsStatus.ACTIVE,
                 onClick = { selectedSns.value = "instagram" },
             ) {
                 Icon(
@@ -118,7 +143,7 @@ private fun SelectableIconPreview() {
             // High Level Composable
             // iconSize 가 null 이 아니고 modifier 에 크기를 지정하지 않으면 iconSize + contentPadding 만큼의 크기를 가진다.
             SelectableIcon(
-                selected = selectedSns.value == "youtube",
+                status = SelectableSnsStatus.INACTIVE,
                 iconRes = R.drawable.ic_logo_youtube,
                 iconSize = 40.dp,
                 onClick = { selectedSns.value = "youtube" },
@@ -128,7 +153,7 @@ private fun SelectableIconPreview() {
             // iconSize 가 null 이면 전체 크기에서 contentPadding을 뺀 만큼 차지한다. 이때 modifier에 크기를 지정해야 함
             SelectableIcon(
                 modifier = Modifier.size(80.dp),
-                selected = selectedSns.value == "youtube",
+                status = SelectableSnsStatus.DISABLE,
                 iconRes = R.drawable.ic_logo_youtube,
                 iconSize = null,
                 onClick = { selectedSns.value = "youtube" },

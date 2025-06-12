@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,9 +43,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,14 +64,15 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ShowItem
-import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.flow.Flow
@@ -296,8 +293,9 @@ private fun ProfileAppBar(
         },
         actionButtons = {
             if (isMine) {
-                BtAppBarDefaults.AppBarTextButton(
-                    label = stringResource(R.string.edit),
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_edit_pen,
+                    description = stringResource(R.string.edit),
                     onClick = navigateToProfileEdit,
                 )
             } else {
@@ -348,81 +346,85 @@ private fun ProfileHeader(
         bottomStart = 20.dp,
         bottomEnd = 20.dp,
     )
-    var contentHeight by remember {
-        mutableStateOf(0.dp)
-    }
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val density = LocalDensity.current
-    val profileHeight = contentHeight.coerceAtMost(screenWidth)
-
     val defaultProfile = painterResource(R.drawable.ic_profile_placeholder)
 
     Box(
         modifier = modifier
             .clip(shape)
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(bottom = 32.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(profileHeight),
-        ) {
-            AsyncImage(
-                modifier = Modifier.fillMaxSize(),
-                model = user.photo,
-                contentScale = ContentScale.Crop,
-                placeholder = defaultProfile,
-                fallback = defaultProfile,
-                contentDescription = stringResource(R.string.description_user_thumbnail),
-            )
+        Column {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            listOf(Color(0x33121318), Color(0xFF121318)),
-                        ),
-                    ),
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .onSizeChanged {
-                    contentHeight = it.height.toDp(density)
-                }
-                .padding(horizontal = marginHorizontal)
-                .padding(
-                    top = 188.dp,
-                    bottom = 32.dp,
-                ), // TODO StatusBar 까지 확장되면 StatusBar 높이 추가되어야 함
-        ) {
-            Text(
-                modifier = Modifier.padding(top = 20.dp),
-                text = user.nickname,
-                style = point3,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-
-            if (user.introduction.isNotBlank()) {
-                Text(
-                    modifier = Modifier.padding(top = 2.dp),
-                    text = user.introduction,
-                    color = Grey30,
-                    style = MaterialTheme.typography.bodyLarge,
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+            ) {
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = user.photo,
+                    contentScale = ContentScale.Crop,
+                    placeholder = defaultProfile,
+                    fallback = defaultProfile,
+                    contentDescription = stringResource(R.string.description_user_thumbnail),
                 )
-            }
-            if (user.sns.isNotEmpty()) {
-                FlowRow(
-                    modifier = Modifier.padding(top = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(Grey90.copy(0.2f), Grey90.copy(1f))
+                            ),
+                        ),
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(horizontal = marginHorizontal),
                 ) {
-                    user.sns.forEach { sns -> SnsChip(sns) { onClickSns(sns) } }
+                    Text(
+                        modifier = Modifier.padding(top = 20.dp),
+                        text = user.nickname,
+                        style = point3,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = "@${user.userCode}",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Normal,
+                        color = Grey50,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal),
+            ) {
+                if (user.introduction.isNotBlank()) {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .fillMaxWidth(),
+                        text = user.introduction,
+                        color = Grey15,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                if (user.sns.isNotEmpty()) {
+                    FlowRow(
+                        modifier = Modifier.padding(top = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        user.sns.forEach { sns -> SnsChip(sns) { onClickSns(sns) } }
+                    }
                 }
             }
         }
@@ -445,22 +447,14 @@ private fun SnsChip(
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .clickable(onClick = onClick)
-            .padding(start = 8.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+            .padding(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             modifier = Modifier.size(20.dp),
             imageVector = ImageVector.vectorResource(iconRes),
-            tint = Grey30,
+            tint = Grey15,
             contentDescription = desc,
-        )
-        Text(
-            modifier = Modifier.padding(start = 6.dp),
-            text = sns.username,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            color = Grey30,
-            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

@@ -61,7 +61,7 @@ fun ShowRegistrationScreen(
             filePathCallback?.onReceiveValue(uris.toTypedArray())
         }
     val domain = BuildConfig.DOMAIN
-    val url = "https://${domain}/show/add"
+    val url = "https://${domain}/show/add/type"
 
     var showExitDialog by remember { mutableStateOf(false) }
 

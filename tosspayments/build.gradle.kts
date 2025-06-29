@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.bundles.lifecycle)
-    implementation(libs.payments.toss)
+    api(libs.payments.toss)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     testImplementation(libs.junit)

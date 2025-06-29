@@ -200,10 +200,12 @@ fun ShowItem(
 @Composable
 private fun ShowItemPreview() {
     BooltiTheme {
-        Scaffold {
+        Scaffold { innerPadding ->
             val scrollState = rememberScrollState()
             Column(
-                Modifier.verticalScroll(scrollState),
+                Modifier
+                    .padding(innerPadding)
+                    .verticalScroll(scrollState),
             ) {
                 Text("ShowItem 을 받는 컴포넌트")
                 ShowItem(

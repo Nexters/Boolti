@@ -93,6 +93,7 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.timber)
+    implementation(libs.zxing.android.embedded)
 }
 
 tasks.withType<Test>().configureEach {

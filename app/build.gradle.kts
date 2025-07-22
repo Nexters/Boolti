@@ -1,5 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Properties
 
 plugins {
@@ -70,6 +72,28 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    applicationVariants.all {
+        outputs.all {
+            val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val versionName = libs.versions.versionName.get()
+            val buildType = name.substringAfterLast('-')
+            val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+
+            // 현재 git 커밋 해시 앞 7자리
+            val gitHash = try {
+                Runtime.getRuntime().exec("git rev-parse --short=7 HEAD")
+                    .inputStream.bufferedReader().readText().trim()
+            } catch (e: Exception) {
+                "nogit"
+            }
+
+            // apk 파일 이름 설정
+            val apkName = "app-$buildType-$versionName-$gitHash-$date.apk"
+            outputImpl.outputFileName = apkName
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

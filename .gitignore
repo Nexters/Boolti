@@ -19,6 +19,7 @@ keystore.properties
 # Gradle files
 .gradle/
 build/
+sh/*
 
 # Log/OS Files
 *.log

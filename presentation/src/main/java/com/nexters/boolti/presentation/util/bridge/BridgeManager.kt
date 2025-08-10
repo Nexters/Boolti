@@ -12,8 +12,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import timber.log.Timber
 
 class BridgeManager(
@@ -60,12 +62,12 @@ class BridgeManager(
 
             CommandType.SHOW_TOAST -> {
                 data.data?.jsonObject?.let {
-                    val message = it["message"]?.toString() ?: run {
+                    val message = it["message"]?.jsonPrimitive?.contentOrNull ?: run {
                         Timber.tag("bridge").d("토스트 메시지 출력 실패: message 없음")
                         callbackToWeb(data)
                         return@let
                     }
-                    val duration = it["duration"]?.toString()?.let { durationStr ->
+                    val duration = it["duration"]?.jsonPrimitive?.contentOrNull?.let { durationStr ->
                         if (durationStr.equals("long", true)) {
                             SnackbarDuration.Long
                         } else {

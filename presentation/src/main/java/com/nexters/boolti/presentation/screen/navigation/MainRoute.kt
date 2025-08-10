@@ -74,6 +74,6 @@ sealed interface MainRoute {
 
     @Serializable
     data class PerformedShows(
-        val userCode: String? = null,
+        val userCode: String,
     ) : MainRoute
 }

@@ -3,8 +3,8 @@ package com.nexters.boolti.presentation.screen.link
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.repository.MemberRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,6 @@ import javax.inject.Inject
 class LinkListViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val memberRepository: MemberRepository,
-    private val getUserUsecase: GetUserUsecase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(LinkListState())
     val uiState = _uiState.asStateFlow()
@@ -33,20 +32,16 @@ class LinkListViewModel @Inject constructor(
     }
 
     private fun initLoad() {
-        savedStateHandle.toRoute<MainRoute.LinkList>().userCode?.let { userCode ->
-            fetchOthersLinks(userCode)
-        } ?: run {
-            fetchMyLinks()
-        }
+        savedStateHandle.toRoute<MainRoute.LinkList>().userCode.let(::fetchLinks)
     }
 
-    private fun fetchOthersLinks(userCode: String) {
+    private fun fetchLinks(userCode: UserCode) {
         viewModelScope.launch(recordExceptionHandler) {
-            memberRepository.getMember(userCode).onSuccess { member ->
+            memberRepository.getLinks(userCode).onSuccess { links ->
                 _uiState.update {
                     it.copy(
                         loading = false,
-                        links = member.link,
+                        links = links,
                     )
                 }
             }.onFailure {
@@ -56,17 +51,6 @@ class LinkListViewModel @Inject constructor(
                 event(LinkListEvent.LoadFailed)
             }
         }
-    }
-
-    private fun fetchMyLinks() {
-        getUserUsecase()?.link?.let { link ->
-            _uiState.update {
-                it.copy(
-                    loading = false,
-                    links = link,
-                )
-            }
-        } ?: event(LinkListEvent.LoadFailed)
     }
 
     private fun event(event: LinkListEvent) {

@@ -85,7 +85,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
-    navigateToLinks: (userCode: String?) -> Unit,
+    navigateToLinks: (userCode: String) -> Unit,
     navigateToPerformedShows: (userCode: String?) -> Unit,
     navigateToShow: (showId: String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
@@ -101,10 +101,7 @@ fun ProfileScreen(
         onClickBack = onClickBack,
         navigateToProfileEdit = navigateToProfileEdit,
         navigateToLinks = {
-            when (uiState.user) {
-                is User.My -> navigateToLinks(null)
-                is User.Others -> navigateToLinks(uiState.user.userCode)
-            }
+            navigateToLinks(uiState.user.userCode)
         },
         navigateToPerformedShows = {
             when (uiState.user) {

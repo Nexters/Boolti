@@ -69,7 +69,7 @@ sealed interface MainRoute {
 
     @Serializable
     data class LinkList(
-        val userCode: String? = null,
+        val userCode: String,
     ) : MainRoute
 
     @Serializable

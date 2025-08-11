@@ -56,6 +56,7 @@
     <string name="bullet">•</string>
     <string name="unit_won">%,d원</string>
     <string name="date_format_kor">%d월 %d일</string>
+    <string name="count">%d개</string>
 
     <string name="btn_ok">확인</string>
     <string name="btn_goto_login">로그인 하러 가기</string>
@@ -315,9 +316,20 @@
     <string name="sns_select_youtube_description">유튜브 선택</string>
 
     <string name="label_nickname">닉네임</string>
+    <string name="label_information">정보</string>
+    <string name="label_id">ID</string>
     <string name="label_introduction">소개</string>
+    <string name="hint_add_introduction">소개 추가</string>
+    <string name="hint_add_sns">SNS 추가</string>
+    <string name="label_activity_visibility">활동 노출</string>
+    <string name="label_upcoming_shows">다가오는 공연</string>
+    <string name="label_past_shows">지난 공연</string>
+    <string name="label_video_and_link">동영상 및 링크</string>
+    <string name="video">비디오</string>
+    <string name="link">링크</string>
     <string name="label_links">링크</string>
     <string name="link_add_btn">링크 추가</string>
+    <string name="video_add">비디오 추가</string>
     <string name="link_add">링크 추가</string>
     <string name="link_edit">링크 편집</string>
     <string name="link_reorder_description">링크 순서 변경</string>

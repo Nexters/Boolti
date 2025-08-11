@@ -12,19 +12,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -32,9 +30,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +45,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,33 +54,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.icon
 import com.nexters.boolti.presentation.extension.label
-import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
-import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.ReorderableState
 import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 @Composable
 fun ProfileEditScreen(
@@ -102,7 +93,7 @@ fun ProfileEditScreen(
     val event = viewModel.event
     val context = LocalContext.current
 
-    LaunchedEffect(newLinkCallback) {
+    /*LaunchedEffect(newLinkCallback) {
         newLinkCallback.collect(viewModel::onNewLinkAdded)
     }
     LaunchedEffect(editLinkCallback) {
@@ -119,44 +110,53 @@ fun ProfileEditScreen(
     }
     LaunchedEffect(removeSnsCallback) {
         removeSnsCallback.collect(viewModel::onSnsRemoved)
-    }
+    }*/
 
     ProfileEditScreen(
         modifier = modifier,
         thumbnail = uiState.thumbnail,
         nickname = uiState.nickname,
-        nicknameError = uiState.nicknameError,
+        userCode = uiState.nickname,
         introduction = uiState.introduction,
-        snsList = uiState.snsList.toImmutableList(),
-        links = uiState.links.toImmutableList(),
+        id = uiState.id,
+        snsCount = uiState.snsCount,
+        upcomingShowCount = uiState.upcomingShowCount,
+        pastShowCount = uiState.pastShowCount,
+        showUpcomingShows = uiState.showUpcomingShows,
+        showPerformedShows = uiState.showPerformedShows,
+        onClickUpcomingShows = viewModel::toggleShowUpcomingShows,
+        onClickPastShows = viewModel::toggleShowPerformedShows,
+        videoCount = uiState.videoCount,
+        linkCount = uiState.linkCount,
         saving = uiState.saving,
         event = event,
-        checkDataChanged = { viewModel.isDataChanged },
         navigateBack = navigateBack,
-        onClickComplete = {
-            val file = it?.let { uri ->
-                val file = File(context.cacheDir, "temp_profile_image.jpg")
-                try {
-                    context.contentResolver.openInputStream(uri).use { inputStream ->
-                        FileOutputStream(file).use { outputStream ->
-                            inputStream?.copyTo(outputStream)
+        /*        onClickComplete = {
+                    val file = it?.let { uri ->
+                        val file = File(context.cacheDir, "temp_profile_image.jpg")
+                        try {
+                            context.contentResolver.openInputStream(uri).use { inputStream ->
+                                FileOutputStream(file).use { outputStream ->
+                                    inputStream?.copyTo(outputStream)
+                                }
+                            }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
+                        file
                     }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-                file
-            }
-            viewModel.completeEdits(file)
-        },
-        onChangeNickname = viewModel::changeNickname,
-        onChangeIntroduction = viewModel::changeIntroduction,
+                    viewModel.completeEdits(file)
+                }*/
+//        onChangeNickname = viewModel::changeNickname,
+//        onChangeIntroduction = viewModel::changeIntroduction,
+        onClickNickname = { /* TODO: 닉네임 수정 기능 구현 */ },
+        onClickId = {},
+        onClickIntroduction = {},
         onClickAddSns = { navigateToSnsEdit(null) },
-        onClickAddLink = { navigateToLinkEdit(null) },
-        onClickEditSns = { sns -> navigateToSnsEdit(sns) },
-        onClickEditLink = { link -> navigateToLinkEdit(link) },
-        onReorderSns = viewModel::reorderSns,
-        onReorderLink = viewModel::reorderLink,
+        onClickVideo = { },
+        onClickLink = { navigateToLinkEdit(null) },
+        onClickEditSns = { /* TODO: SNS 수정 기능 구현 */ },
+        onClickEditLink = { /* TODO: 링크 수정 기능 구현 */ },
     )
 }
 
@@ -165,23 +165,36 @@ fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     thumbnail: String,
     nickname: String,
-    nicknameError: NicknameError? = null,
+    userCode: UserCode,
+//    nicknameError: NicknameError? = null,
     introduction: String,
-    snsList: ImmutableList<Sns>,
-    links: ImmutableList<Link>,
+//    snsList: ImmutableList<Sns>,
+//    links: ImmutableList<Link>,
+    id: String,
+    snsCount: Int,
+    upcomingShowCount: Int,
+    pastShowCount: Int,
+    showUpcomingShows: Boolean,
+    showPerformedShows: Boolean,
+    onClickUpcomingShows: () -> Unit,
+    onClickPastShows: () -> Unit,
+    videoCount: Int,
+    linkCount: Int,
     saving: Boolean,
     event: Flow<ProfileEditEvent>,
-    checkDataChanged: () -> Boolean,
+//    checkDataChanged: () -> Boolean,
     navigateBack: () -> Unit,
-    onClickComplete: (uri: Uri?) -> Unit,
-    onChangeNickname: (String) -> Unit,
-    onChangeIntroduction: (String) -> Unit,
+//    onClickComplete: (uri: Uri?) -> Unit,
+//    onChangeNickname: (String) -> Unit,
+//    onChangeIntroduction: (String) -> Unit,
+    onClickNickname: () -> Unit,
+    onClickId: () -> Unit,
+    onClickIntroduction: () -> Unit,
+    onClickVideo: () -> Unit,
     onClickAddSns: () -> Unit,
-    onClickAddLink: () -> Unit,
-    onClickEditSns: (Sns) -> Unit,
-    onClickEditLink: (Link) -> Unit,
-    onReorderSns: (from: Int, to: Int) -> Unit,
-    onReorderLink: (from: Int, to: Int) -> Unit,
+    onClickLink: () -> Unit,
+    onClickEditSns: () -> Unit,
+    onClickEditLink: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = LocalSnackbarController.current
@@ -206,7 +219,7 @@ fun ProfileEditScreen(
     var showUnAuthorizedDialog by remember { mutableStateOf(false) }
 
     fun tryBack() {
-        if (checkDataChanged()) showExitAlertDialog = true else navigateBack()
+//        if (checkDataChanged()) showExitAlertDialog = true else navigateBack()
     }
 
     BackHandler { tryBack() }
@@ -237,13 +250,6 @@ fun ProfileEditScreen(
                     BtAppBarDefaults.AppBarIconButton(
                         onClick = ::tryBack,
                         iconRes = R.drawable.ic_arrow_back,
-                    )
-                },
-                actionButtons = {
-                    BtAppBarDefaults.AppBarTextButton(
-                        label = stringResource(R.string.complete),
-                        onClick = { onClickComplete(selectedImage) },
-                        enabled = !saving && nicknameError == null,
                     )
                 },
                 title = stringResource(R.string.profile_edit),
@@ -296,57 +302,87 @@ fun ProfileEditScreen(
                         )
                     }
                 }
-                Section(title = stringResource(R.string.label_nickname)) {
-                    BTTextField(
-                        modifier = Modifier
-                            .padding(horizontal = marginHorizontal)
-                            .fillMaxWidth(),
-                        text = nickname,
-                        placeholder = stringResource(R.string.profile_edit_nickname_placeholder),
-                        onValueChanged = onChangeNickname,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                        ),
-                        singleLine = true,
-                        isError = nicknameError != null,
-                        supportingText = nicknameError?.let {
-                            when (it) {
-                                NicknameError.MinLength -> stringResource(
-                                    R.string.validate_min_length,
-                                    1
-                                )
-
-                                NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
-                            }
+                Section(title = stringResource(R.string.label_information)) {
+                    SectionItem(
+                        label = stringResource(R.string.label_nickname),
+                        value = nickname,
+                        defaultValue = userCode,
+                        onClick = onClickNickname,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.label_id),
+                        value = id,
+                        defaultValue = id,
+                        onClick = onClickId,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.label_introduction),
+                        value = introduction,
+                        defaultValue = stringResource(R.string.hint_add_introduction),
+                        onClick = onClickIntroduction,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.sns),
+                        count = snsCount,
+                        defaultValue = stringResource(R.string.hint_add_sns),
+                        onClick = onClickIntroduction,
+                        right = { ArrowRight() },
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                Section(title = stringResource(R.string.label_activity_visibility)) {
+                    SectionItem(
+                        label = stringResource(R.string.label_upcoming_shows),
+                        count = upcomingShowCount,
+                        defaultValue = "-",
+                        onClick = if (upcomingShowCount > 0) {
+                            onClickUpcomingShows
+                        } else {
+                            null
                         },
-                        enabled = !saving,
+                        right = {
+                            Switch(
+                                checked = showUpcomingShows,
+                                onCheckedChange = null,
+                                enabled = upcomingShowCount > 0,
+                            )
+                        },
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.label_past_shows),
+                        count = pastShowCount,
+                        defaultValue = "-",
+                        onClick = if (pastShowCount > 0) {
+                            onClickPastShows
+                        } else {
+                            null
+                        },
+                        right = {
+                            Switch(
+                                checked = showPerformedShows,
+                                onCheckedChange = null,
+                                enabled = pastShowCount > 0,
+                            )
+                        },
                     )
                 }
-                Section(
-                    modifier = Modifier.padding(top = 12.dp),
-                    title = stringResource(R.string.label_introduction)
-                ) {
-                    val maxIntroduceLength = 60
-
-                    BTTextField(
-                        modifier = Modifier
-                            .padding(horizontal = marginHorizontal)
-                            .fillMaxWidth()
-                            .height(122.dp),
-                        text = introduction.takeForUnicode(maxIntroduceLength),
-                        placeholder = stringResource(R.string.profile_edit_introduction_placeholder),
-                        minHeight = 122.dp,
-                        bottomEndText = stringResource(
-                            R.string.input_limit,
-                            introduction.length,
-                            maxIntroduceLength
-                        ),
-                        onValueChanged = { onChangeIntroduction(it.takeForUnicode(maxIntroduceLength)) },
-                        enabled = !saving,
+                Spacer(Modifier.height(12.dp))
+                Section(title = stringResource(R.string.label_video_and_link)) {
+                    SectionItem(
+                        label = stringResource(R.string.video),
+                        count = videoCount,
+                        defaultValue = stringResource(R.string.video_add),
+                        onClick = onClickVideo,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.link),
+                        count = videoCount,
+                        defaultValue = stringResource(R.string.link_add),
+                        onClick = onClickLink,
                     )
                 }
 
-                val snsReorderState = rememberReorderableLazyListState(
+                /*val snsReorderState = rememberReorderableLazyListState(
                     onMove = { from, to ->
                         onReorderSns(from.index - 1, to.index - 1)
                     },
@@ -443,27 +479,12 @@ fun ProfileEditScreen(
                     }
                 }
 
-                Spacer(Modifier.size(32.dp))
+                Spacer(Modifier.size(32.dp))*/
             }
 
             if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-        if (showExitAlertDialog) {
-            BTDialog(
-                content = {
-                    Text(
-                        text = stringResource(R.string.profile_edit_alert_exit),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                },
-                positiveButtonLabel = stringResource(R.string.save),
-                negativeButtonLabel = stringResource(R.string.btn_exit),
-                onClickPositiveButton = { onClickComplete(selectedImage) },
-                onClickNegativeButton = navigateBack,
-                onDismiss = { showExitAlertDialog = false },
-            )
-        }
+
         if (showUnAuthorizedDialog) {
             BTDialog(
                 enableDismiss = false,
@@ -640,4 +661,79 @@ private fun Section(
             content()
         }
     }
+}
+
+@Composable
+private fun SectionItem(
+    label: String,
+    count: Int,
+    defaultValue: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    right: (@Composable RowScope.() -> Unit)? = null,
+) {
+    SectionItem(
+        label = label,
+        value = if (count != 0) stringResource(R.string.count, count) else "",
+        defaultValue = defaultValue,
+        modifier = modifier,
+        onClick = onClick,
+        right = right,
+    )
+}
+
+@Composable
+private fun SectionItem(
+    label: String,
+    value: String,
+    defaultValue: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    right: (@Composable RowScope.() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier
+            .clickable(
+                onClick = onClick ?: {},
+                role = Role.Button,
+                enabled = onClick != null,
+                onClickLabel = label,
+            )
+            .padding(vertical = 10.dp, horizontal = marginHorizontal),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(
+            modifier = Modifier.width(92.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30,
+                maxLines = 1,
+            )
+        }
+        Text(
+            modifier = Modifier.weight(1f),
+            text = value.ifEmpty { defaultValue },
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (value.isNotEmpty()) Grey05 else Grey70,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        right?.invoke(this)
+    }
+}
+
+@Composable
+private fun ArrowRight(
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+) {
+    Icon(
+        modifier = modifier.size(20.dp),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
+        contentDescription = contentDescription,
+        tint = Grey50,
+    )
 }

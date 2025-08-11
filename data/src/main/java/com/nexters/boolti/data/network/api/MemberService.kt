@@ -12,11 +12,18 @@ internal interface MemberService {
         @Path("userCode") userCode: String,
     ): MemberResponse
 
+    @GET("/app/papi/v2/users/{userCode}/links")
     suspend fun getLinks(
         @Path("userCode") userCode: String,
-    ): List<EditProfileRequest.LinkDto> = emptyList()
+    ): List<EditProfileRequest.LinkDto>
 
+    @GET("/app/papi/v2/users/{userCode}/shows")
     suspend fun getPerformedShows(
         @Path("userCode") userCode: String,
-    ): List<HostedShowDto> = emptyList()
+    ): List<HostedShowDto>
+
+    @GET("/app/papi/v2/users/{userCode}/videos")
+    suspend fun getVideos(
+        @Path("userCode") userCode: String,
+    ): List<String>
 }

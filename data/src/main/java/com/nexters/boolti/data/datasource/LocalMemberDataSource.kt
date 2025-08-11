@@ -4,7 +4,9 @@ import com.nexters.boolti.data.network.response.HostedShowDto
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.request.EditProfileRequest
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Singleton
 
+@Singleton
 internal class LocalMemberDataSource {
     private val linksCache = ConcurrentHashMap<UserCode, List<EditProfileRequest.LinkDto>>(300)
     private val performedShowsCache = ConcurrentHashMap<UserCode, List<HostedShowDto>>(300)

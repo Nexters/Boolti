@@ -9,7 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.HTTP
 
 internal interface UserService {
-    @GET("/app/api/v1/user")
+    @GET("/app/api/v2/user")
     suspend fun getUser(): Response<UserResponse>
 
     @HTTP(method = "DELETE", path = "/app/api/v1/user", hasBody = true)

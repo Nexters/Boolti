@@ -59,6 +59,7 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.model.emptyPreviewList
 import com.nexters.boolti.domain.model.url
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -188,20 +189,20 @@ fun ProfileScreen(
                 },
             )
 
-            if (user.link.isNotEmpty() || user.performedShow.isNotEmpty()) {
+            if (user.link.previewItems.isNotEmpty() || user.performedShow.previewItems.isNotEmpty()) {
                 Spacer(Modifier.size(8.dp))
             }
 
-            if (user.link.isNotEmpty()) { // 링크가 있으면
+            if (user.link.previewItems.isNotEmpty()) { // 링크가 있으면
                 Section(
                     title = stringResource(R.string.profile_links_title),
-                    onClickShowAll = if (user.link.size >= 4) {
+                    onClickShowAll = if (user.link.hasMoreItems) {
                         { navigateToLinks() }
                     } else {
                         null
                     },
                 ) {
-                    user.link.take(3).forEachIndexed { i, link ->
+                    user.link.previewItems.forEachIndexed { i, link ->
                         LinkItem(
                             modifier = Modifier
                                 .padding(top = if (i == 0) 0.dp else 16.dp)
@@ -219,23 +220,23 @@ fun ProfileScreen(
                 }
             }
 
-            if (user.link.isNotEmpty() && user.performedShow.isNotEmpty()) {
+            if (user.link.previewItems.isNotEmpty() && user.performedShow.previewItems.isNotEmpty()) {
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = marginHorizontal),
                     color = Grey85,
                 )
             }
 
-            if (user.performedShow.isNotEmpty()) { // 출연한 공연이 있으면
+            if (user.performedShow.previewItems.isNotEmpty()) { // 출연한 공연이 있으면
                 Section(
                     title = stringResource(R.string.performed_shows),
-                    onClickShowAll = if (user.performedShow.size >= 3) {
+                    onClickShowAll = if (user.performedShow.hasMoreItems) {
                         { navigateToPerformedShows() }
                     } else {
                         null
                     },
                 ) {
-                    user.performedShow.take(2).forEachIndexed { i, show ->
+                    user.performedShow.previewItems.forEachIndexed { i, show ->
                         ShowItem(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -568,8 +569,8 @@ private fun ProfileScreenPreview() {
             Sns("1", Sns.SnsType.INSTAGRAM, "hey__suun"),
             Sns("1", Sns.SnsType.YOUTUBE, "tune_official"),
         ),
-        link = listOf(),
-        performedShow = listOf(),
+        link = emptyPreviewList(),
+        performedShow = emptyPreviewList(),
     )
     BooltiTheme {
         ProfileScreen(

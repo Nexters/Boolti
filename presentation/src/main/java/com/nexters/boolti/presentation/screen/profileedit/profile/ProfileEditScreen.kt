@@ -30,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,6 +59,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
+import com.nexters.boolti.presentation.component.BtSwitch
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.icon
 import com.nexters.boolti.presentation.extension.label
@@ -341,9 +341,8 @@ fun ProfileEditScreen(
                             null
                         },
                         right = {
-                            Switch(
+                            BtSwitch(
                                 checked = showUpcomingShows,
-                                onCheckedChange = null,
                                 enabled = upcomingShowCount > 0,
                             )
                         },
@@ -358,9 +357,8 @@ fun ProfileEditScreen(
                             null
                         },
                         right = {
-                            Switch(
+                            BtSwitch(
                                 checked = showPerformedShows,
-                                onCheckedChange = null,
                                 enabled = pastShowCount > 0,
                             )
                         },

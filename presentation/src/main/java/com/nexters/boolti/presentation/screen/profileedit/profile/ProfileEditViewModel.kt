@@ -1,12 +1,10 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.repository.AuthRepository
-import com.nexters.boolti.domain.repository.FileRepository
+import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val fileRepository: FileRepository,
+    private val userConfigRepository: UserConfigRepository,
     getUserUseCase: GetUserUsecase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditState())
@@ -71,16 +68,20 @@ class ProfileEditViewModel @Inject constructor(
     }*/
 
     fun toggleShowUpcomingShows() {
-        viewModelScope.launch(Dispatchers.IO) {
-            // api call
-            _uiState.update { it.copy(showUpcomingShows = !it.showUpcomingShows) }
+        viewModelScope.launch {
+            userConfigRepository.setUpcomingShowVisible(!uiState.value.showUpcomingShows)
+                .onSuccess { result ->
+                    _uiState.update { it.copy(showUpcomingShows = result.value) }
+                }
         }
     }
 
     fun toggleShowPerformedShows() {
-        viewModelScope.launch(Dispatchers.IO) {
-            // api call
-            _uiState.update { it.copy(showPerformedShows = !it.showPerformedShows) }
+        viewModelScope.launch {
+            userConfigRepository.setPastShowVisible(!uiState.value.showPerformedShows)
+                .onSuccess { result ->
+                    _uiState.update { it.copy(showPerformedShows = result.value) }
+                }
         }
     }
 

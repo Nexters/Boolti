@@ -12,6 +12,9 @@ sealed interface ProfileRoute {
     data object ProfileEdit : ProfileRoute
 
     @Serializable
+    data object ProfileNicknameEdit : ProfileRoute
+
+    @Serializable
     data class ProfileSnsEdit(
         val snsType: Sns.SnsType = Sns.SnsType.INSTAGRAM,
         val linkId: String? = null,

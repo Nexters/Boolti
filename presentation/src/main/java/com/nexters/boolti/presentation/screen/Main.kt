@@ -39,6 +39,7 @@ import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.nickname.profileNicknameEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.sns.profileSnsEditScreen
 import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
@@ -177,6 +178,7 @@ fun MainNavigation(
             profileEditScreen()
             profileSnsEditScreen()
             profileLinkEditScreen()
+            profileNicknameEditScreen()
         }
 
         linkListScreen()

@@ -79,6 +79,7 @@ import org.burnoutcrew.reorderable.detectReorder
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
+    navigateToNicknameEdit: (nickname: String) -> Unit,
     navigateToSnsEdit: (Sns?) -> Unit,
     navigateToLinkEdit: (Link?) -> Unit,
     newLinkCallback: Flow<Link>,
@@ -149,7 +150,7 @@ fun ProfileEditScreen(
                 }*/
 //        onChangeNickname = viewModel::changeNickname,
 //        onChangeIntroduction = viewModel::changeIntroduction,
-        onClickNickname = { /* TODO: 닉네임 수정 기능 구현 */ },
+        onClickNickname = { navigateToNicknameEdit(uiState.nickname) },
         onClickId = {},
         onClickIntroduction = {},
         onClickAddSns = { navigateToSnsEdit(null) },
@@ -166,7 +167,6 @@ fun ProfileEditScreen(
     thumbnail: String,
     nickname: String,
     userCode: UserCode,
-//    nicknameError: NicknameError? = null,
     introduction: String,
 //    snsList: ImmutableList<Sns>,
 //    links: ImmutableList<Link>,
@@ -219,7 +219,7 @@ fun ProfileEditScreen(
     var showUnAuthorizedDialog by remember { mutableStateOf(false) }
 
     fun tryBack() {
-//        if (checkDataChanged()) showExitAlertDialog = true else navigateBack()
+        navigateBack()
     }
 
     BackHandler { tryBack() }

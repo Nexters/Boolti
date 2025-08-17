@@ -1,13 +1,18 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.toDomain
+import com.nexters.boolti.domain.model.Duplicated
 import com.nexters.boolti.domain.model.ToggleResult
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.repository.UserConfigRepository
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 internal class UserConfigRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource,
+    private val authDataSource: AuthDataSource,
 ) : UserConfigRepository {
     override suspend fun setUpcomingShowVisible(visible: Boolean): Result<ToggleResult> =
         runCatching {
@@ -17,5 +22,20 @@ internal class UserConfigRepositoryImpl @Inject constructor(
     override suspend fun setPastShowVisible(visible: Boolean): Result<ToggleResult> =
         runCatching {
             userDataSource.setPastShowVisible(visible).toDomain()
+        }
+
+    override suspend fun checkUserCodeDuplicated(userCode: UserCode): Result<Duplicated> =
+        runCatching {
+            userDataSource.checkUserCodeDuplicated(userCode).isDuplicated
+        }
+
+    override suspend fun saveNickname(nickname: String): Result<String> =
+        runCatching {
+            userDataSource.saveNickname(nickname).nickname
+        }.onSuccess { nickname ->
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(user.copy(nickname = nickname))
+            }
         }
 }

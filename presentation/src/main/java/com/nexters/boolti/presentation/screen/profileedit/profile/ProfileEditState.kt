@@ -14,19 +14,4 @@ data class ProfileEditState(
     val linkCount: Int = 0,
     val showUpcomingShows: Boolean = false,
     val showPerformedShows: Boolean = false,
-) {
-    val nicknameError: NicknameError? // TODO 제거
-        get() = when {
-            nickname.isEmpty() -> NicknameError.MinLength
-            !NicknameError.InvalidRegex.matches(nickname) -> NicknameError.Invalid
-            else -> null
-        }
-}
-
-enum class NicknameError {
-    MinLength, Invalid;
-
-    companion object {
-        val InvalidRegex = Regex("""^(?!\s)([0-9a-zA-Z\s가-힣]{1,20})(?<!\s)$""")
-    }
-}
+)

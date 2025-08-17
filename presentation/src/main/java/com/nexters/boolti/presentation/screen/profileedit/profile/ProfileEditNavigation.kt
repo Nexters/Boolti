@@ -111,6 +111,9 @@ fun NavGraphBuilder.profileEditScreen(
         ProfileEditScreen(
             modifier = modifier,
             navigateBack = navController::popBackStack,
+            navigateToNicknameEdit = { nickname ->
+                navController.navigate(ProfileRoute.ProfileNicknameEdit)
+            },
             navigateToSnsEdit = { sns ->
                 navController.navigate(ProfileRoute.ProfileSnsEdit(sns))
             },

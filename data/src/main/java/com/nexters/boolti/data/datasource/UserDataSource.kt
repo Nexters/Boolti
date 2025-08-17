@@ -1,7 +1,9 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.UserService
+import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
+import com.nexters.boolti.data.network.response.DuplicatedResponse
 import com.nexters.boolti.data.network.response.ToggleResultDto
 import com.nexters.boolti.data.network.response.UserResponse
 import com.nexters.boolti.domain.request.EditProfileRequest
@@ -25,4 +27,10 @@ internal class UserDataSource @Inject constructor(
 
     suspend fun setPastShowVisible(visible: Boolean): ToggleResultDto =
         userService.setPastShowVisible(SetVisibleRequest(visible))
+
+    suspend fun checkUserCodeDuplicated(userCode: String): DuplicatedResponse =
+        userService.checkUserCodeDuplicate(userCode)
+
+    suspend fun saveNickname(nickname: String) =
+        userService.saveNickname(SaveNicknameRequest(nickname))
 }

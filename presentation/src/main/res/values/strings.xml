@@ -32,7 +32,8 @@
     <string name="validation_contact">연락처를 올바르게 입력해 주세요</string>
     <string name="validation_account">계좌번호 확인 후 다시 입력해 주세요</string>
     <string name="validate_min_length">%d자 이상 입력해 주세요</string>
-    <string name="validate_edit_nickname">앞뒤 공백 없이 숫자, 한글, 영문 20자 이내로 입력해 주세요</string>
+    <string name="validate_edit_nickname">한글, 영문, 숫자만 입력 가능합니다</string>
+    <string name="validate_trimmed">앞뒤 공백을 제거해 주세요</string>
 
     <!-- 홈(Show) -->
     <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
@@ -225,6 +226,8 @@
     <string name="gift_registration_failed_dialog">선물 등록 중 오류가 발생했습니다.\n웹 링크에서 선물 상태를 확인 후 다시 시도해 주세요</string>
     <string name="save">저장하기</string>
     <string name="cancel">취소하기</string>
+    <string name="save_short">저장</string>
+    <string name="save_cancel">취소</string>
 
     <!-- 공연 -->
     <string name="show_call_to_ask">전화 문의하기</string>
@@ -342,6 +345,10 @@
     <string name="link_edit_msg">링크를 편집했어요</string>
     <string name="link_remove_msg">링크를 삭제했어요</string>
     <string name="invalid_link">유효한 링크가 아니에요</string>
+
+    <string name="nickname_edit_description">실명, 활동명 등 회원님의 알려진 이름을 사용하여 사람들이 회원님의 프로필을 찾을 수 있도록 도와주세요.</string>
+    <string name="nickname_edit_exit_alert">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
+    <string name="nickname_edit_placeholder">닉네임을 입력해 주세요 (12자 이내)</string>
 
     <!-- 입장 확인 -->
     <string name="hostedShowsTitle">입장 확인</string>

@@ -48,4 +48,14 @@ internal class UserConfigRepositoryImpl @Inject constructor(
                 authDataSource.updateUser(user.copy(nickname = nickname))
             }
         }
+
+    override suspend fun saveIntroduce(introduce: String): Result<String> =
+        runCatching {
+            userDataSource.saveIntroduce(introduce).introduction
+        }.onSuccess { introduce ->
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(user.copy(introduction = introduce))
+            }
+        }
 }

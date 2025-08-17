@@ -10,4 +10,5 @@ interface UserConfigRepository {
     suspend fun saveNickname(nickname: String): Result<String>
     suspend fun checkUserCodeDuplicated(userCode: UserCode): Result<Duplicated>
     suspend fun saveUserCode(userCode: UserCode): Result<String>
+    suspend fun saveIntroduce(introduce: String): Result<String>
 }

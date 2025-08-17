@@ -117,6 +117,9 @@ fun NavGraphBuilder.profileEditScreen(
             navigateToUserCodeEdit = {
                 navController.navigate(ProfileRoute.ProfileUserCodeEdit)
             },
+            navigateToIntroductionEdit = {
+                navController.navigate(ProfileRoute.ProfileIntroduceEdit)
+            },
             navigateToSnsEdit = { sns ->
                 navController.navigate(ProfileRoute.ProfileSnsEdit(sns))
             },

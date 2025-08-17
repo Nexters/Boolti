@@ -356,6 +356,8 @@
     <string name="usercode_edit_description">회원님을 식별할 수 있는 4자 이상, 20자 이내의 ID를 생성해 주세요. (영어 소문자, 숫자, _ 사용 가능)</string>
     <string name="usercode_edit_placeholder">ID를 입력해 주세요 (20자 이내)</string>
 
+    <string name="introduce_edit_placeholder">예) 재즈와 펑크락을 좋아해요</string>
+
     <!-- 입장 확인 -->
     <string name="hostedShowsTitle">입장 확인</string>
     <string name="hosted_shows_empty_label">입장을 확인할 공연이 없어요</string>

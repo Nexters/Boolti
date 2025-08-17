@@ -1,8 +1,10 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.request.SaveIntroduceRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
 import com.nexters.boolti.data.network.response.DuplicatedResponse
+import com.nexters.boolti.data.network.response.IntroductionResponse
 import com.nexters.boolti.data.network.response.NicknameResponse
 import com.nexters.boolti.data.network.response.ToggleResultDto
 import com.nexters.boolti.data.network.response.UserResponse
@@ -41,11 +43,17 @@ internal interface UserService {
 
     @GET("/app/api/v1/user/code/check-duplicate")
     suspend fun checkUserCodeDuplicate(
-        @Query ("userCode") userCode: String,
+        @Query("userCode") userCode: String,
     ): DuplicatedResponse
 
     @PATCH("/app/api/v1/user/nickname")
     suspend fun saveNickname(
         @Body request: SaveNicknameRequest,
     ): NicknameResponse
+
+
+    @PATCH("/app/api/v1/user/introduction")
+    suspend fun saveIntroduction(
+        @Body request: SaveIntroduceRequest,
+    ): IntroductionResponse
 }

@@ -38,6 +38,7 @@ import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
+import com.nexters.boolti.presentation.screen.profileedit.introduce.profileIntroduceEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.nickname.profileNicknameEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
@@ -181,6 +182,7 @@ fun MainNavigation(
             profileLinkEditScreen()
             profileNicknameEditScreen()
             profileUserCodeEditScreen()
+            profileIntroduceEditScreen()
         }
 
         linkListScreen()

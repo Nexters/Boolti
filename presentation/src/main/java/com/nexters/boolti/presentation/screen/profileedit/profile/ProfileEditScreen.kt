@@ -79,7 +79,8 @@ import org.burnoutcrew.reorderable.detectReorder
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
-    navigateToNicknameEdit: (nickname: String) -> Unit,
+    navigateToNicknameEdit: () -> Unit,
+    navigateToUserCodeEdit: () -> Unit,
     navigateToSnsEdit: (Sns?) -> Unit,
     navigateToLinkEdit: (Link?) -> Unit,
     newLinkCallback: Flow<Link>,
@@ -117,9 +118,8 @@ fun ProfileEditScreen(
         modifier = modifier,
         thumbnail = uiState.thumbnail,
         nickname = uiState.nickname,
-        userCode = uiState.nickname,
+        userCode = uiState.userCode,
         introduction = uiState.introduction,
-        id = uiState.id,
         snsCount = uiState.snsCount,
         upcomingShowCount = uiState.upcomingShowCount,
         pastShowCount = uiState.pastShowCount,
@@ -150,8 +150,8 @@ fun ProfileEditScreen(
                 }*/
 //        onChangeNickname = viewModel::changeNickname,
 //        onChangeIntroduction = viewModel::changeIntroduction,
-        onClickNickname = { navigateToNicknameEdit(uiState.nickname) },
-        onClickId = {},
+        onClickNickname = navigateToNicknameEdit,
+        onClickUserCode = navigateToUserCodeEdit,
         onClickIntroduction = {},
         onClickAddSns = { navigateToSnsEdit(null) },
         onClickVideo = { },
@@ -170,7 +170,6 @@ fun ProfileEditScreen(
     introduction: String,
 //    snsList: ImmutableList<Sns>,
 //    links: ImmutableList<Link>,
-    id: String,
     snsCount: Int,
     upcomingShowCount: Int,
     pastShowCount: Int,
@@ -188,7 +187,7 @@ fun ProfileEditScreen(
 //    onChangeNickname: (String) -> Unit,
 //    onChangeIntroduction: (String) -> Unit,
     onClickNickname: () -> Unit,
-    onClickId: () -> Unit,
+    onClickUserCode: () -> Unit,
     onClickIntroduction: () -> Unit,
     onClickVideo: () -> Unit,
     onClickAddSns: () -> Unit,
@@ -311,9 +310,9 @@ fun ProfileEditScreen(
                     )
                     SectionItem(
                         label = stringResource(R.string.label_id),
-                        value = id,
-                        defaultValue = id,
-                        onClick = onClickId,
+                        value = userCode,
+                        defaultValue = userCode,
+                        onClick = onClickUserCode,
                     )
                     SectionItem(
                         label = stringResource(R.string.label_introduction),

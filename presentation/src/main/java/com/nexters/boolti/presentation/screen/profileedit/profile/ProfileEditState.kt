@@ -1,11 +1,13 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
+import com.nexters.boolti.domain.model.UserCode
+
 data class ProfileEditState(
     val loading: Boolean = false,
     val saving: Boolean = false,
     val thumbnail: String = "",
     val nickname: String = "",
-    val id: String = "",
+    val userCode: UserCode = "",
     val introduction: String = "",
     val snsCount: Int = 0,
     val upcomingShowCount: Int = 0,

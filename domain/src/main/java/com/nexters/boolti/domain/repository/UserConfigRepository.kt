@@ -7,6 +7,7 @@ import com.nexters.boolti.domain.model.UserCode
 interface UserConfigRepository {
     suspend fun setUpcomingShowVisible(visible: Boolean): Result<ToggleResult>
     suspend fun setPastShowVisible(visible: Boolean): Result<ToggleResult>
-    suspend fun checkUserCodeDuplicated(userCode: UserCode): Result<Duplicated>
     suspend fun saveNickname(nickname: String): Result<String>
+    suspend fun checkUserCodeDuplicated(userCode: UserCode): Result<Duplicated>
+    suspend fun saveUserCode(userCode: UserCode): Result<String>
 }

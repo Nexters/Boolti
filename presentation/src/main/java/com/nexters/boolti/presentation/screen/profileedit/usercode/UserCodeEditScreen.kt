@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.profileedit.nickname
+package com.nexters.boolti.presentation.screen.profileedit.usercode
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
@@ -38,10 +39,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
-fun NicknameEditScreen(
+fun UserCodeEditScreen(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
-    viewModel: NicknameEditViewModel = hiltViewModel(),
+    viewModel: UserCodeEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
@@ -55,10 +56,10 @@ fun NicknameEditScreen(
         if (canExit) dismissDialogAndNavigateUp()
     }
 
-    NicknameEditScreen(
+    UserCodeEditScreen(
         modifier = modifier,
         navigateUp = dismissDialogAndNavigateUp,
-        nickname = uiState.nickname,
+        userCode = uiState.userCode,
         showExitAlertDialog = uiState.showExitAlertDialog,
         event = event,
         onDismissExitAlertDialog = viewModel::dismissExitAlertDialog,
@@ -66,21 +67,21 @@ fun NicknameEditScreen(
             val canExit = viewModel.checkCanExit()
             if (canExit) dismissDialogAndNavigateUp()
         },
-        onChangeNickname = viewModel::changeNickname,
-        nicknameError = uiState.nicknameError,
+        onChangeUserCode = viewModel::changeUserCode,
+        nicknameError = uiState.userCodeError,
         saveEnabled = uiState.saveEnabled,
-        onSave = viewModel::saveNickname,
+        onSave = viewModel::saveUserCode,
     )
 }
 
 @Composable
-private fun NicknameEditScreen(
-    nickname: String,
-    onChangeNickname: (String) -> Unit,
-    nicknameError: NicknameError?,
+private fun UserCodeEditScreen(
+    userCode: UserCode,
+    onChangeUserCode: (String) -> Unit,
+    nicknameError: UserCodeError?,
     saveEnabled: Boolean,
     showExitAlertDialog: Boolean,
-    event: Flow<NicknameEditEvent>,
+    event: Flow<UserCodeEditEvent>,
     tryBack: () -> Unit, // 이탈 가능 상태 확인 후 이탈
     navigateUp: () -> Unit, // 진짜로 화면 이탈
     onSave: () -> Unit,
@@ -89,7 +90,7 @@ private fun NicknameEditScreen(
 ) {
     ObserveAsEvents(event) {
         when (it) {
-            NicknameEditEvent.Saved -> navigateUp()
+            UserCodeEditEvent.Saved -> navigateUp()
         }
     }
 
@@ -103,7 +104,7 @@ private fun NicknameEditScreen(
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
-                title = stringResource(R.string.label_nickname),
+                title = stringResource(R.string.label_id),
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.save_short),
@@ -125,33 +126,34 @@ private fun NicknameEditScreen(
                     .fillMaxWidth()
                     .padding(top = 20.dp)
                     .padding(horizontal = marginHorizontal),
-                text = nickname,
-                onValueChanged = onChangeNickname,
+                text = userCode,
+                onValueChanged = onChangeUserCode,
                 isError = nicknameError != null,
                 supportingText = nicknameError?.let {
                     when (it) {
-                        NicknameError.MinLength -> stringResource(
+                        UserCodeError.MinLength -> stringResource(
                             R.string.validate_min_length,
-                            1,
+                            4,
                         )
 
-                        NicknameError.NotTrimmed -> stringResource(R.string.validate_trimmed)
+                        UserCodeError.ContainsWhitespace -> stringResource(R.string.validate_whitespace)
 
-                        NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
+                        UserCodeError.Invalid -> stringResource(R.string.validate_edit_usercode)
+                        UserCodeError.Duplicated -> stringResource(R.string.validate_duplicated_usercode)
                     }
                 },
                 placeholder = stringResource(R.string.nickname_edit_placeholder),
                 singleLine = true,
                 trailingIcon = {
-                    if (nickname.isNotEmpty()) {
-                        BTTextFieldDefaults.ClearButton(onClick = { onChangeNickname("") })
+                    if (userCode.isNotEmpty()) {
+                        BTTextFieldDefaults.ClearButton(onClick = { onChangeUserCode("") })
                     }
                 },
             )
             Spacer(Modifier.height(20.dp))
             Text(
                 modifier = Modifier.padding(horizontal = marginHorizontal),
-                text = stringResource(R.string.nickname_edit_description),
+                text = stringResource(R.string.usercode_edit_description),
                 fontWeight = FontWeight.Normal,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
@@ -181,12 +183,12 @@ private fun NicknameEditScreen(
 
 @Preview
 @Composable
-private fun NicknameEditScreenPreview() {
-    var nickname by remember { mutableStateOf("mangbaam") }
+private fun UserCodeEditScreenPreview() {
+    var userCode by remember { mutableStateOf("A1234") }
     BooltiTheme {
-        NicknameEditScreen(
-            nickname = nickname,
-            onChangeNickname = { nickname = it },
+        UserCodeEditScreen(
+            userCode = userCode,
+            onChangeUserCode = { userCode = it },
             nicknameError = null,
             saveEnabled = false,
             showExitAlertDialog = false,

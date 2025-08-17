@@ -33,7 +33,10 @@
     <string name="validation_account">계좌번호 확인 후 다시 입력해 주세요</string>
     <string name="validate_min_length">%d자 이상 입력해 주세요</string>
     <string name="validate_edit_nickname">한글, 영문, 숫자만 입력 가능합니다</string>
+    <string name="validate_edit_usercode">영어 소문자, 숫자, _만 입력 가능합니다</string>
     <string name="validate_trimmed">앞뒤 공백을 제거해 주세요</string>
+    <string name="validate_whitespace">공백을 제거해 주세요</string>
+    <string name="validate_duplicated_usercode">이미 사용중인 ID입니다</string>
 
     <!-- 홈(Show) -->
     <string name="home_sub_title">%s님, 오늘은\n어떤 공연을 즐겨볼까요?</string>
@@ -347,8 +350,11 @@
     <string name="invalid_link">유효한 링크가 아니에요</string>
 
     <string name="nickname_edit_description">실명, 활동명 등 회원님의 알려진 이름을 사용하여 사람들이 회원님의 프로필을 찾을 수 있도록 도와주세요.</string>
-    <string name="nickname_edit_exit_alert">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
+    <string name="profile_edit_exit_alert">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="nickname_edit_placeholder">닉네임을 입력해 주세요 (12자 이내)</string>
+
+    <string name="usercode_edit_description">회원님을 식별할 수 있는 4자 이상, 20자 이내의 ID를 생성해 주세요. (영어 소문자, 숫자, _ 사용 가능)</string>
+    <string name="usercode_edit_placeholder">ID를 입력해 주세요 (20자 이내)</string>
 
     <!-- 입장 확인 -->
     <string name="hostedShowsTitle">입장 확인</string>

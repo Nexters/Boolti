@@ -32,7 +32,7 @@ class ProfileEditViewModel @Inject constructor(
                 .collect { user ->
                     _uiState.update {
                         it.copy(
-                            id = user.userCode,
+                            userCode = user.userCode,
                             thumbnail = user.photo ?: "",
                             nickname = user.nickname,
                             introduction = user.introduction,

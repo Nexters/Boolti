@@ -135,7 +135,7 @@ private fun NicknameEditScreen(
                             1,
                         )
 
-                        NicknameError.ContainsWhitespace -> stringResource(R.string.validate_trimmed)
+                        NicknameError.NotTrimmed -> stringResource(R.string.validate_trimmed)
 
                         NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
                     }

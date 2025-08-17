@@ -7,7 +7,7 @@ data class NicknameEditState(
 ) {
     val nicknameError: NicknameError? = when {
         nickname.isEmpty() -> NicknameError.MinLength
-        nickname.first().isWhitespace() || nickname.last().isWhitespace() -> NicknameError.ContainsWhitespace
+        nickname.first().isWhitespace() || nickname.last().isWhitespace() -> NicknameError.NotTrimmed
         !NicknameError.InvalidRegex.matches(nickname) -> NicknameError.Invalid
         else -> null
     }
@@ -16,9 +16,9 @@ data class NicknameEditState(
 }
 
 enum class NicknameError {
-    MinLength, Invalid, ContainsWhitespace;
+    MinLength, Invalid, NotTrimmed;
 
     companion object {
-        val InvalidRegex = Regex("""^(?!\s)([0-9a-zA-Z\sㄱ-ㅎㅏ-ㅣ가-힣]{1,120})(?<!\s)$""")
+        val InvalidRegex = Regex("""^(?!\s)([0-9a-zA-Z\sㄱ-ㅎㅏ-ㅣ가-힣]{1,12})(?<!\s)$""")
     }
 }

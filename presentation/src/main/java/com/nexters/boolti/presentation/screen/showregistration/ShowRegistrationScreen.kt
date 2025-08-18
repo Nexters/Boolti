@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.showregistration
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.net.Uri
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
@@ -18,7 +19,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,8 +31,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
@@ -37,13 +43,16 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
 import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import com.nexters.boolti.presentation.util.bridge.NavigateOption
 import com.nexters.boolti.presentation.util.bridge.TokenDto
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import androidx.core.graphics.toColorInt
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -71,6 +80,27 @@ fun ShowRegistrationScreen(
     val loading by remember { derivedStateOf { webviewProgress < 100 } }
 
     val snackbarHostState = LocalSnackbarController.current
+
+    val view = LocalView.current
+    val window = (view.context.requireActivity()).window
+    val controller = remember(window) {
+        WindowCompat.getInsetsController(window, window.decorView)
+    }
+
+    DisposableEffect(Unit) {
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        val prevColor = window.statusBarColor
+        val prevLight = controller.isAppearanceLightStatusBars
+
+        window.statusBarColor = Grey95.toString().toColorInt()
+        controller.isAppearanceLightStatusBars = false
+
+        onDispose {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            window.statusBarColor = prevColor
+            controller.isAppearanceLightStatusBars = prevLight
+        }
+    }
 
     LaunchedEffect(webView != null) {
         webView?.setBridgeManager(

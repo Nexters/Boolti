@@ -4,9 +4,11 @@ import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.toDomain
 import com.nexters.boolti.domain.model.Duplicated
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.ToggleResult
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.domain.request.toDto
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -56,6 +58,16 @@ internal class UserConfigRepositoryImpl @Inject constructor(
             val user = authDataSource.user.firstOrNull()
             if (user != null) {
                 authDataSource.updateUser(user.copy(introduction = introduce))
+            }
+        }
+
+    override suspend fun saveSns(snsList: List<Sns>): Result<Unit> =
+        runCatching {
+            userDataSource.saveSns(snsList)
+        }.onSuccess {
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(user.copy(sns = snsList.map { it.toDto() }))
             }
         }
 }

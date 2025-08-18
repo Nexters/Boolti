@@ -306,6 +306,8 @@
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
 
     <string name="sns">SNS</string>
+    <string name="sns_edit_error_contains_at_sign">\@을 제외하고 입력해 주세요</string>
+    <string name="sns_edit_error_contains_unsupported_character">미지원 특수문자가 포함되어 있습니다</string>
     <string name="username">Username</string>
     <string name="sns_add">SNS 추가</string>
     <string name="sns_edit">SNS 편집</string>

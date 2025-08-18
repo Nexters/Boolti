@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -82,38 +81,12 @@ fun ProfileEditScreen(
     navigateToNicknameEdit: () -> Unit,
     navigateToUserCodeEdit: () -> Unit,
     navigateToIntroductionEdit: () -> Unit,
-    navigateToSnsEdit: (Sns?) -> Unit,
+    navigateToSnsEdit: () -> Unit,
     navigateToLinkEdit: (Link?) -> Unit,
-    newLinkCallback: Flow<Link>,
-    editLinkCallback: Flow<Link>,
-    removeLinkCallback: Flow<String>,
-    newSnsCallback: Flow<Sns>,
-    editSnsCallback: Flow<Sns>,
-    removeSnsCallback: Flow<String>,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
-    val context = LocalContext.current
-
-    /*LaunchedEffect(newLinkCallback) {
-        newLinkCallback.collect(viewModel::onNewLinkAdded)
-    }
-    LaunchedEffect(editLinkCallback) {
-        editLinkCallback.collect(viewModel::onLinkEdited)
-    }
-    LaunchedEffect(removeLinkCallback) {
-        removeLinkCallback.collect(viewModel::onLinkRemoved)
-    }
-    LaunchedEffect(newSnsCallback) {
-        newSnsCallback.collect(viewModel::onSnsAdded)
-    }
-    LaunchedEffect(editSnsCallback) {
-        editSnsCallback.collect(viewModel::onSnsEdited)
-    }
-    LaunchedEffect(removeSnsCallback) {
-        removeSnsCallback.collect(viewModel::onSnsRemoved)
-    }*/
 
     ProfileEditScreen(
         modifier = modifier,
@@ -133,31 +106,12 @@ fun ProfileEditScreen(
         saving = uiState.saving,
         event = event,
         navigateBack = navigateBack,
-        /*        onClickComplete = {
-                    val file = it?.let { uri ->
-                        val file = File(context.cacheDir, "temp_profile_image.jpg")
-                        try {
-                            context.contentResolver.openInputStream(uri).use { inputStream ->
-                                FileOutputStream(file).use { outputStream ->
-                                    inputStream?.copyTo(outputStream)
-                                }
-                            }
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                        file
-                    }
-                    viewModel.completeEdits(file)
-                }*/
-//        onChangeNickname = viewModel::changeNickname,
-//        onChangeIntroduction = viewModel::changeIntroduction,
         onClickNickname = navigateToNicknameEdit,
         onClickUserCode = navigateToUserCodeEdit,
         onClickIntroduction = navigateToIntroductionEdit,
-        onClickAddSns = { navigateToSnsEdit(null) },
+        onClickSns = navigateToSnsEdit,
         onClickVideo = { },
         onClickLink = { navigateToLinkEdit(null) },
-        onClickEditSns = { /* TODO: SNS 수정 기능 구현 */ },
         onClickEditLink = { /* TODO: 링크 수정 기능 구현 */ },
     )
 }
@@ -169,8 +123,6 @@ fun ProfileEditScreen(
     nickname: String,
     userCode: UserCode,
     introduction: String,
-//    snsList: ImmutableList<Sns>,
-//    links: ImmutableList<Link>,
     snsCount: Int,
     upcomingShowCount: Int,
     pastShowCount: Int,
@@ -182,18 +134,13 @@ fun ProfileEditScreen(
     linkCount: Int,
     saving: Boolean,
     event: Flow<ProfileEditEvent>,
-//    checkDataChanged: () -> Boolean,
     navigateBack: () -> Unit,
-//    onClickComplete: (uri: Uri?) -> Unit,
-//    onChangeNickname: (String) -> Unit,
-//    onChangeIntroduction: (String) -> Unit,
     onClickNickname: () -> Unit,
     onClickUserCode: () -> Unit,
     onClickIntroduction: () -> Unit,
+    onClickSns: () -> Unit,
     onClickVideo: () -> Unit,
-    onClickAddSns: () -> Unit,
     onClickLink: () -> Unit,
-    onClickEditSns: () -> Unit,
     onClickEditLink: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -215,7 +162,6 @@ fun ProfileEditScreen(
         onResult = { uri -> selectedImage = uri }
     )
 
-    var showExitAlertDialog by remember { mutableStateOf(false) }
     var showUnAuthorizedDialog by remember { mutableStateOf(false) }
 
     fun tryBack() {
@@ -325,7 +271,7 @@ fun ProfileEditScreen(
                         label = stringResource(R.string.sns),
                         count = snsCount,
                         defaultValue = stringResource(R.string.hint_add_sns),
-                        onClick = onClickIntroduction,
+                        onClick = onClickSns,
                         right = { ArrowRight() },
                     )
                 }

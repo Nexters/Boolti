@@ -3,12 +3,15 @@ package com.nexters.boolti.data.datasource
 import com.nexters.boolti.data.network.api.UserService
 import com.nexters.boolti.data.network.request.SaveIntroduceRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
+import com.nexters.boolti.data.network.request.SaveSnsRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
 import com.nexters.boolti.data.network.response.DuplicatedResponse
 import com.nexters.boolti.data.network.response.ToggleResultDto
 import com.nexters.boolti.data.network.response.UserResponse
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.SignoutRequest
+import com.nexters.boolti.domain.request.toDto
 import javax.inject.Inject
 
 internal class UserDataSource @Inject constructor(
@@ -37,4 +40,7 @@ internal class UserDataSource @Inject constructor(
 
     suspend fun saveIntroduce(introduce: String) =
         userService.saveIntroduction(SaveIntroduceRequest(introduce))
+
+    suspend fun saveSns(snsList: List<Sns>) =
+        userService.saveSns(SaveSnsRequest(snsList.map { it.toDto() }))
 }

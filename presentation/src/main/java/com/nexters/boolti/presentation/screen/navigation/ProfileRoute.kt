@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen.navigation
 
 import com.nexters.boolti.domain.model.Link
-import com.nexters.boolti.domain.model.Sns
 import kotlinx.serialization.Serializable
 
 sealed interface ProfileRoute {
@@ -21,17 +20,7 @@ sealed interface ProfileRoute {
     data object ProfileIntroduceEdit : ProfileRoute
 
     @Serializable
-    data class ProfileSnsEdit(
-        val snsType: Sns.SnsType = Sns.SnsType.INSTAGRAM,
-        val linkId: String? = null,
-        val username: String? = null,
-    ) : ProfileRoute {
-        constructor(sns: Sns?) : this(
-            snsType = sns?.type ?: Sns.SnsType.INSTAGRAM,
-            linkId = sns?.id,
-            username = sns?.username,
-        )
-    }
+    data object ProfileSnsEdit : ProfileRoute
 
     @Serializable
     data class ProfileLinkEdit(

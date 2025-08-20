@@ -73,6 +73,7 @@
     <string name="next">다음</string>
     <string name="show">보기</string>
     <string name="show_all">전체보기</string>
+    <string name="do_add">추가하기</string>
 
     <string name="ticket_holder">방문자</string>
     <string name="depositor">결제자</string>

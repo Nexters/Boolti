@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
@@ -82,7 +81,7 @@ fun ProfileEditScreen(
     navigateToUserCodeEdit: () -> Unit,
     navigateToIntroductionEdit: () -> Unit,
     navigateToSnsEdit: () -> Unit,
-    navigateToLinkEdit: (Link?) -> Unit,
+    navigateToLinkEdit: (userCode: UserCode) -> Unit,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -111,8 +110,7 @@ fun ProfileEditScreen(
         onClickIntroduction = navigateToIntroductionEdit,
         onClickSns = navigateToSnsEdit,
         onClickVideo = { },
-        onClickLink = { navigateToLinkEdit(null) },
-        onClickEditLink = { /* TODO: 링크 수정 기능 구현 */ },
+        onClickLink = { navigateToLinkEdit(uiState.userCode) },
     )
 }
 
@@ -141,7 +139,6 @@ fun ProfileEditScreen(
     onClickSns: () -> Unit,
     onClickVideo: () -> Unit,
     onClickLink: () -> Unit,
-    onClickEditLink: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = LocalSnackbarController.current

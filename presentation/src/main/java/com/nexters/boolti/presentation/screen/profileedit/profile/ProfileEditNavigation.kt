@@ -4,6 +4,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 
 fun NavGraphBuilder.profileEditScreen(
@@ -27,8 +28,8 @@ fun NavGraphBuilder.profileEditScreen(
             navigateToSnsEdit = {
                 navController.navigate(ProfileRoute.ProfileSnsEdit)
             },
-            navigateToLinkEdit = { link ->
-                navController.navigate(ProfileRoute.ProfileLinkEdit(link))
+            navigateToLinkEdit = { userCode ->
+                navController.navigate(LinkListRoute.LinkListRoot(userCode))
             },
         )
     }

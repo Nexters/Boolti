@@ -30,7 +30,9 @@ import com.nexters.boolti.presentation.screen.gift.giftScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
+import com.nexters.boolti.presentation.screen.link.linkListScreen2
 import com.nexters.boolti.presentation.screen.login.loginScreen
+import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
@@ -39,6 +41,7 @@ import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.introduce.profileIntroduceEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.linkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.nickname.profileNicknameEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
@@ -183,6 +186,13 @@ fun MainNavigation(
             profileNicknameEditScreen()
             profileUserCodeEditScreen()
             profileIntroduceEditScreen()
+        }
+
+        navigation<LinkListRoute.LinkListRoot>(
+            startDestination = LinkListRoute.LinkList,
+        ) {
+            linkListScreen2()
+            linkEditScreen()
         }
 
         linkListScreen()

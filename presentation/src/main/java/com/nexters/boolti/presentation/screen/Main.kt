@@ -58,6 +58,7 @@ import com.nexters.boolti.presentation.screen.showregistration.addShowRegistrati
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
+import com.nexters.boolti.presentation.screen.video.videoEditScreen
 import com.nexters.boolti.presentation.screen.video.videoListScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
@@ -202,6 +203,9 @@ fun MainNavigation(
             startDestination = VideoListRoute.VideoList,
         ) {
             videoListScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+            videoEditScreen(
                 getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
         }

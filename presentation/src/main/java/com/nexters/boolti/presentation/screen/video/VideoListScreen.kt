@@ -2,7 +2,6 @@ package com.nexters.boolti.presentation.screen.video
 
 import android.content.ActivityNotFoundException
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -46,6 +47,7 @@ import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
@@ -125,7 +127,7 @@ private fun VideoListScreen(
 
     val videoAddMsg = stringResource(R.string.video_add_msg)
     val videoEditMsg = stringResource(R.string.video_edit_msg)
-    val videoRemoveMsg = stringResource(R.string.video_remove_msg)
+    val videoDeleteMsg = stringResource(R.string.video_delete_msg)
 
     ObserveAsEvents(event) {
         when (it) {
@@ -138,7 +140,7 @@ private fun VideoListScreen(
             }
 
             is VideoListEvent.Removed -> {
-                snackbarHostState.showMessage(videoRemoveMsg)
+                snackbarHostState.showMessage(videoDeleteMsg)
             }
 
             is VideoListEvent.Finish -> navigateUp()
@@ -276,18 +278,20 @@ private fun VideoItems(
         state = reorderableState.listState,
         modifier = modifier
             .reorderable(reorderableState),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         items(
             items = videos,
-            key = { it.id },
+//            key = { it.id },
         ) { video ->
             ReorderableItem(
                 state = reorderableState,
                 key = video.id,
             ) {
                 VideoItem(
-                    modifier = Modifier.clickable(onClick = { onClick(video.id) }),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable(onClick = { onClick(video.id) }),
                     video = video,
                     showHandle = reorderable,
                     reorderableState = reorderableState,
@@ -307,8 +311,7 @@ private fun VideoItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(vertical = 16.dp, horizontal = 20.dp),
+            .height(90.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -340,9 +343,11 @@ private fun VideoItem(
         if (showHandle) {
             Icon(
                 modifier = Modifier
+                    .padding(start = 16.dp)
                     .size(24.dp)
                     .detectReorder(state = reorderableState),
                 imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
+                tint = Grey70,
                 contentDescription = null,
             )
         }
@@ -350,18 +355,20 @@ private fun VideoItem(
 }
 
 @Composable
-fun VideoThumbnail(
+private fun VideoThumbnail(
     thumbnailUrl: String,
     modifier: Modifier = Modifier,
     description: String? = null,
 ) {
+    val shape = RoundedCornerShape(4.dp)
     Box(
         modifier = modifier
             .aspectRatio(160 / 90f)
+            .clip(shape)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(4.dp),
+                shape = shape,
             ),
         contentAlignment = Alignment.Center,
     ) {

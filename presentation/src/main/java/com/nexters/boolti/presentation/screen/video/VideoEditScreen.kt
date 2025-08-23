@@ -36,6 +36,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
@@ -97,7 +98,11 @@ fun VideoEditScreen(
                         enabled = videoUrl.isNotBlank(),
                     )
                 },
-                title = stringResource(if (isEditMode) R.string.video_edit else R.string.video_add),
+                title = if (isEditMode) {
+                    stringResource(R.string.video_edit)
+                } else {
+                    stringResource(R.string.video_add)
+                },
             )
         },
     ) { innerPadding ->
@@ -107,7 +112,7 @@ fun VideoEditScreen(
                 .padding(innerPadding),
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
+                modifier = Modifier.padding(horizontal = marginHorizontal),
             ) {
                 Row(
                     modifier = Modifier.padding(top = 20.dp, bottom = 20.dp),
@@ -115,13 +120,13 @@ fun VideoEditScreen(
                 ) {
                     Text(
                         modifier = Modifier.defaultMinSize(minWidth = 64.dp),
-                        text = "URL",
+                        text = stringResource(R.string.link_url),
                         color = Grey30,
                     )
                     BTTextField(
                         modifier = Modifier.padding(start = 12.dp),
                         text = videoUrl,
-                        placeholder = "URL을 첨부해 주세요",
+                        placeholder = stringResource(R.string.video_edit_placeholer),
                         singleLine = true,
                         onValueChanged = onChangeVideoUrl,
                         keyboardOptions = KeyboardOptions(
@@ -136,6 +141,13 @@ fun VideoEditScreen(
                         interactionSource = videoUrlInteractionSource,
                     )
                 }
+
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = stringResource(R.string.video_edit_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                )
             }
             if (isEditMode) {
                 MainButton(
@@ -144,7 +156,7 @@ fun VideoEditScreen(
                         .padding(horizontal = marginHorizontal)
                         .padding(bottom = 20.dp)
                         .fillMaxWidth(),
-                    label = stringResource(R.string.video_remove),
+                    label = stringResource(R.string.video_delete),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         contentColor = Grey90,
@@ -165,7 +177,7 @@ fun VideoEditScreen(
                 onClickNegativeButton = { showVideoRemoveDialog = false },
                 onDismiss = { showVideoRemoveDialog = false },
             ) {
-                Text(stringResource(R.string.remove_video_dialog_message))
+                Text(stringResource(R.string.video_delete_confirm_msg))
             }
         }
     }

@@ -18,11 +18,25 @@ fun NavGraphBuilder.videoListScreen(
             modifier = modifier,
             navigateUp = navController::navigateUp,
             navigateToAddVideo = {
-
+                navController.navigate(VideoListRoute.VideoEdit(false))
             },
             navigateToEditVideo = {
-
+                navController.navigate(VideoListRoute.VideoEdit(true))
             },
+            viewModel = getSharedViewModel(entry),
+        )
+    }
+}
+
+fun NavGraphBuilder.videoEditScreen(
+    modifier: Modifier = Modifier,
+    getSharedViewModel: @Composable (NavBackStackEntry) -> VideoListViewModel,
+) {
+    composable<VideoListRoute.VideoEdit> { entry ->
+        val navController = LocalNavController.current
+        VideoEditScreen(
+            modifier = modifier,
+            navigateUp = navController::navigateUp,
             viewModel = getSharedViewModel(entry),
         )
     }

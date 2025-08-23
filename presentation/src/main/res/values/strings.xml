@@ -340,6 +340,14 @@
     <string name="label_links">링크</string>
     <string name="link_add_btn">링크 추가</string>
     <string name="video_add">동영상 추가</string>
+    <string name="video_edit">동영상 편집</string>
+    <string name="video_delete">동영상 삭제</string>
+    <string name="video_delete_confirm_msg">동영상을 삭제하시겠어요?</string>
+    <string name="video_edit_placeholer">URL을 첨부해 주세요</string>
+    <string name="video_edit_description">지금은 Youtube 동영상만 첨부가 가능합니다.\n첨부하려는 동영상에 접속한 후 공유 > URL 복사 버튼을 \n클릭, 복사한 URL을 첨부해 주세요.</string>
+    <string name="video_add_msg">동영상을 추가했어요</string>
+    <string name="video_edit_msg">동영상을 편집했어요</string>
+    <string name="video_delete_msg">동영상을 삭제했어요</string>
     <string name="link_add">링크 추가</string>
     <string name="link_edit">링크 편집</string>
     <string name="link_reorder_description">링크 순서 변경</string>

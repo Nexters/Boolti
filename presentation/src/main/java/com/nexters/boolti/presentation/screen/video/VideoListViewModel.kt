@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.YouTubeVideo
-import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
-import com.nexters.boolti.domain.usecase.GetYouTubeVideoInfoByUrlListUseCase
+import com.nexters.boolti.domain.usecase.GetYouTubeVideoInfoByUrlUseCase
+import com.nexters.boolti.domain.usecase.GetYouTubeVideoListByUserCodeUseCase
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -24,8 +24,8 @@ import javax.inject.Inject
 class VideoListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getUserUseCase: GetUserUsecase,
-    private val memberRepository: MemberRepository,
-    private val getYouTubeVideoInfoByUrlListUseCase: GetYouTubeVideoInfoByUrlListUseCase,
+    private val getYouTubeVideoListByUserCodeUseCase: GetYouTubeVideoListByUserCodeUseCase,
+    private val getYouTubeVideoInfoByUrlUseCase: GetYouTubeVideoInfoByUrlUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
     private val userCode = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>().userCode
@@ -48,7 +48,7 @@ class VideoListViewModel @Inject constructor(
 
     private fun fetchVideos() {
         viewModelScope.launch {
-            memberRepository.getVideoLinks(userCode, refresh = true)
+            getYouTubeVideoListByUserCodeUseCase(userCode, refresh = true)
                 .onSuccess { videos ->
                     _uiState.update {
                         it.copy(
@@ -134,15 +134,24 @@ class VideoListViewModel @Inject constructor(
     fun completeAddOrEditVideo() {
         val video = uiState.value.editingVideo ?: return
         val editMode = video.id.isNotEmpty()
-        if (editMode) {
-            editVideo(video)
-        } else {
-            addVideo(video)
+        
+        viewModelScope.launch {
+            if (editMode) {
+                editVideo(video)
+                videoEditEvent(VideoEditEvent.Finish)
+                videoListEvent(VideoListEvent.Edited)
+            } else {
+                // 새 동영상 추가 시 YouTube API로 정보 가져오기
+                val youTubeVideo = getYouTubeVideoInfoByUrlUseCase(video.url)
+                if (youTubeVideo != null) {
+                    addVideo(youTubeVideo)
+                    videoListEvent(VideoListEvent.Added)
+                } else {
+                    // TODO: 에러 처리 - 유효하지 않은 YouTube URL
+                }
+                videoEditEvent(VideoEditEvent.Finish)
+            }
         }
-        videoEditEvent(VideoEditEvent.Finish)
-        videoListEvent(
-            if (editMode) VideoListEvent.Edited else VideoListEvent.Added,
-        )
     }
 
     private fun addVideo(

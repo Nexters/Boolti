@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -192,12 +193,12 @@ private fun VideoListScreen(
                     reorderableState = reorderableState,
                     reorderable = editing,
                     onClickAdd = { id -> onClickAdd(id) },
-                    onClickVideo = { id ->
+                    onClickVideo = { localId ->
                         if (editing) {
-                            onClickAdd(id)
+                            onClickAdd(localId.ifEmpty { null })
                         } else {
                             try {
-                                uriHandler.openUri(videos.first { it.id == id }.url)
+                                uriHandler.openUri(videos.first { it.localId == localId }.url)
                             } catch (e: ActivityNotFoundException) {
                                 e.printStackTrace()
                                 snackbarHostState.showMessage(invalidUrlMsg)
@@ -282,16 +283,16 @@ private fun VideoItems(
     ) {
         items(
             items = videos,
-//            key = { it.id },
+            key = { it.localId },
         ) { video ->
             ReorderableItem(
                 state = reorderableState,
-                key = video.id,
+                key = video.localId,
             ) {
                 VideoItem(
                     modifier = Modifier
                         .clip(RoundedCornerShape(4.dp))
-                        .clickable(onClick = { onClick(video.id) }),
+                        .clickable(onClick = { onClick(video.localId) }),
                     video = video,
                     showHandle = reorderable,
                     reorderableState = reorderableState,
@@ -325,12 +326,15 @@ private fun VideoItem(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentHeight(),
                 text = video.title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 overflow = TextOverflow.Ellipsis,
+                maxLines = 2,
             )
             Text(
                 text = video.duration.ifEmpty { "-" },

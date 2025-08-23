@@ -1,6 +1,7 @@
 package com.nexters.boolti.domain.model
 
 data class YouTubeVideo(
+    val localId: String,
     val id: String,
     val title: String,
     val description: String,
@@ -12,6 +13,7 @@ data class YouTubeVideo(
 ) {
     companion object {
         val EMPTY = YouTubeVideo(
+            localId = "",
             id = "",
             title = "",
             description = "",

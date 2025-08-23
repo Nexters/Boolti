@@ -14,13 +14,15 @@ class GetYouTubeVideoInfoByUrlUseCaseTest : DescribeSpec({
     val useCase = GetYouTubeVideoInfoByUrlUseCase(youTubeRepository)
 
     val mockYouTubeVideo = YouTubeVideo(
+        localId = "test-local-id",
         id = "eP4ga_fNm-E",
         title = "Test Video Title",
         description = "Test Video Description",
         channelTitle = "Test Channel",
         publishedAt = "2023-01-01T00:00:00Z",
         duration = "PT3M33S",
-        thumbnailUrl = "https://img.youtube.com/vi/eP4ga_fNm-E/hqdefault.jpg"
+        thumbnailUrl = "https://img.youtube.com/vi/eP4ga_fNm-E/hqdefault.jpg",
+        url = "https://www.youtube.com/watch?v=eP4ga_fNm-E"
     )
 
     describe("invoke") {

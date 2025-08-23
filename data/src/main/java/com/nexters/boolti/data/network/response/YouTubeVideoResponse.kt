@@ -3,6 +3,7 @@ package com.nexters.boolti.data.network.response
 import com.nexters.boolti.domain.model.YouTubeVideo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 data class YouTubeVideoResponse(
@@ -30,6 +31,7 @@ data class YouTubeVideoItem(
         }
 
         return YouTubeVideo(
+            localId = UUID.randomUUID().toString(),
             id = id,
             title = snippet.title,
             description = snippet.description,

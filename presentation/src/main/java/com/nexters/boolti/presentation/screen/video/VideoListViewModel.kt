@@ -107,7 +107,7 @@ class VideoListViewModel @Inject constructor(
     fun startAddOrEditVideo(
         videoId: String?,
     ) {
-        val targetVideo = uiState.value.videos.find { it.id == videoId }
+        val targetVideo = uiState.value.videos.find { it.localId == videoId }
             ?: YouTubeVideo.EMPTY
         _uiState.update { it.copy(editingVideo = targetVideo) }
     }
@@ -128,7 +128,7 @@ class VideoListViewModel @Inject constructor(
         val targetVideo = uiState.value.editingVideo ?: return
         _uiState.update {
             it.copy(
-                videos = it.videos.filterNot { it.id == targetVideo.id },
+                videos = it.videos.filterNot { it.localId == targetVideo.localId },
                 editingVideo = null,
             )
         }
@@ -138,7 +138,7 @@ class VideoListViewModel @Inject constructor(
 
     fun completeAddOrEditVideo() {
         val video = uiState.value.editingVideo ?: return
-        val editMode = video.id.isNotEmpty()
+        val editMode = video.localId.isNotEmpty()
 
         viewModelScope.launch {
             if (editMode) {
@@ -177,7 +177,7 @@ class VideoListViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 videos = it.videos.map { old ->
-                    if (old.id == video.id) video else old
+                    if (old.localId == video.localId) video else old
                 },
                 editingVideo = null,
             )

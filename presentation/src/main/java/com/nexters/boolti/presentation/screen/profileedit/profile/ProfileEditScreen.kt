@@ -6,7 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,8 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -50,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -59,19 +53,14 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSwitch
 import com.nexters.boolti.presentation.component.UserThumbnail
-import com.nexters.boolti.presentation.extension.icon
-import com.nexters.boolti.presentation.extension.label
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey05
-import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
-import org.burnoutcrew.reorderable.ReorderableState
-import org.burnoutcrew.reorderable.detectReorder
 
 @Composable
 fun ProfileEditScreen(
@@ -317,110 +306,11 @@ fun ProfileEditScreen(
                     )
                     SectionItem(
                         label = stringResource(R.string.link),
-                        count = videoCount,
+                        count = linkCount,
                         defaultValue = stringResource(R.string.link_add),
                         onClick = onClickLink,
                     )
                 }
-
-                /*val snsReorderState = rememberReorderableLazyListState(
-                    onMove = { from, to ->
-                        onReorderSns(from.index - 1, to.index - 1)
-                    },
-                )
-                Section(
-                    modifier = Modifier.padding(top = 12.dp),
-                    title = stringResource(R.string.profile_edit_sns_title),
-                ) {
-                    LazyColumn(
-                        state = snsReorderState.listState,
-                        modifier = Modifier
-                            .heightIn(max = 100.dp * (snsList.size + 1)) // 대충 넉넉하게 잡은 높이
-                            .reorderable(snsReorderState),
-                    ) {
-                        val snsAddable = !snsList
-                            .asSequence()
-                            .map { it.type }
-                            .toSet()
-                            .containsAll(Sns.SnsType.entries)
-
-                        if (snsAddable) {
-                            item(
-                                contentType = "SnsAddButton",
-                            ) {
-                                LinkAddButton(
-                                    modifier = Modifier.padding(top = 4.dp),
-                                    label = stringResource(R.string.sns_add),
-                                    onClick = onClickAddSns,
-                                    enabled = !saving,
-                                )
-                            }
-                        }
-                        items(
-                            items = snsList,
-                            key = { it.id },
-                            contentType = { "SnsItem" },
-                        ) { sns ->
-                            ReorderableItem(
-                                state = snsReorderState,
-                                key = sns.id,
-                            ) {
-                                SnsItem(
-                                    modifier = Modifier.padding(top = 12.dp),
-                                    sns = sns,
-                                    reorderableState = snsReorderState,
-                                ) { if (!saving) onClickEditSns(sns) }
-                            }
-                        }
-                    }
-                }
-
-                val linkReorderState = rememberReorderableLazyListState(
-                    onMove = { from, to ->
-                        onReorderLink(from.index - 1, to.index - 1)
-                    },
-                )
-                Section(
-                    modifier = Modifier.padding(top = 12.dp),
-                    title = stringResource(R.string.label_links),
-                ) {
-                    LazyColumn(
-                        state = linkReorderState.listState,
-                        modifier = Modifier
-                            .heightIn(max = 100.dp * (links.size + 1)) // 대충 넉넉하게 잡은 높이
-                            .reorderable(linkReorderState),
-                    ) {
-                        item(
-                            contentType = "LinkAddButton",
-                        ) {
-                            LinkAddButton(
-                                modifier = Modifier.padding(top = 4.dp),
-                                label = stringResource(R.string.link_add_btn),
-                                onClick = onClickAddLink,
-                                enabled = !saving,
-                            )
-                        }
-                        items(
-                            items = links,
-                            key = { it.id },
-                            contentType = { "LinkItem" },
-                        ) { link ->
-                            ReorderableItem(
-                                state = linkReorderState,
-                                key = link.id,
-                            ) {
-                                LinkItem(
-                                    modifier = Modifier.padding(top = 12.dp),
-                                    title = link.name,
-                                    url = link.url,
-                                    reorderableState = linkReorderState,
-                                ) { if (!saving) onClickEditLink(link) }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.size(32.dp))*/
             }
 
             if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -441,139 +331,6 @@ fun ProfileEditScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun LinkAddButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(vertical = 10.dp, horizontal = marginHorizontal),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .border(1.dp, Grey50, CircleShape)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                modifier = Modifier.size(20.dp),
-                imageVector = Icons.Rounded.Add,
-                tint = Grey30,
-                contentDescription = label,
-            )
-        }
-        Text(
-            modifier = Modifier.padding(start = 16.dp),
-            text = label,
-            style = MaterialTheme.typography.titleMedium,
-        )
-    }
-}
-
-@Composable
-private fun SnsItem(
-    sns: Sns,
-    modifier: Modifier = Modifier,
-    reorderableState: ReorderableState<*>,
-    onClickEdit: () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClickEdit)
-            .padding(horizontal = marginHorizontal, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            modifier = Modifier.size(24.dp),
-            imageVector = ImageVector.vectorResource(sns.type.icon),
-            tint = Grey30,
-            contentDescription = sns.type.label,
-        )
-        Text(
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .defaultMinSize(minWidth = 72.dp),
-            text = sns.type.label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Grey30,
-        )
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .weight(1f),
-            text = sns.username,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleMedium,
-            color = Grey15,
-        )
-        Icon(
-            modifier = Modifier
-                .padding(start = 20.dp)
-                .size(20.dp)
-                .detectReorder(reorderableState),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
-            tint = Grey50,
-            contentDescription = stringResource(R.string.sns_reorder_description),
-        )
-    }
-}
-
-@Composable
-private fun LinkItem(
-    title: String,
-    url: String,
-    reorderableState: ReorderableState<*>,
-    modifier: Modifier = Modifier,
-    onClickEdit: () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClickEdit)
-            .padding(horizontal = marginHorizontal),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(vertical = 5.dp)
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = title,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleMedium,
-                color = Grey15,
-            )
-            Text(
-                text = url,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey30,
-                maxLines = 1,
-            )
-        }
-        Icon(
-            modifier = Modifier
-                .padding(start = 20.dp)
-                .size(20.dp)
-                .detectReorder(reorderableState),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
-            tint = Grey50,
-            contentDescription = stringResource(R.string.link_reorder_description),
-        )
     }
 }
 

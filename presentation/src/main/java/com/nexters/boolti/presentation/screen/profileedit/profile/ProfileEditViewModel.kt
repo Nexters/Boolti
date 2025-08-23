@@ -49,28 +49,6 @@ class ProfileEditViewModel @Inject constructor(
         }
     }
 
-    /*fun reorderSns(from: Int, to: Int) {
-        val snsList = uiState.value.snsList.toMutableList()
-        if (from !in snsList.indices || to !in snsList.indices) return
-
-        _uiState.update {
-            it.copy(
-                snsList = snsList.apply { add(to, removeAt(from)) },
-            )
-        }
-    }
-
-    fun reorderLink(from: Int, to: Int) {
-        val links = uiState.value.links.toMutableList()
-        if (from !in links.indices || to !in links.indices) return
-
-        _uiState.update {
-            it.copy(
-                links = links.apply { add(to, removeAt(from)) },
-            )
-        }
-    }*/
-
     fun toggleShowUpcomingShows() {
         viewModelScope.launch {
             userConfigRepository.setUpcomingShowVisible(!uiState.value.showUpcomingShows)

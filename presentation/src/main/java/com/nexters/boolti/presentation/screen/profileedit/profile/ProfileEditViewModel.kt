@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.AuthRepository
+import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,12 +13,14 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileEditViewModel @Inject constructor(
     private val userConfigRepository: UserConfigRepository,
     private val authRepository: AuthRepository,
+    private val fileRepository: FileRepository,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditState())
     val uiState = _uiState.asStateFlow()
@@ -46,6 +49,14 @@ class ProfileEditViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun changeThumbnail(file: File?) {
+        file ?: return
+        viewModelScope.launch {
+            val newThumbnailUrl = fileRepository.requestUrlForUpload(file).getOrNull() ?: return@launch
+            userConfigRepository.saveThumbnail(newThumbnailUrl)
         }
     }
 

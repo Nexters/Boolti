@@ -4,6 +4,7 @@ import com.nexters.boolti.data.network.request.SaveIntroduceRequest
 import com.nexters.boolti.data.network.request.SaveLinksRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SaveSnsRequest
+import com.nexters.boolti.data.network.request.SaveThumbnailRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
 import com.nexters.boolti.data.network.response.DuplicatedResponse
 import com.nexters.boolti.data.network.response.IntroductionResponse
@@ -72,5 +73,10 @@ internal interface UserService {
     @PATCH("/app/api/v1/user/videos")
     suspend fun saveVideos(
         @Body request: List<String>,
+    )
+
+    @PATCH("/app/api/v1/user/profile-image")
+    suspend fun saveThumbnail(
+        @Body request: SaveThumbnailRequest,
     )
 }

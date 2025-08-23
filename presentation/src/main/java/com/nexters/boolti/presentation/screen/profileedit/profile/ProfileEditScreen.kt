@@ -5,14 +5,18 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,17 +38,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -52,15 +61,18 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSwitch
-import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @Composable
 fun ProfileEditScreen(
@@ -74,6 +86,7 @@ fun ProfileEditScreen(
     navigateToVideoEdit: (userCode: UserCode) -> Unit,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
 
@@ -95,6 +108,22 @@ fun ProfileEditScreen(
         saving = uiState.saving,
         event = event,
         navigateBack = navigateBack,
+        onChangeThumbnail = {
+            val file = it?.let { uri ->
+                val file = File(context.cacheDir, "temp_profile_image.jpg")
+                try {
+                    context.contentResolver.openInputStream(uri).use { inputStream ->
+                        FileOutputStream(file).use { outputStream ->
+                            inputStream?.copyTo(outputStream)
+                        }
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                file
+            }
+            viewModel.changeThumbnail(file)
+        },
         onClickNickname = navigateToNicknameEdit,
         onClickUserCode = navigateToUserCodeEdit,
         onClickIntroduction = navigateToIntroductionEdit,
@@ -105,7 +134,7 @@ fun ProfileEditScreen(
 }
 
 @Composable
-fun ProfileEditScreen(
+private fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     thumbnail: String,
     nickname: String,
@@ -123,6 +152,7 @@ fun ProfileEditScreen(
     saving: Boolean,
     event: Flow<ProfileEditEvent>,
     navigateBack: () -> Unit,
+    onChangeThumbnail: (Uri?) -> Unit,
     onClickNickname: () -> Unit,
     onClickUserCode: () -> Unit,
     onClickIntroduction: () -> Unit,
@@ -142,11 +172,23 @@ fun ProfileEditScreen(
     val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
     val unknownErrorMsg = stringResource(R.string.message_unknown_error)
 
+    val appBarBgColor by animateColorAsState(
+        targetValue = if (scrollState.canScrollBackward) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            Color.Transparent
+        },
+        label = "appBarBgColor",
+    )
+
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> selectedImage = uri }
+        onResult = { uri ->
+            selectedImage = uri
+            onChangeThumbnail(uri)
+        }
     )
 
     var showUnAuthorizedDialog by remember { mutableStateOf(false) }
@@ -176,9 +218,13 @@ fun ProfileEditScreen(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
+        modifier = modifier,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ) {
             BtAppBar(
+                modifier = Modifier.zIndex(1f),
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
                         onClick = ::tryBack,
@@ -186,55 +232,25 @@ fun ProfileEditScreen(
                     )
                 },
                 title = stringResource(R.string.profile_edit),
-                colors = BtAppBarDefaults.appBarColors(),
+                colors = BtAppBarDefaults.appBarColors(
+                    containerColor = appBarBgColor,
+                ),
             )
-        },
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState),
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(bottom = innerPadding.calculateBottomPadding()),
             ) {
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                ) {
-                    val (thumbnailImg, cameraIcon) = createRefs()
-                    UserThumbnail(
-                        modifier = Modifier.constrainAs(thumbnailImg) { centerTo(parent) },
-                        size = 100.dp,
-                        model = selectedImage ?: thumbnail,
-                        contentDescription = stringResource(R.string.description_user_thumbnail),
-                    )
-                    Surface(
-                        modifier = Modifier
-                            .constrainAs(cameraIcon) {
-                                end.linkTo(thumbnailImg.end, margin = (-7.5).dp)
-                                bottom.linkTo(thumbnailImg.bottom)
-                            }
-                            .size(40.dp),
-                        shape = CircleShape,
-                        color = Color.White,
-                        shadowElevation = 6.dp,
-                        onClick = {
-                            if (!saving) photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        },
-                    ) {
-                        Image(
-                            modifier = Modifier.padding(8.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_camera),
-                            contentDescription = stringResource(R.string.change_thumbnail_description),
+                ProfileHeader(
+                    modifier = Modifier.fillMaxWidth(),
+                    thumbnail = selectedImage ?: thumbnail,
+                    onClickPhotoButton = {
+                        if (!saving) photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     }
-                }
+                )
                 Section(title = stringResource(R.string.label_information)) {
                     SectionItem(
                         label = stringResource(R.string.label_nickname),
@@ -330,6 +346,65 @@ fun ProfileEditScreen(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ProfileHeader(
+    thumbnail: Any,
+    onClickPhotoButton: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val defaultProfile = painterResource(R.drawable.ic_profile_placeholder)
+
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(bottom = 32.dp),
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+            ) {
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = thumbnail,
+                    contentScale = ContentScale.Crop,
+                    placeholder = defaultProfile,
+                    fallback = defaultProfile,
+                    contentDescription = stringResource(R.string.description_user_thumbnail),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(Grey90.copy(0.2f), Grey90.copy(1f))
+                            ),
+                        ),
+                )
+
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(20.dp)
+                        .size(40.dp),
+                    shape = CircleShape,
+                    color = Color.White,
+                    shadowElevation = 6.dp,
+                    onClick = onClickPhotoButton,
+                ) {
+                    Image(
+                        modifier = Modifier.padding(8.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_camera),
+                        contentDescription = stringResource(R.string.change_thumbnail_description),
+                    )
+                }
             }
         }
     }

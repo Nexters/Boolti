@@ -101,4 +101,14 @@ internal class UserConfigRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun saveThumbnail(path: String): Result<Unit> =
+        runCatching {
+            userDataSource.saveThumbnail(path)
+        }.onSuccess {
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(user.copy(imgPath = path))
+            }
+        }
 }

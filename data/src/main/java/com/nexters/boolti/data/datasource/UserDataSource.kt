@@ -5,6 +5,7 @@ import com.nexters.boolti.data.network.request.SaveIntroduceRequest
 import com.nexters.boolti.data.network.request.SaveLinksRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SaveSnsRequest
+import com.nexters.boolti.data.network.request.SaveThumbnailRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
 import com.nexters.boolti.data.network.response.DuplicatedResponse
 import com.nexters.boolti.data.network.response.ToggleResultDto
@@ -51,4 +52,7 @@ internal class UserDataSource @Inject constructor(
 
     suspend fun saveVideos(videos: List<String>) =
         userService.saveVideos(videos)
+
+    suspend fun saveThumbnail(path: String) =
+        userService.saveThumbnail(SaveThumbnailRequest(path))
 }

@@ -40,6 +40,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.DashedBorderBox
+import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
@@ -193,8 +194,12 @@ private fun LinkListScreen(
                             onClickAdd(id)
                         } else {
                             try {
-                                uriHandler.openUri(links.first { it.id == id }.url)
+                                uriHandler.openUri(links.first { it.id == id }.url.toValidUrlString())
                             } catch (e: ActivityNotFoundException) {
+                                e.printStackTrace()
+                                snackbarHostState.showMessage(invalidUrlMsg)
+                            } catch (e: IllegalArgumentException) {
+                                e.printStackTrace()
                                 snackbarHostState.showMessage(invalidUrlMsg)
                             }
                         }

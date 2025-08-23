@@ -16,6 +16,8 @@ internal data class MemberResponse(
     val sns: List<EditProfileRequest.SnsDto> = emptyList(),
     val link: PreviewList<EditProfileRequest.LinkDto> = emptyPreviewList(),
     val performedShow: PreviewList<ShowResponse> = emptyPreviewList(),
+    val comingSoonShow: PreviewList<ShowResponse> = emptyPreviewList(),
+    val video: PreviewList<String> = emptyPreviewList(),
 ) {
     fun toDomain(): User.Others = User.Others(
         nickname = nickname,
@@ -25,5 +27,7 @@ internal data class MemberResponse(
         sns = sns.map { it.toDomain() },
         link = link.map { it.toDomain() },
         performedShow = performedShow.map { it.toDomain() },
+        upcomingShow = comingSoonShow.map { it.toDomain() },
+        video = video,
     )
 }

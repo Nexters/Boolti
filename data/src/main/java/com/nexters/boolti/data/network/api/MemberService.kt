@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 internal interface MemberService {
-    @GET("/app/papi/v1/users/{userCode}")
+    @GET("/app/papi/v2/users/{userCode}")
     suspend fun getMember(
         @Path("userCode") userCode: String,
     ): MemberResponse

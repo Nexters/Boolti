@@ -8,6 +8,7 @@ data class YouTubeVideo(
     val publishedAt: String,
     val duration: String,
     val thumbnailUrl: String,
+    val url: String,
 ) {
     companion object {
         val EMPTY = YouTubeVideo(
@@ -18,6 +19,7 @@ data class YouTubeVideo(
             publishedAt = "",
             duration = "",
             thumbnailUrl = "",
+            url = "",
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.response
 
+import com.nexters.boolti.domain.model.YouTubeVideo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -17,7 +18,29 @@ data class YouTubeVideoItem(
     val snippet: YouTubeVideoSnippet,
     @SerialName("contentDetails")
     val contentDetails: YouTubeContentDetails,
-)
+) {
+    fun toYouTubeVideo(): YouTubeVideo {
+        val bestThumbnail = snippet.thumbnails.let { thumbnails ->
+            thumbnails.maxres?.url
+                ?: thumbnails.high?.url
+                ?: thumbnails.standard?.url
+                ?: thumbnails.medium?.url
+                ?: thumbnails.default?.url
+                ?: ""
+        }
+
+        return YouTubeVideo(
+            id = id,
+            title = snippet.title,
+            description = snippet.description,
+            channelTitle = snippet.channelTitle,
+            publishedAt = snippet.publishedAt,
+            duration = contentDetails.duration,
+            thumbnailUrl = bestThumbnail,
+            url = "https://www.youtube.com/watch?v=$id",
+        )
+    }
+}
 
 @Serializable
 data class YouTubeVideoSnippet(

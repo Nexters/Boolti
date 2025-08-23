@@ -3,7 +3,6 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.BuildConfig
 import com.nexters.boolti.data.network.api.YouTubeService
 import com.nexters.boolti.data.util.YouTubeUrlUtils
-import com.nexters.boolti.data.util.toYouTubeVideo
 import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.domain.repository.YouTubeRepository
 import javax.inject.Inject

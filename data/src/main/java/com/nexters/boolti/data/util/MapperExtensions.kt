@@ -1,9 +1,7 @@
 package com.nexters.boolti.data.util
 
-import com.nexters.boolti.data.network.response.YouTubeVideoItem
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationState
-import com.nexters.boolti.domain.model.YouTubeVideo
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -49,24 +47,3 @@ internal fun File.toImageMultipartBody(): MultipartBody.Part = MultipartBody.Par
     filename = name,
     body = asRequestBody("image/*".toMediaType())
 )
-
-internal fun YouTubeVideoItem.toYouTubeVideo(): YouTubeVideo {
-    val bestThumbnail = snippet.thumbnails.let { thumbnails ->
-        thumbnails.maxres?.url
-            ?: thumbnails.high?.url
-            ?: thumbnails.standard?.url
-            ?: thumbnails.medium?.url
-            ?: thumbnails.default?.url
-            ?: ""
-    }
-
-    return YouTubeVideo(
-        id = id,
-        title = snippet.title,
-        description = snippet.description,
-        channelTitle = snippet.channelTitle,
-        publishedAt = snippet.publishedAt,
-        duration = contentDetails.duration,
-        thumbnailUrl = bestThumbnail,
-    )
-}

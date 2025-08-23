@@ -36,6 +36,7 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
+import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
@@ -57,6 +58,7 @@ import com.nexters.boolti.presentation.screen.showregistration.addShowRegistrati
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
+import com.nexters.boolti.presentation.screen.video.videoListScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -192,6 +194,14 @@ fun MainNavigation(
                 getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
             linkEditScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+        }
+
+        navigation<VideoListRoute.VideoListRoot>(
+            startDestination = VideoListRoute.VideoList,
+        ) {
+            videoListScreen(
                 getSharedViewModel = { entry -> entry.sharedViewModel() },
             )
         }

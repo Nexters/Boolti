@@ -1,4 +1,4 @@
-package com.nexters.boolti.presentation.screen.profileedit.link
+package com.nexters.boolti.presentation.screen.video
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -6,18 +6,23 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
-import com.nexters.boolti.presentation.screen.link.LinkListViewModel
-import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
+import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 
-fun NavGraphBuilder.linkEditScreen(
+fun NavGraphBuilder.videoListScreen(
     modifier: Modifier = Modifier,
-    getSharedViewModel: @Composable (NavBackStackEntry) -> LinkListViewModel,
+    getSharedViewModel: @Composable (NavBackStackEntry) -> VideoListViewModel,
 ) {
-    composable<LinkListRoute.LinkEdit> { entry ->
+    composable<VideoListRoute.VideoList> { entry ->
         val navController = LocalNavController.current
-        LinkEditScreen(
+        VideoListScreen(
             modifier = modifier,
             navigateUp = navController::navigateUp,
+            navigateToAddVideo = {
+
+            },
+            navigateToEditVideo = {
+
+            },
             viewModel = getSharedViewModel(entry),
         )
     }

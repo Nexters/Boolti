@@ -71,6 +71,7 @@ fun ProfileEditScreen(
     navigateToIntroductionEdit: () -> Unit,
     navigateToSnsEdit: () -> Unit,
     navigateToLinkEdit: (userCode: UserCode) -> Unit,
+    navigateToVideoEdit: (userCode: UserCode) -> Unit,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -98,7 +99,7 @@ fun ProfileEditScreen(
         onClickUserCode = navigateToUserCodeEdit,
         onClickIntroduction = navigateToIntroductionEdit,
         onClickSns = navigateToSnsEdit,
-        onClickVideo = { },
+        onClickVideo = { navigateToVideoEdit(uiState.userCode) },
         onClickLink = { navigateToLinkEdit(uiState.userCode) },
     )
 }

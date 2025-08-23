@@ -8,4 +8,5 @@ interface MemberRepository {
     suspend fun getMember(userCode: String): Result<User.Others>
     suspend fun getLinks(userCode: String, refresh: Boolean = false): Result<List<Link>>
     suspend fun getPerformedShows(userCode: String): Result<List<Show>>
+    suspend fun getVideoLinks(userCode: String, refresh: Boolean = false): Result<List<String>>
 }

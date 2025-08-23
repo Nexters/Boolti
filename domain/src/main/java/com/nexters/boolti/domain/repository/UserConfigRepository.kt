@@ -15,4 +15,5 @@ interface UserConfigRepository {
     suspend fun saveIntroduce(introduce: String): Result<String>
     suspend fun saveSns(snsList: List<Sns>): Result<Unit>
     suspend fun saveLinks(links: List<Link>): Result<Unit>
+    suspend fun saveVideos(videoLinks: List<String>): Result<Unit>
 }

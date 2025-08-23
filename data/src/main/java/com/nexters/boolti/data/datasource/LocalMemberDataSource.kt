@@ -10,7 +10,7 @@ import javax.inject.Singleton
 internal class LocalMemberDataSource {
     private val linksCache = ConcurrentHashMap<UserCode, List<EditProfileRequest.LinkDto>>(300)
     private val performedShowsCache = ConcurrentHashMap<UserCode, List<HostedShowDto>>(300)
-    private val videosCache = ConcurrentHashMap<UserCode, String>(300)
+    private val videosCache = ConcurrentHashMap<UserCode, List<String>>(300)
 
     fun getLinks(userCode: UserCode): List<EditProfileRequest.LinkDto>? {
         return linksCache[userCode]
@@ -36,12 +36,12 @@ internal class LocalMemberDataSource {
         performedShowsCache.remove(userCode)
     }
 
-    fun getVideo(userCode: UserCode): String? {
+    fun getVideoLinks(userCode: UserCode): List<String>? {
         return videosCache[userCode]
     }
 
-    fun setVideo(userCode: UserCode, video: String) {
-        videosCache[userCode] = video
+    fun setVideoLinks(userCode: UserCode, videoLinks: List<String>) {
+        videosCache[userCode] = videoLinks
     }
 
     fun removeVideo(userCode: UserCode) {

@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.video
 
 import android.content.ActivityNotFoundException
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.presentation.R
@@ -42,11 +45,10 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.link.LinkListEvent
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.ReorderableLazyListState
 import org.burnoutcrew.reorderable.detectReorder
@@ -61,28 +63,34 @@ fun VideoListScreen(
     modifier: Modifier = Modifier,
     viewModel: VideoListViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler {
+        viewModel.tryBack()
+    }
+
     VideoListScreen(
-        videos = emptyList(),
+        videos = uiState.videos,
         onClickAdd = { id ->
             if (id != null) {
                 navigateToEditVideo()
             } else {
                 navigateToAddVideo()
             }
-//            viewModel.startAddOrEditVideo(id)
+            viewModel.startAddOrEditVideo(id)
         },
-        onSave = {},
-        tryBack = navigateUp,
+        onSave = viewModel::save,
+        tryBack = viewModel::tryBack,
         navigateUp = navigateUp,
-        event = emptyFlow(),
+        event = viewModel.videoListEvent,
         modifier = modifier,
-        showActionButton = true,
-        actionButtonEnabled = true,
-        editing = false,
-        showExitAlertDialog = false,
-        onDismissExitAlertDialog = {},
-        setEditMode = {},
-        onReorder = { _, _ -> },
+        showActionButton = uiState.isMine,
+        actionButtonEnabled = uiState.saveEnabled,
+        editing = uiState.editing,
+        showExitAlertDialog = uiState.showExitAlertDialog,
+        onDismissExitAlertDialog = viewModel::dismissExitAlertDialog,
+        setEditMode = viewModel::setEditMode,
+        onReorder = viewModel::reorder,
     )
 }
 
@@ -93,7 +101,7 @@ private fun VideoListScreen(
     onSave: () -> Unit,
     tryBack: () -> Unit,
     navigateUp: () -> Unit,
-    event: Flow<LinkListEvent>,
+    event: Flow<VideoListEvent>,
     modifier: Modifier = Modifier,
     showActionButton: Boolean = false,
     actionButtonEnabled: Boolean = false,
@@ -114,6 +122,28 @@ private fun VideoListScreen(
     val uriHandler = LocalUriHandler.current
     val unknownErrorMsg = stringResource(R.string.message_unknown_error)
     val invalidUrlMsg = stringResource(R.string.invalid_link)
+
+    val videoAddMsg = stringResource(R.string.video_add_msg)
+    val videoEditMsg = stringResource(R.string.video_edit_msg)
+    val videoRemoveMsg = stringResource(R.string.video_remove_msg)
+
+    ObserveAsEvents(event) {
+        when (it) {
+            is VideoListEvent.Added -> {
+                snackbarHostState.showMessage(videoAddMsg)
+            }
+
+            is VideoListEvent.Edited -> {
+                snackbarHostState.showMessage(videoEditMsg)
+            }
+
+            is VideoListEvent.Removed -> {
+                snackbarHostState.showMessage(videoRemoveMsg)
+            }
+
+            is VideoListEvent.Finish -> navigateUp()
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -151,7 +181,7 @@ private fun VideoListScreen(
         ) {
             if (videos.isEmpty()) {
                 EmptyListAddButton(
-                    onClickAdd = {},
+                    onClickAdd = { onClickAdd(null) }
                 )
             } else {
                 VideosContent(

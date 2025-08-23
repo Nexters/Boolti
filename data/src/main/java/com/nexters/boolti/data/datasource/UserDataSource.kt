@@ -48,4 +48,7 @@ internal class UserDataSource @Inject constructor(
 
     suspend fun saveLinks(links: List<Link>) =
         userService.saveLinks(SaveLinksRequest(links.map { it.toDto() }))
+
+    suspend fun saveVideos(videos: List<String>) =
+        userService.saveVideos(videos)
 }

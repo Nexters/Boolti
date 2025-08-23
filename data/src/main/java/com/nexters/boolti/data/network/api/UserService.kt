@@ -68,4 +68,9 @@ internal interface UserService {
     suspend fun saveLinks(
         @Body request: SaveLinksRequest,
     )
+
+    @PATCH("/app/api/v1/user/videos")
+    suspend fun saveVideos(
+        @Body request: List<String>,
+    )
 }

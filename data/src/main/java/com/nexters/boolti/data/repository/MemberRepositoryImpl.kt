@@ -38,4 +38,20 @@ internal class MemberRepositoryImpl @Inject constructor(
                 localMemberDataSource.setPerformedShows(userCode, it)
             }.map { it.toDomain() }
     }
+
+    override suspend fun getVideoLinks(userCode: String, refresh: Boolean): Result<List<String>> =
+        runCatching {
+            suspend fun getRemoteVideosAndCache(): List<String> {
+                return remoteMemberDataSource.getVideoLinks(userCode).also {
+                    localMemberDataSource.setVideoLinks(userCode, it)
+                }
+            }
+
+            if (refresh) {
+                getRemoteVideosAndCache()
+            } else {
+                localMemberDataSource.getVideoLinks(userCode)
+                    ?: getRemoteVideosAndCache()
+            }
+        }
 }

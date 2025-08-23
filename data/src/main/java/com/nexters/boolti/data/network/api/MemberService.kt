@@ -23,7 +23,7 @@ internal interface MemberService {
     ): List<HostedShowDto>
 
     @GET("/app/papi/v2/users/{userCode}/videos")
-    suspend fun getVideos(
+    suspend fun getVideoLinks(
         @Path("userCode") userCode: String,
     ): List<String>
 }

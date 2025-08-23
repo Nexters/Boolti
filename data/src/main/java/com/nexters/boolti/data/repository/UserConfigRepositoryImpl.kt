@@ -87,4 +87,18 @@ internal class UserConfigRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun saveVideos(videoLinks: List<String>): Result<Unit> =
+        runCatching {
+            userDataSource.saveVideos(videoLinks)
+        }.onSuccess {
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(
+                    user.copy(
+                        video = videoLinks.toPreviewList(3)
+                    ),
+                )
+            }
+        }
 }

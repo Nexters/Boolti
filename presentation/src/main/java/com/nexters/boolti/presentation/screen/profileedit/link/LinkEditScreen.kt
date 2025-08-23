@@ -127,7 +127,9 @@ fun LinkEditScreen(
                         color = Grey30,
                     )
                     BTTextField(
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .fillMaxWidth(),
                         text = linkName,
                         placeholder = stringResource(R.string.link_name_placeholder),
                         singleLine = true,
@@ -153,7 +155,9 @@ fun LinkEditScreen(
                         color = Grey30,
                     )
                     BTTextField(
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .fillMaxWidth(),
                         text = linkUrl,
                         placeholder = stringResource(R.string.link_url_placeholder),
                         singleLine = true,

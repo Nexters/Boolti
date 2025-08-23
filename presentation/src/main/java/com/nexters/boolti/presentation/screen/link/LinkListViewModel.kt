@@ -52,6 +52,7 @@ class LinkListViewModel @Inject constructor(
                         it.copy(
                             links = links,
                             originalLinks = links,
+                            editing = isMine && links.isEmpty(),
                         )
                     }
                 }
@@ -85,6 +86,10 @@ class LinkListViewModel @Inject constructor(
         when {
             uiState.value.editing && uiState.value.edited -> {
                 _uiState.update { it.copy(showExitAlertDialog = true) }
+            }
+
+            uiState.value.editing && uiState.value.originalLinks.isEmpty() -> {
+                linkListEvent(LinkListEvent.Finish)
             }
 
             uiState.value.editing -> {

@@ -124,7 +124,9 @@ fun VideoEditScreen(
                         color = Grey30,
                     )
                     BTTextField(
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .fillMaxWidth(),
                         text = videoUrl,
                         placeholder = stringResource(R.string.video_edit_placeholer),
                         singleLine = true,

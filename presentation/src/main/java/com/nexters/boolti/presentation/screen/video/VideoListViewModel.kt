@@ -54,6 +54,7 @@ class VideoListViewModel @Inject constructor(
                         it.copy(
                             videos = videos,
                             originalVideos = videos,
+                            editing = isMine && videos.isEmpty(),
                         )
                     }
                 }
@@ -87,6 +88,10 @@ class VideoListViewModel @Inject constructor(
         when {
             uiState.value.editing && uiState.value.edited -> {
                 _uiState.update { it.copy(showExitAlertDialog = true) }
+            }
+
+            uiState.value.editing && uiState.value.originalVideos.isEmpty() -> {
+                videoListEvent(VideoListEvent.Finish)
             }
 
             uiState.value.editing -> {
@@ -134,7 +139,7 @@ class VideoListViewModel @Inject constructor(
     fun completeAddOrEditVideo() {
         val video = uiState.value.editingVideo ?: return
         val editMode = video.id.isNotEmpty()
-        
+
         viewModelScope.launch {
             if (editMode) {
                 editVideo(video)

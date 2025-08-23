@@ -37,7 +37,7 @@ class ProfileEditViewModel @Inject constructor(
                             nickname = user.nickname,
                             introduction = user.introduction,
                             snsCount = user.sns.size,
-                            videoCount = 0,
+                            videoCount = user.video.totalSize,
                             linkCount = user.link.totalSize,
                             upcomingShowCount = user.upcomingShow.totalSize,
                             pastShowCount = user.performedShow.totalSize,

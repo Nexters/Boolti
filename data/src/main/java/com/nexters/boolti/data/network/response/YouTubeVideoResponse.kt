@@ -35,7 +35,7 @@ data class YouTubeVideoItem(
             description = snippet.description,
             channelTitle = snippet.channelTitle,
             publishedAt = snippet.publishedAt,
-            duration = contentDetails.duration,
+            duration = contentDetails.duration.parseIsoDurationToTimeString(),
             thumbnailUrl = bestThumbnail,
             url = "https://www.youtube.com/watch?v=$id",
         )
@@ -85,3 +85,28 @@ data class YouTubeThumbnail(
     @SerialName("height")
     val height: Int,
 )
+
+/**
+ * ISO 8601 duration 형식을 시간 문자열로 변환합니다.
+ * 예: PT15M33S -> "15:33", PT1H30M45S -> "1:30:45"
+ */
+internal fun String.parseIsoDurationToTimeString(): String {
+    if (!startsWith("PT")) return this
+    
+    // PT를 제거하고 파싱
+    val duration = substring(2)
+    
+    // 정규식으로 시간, 분, 초 추출
+    val hourRegex = "(\\d+)H".toRegex()
+    val minuteRegex = "(\\d+)M".toRegex()
+    val secondRegex = "(\\d+)S".toRegex()
+    
+    val hours = hourRegex.find(duration)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    val minutes = minuteRegex.find(duration)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    val seconds = secondRegex.find(duration)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    
+    return when {
+        hours > 0 -> "%d:%02d:%02d".format(hours, minutes, seconds)
+        else -> "%02d:%02d".format(minutes, seconds)
+    }
+}

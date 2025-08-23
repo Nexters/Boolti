@@ -6,12 +6,14 @@ import com.nexters.boolti.data.network.request.SaveLinksRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SaveSnsRequest
 import com.nexters.boolti.data.network.request.SaveThumbnailRequest
+import com.nexters.boolti.data.network.request.SaveUserCodeRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
 import com.nexters.boolti.data.network.response.DuplicatedResponse
 import com.nexters.boolti.data.network.response.ToggleResultDto
 import com.nexters.boolti.data.network.response.UserResponse
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.SignoutRequest
 import com.nexters.boolti.domain.request.toDto
@@ -40,6 +42,9 @@ internal class UserDataSource @Inject constructor(
 
     suspend fun saveNickname(nickname: String) =
         userService.saveNickname(SaveNicknameRequest(nickname))
+
+    suspend fun saveUserCode(userCode: UserCode) =
+        userService.saveUserCode(SaveUserCodeRequest(userCode))
 
     suspend fun saveIntroduce(introduce: String) =
         userService.saveIntroduction(SaveIntroduceRequest(introduce))

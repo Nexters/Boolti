@@ -46,13 +46,13 @@ internal class UserConfigRepositoryImpl @Inject constructor(
 
     override suspend fun saveUserCode(userCode: UserCode): Result<String> =
         runCatching {
-            userDataSource.saveNickname(userCode).nickname
-        }.onSuccess { nickname ->
+            userDataSource.saveUserCode(userCode)
+        }.onSuccess {
             val user = authDataSource.user.firstOrNull()
             if (user != null) {
-                authDataSource.updateUser(user.copy(nickname = nickname))
+                authDataSource.updateUser(user.copy(userCode = userCode))
             }
-        }
+        }.map { userCode }
 
     override suspend fun saveIntroduce(introduce: String): Result<String> =
         runCatching {

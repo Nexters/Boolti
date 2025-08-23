@@ -5,6 +5,7 @@ import com.nexters.boolti.data.network.request.SaveLinksRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SaveSnsRequest
 import com.nexters.boolti.data.network.request.SaveThumbnailRequest
+import com.nexters.boolti.data.network.request.SaveUserCodeRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
 import com.nexters.boolti.data.network.response.DuplicatedResponse
 import com.nexters.boolti.data.network.response.IntroductionResponse
@@ -54,6 +55,10 @@ internal interface UserService {
         @Body request: SaveNicknameRequest,
     ): NicknameResponse
 
+    @PATCH("/app/api/v1/user/code")
+    suspend fun saveUserCode(
+        @Body request: SaveUserCodeRequest,
+    )
 
     @PATCH("/app/api/v1/user/introduction")
     suspend fun saveIntroduction(

@@ -4,9 +4,12 @@ import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.toDomain
 import com.nexters.boolti.domain.model.Duplicated
+import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.ToggleResult
 import com.nexters.boolti.domain.model.UserCode
+import com.nexters.boolti.domain.model.map
+import com.nexters.boolti.domain.model.toPreviewList
 import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.request.toDto
 import kotlinx.coroutines.flow.firstOrNull
@@ -68,6 +71,20 @@ internal class UserConfigRepositoryImpl @Inject constructor(
             val user = authDataSource.user.firstOrNull()
             if (user != null) {
                 authDataSource.updateUser(user.copy(sns = snsList.map { it.toDto() }))
+            }
+        }
+
+    override suspend fun saveLinks(links: List<Link>): Result<Unit> =
+        runCatching {
+            userDataSource.saveLinks(links)
+        }.onSuccess {
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(
+                    user.copy(
+                        link = links.toPreviewList(3).map { it.toDto() },
+                    ),
+                )
             }
         }
 }

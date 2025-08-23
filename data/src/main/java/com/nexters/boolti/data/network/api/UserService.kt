@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.request.SaveIntroduceRequest
+import com.nexters.boolti.data.network.request.SaveLinksRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
 import com.nexters.boolti.data.network.request.SaveSnsRequest
 import com.nexters.boolti.data.network.request.SetVisibleRequest
@@ -61,5 +62,10 @@ internal interface UserService {
     @PATCH("/app/api/v1/user/sns")
     suspend fun saveSns(
         @Body request: SaveSnsRequest,
+    )
+
+    @PATCH("/app/api/v1/user/links")
+    suspend fun saveLinks(
+        @Body request: SaveLinksRequest,
     )
 }

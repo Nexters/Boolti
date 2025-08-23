@@ -11,5 +11,5 @@ sealed interface LinkListRoute {
     data object LinkList : LinkListRoute
 
     @Serializable
-    data class LinkEdit(val url: String) : LinkListRoute
+    data class LinkEdit(val isEditMode: Boolean) : LinkListRoute
 }

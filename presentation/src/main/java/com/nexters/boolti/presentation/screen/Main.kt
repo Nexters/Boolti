@@ -30,7 +30,6 @@ import com.nexters.boolti.presentation.screen.gift.giftScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
-import com.nexters.boolti.presentation.screen.link.linkListScreen2
 import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -42,7 +41,6 @@ import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScree
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.introduce.profileIntroduceEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.linkEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.nickname.profileNicknameEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.sns.profileSnsEditScreen
@@ -182,7 +180,6 @@ fun MainNavigation(
         ) {
             profileEditScreen()
             profileSnsEditScreen()
-            profileLinkEditScreen()
             profileNicknameEditScreen()
             profileUserCodeEditScreen()
             profileIntroduceEditScreen()
@@ -191,11 +188,14 @@ fun MainNavigation(
         navigation<LinkListRoute.LinkListRoot>(
             startDestination = LinkListRoute.LinkList,
         ) {
-            linkListScreen2()
-            linkEditScreen()
+            linkListScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+            linkEditScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
         }
 
-        linkListScreen()
         performedShowsScreen()
 
         addShowRegistration()

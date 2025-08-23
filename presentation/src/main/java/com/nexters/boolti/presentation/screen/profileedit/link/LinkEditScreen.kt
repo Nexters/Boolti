@@ -26,7 +26,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -35,38 +34,39 @@ import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.screen.link.LinkEditEvent
+import com.nexters.boolti.presentation.screen.link.LinkListViewModel
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 
 @Composable
 fun LinkEditScreen(
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    onAddLink: (name: String, url: String) -> Unit,
-    onEditLink: (id: String, name: String, url: String) -> Unit,
-    onRemoveLink: (id: String) -> Unit,
-    navigateBack: () -> Unit = {},
-    viewModel: LinkEditViewModel = hiltViewModel(),
+    viewModel: LinkListViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event = viewModel.linkEditEvent
+
+    ObserveAsEvents(event) {
+        when (it) {
+            LinkEditEvent.Finish -> navigateUp()
+        }
+    }
 
     LinkEditScreen(
+        isEditMode = uiState.editingLink?.id?.isNotEmpty() == true,
+        linkName = uiState.editingLink?.name.orEmpty(),
+        linkUrl = uiState.editingLink?.url.orEmpty(),
+        onClickBack = navigateUp,
+        onClickComplete = viewModel::completeAddOrEditLink,
+        onChangeLinkName = viewModel::onLinkNameChanged,
+        onChangeLinkUrl = viewModel::onLinkUrlChanged,
+        requireRemove = viewModel::removeLink,
         modifier = modifier,
-        isEditMode = uiState.isEditMode,
-        linkName = uiState.linkName,
-        linkUrl = uiState.url,
-        onClickBack = navigateBack,
-        onClickComplete = {
-            if (uiState.isEditMode) {
-                onEditLink(viewModel.editLinkId, uiState.linkName, uiState.url)
-            } else {
-                onAddLink(uiState.linkName, uiState.url)
-            }
-        },
-        onChangeLinkName = viewModel::onChangeLinkName,
-        onChangeLinkUrl = viewModel::onChangeLinkUrl,
-        requireRemove = { if (viewModel.editLinkId.isNotBlank()) onRemoveLink(viewModel.editLinkId) },
     )
 }
 

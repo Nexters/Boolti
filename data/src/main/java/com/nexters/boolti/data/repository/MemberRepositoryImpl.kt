@@ -16,12 +16,21 @@ internal class MemberRepositoryImpl @Inject constructor(
         remoteMemberDataSource.getMember(userCode).toDomain()
     }
 
-    override suspend fun getLinks(userCode: String): Result<List<Link>> = runCatching {
-        localMemberDataSource.getLinks(userCode)?.map { it.toDomain() }
-            ?: remoteMemberDataSource.getLinks(userCode).also {
-                localMemberDataSource.setLink(userCode, it)
-            }.map { it.toDomain() }
-    }
+    override suspend fun getLinks(userCode: String, refresh: Boolean): Result<List<Link>> =
+        runCatching {
+            suspend fun getRemoteLinksAndCache(): List<Link> {
+                return remoteMemberDataSource.getLinks(userCode).also {
+                    localMemberDataSource.setLink(userCode, it)
+                }.map { it.toDomain() }
+            }
+
+            if (refresh) {
+                getRemoteLinksAndCache()
+            } else {
+                localMemberDataSource.getLinks(userCode)?.map { it.toDomain() }
+                    ?: getRemoteLinksAndCache()
+            }
+        }
 
     override suspend fun getPerformedShows(userCode: String): Result<List<Show>> = runCatching {
         localMemberDataSource.getPerformedShows(userCode)?.map { it.toDomain() }

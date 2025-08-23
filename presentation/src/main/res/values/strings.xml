@@ -90,6 +90,7 @@
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>
 
     <string name="input_limit">%d/%d자</string>
+    <string name="list_total_count">전체 (%d)</string>
 
     <string name="error_network">네트워크 오류가 발생했어요</string>
 

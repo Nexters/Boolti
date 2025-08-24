@@ -32,7 +32,7 @@ class VideoListViewModel @Inject constructor(
     private val isMine = getUserUseCase()?.userCode == userCode
 
     private val _uiState = MutableStateFlow(
-        VideoListState(isMine = isMine)
+        VideoListState(isMine = isMine, loading = true)
     )
     val uiState = _uiState.asStateFlow()
 
@@ -55,10 +55,12 @@ class VideoListViewModel @Inject constructor(
                             videos = videos,
                             originalVideos = videos,
                             editing = isMine && videos.isEmpty(),
+                            loading = false,
                         )
                     }
                 }
                 .onFailure {
+                    _uiState.update { it.copy(loading = false) }
                     // TODO 에러 처리
                 }
         }

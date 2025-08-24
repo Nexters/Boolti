@@ -8,6 +8,7 @@ data class VideoListState(
     val editingVideo: YouTubeVideo? = null,
     val editing: Boolean = false,
     val saving: Boolean = false,
+    val loading: Boolean = false,
     val isMine: Boolean = false,
     val showExitAlertDialog: Boolean = false,
 ) {

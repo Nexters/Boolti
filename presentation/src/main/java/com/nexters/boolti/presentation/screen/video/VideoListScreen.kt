@@ -44,6 +44,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -92,6 +93,7 @@ fun VideoListScreen(
         showActionButton = uiState.isMine,
         actionButtonEnabled = uiState.saveEnabled,
         editing = uiState.editing,
+        loading = uiState.loading,
         showExitAlertDialog = uiState.showExitAlertDialog,
         onDismissExitAlertDialog = viewModel::dismissExitAlertDialog,
         setEditMode = viewModel::setEditMode,
@@ -111,6 +113,7 @@ private fun VideoListScreen(
     showActionButton: Boolean = false,
     actionButtonEnabled: Boolean = false,
     editing: Boolean = false,
+    loading: Boolean = false,
     showExitAlertDialog: Boolean = false,
     onDismissExitAlertDialog: () -> Unit = {},
     setEditMode: () -> Unit = {},
@@ -184,7 +187,11 @@ private fun VideoListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            if (videos.isEmpty()) {
+            if (loading) {
+                BtCircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else if (videos.isEmpty()) {
                 EmptyListAddButton(
                     onClickAdd = { onClickAdd(null) }
                 )

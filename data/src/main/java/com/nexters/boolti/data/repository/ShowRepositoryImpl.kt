@@ -1,7 +1,6 @@
 package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.ShowDataSource
-import com.nexters.boolti.data.network.response.toDomains
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.ShowDetail
@@ -13,7 +12,7 @@ internal class ShowRepositoryImpl @Inject constructor(
 ) : ShowRepository {
     override suspend fun search(keyword: String): Result<List<Show>> {
         return showDateSource.search(keyword = keyword).map {
-            it.toDomains()
+            it.map { show -> show.toDomain() }
         }
     }
 

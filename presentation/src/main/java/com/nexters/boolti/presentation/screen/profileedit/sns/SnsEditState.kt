@@ -1,18 +1,37 @@
 package com.nexters.boolti.presentation.screen.profileedit.sns
 
-import com.nexters.boolti.domain.model.Sns
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.nexters.boolti.presentation.R
 
 data class SnsEditState(
-    val snsId: String? = null,
-    val selectedSns: Sns.SnsType = Sns.SnsType.INSTAGRAM,
-    val username: String,
-    val inUseSnsTypes: List<Sns.SnsType> = emptyList(),
+    val instagramUsername: String = "",
+    val youtubeUsername: String = "",
+    val saving: Boolean = false,
+    val showExitAlertDialog: Boolean = false,
 ) {
-    val isEditMode: Boolean
-        get() = snsId != null
-    val usernameHasError: Boolean
-        get() = when (selectedSns) {
-            Sns.SnsType.INSTAGRAM -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._]+"))
-            Sns.SnsType.YOUTUBE -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._-]+"))
-        }
+    val instagramUsernameError: SnsError? = when {
+        instagramUsername.contains('@') -> SnsError.ContainsAtSign
+        instagramUsername.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._]+")) -> SnsError.ContainsUnsupportedCharacter
+        else -> null
+    }
+    val youtubeUsernameError: SnsError? = when {
+        youtubeUsername.contains('@') -> SnsError.ContainsAtSign
+        youtubeUsername.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._-]+")) -> SnsError.ContainsUnsupportedCharacter
+        else -> null
+    }
+    val saveEnabled: Boolean =
+        instagramUsernameError == null && youtubeUsernameError == null && !saving
 }
+
+enum class SnsError {
+    ContainsAtSign, ContainsUnsupportedCharacter
+}
+
+internal val SnsError?.message: String?
+    @Composable
+    get() = when (this) {
+        SnsError.ContainsAtSign -> stringResource(R.string.sns_edit_error_contains_at_sign)
+        SnsError.ContainsUnsupportedCharacter -> stringResource(R.string.sns_edit_error_contains_unsupported_character)
+        null -> null
+    }

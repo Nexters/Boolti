@@ -13,34 +13,7 @@ fun NavGraphBuilder.profileSnsEditScreen(
         val navController = LocalNavController.current
         SnsEditScreen(
             modifier = modifier,
-            onAddSns = { type, username ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.apply {
-                        set("newSnsType", type)
-                        set("newSnsUsername", username)
-                    }
-                navController.popBackStack()
-            },
-            onEditSns = { id, type, username ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.apply {
-                        set("editSnsId", id)
-                        set("editSnsType", type)
-                        set("editSnsUsername", username)
-                    }
-                navController.popBackStack()
-            },
-            onRemoveSns = { id ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.apply {
-                        set("removeSnsId", id)
-                    }
-                navController.popBackStack()
-            },
-            navigateBack = navController::popBackStack,
+            navigateUp = navController::popBackStack,
         )
     }
 }

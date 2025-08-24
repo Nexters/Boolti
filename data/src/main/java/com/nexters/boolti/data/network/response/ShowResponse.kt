@@ -25,5 +25,3 @@ internal data class ShowResponse(
         )
     }
 }
-
-internal fun List<ShowResponse>.toDomains(): List<Show> = this.map { it.toDomain() }

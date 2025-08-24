@@ -11,6 +11,7 @@ import com.nexters.boolti.data.network.api.LoginService
 import com.nexters.boolti.data.network.request.RefreshRequest
 import com.nexters.boolti.data.network.response.SignUpResponse
 import com.nexters.boolti.data.network.response.UserResponse
+import com.nexters.boolti.domain.model.PreviewList
 import com.nexters.boolti.domain.request.LoginRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -41,8 +42,28 @@ internal class AuthDataSource @Inject constructor(
                         userCode = it.userCode,
                         introduction = it.profileIntroduction,
                         sns = it.profileSns,
-                        link = it.profileLink,
-                        performedShow = it.performedShow,
+                        link = PreviewList(
+                            totalSize = it.profileLinkCount,
+                            hasMoreItems = it.hasMoreLink,
+                            previewItems = it.profileLink,
+                        ),
+                        comingSoonShow = PreviewList(
+                            totalSize = it.upcomingShowCount,
+                            hasMoreItems = it.hasMoreUpcomingShow,
+                            previewItems = it.upcomingShow,
+                            isVisible = it.showUpcomingShow,
+                        ),
+                        performedShow = PreviewList(
+                            totalSize = it.performedShowCount,
+                            hasMoreItems = it.hasMorePerformedShow,
+                            previewItems = it.performedShow,
+                            isVisible = it.showPerformedShow,
+                        ),
+                        video = PreviewList(
+                            totalSize = it.videoCount,
+                            hasMoreItems = it.hasMoreVideoItem,
+                            previewItems = it.video,
+                        ),
                     )
                 }
             }
@@ -75,6 +96,22 @@ internal class AuthDataSource @Inject constructor(
                 profileIntroduction = "",
                 profileSns = emptyList(),
                 profileLink = emptyList(),
+                hasMoreLink = false,
+
+                performedShow = emptyList(),
+                performedShowCount = 0,
+                hasMorePerformedShow = false,
+                showPerformedShow = false,
+
+                upcomingShow = emptyList(),
+                upcomingShowCount = 0,
+                hasMoreUpcomingShow = false,
+                showUpcomingShow = false,
+
+                videoCount = 0,
+                hasMoreVideoItem = false,
+                video = emptyList(),
+
                 accessToken = "",
                 refreshToken = "",
             )
@@ -98,8 +135,24 @@ internal class AuthDataSource @Inject constructor(
                 userCode = user.userCode,
                 profileIntroduction = user.introduction,
                 profileSns = user.sns,
-                profileLink = user.link,
-                performedShow = user.performedShow,
+
+                profileLink = user.link.previewItems,
+                profileLinkCount = user.link.totalSize,
+                hasMoreLink = user.link.hasMoreItems,
+
+                performedShow = user.performedShow.previewItems,
+                performedShowCount = user.performedShow.totalSize,
+                hasMorePerformedShow = user.performedShow.hasMoreItems,
+                showPerformedShow = user.performedShow.isVisible == true,
+
+                upcomingShow = user.comingSoonShow.previewItems,
+                upcomingShowCount = user.comingSoonShow.totalSize,
+                hasMoreUpcomingShow = user.comingSoonShow.hasMoreItems,
+                showUpcomingShow = user.comingSoonShow.isVisible == true,
+
+                videoCount = user.video.totalSize,
+                hasMoreVideoItem = user.video.hasMoreItems,
+                video = user.video.previewItems,
             )
         }
         Firebase.analytics.apply {

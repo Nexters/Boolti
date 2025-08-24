@@ -3,8 +3,8 @@ package com.nexters.boolti.presentation.screen.perforemdshows
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.repository.MemberRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,6 @@ import javax.inject.Inject
 class PerformedShowsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val memberRepository: MemberRepository,
-    private val getUserUsecase: GetUserUsecase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(PerformedShowsState())
     val uiState = _uiState.asStateFlow()
@@ -33,32 +32,18 @@ class PerformedShowsViewModel @Inject constructor(
     }
 
     private fun initLoad() {
-        savedStateHandle.toRoute<MainRoute.PerformedShows>().userCode?.let { userCode ->
-            fetchOthersShows(userCode)
-        } ?: fetchMyShows()
+        savedStateHandle.toRoute<MainRoute.PerformedShows>().userCode.let(::fetchShows)
     }
 
-    private fun fetchMyShows() {
-        _uiState.update { it.copy(loading = true) }
-        getUserUsecase()?.performedShow?.let { shows ->
-            _uiState.update {
-                it.copy(
-                    loading = false,
-                    shows = shows,
-                )
-            }
-        } ?: event(PerformedShowsEvent.FetchFailed)
-    }
-
-    private fun fetchOthersShows(userCode: String) {
+    private fun fetchShows(userCode: UserCode) {
         _uiState.update { it.copy(loading = true) }
         viewModelScope.launch(recordExceptionHandler) {
-            memberRepository.getMember(userCode)
-                .onSuccess { member ->
+            memberRepository.getPerformedShows(userCode)
+                .onSuccess { shows ->
                     _uiState.update {
                         it.copy(
                             loading = false,
-                            shows = member.performedShow,
+                            shows = shows,
                         )
                     }
                 }

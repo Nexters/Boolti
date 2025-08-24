@@ -31,16 +31,21 @@ import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
+import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
+import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
-import com.nexters.boolti.presentation.screen.profileedit.link.profileLinkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.introduce.profileIntroduceEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.link.linkEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.nickname.profileNicknameEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.sns.profileSnsEditScreen
+import com.nexters.boolti.presentation.screen.profileedit.usercode.profileUserCodeEditScreen
 import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
 import com.nexters.boolti.presentation.screen.qr.qrFullScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
@@ -53,6 +58,8 @@ import com.nexters.boolti.presentation.screen.showregistration.addShowRegistrati
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
+import com.nexters.boolti.presentation.screen.video.videoEditScreen
+import com.nexters.boolti.presentation.screen.video.videoListScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -176,10 +183,33 @@ fun MainNavigation(
         ) {
             profileEditScreen()
             profileSnsEditScreen()
-            profileLinkEditScreen()
+            profileNicknameEditScreen()
+            profileUserCodeEditScreen()
+            profileIntroduceEditScreen()
         }
 
-        linkListScreen()
+        navigation<LinkListRoute.LinkListRoot>(
+            startDestination = LinkListRoute.LinkList,
+        ) {
+            linkListScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+            linkEditScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+        }
+
+        navigation<VideoListRoute.VideoListRoot>(
+            startDestination = VideoListRoute.VideoList,
+        ) {
+            videoListScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+            videoEditScreen(
+                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            )
+        }
+
         performedShowsScreen()
 
         addShowRegistration()

@@ -5,23 +5,23 @@ import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.Show
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Serializable
 internal data class HostedShowDto(
-    @SerialName("showId") val showId: String,
-    @SerialName("showName") val showName: String,
+    @SerialName("id") val showId: String,
+    @SerialName("name") val showName: String,
     @SerialName("date") val date: String,
-    @SerialName("salesStartTime") val salesStartDate: String,
-    @SerialName("salesEndTime") val salesEndDate: String,
+    @SerialName("salesStartTime") val salesStartDate: String?,
+    @SerialName("salesEndTime") val salesEndDate: String?,
+    @SerialName("showImg") val thumbnailImage: String,
+    @SerialName("isNonTicketing") val isNonTicketing: Boolean,
 ) {
     fun toDomain(): Show = Show(
         id = showId,
         name = showName,
         date = date.toLocalDateTime(),
-        salesStartDate = salesStartDate.toLocalDate(),
-        salesEndDate = salesEndDate.toLocalDate(),
-        thumbnailImage = "",
+        salesStartDate = salesStartDate?.toLocalDate(),
+        salesEndDate = salesEndDate?.toLocalDate(),
+        thumbnailImage = thumbnailImage,
     )
 }

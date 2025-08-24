@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.profileedit.link
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,10 @@ fun LinkEditScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.linkEditEvent
 
+    BackHandler {
+        viewModel.tryBack()
+    }
+
     ObserveAsEvents(event) {
         when (it) {
             LinkEditEvent.Finish -> navigateUp()
@@ -61,7 +66,7 @@ fun LinkEditScreen(
         isEditMode = uiState.editingLink?.id?.isNotEmpty() == true,
         linkName = uiState.editingLink?.name.orEmpty(),
         linkUrl = uiState.editingLink?.url.orEmpty(),
-        onClickBack = navigateUp,
+        onClickBack = viewModel::tryBack,
         onClickComplete = viewModel::completeAddOrEditLink,
         onChangeLinkName = viewModel::onLinkNameChanged,
         onChangeLinkUrl = viewModel::onLinkUrlChanged,

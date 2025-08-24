@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +44,6 @@ import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.ReorderableLazyListState
@@ -78,6 +78,7 @@ fun LinkListScreen(
         onSave = viewModel::save,
         tryBack = viewModel::tryBack,
         navigateUp = navigateUp,
+        navigateToEditLink = navigateToEditLink,
         event = viewModel.linkListEvent,
         modifier = modifier,
         showActionButton = uiState.isMine,
@@ -97,6 +98,7 @@ private fun LinkListScreen(
     onSave: () -> Unit,
     tryBack: () -> Unit,
     navigateUp: () -> Unit,
+    navigateToEditLink: () -> Unit,
     event: Flow<LinkListEvent>,
     modifier: Modifier = Modifier,
     showActionButton: Boolean = false,
@@ -123,21 +125,25 @@ private fun LinkListScreen(
     val linkEditMsg = stringResource(R.string.link_edit_msg)
     val linkRemoveMsg = stringResource(R.string.link_remove_msg)
 
-    ObserveAsEvents(event) {
-        when (it) {
-            is LinkListEvent.Added -> {
-                snackbarHostState.showMessage(linkAddMsg)
-            }
+    LaunchedEffect(Unit) {
+        event.collect {
+            when (it) {
+                is LinkListEvent.Added -> {
+                    snackbarHostState.showMessage(linkAddMsg)
+                }
 
-            is LinkListEvent.Edited -> {
-                snackbarHostState.showMessage(linkEditMsg)
-            }
+                is LinkListEvent.Edited -> {
+                    snackbarHostState.showMessage(linkEditMsg)
+                }
 
-            is LinkListEvent.Removed -> {
-                snackbarHostState.showMessage(linkRemoveMsg)
-            }
+                is LinkListEvent.Removed -> {
+                    snackbarHostState.showMessage(linkRemoveMsg)
+                }
 
-            is LinkListEvent.Finish -> navigateUp()
+                is LinkListEvent.Finish -> navigateUp()
+
+                is LinkListEvent.NavigateToEdit -> navigateToEditLink()
+            }
         }
     }
 

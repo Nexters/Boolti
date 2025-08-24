@@ -28,6 +28,7 @@ class LinkListViewModel @Inject constructor(
 ) : ViewModel() {
     private val userCode = savedStateHandle.toRoute<LinkListRoute.LinkListRoot>().userCode
     private val isMine = getUserUseCase()?.userCode == userCode
+    private var autoNavigatedToEdit = false
 
     private val _uiState = MutableStateFlow(
         LinkListState(isMine = isMine)
@@ -54,6 +55,10 @@ class LinkListViewModel @Inject constructor(
                             originalLinks = links,
                             editing = isMine && links.isEmpty(),
                         )
+                    }
+                    if (isMine && links.isEmpty()) {
+                        autoNavigatedToEdit = true
+                        linkListEvent(LinkListEvent.NavigateToEdit)
                     }
                 }
                 .onFailure {
@@ -84,6 +89,11 @@ class LinkListViewModel @Inject constructor(
 
     fun tryBack() {
         when {
+            uiState.value.editing && autoNavigatedToEdit && !uiState.value.saveEnabled -> {
+                linkEditEvent(LinkEditEvent.Finish)
+                linkListEvent(LinkListEvent.Finish)
+            }
+
             uiState.value.editing && uiState.value.edited -> {
                 _uiState.update { it.copy(showExitAlertDialog = true) }
             }
@@ -142,10 +152,11 @@ class LinkListViewModel @Inject constructor(
         val targetLink = uiState.value.editingLink ?: return
         _uiState.update {
             it.copy(
-                links = it.links.filterNot { it.id == targetLink.id },
+                links = it.links.filterNot { link -> link.id == targetLink.id },
                 editingLink = null,
             )
         }
+        autoNavigatedToEdit = false
         linkEditEvent(LinkEditEvent.Finish)
         linkListEvent(LinkListEvent.Removed)
     }
@@ -158,6 +169,7 @@ class LinkListViewModel @Inject constructor(
         } else {
             addLink(link)
         }
+        autoNavigatedToEdit = false
         linkEditEvent(LinkEditEvent.Finish)
         linkListEvent(
             if (editMode) LinkListEvent.Edited else LinkListEvent.Added,

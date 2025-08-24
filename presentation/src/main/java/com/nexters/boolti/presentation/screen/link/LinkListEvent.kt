@@ -5,6 +5,7 @@ sealed interface LinkListEvent {
     data object Edited : LinkListEvent
     data object Removed : LinkListEvent
     data object Finish : LinkListEvent
+    data object NavigateToEdit : LinkListEvent
 }
 
 sealed interface LinkEditEvent {

@@ -290,8 +290,7 @@ private fun VideoItems(
                 key = video.localId,
             ) {
                 VideoItem(
-                    modifier = Modifier
-                        .clickable(onClick = { onClick(video.localId) }),
+                    onClick = { onClick(video.localId) },
                     video = video,
                     showHandle = reorderable,
                     reorderableState = reorderableState,
@@ -305,12 +304,14 @@ private fun VideoItems(
 fun VideoItem(
     video: YouTubeVideo,
     showHandle: Boolean,
-    reorderableState: ReorderableLazyListState,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    reorderableState: ReorderableLazyListState? = null,
 ) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(4.dp))
+            .clickable(onClick = onClick)
             .fillMaxWidth()
             .height(90.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -344,12 +345,18 @@ fun VideoItem(
             )
         }
 
+        val reorderableModifier = if (reorderableState != null) {
+            Modifier.detectReorder(state = reorderableState)
+        } else {
+            Modifier
+        }
+
         if (showHandle) {
             Icon(
                 modifier = Modifier
                     .padding(start = 16.dp)
                     .size(24.dp)
-                    .detectReorder(state = reorderableState),
+                    .then(reorderableModifier),
                 imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
                 tint = Grey70,
                 contentDescription = null,

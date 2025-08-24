@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -60,6 +61,7 @@ import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.PreviewList
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.domain.model.emptyPreviewList
 import com.nexters.boolti.domain.model.url
 import com.nexters.boolti.presentation.R
@@ -69,6 +71,7 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.video.VideoItem
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -100,6 +103,7 @@ fun ProfileScreen(
     ProfileScreen(
         modifier = modifier,
         user = uiState.user,
+        videos = uiState.youtubeVideos,
         isMine = uiState.isMine,
         event = event,
         onClickBack = onClickBack,
@@ -124,6 +128,7 @@ fun ProfileScreen(
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     user: User,
+    videos: List<YouTubeVideo>,
     isMine: Boolean,
     event: Flow<ProfileEvent>,
     onClickBack: () -> Unit,
@@ -261,23 +266,28 @@ fun ProfileScreen(
                         null
                     },
                 ) {
-                    /*user.video.previewItems.forEachIndexed { i, video ->
+                    videos.forEachIndexed { i, video ->
+                        Spacer(
+                            Modifier.height(if (i == 0) 16.dp else 20.dp)
+                        )
+
                         VideoItem(
+                            modifier = Modifier.padding(horizontal = marginHorizontal),
+                            onClick = {
+                                try {
+                                    uriHandler.openUri(video.url)
+                                } catch (e: ActivityNotFoundException) {
+                                    e.printStackTrace()
+                                    snackbarHostState.showMessage(invalidUrlMsg)
+                                } catch (e: IllegalArgumentException) {
+                                    e.printStackTrace()
+                                    snackbarHostState.showMessage(invalidUrlMsg)
+                                }
+                            },
                             video = video,
                             showHandle = false,
-                            reorderableState = rememberReorderableLazyListState(),
                         )
-                        ShowItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = if (i == 0) 0.dp else 20.dp)
-                                .padding(horizontal = marginHorizontal),
-                            show = show,
-                            backgroundColor = MaterialTheme.colorScheme.background,
-                            onClick = { navigateToShow(show.id) },
-                            contentPadding = PaddingValues(),
-                        )
-                    }*/
+                    }
                 }
                 Divider()
             }
@@ -294,7 +304,7 @@ fun ProfileScreen(
                     user.link.previewItems.forEachIndexed { i, link ->
                         LinkItem(
                             modifier = Modifier
-                                .padding(top = if (i == 0) 0.dp else 16.dp)
+                                .padding(top = 16.dp)
                                 .padding(horizontal = marginHorizontal),
                             link = link,
                             onClick = {
@@ -672,6 +682,7 @@ private fun ProfileScreenPreview() {
     BooltiTheme {
         ProfileScreen(
             user = user,
+            videos = emptyList(),
             isMine = false,
             event = emptyFlow(),
             onClickBack = {},

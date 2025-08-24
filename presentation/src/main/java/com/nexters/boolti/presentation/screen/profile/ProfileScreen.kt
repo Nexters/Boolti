@@ -57,6 +57,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.model.PreviewList
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.emptyPreviewList
@@ -87,6 +88,8 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: (userCode: String) -> Unit,
+    navigateToVideos: (userCode: String) -> Unit,
+    navigateToUpcomingShows: (userCode: String) -> Unit,
     navigateToPerformedShows: (userCode: String) -> Unit,
     navigateToShow: (showId: String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
@@ -104,6 +107,12 @@ fun ProfileScreen(
         navigateToLinks = {
             navigateToLinks(uiState.user.userCode)
         },
+        navigateToVideos = {
+            navigateToVideos(uiState.user.userCode)
+        },
+        navigateToUpcomingShows = {
+            navigateToUpcomingShows(uiState.user.userCode)
+        },
         navigateToPerformedShows = {
             navigateToPerformedShows(uiState.user.userCode)
         },
@@ -120,6 +129,8 @@ fun ProfileScreen(
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: () -> Unit,
+    navigateToVideos: () -> Unit,
+    navigateToUpcomingShows: () -> Unit,
     navigateToPerformedShows: () -> Unit,
     navigateToShow: (showId: String) -> Unit,
 ) {
@@ -189,11 +200,89 @@ fun ProfileScreen(
                 },
             )
 
-            if (user.link.previewItems.isNotEmpty() || user.performedShow.previewItems.isNotEmpty()) {
-                Spacer(Modifier.size(8.dp))
+            Spacer(Modifier.size(8.dp))
+
+            if (user.upcomingShow.visible) {
+                Section(
+                    title = stringResource(R.string.upcoming_shows),
+                    onClickShowAll = if (user.upcomingShow.hasMoreItems) {
+                        { navigateToUpcomingShows() }
+                    } else {
+                        null
+                    },
+                ) {
+                    user.upcomingShow.previewItems.forEachIndexed { i, show ->
+                        ShowItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = if (i == 0) 0.dp else 20.dp)
+                                .padding(horizontal = marginHorizontal),
+                            show = show,
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            onClick = { navigateToShow(show.id) },
+                            contentPadding = PaddingValues(),
+                        )
+                    }
+                }
+                Divider()
             }
 
-            if (user.link.previewItems.isNotEmpty()) { // 링크가 있으면
+            if (user.performedShow.visible) {
+                Section(
+                    title = stringResource(R.string.last_shows),
+                    onClickShowAll = if (user.performedShow.hasMoreItems) {
+                        { navigateToPerformedShows() }
+                    } else {
+                        null
+                    },
+                ) {
+                    user.upcomingShow.previewItems.forEachIndexed { i, show ->
+                        ShowItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = if (i == 0) 0.dp else 20.dp)
+                                .padding(horizontal = marginHorizontal),
+                            show = show,
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            onClick = { navigateToShow(show.id) },
+                            contentPadding = PaddingValues(),
+                        )
+                    }
+                }
+                Divider()
+            }
+
+            if (user.video.visible) {
+                Section(
+                    title = stringResource(R.string.video),
+                    onClickShowAll = if (user.video.hasMoreItems) {
+                        { navigateToVideos() }
+                    } else {
+                        null
+                    },
+                ) {
+                    /*user.video.previewItems.forEachIndexed { i, video ->
+                        VideoItem(
+                            video = video,
+                            showHandle = false,
+                            reorderableState = rememberReorderableLazyListState(),
+                        )
+                        ShowItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = if (i == 0) 0.dp else 20.dp)
+                                .padding(horizontal = marginHorizontal),
+                            show = show,
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            onClick = { navigateToShow(show.id) },
+                            contentPadding = PaddingValues(),
+                        )
+                    }*/
+                }
+                Divider()
+            }
+
+            if (user.link.visible) { // 링크가 있으면
                 Section(
                     title = stringResource(R.string.profile_links_title),
                     onClickShowAll = if (user.link.hasMoreItems) {
@@ -220,7 +309,7 @@ fun ProfileScreen(
                 }
             }
 
-            if (user.link.previewItems.isNotEmpty() && user.performedShow.previewItems.isNotEmpty()) {
+            /*if (user.link.previewItems.isNotEmpty() && user.performedShow.previewItems.isNotEmpty()) {
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = marginHorizontal),
                     color = Grey85,
@@ -249,7 +338,7 @@ fun ProfileScreen(
                         )
                     }
                 }
-            }
+            }*/
 
             Spacer(Modifier.size(32.dp))
         }
@@ -544,6 +633,14 @@ fun LinkItem(
     }
 }
 
+@Composable
+private fun Divider(modifier: Modifier = Modifier) {
+    HorizontalDivider(
+        modifier = modifier.padding(horizontal = marginHorizontal),
+        color = Grey85,
+    )
+}
+
 @Preview
 @Composable
 private fun SectionPreview() {
@@ -580,8 +677,13 @@ private fun ProfileScreenPreview() {
             onClickBack = {},
             navigateToProfileEdit = {},
             navigateToLinks = {},
+            navigateToVideos = {},
             navigateToShow = {},
+            navigateToUpcomingShows = {},
             navigateToPerformedShows = {},
         )
     }
 }
+
+private val <T : Any> PreviewList<T>.visible: Boolean
+    get() = totalSize > 0 && isVisible != false

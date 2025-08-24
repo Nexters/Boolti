@@ -291,7 +291,6 @@ private fun VideoItems(
             ) {
                 VideoItem(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
                         .clickable(onClick = { onClick(video.localId) }),
                     video = video,
                     showHandle = reorderable,
@@ -303,7 +302,7 @@ private fun VideoItems(
 }
 
 @Composable
-private fun VideoItem(
+fun VideoItem(
     video: YouTubeVideo,
     showHandle: Boolean,
     reorderableState: ReorderableLazyListState,
@@ -311,6 +310,7 @@ private fun VideoItem(
 ) {
     Row(
         modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
             .fillMaxWidth()
             .height(90.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

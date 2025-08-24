@@ -8,6 +8,7 @@ import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 
 fun NavGraphBuilder.profileScreen(
     modifier: Modifier = Modifier,
@@ -19,6 +20,12 @@ fun NavGraphBuilder.profileScreen(
             onClickBack = navController::popBackStack,
             navigateToLinks = { userCode ->
                 navController.navigate(LinkListRoute.LinkListRoot(userCode))
+            },
+            navigateToUpcomingShows = {
+
+            },
+            navigateToVideos = { userCode ->
+                navController.navigate(VideoListRoute.VideoListRoot(userCode))
             },
             navigateToPerformedShows = { userCode ->
                 navController.navigate(MainRoute.PerformedShows(userCode))

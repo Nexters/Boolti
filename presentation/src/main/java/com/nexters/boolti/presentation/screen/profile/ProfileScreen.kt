@@ -19,7 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +71,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.HorizontalShowItem
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -241,17 +245,19 @@ fun ProfileScreen(
                         null
                     },
                 ) {
-                    user.upcomingShow.previewItems.forEachIndexed { i, show ->
-                        ShowItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = if (i == 0) 0.dp else 20.dp)
-                                .padding(horizontal = marginHorizontal),
-                            show = show,
-                            backgroundColor = MaterialTheme.colorScheme.background,
-                            onClick = { navigateToShow(show.id) },
-                            contentPadding = PaddingValues(),
-                        )
+                    LazyRow {
+                        item { Spacer(Modifier.width(20.dp)) }
+                        items(
+                            items = user.performedShow.previewItems,
+                            key = { it.id },
+                        ) { show ->
+                            HorizontalShowItem(
+                                modifier = Modifier.padding(end = 16.dp),
+                                show = show,
+                                onClick = { navigateToShow(show.id) },
+                            )
+                        }
+                        item { Spacer(Modifier.width(4.dp)) }
                     }
                 }
                 Divider()

@@ -30,6 +30,7 @@ class VideoListViewModel @Inject constructor(
 ) : ViewModel() {
     private val userCode = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>().userCode
     private val isMine = getUserUseCase()?.userCode == userCode
+    private var autoNavigatedToEdit = false
 
     private val _uiState = MutableStateFlow(
         VideoListState(isMine = isMine, loading = true)
@@ -57,6 +58,10 @@ class VideoListViewModel @Inject constructor(
                             editing = isMine && videos.isEmpty(),
                             loading = false,
                         )
+                    }
+                    if (isMine && videos.isEmpty()) {
+                        autoNavigatedToEdit = true
+                        videoListEvent(VideoListEvent.NavigateToEdit)
                     }
                 }
                 .onFailure {
@@ -88,6 +93,11 @@ class VideoListViewModel @Inject constructor(
 
     fun tryBack() {
         when {
+            uiState.value.editing && autoNavigatedToEdit && !uiState.value.saveEnabled -> {
+                videoEditEvent(VideoEditEvent.Finish)
+                videoListEvent(VideoListEvent.Finish)
+            }
+
             uiState.value.editing && uiState.value.edited -> {
                 _uiState.update { it.copy(showExitAlertDialog = true) }
             }
@@ -130,10 +140,11 @@ class VideoListViewModel @Inject constructor(
         val targetVideo = uiState.value.editingVideo ?: return
         _uiState.update {
             it.copy(
-                videos = it.videos.filterNot { it.localId == targetVideo.localId },
+                videos = it.videos.filterNot { video -> video.localId == targetVideo.localId },
                 editingVideo = null,
             )
         }
+        autoNavigatedToEdit = false
         videoEditEvent(VideoEditEvent.Finish)
         videoListEvent(VideoListEvent.Removed)
     }
@@ -163,6 +174,7 @@ class VideoListViewModel @Inject constructor(
                     addVideo(invalidVideo)
                     videoListEvent(VideoListEvent.Added)
                 }
+                autoNavigatedToEdit = false
                 videoEditEvent(VideoEditEvent.Finish)
             }
         }

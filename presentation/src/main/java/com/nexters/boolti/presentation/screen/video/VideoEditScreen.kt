@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.video
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -50,6 +51,10 @@ fun VideoEditScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.videoEditEvent
 
+    BackHandler {
+        viewModel.tryBack()
+    }
+
     ObserveAsEvents(event) {
         when (it) {
             VideoEditEvent.Finish -> navigateUp()
@@ -57,9 +62,9 @@ fun VideoEditScreen(
     }
 
     VideoEditScreen(
-        isEditMode = uiState.editingVideo?.id?.isNotEmpty() == true,
+        isEditMode = uiState.editingVideo?.localId?.isNotEmpty() == true,
         videoUrl = uiState.editingVideo?.url.orEmpty(),
-        onClickBack = navigateUp,
+        onClickBack = viewModel::tryBack,
         onClickComplete = viewModel::completeAddOrEditVideo,
         onChangeVideoUrl = viewModel::onVideoUrlChanged,
         requireRemove = viewModel::removeVideo,

@@ -20,7 +20,7 @@ class YouTubeRepositoryImpl @Inject constructor(
 
             val response = youtubeService.getVideoInfo(
                 id = videoId,
-                key = BuildConfig.YOUTUBE_API_KEY
+                key = BuildConfig.YOUTUBE_API_KEY,
             )
 
             response.items.firstOrNull()?.toYouTubeVideo()

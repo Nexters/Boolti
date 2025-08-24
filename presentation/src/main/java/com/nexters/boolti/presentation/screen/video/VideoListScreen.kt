@@ -88,6 +88,7 @@ fun VideoListScreen(
         onSave = viewModel::save,
         tryBack = viewModel::tryBack,
         navigateUp = navigateUp,
+        navigateToEditVideo = navigateToEditVideo,
         event = viewModel.videoListEvent,
         modifier = modifier,
         showActionButton = uiState.isMine,
@@ -108,6 +109,7 @@ private fun VideoListScreen(
     onSave: () -> Unit,
     tryBack: () -> Unit,
     navigateUp: () -> Unit,
+    navigateToEditVideo: () -> Unit,
     event: Flow<VideoListEvent>,
     modifier: Modifier = Modifier,
     showActionButton: Boolean = false,
@@ -150,6 +152,8 @@ private fun VideoListScreen(
             }
 
             is VideoListEvent.Finish -> navigateUp()
+            
+            is VideoListEvent.NavigateToEdit -> navigateToEditVideo()
         }
     }
 

@@ -22,11 +22,33 @@ internal class UserConfigRepositoryImpl @Inject constructor(
     override suspend fun setUpcomingShowVisible(visible: Boolean): Result<ToggleResult> =
         runCatching {
             userDataSource.setUpcomingShowVisible(visible).toDomain()
+        }.onSuccess { result ->
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(
+                    user.copy(
+                        comingSoonShow = user.comingSoonShow.copy(
+                            isVisible = result.value,
+                        )
+                    )
+                )
+            }
         }
 
     override suspend fun setPastShowVisible(visible: Boolean): Result<ToggleResult> =
         runCatching {
             userDataSource.setPastShowVisible(visible).toDomain()
+        }.onSuccess { result ->
+            val user = authDataSource.user.firstOrNull()
+            if (user != null) {
+                authDataSource.updateUser(
+                    user.copy(
+                        performedShow = user.performedShow.copy(
+                            isVisible = result.value,
+                        )
+                    )
+                )
+            }
         }
 
     override suspend fun checkUserCodeDuplicated(userCode: UserCode): Result<Duplicated> =

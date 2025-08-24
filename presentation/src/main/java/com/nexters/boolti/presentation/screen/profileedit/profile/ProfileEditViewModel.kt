@@ -55,7 +55,8 @@ class ProfileEditViewModel @Inject constructor(
     fun changeThumbnail(file: File?) {
         file ?: return
         viewModelScope.launch {
-            val newThumbnailUrl = fileRepository.requestUrlForUpload(file).getOrNull() ?: return@launch
+            val newThumbnailUrl =
+                fileRepository.requestUrlForUpload(file).getOrNull() ?: return@launch
             userConfigRepository.saveThumbnail(newThumbnailUrl)
         }
     }
@@ -63,18 +64,12 @@ class ProfileEditViewModel @Inject constructor(
     fun toggleShowUpcomingShows() {
         viewModelScope.launch {
             userConfigRepository.setUpcomingShowVisible(!uiState.value.showUpcomingShows)
-                .onSuccess { result ->
-                    _uiState.update { it.copy(showUpcomingShows = result.value) }
-                }
         }
     }
 
     fun toggleShowPerformedShows() {
         viewModelScope.launch {
             userConfigRepository.setPastShowVisible(!uiState.value.showPerformedShows)
-                .onSuccess { result ->
-                    _uiState.update { it.copy(showPerformedShows = result.value) }
-                }
         }
     }
 }

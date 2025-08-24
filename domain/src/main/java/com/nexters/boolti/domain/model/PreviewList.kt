@@ -14,7 +14,8 @@ fun <P : Any, Q : Any> PreviewList<P>.map(transform: (P) -> Q): PreviewList<Q> =
     PreviewList(
         totalSize = totalSize,
         hasMoreItems = hasMoreItems,
-        previewItems = previewItems.map(transform)
+        previewItems = previewItems.map(transform),
+        isVisible = isVisible,
     )
 
 inline fun <reified T : Any> emptyPreviewList() =

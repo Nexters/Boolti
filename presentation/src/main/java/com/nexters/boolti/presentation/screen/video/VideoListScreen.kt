@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.video
 
 import android.content.ActivityNotFoundException
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -49,6 +49,8 @@ import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
@@ -327,14 +329,12 @@ fun VideoItem(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentHeight(),
-                text = video.title,
+                text = video.title.ifEmpty { stringResource(R.string.unknown_video) },
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 overflow = TextOverflow.Ellipsis,
+                lineHeight = 22.sp,
                 maxLines = 2,
             )
             Text(
@@ -383,11 +383,26 @@ private fun VideoThumbnail(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        // TODO default thumbnail
-        AsyncImage(
+        SubcomposeAsyncImage(
             modifier = Modifier.fillMaxSize(),
-            model = thumbnailUrl,
-            contentDescription = description,
+            model = thumbnailUrl.takeIf { it.isNotEmpty() },
+            contentDescription = description?.ifEmpty { stringResource(R.string.unknown_video) },
+            error = {
+                // fallback UI 표시
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Grey80),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(width = 77.dp, height = 29.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_logo_boolti),
+                        tint = Grey90,
+                        contentDescription = stringResource(R.string.description_app_logo),
+                    )
+                }
+            }
         )
     }
 }

@@ -5,6 +5,7 @@ import com.nexters.boolti.data.network.api.YouTubeService
 import com.nexters.boolti.data.util.YouTubeUrlUtils
 import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.domain.repository.YouTubeRepository
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,12 +17,12 @@ class YouTubeRepositoryImpl @Inject constructor(
     override suspend fun getVideoInfo(videoId: String): YouTubeVideo? {
         return try {
             if (!YouTubeUrlUtils.isValidVideoId(videoId)) return null
-            
+
             val response = youtubeService.getVideoInfo(
                 id = videoId,
                 key = BuildConfig.YOUTUBE_API_KEY
             )
-            
+
             response.items.firstOrNull()?.toYouTubeVideo()
         } catch (e: Exception) {
             null
@@ -29,18 +30,12 @@ class YouTubeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getVideoInfoList(videoIds: List<String>): List<YouTubeVideo> {
-        return try {
-            val validVideoIds = videoIds.filter { YouTubeUrlUtils.isValidVideoId(it) }
-            if (validVideoIds.isEmpty()) return emptyList()
-            
-            val response = youtubeService.getVideoInfo(
-                id = validVideoIds.joinToString(","),
-                key = BuildConfig.YOUTUBE_API_KEY
-            )
-            
-            response.items.map { it.toYouTubeVideo() }
-        } catch (e: Exception) {
-            emptyList()
+        return videoIds.map { videoId ->
+            if (YouTubeUrlUtils.isValidVideoId(videoId)) {
+                getVideoInfo(videoId) ?: createInvalidVideoById(videoId)
+            } else {
+                createInvalidVideoById(videoId)
+            }
         }
     }
 
@@ -50,7 +45,28 @@ class YouTubeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getVideoInfoByUrlList(urls: List<String>): List<YouTubeVideo> {
-        val videoIds = urls.mapNotNull { YouTubeUrlUtils.extractVideoId(it) }
-        return getVideoInfoList(videoIds)
+        return urls.map { url ->
+            val videoId = YouTubeUrlUtils.extractVideoId(url)
+            if (videoId != null) {
+                getVideoInfo(videoId) ?: createInvalidVideo(url)
+            } else {
+                createInvalidVideo(url)
+            }
+        }
+    }
+
+    private fun createInvalidVideo(url: String): YouTubeVideo {
+        return YouTubeVideo.EMPTY.copy(
+            localId = UUID.randomUUID().toString(),
+            url = url,
+        )
+    }
+
+    private fun createInvalidVideoById(videoId: String): YouTubeVideo {
+        return YouTubeVideo.EMPTY.copy(
+            localId = UUID.randomUUID().toString(),
+            id = videoId,
+            url = "https://www.youtube.com/watch?v=$videoId",
+        )
     }
 }

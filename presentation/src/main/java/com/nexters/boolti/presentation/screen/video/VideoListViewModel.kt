@@ -142,7 +142,11 @@ class VideoListViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (editMode) {
-                editVideo(video)
+                // 편집 모드일 때도 YouTube API로 정보 업데이트
+                val youTubeVideo = getYouTubeVideoInfoByUrlUseCase(video.url)
+                val updatedVideo = youTubeVideo?.copy(localId = video.localId)
+                    ?: createInvalidVideo(video.url).copy(localId = video.localId)
+                editVideo(updatedVideo)
                 videoEditEvent(VideoEditEvent.Finish)
                 videoListEvent(VideoListEvent.Edited)
             } else {
@@ -152,7 +156,10 @@ class VideoListViewModel @Inject constructor(
                     addVideo(youTubeVideo)
                     videoListEvent(VideoListEvent.Added)
                 } else {
-                    // TODO: 에러 처리 - 유효하지 않은 YouTube URL
+                    // 유효하지 않은 URL인 경우 기본 비디오 객체 생성하여 추가
+                    val invalidVideo = createInvalidVideo(video.url)
+                    addVideo(invalidVideo)
+                    videoListEvent(VideoListEvent.Added)
                 }
                 videoEditEvent(VideoEditEvent.Finish)
             }
@@ -162,7 +169,7 @@ class VideoListViewModel @Inject constructor(
     private fun addVideo(
         video: YouTubeVideo,
     ) {
-        val newVideo = video.copy(id = UUID.randomUUID().toString())
+        val newVideo = video.copy(localId = UUID.randomUUID().toString())
         _uiState.update {
             it.copy(
                 videos = listOf(newVideo) + it.videos, // 최상단에 추가
@@ -213,5 +220,12 @@ class VideoListViewModel @Inject constructor(
         viewModelScope.launch {
             _videoEditEvent.send(event)
         }
+    }
+
+    private fun createInvalidVideo(url: String): YouTubeVideo {
+        return YouTubeVideo.EMPTY.copy(
+            localId = UUID.randomUUID().toString(),
+            url = url,
+        )
     }
 }

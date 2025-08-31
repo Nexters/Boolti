@@ -28,7 +28,7 @@ internal data class UserResponse(
         photo = imgPath,
         userCode = userCode ?: "",
         introduction = introduction,
-        sns = sns.map { it.toDomain() },
+        sns = sns.filter { it.username.isNotEmpty() }.map { it.toDomain() },
         link = link.map { it.toDomain() },
         performedShow = performedShow.map { it.toDomain() },
         upcomingShow = comingSoonShow.map { it.toDomain() },

@@ -7,6 +7,8 @@ import com.nexters.boolti.presentation.R
 data class SnsEditState(
     val instagramUsername: String = "",
     val youtubeUsername: String = "",
+    val originalInstagramUsername: String = "",
+    val originalYoutubeUsername: String = "",
     val saving: Boolean = false,
     val showExitAlertDialog: Boolean = false,
 ) {
@@ -20,7 +22,10 @@ data class SnsEditState(
         else -> null
     }
     val saveEnabled: Boolean =
-        instagramUsernameError == null && youtubeUsernameError == null && !saving
+        !(originalInstagramUsername == instagramUsername && originalYoutubeUsername == youtubeUsername) &&
+                instagramUsernameError == null &&
+                youtubeUsernameError == null &&
+                !saving
 }
 
 enum class SnsError {

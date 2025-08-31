@@ -26,6 +26,8 @@ class SnsEditViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         SnsEditState(
+            originalInstagramUsername = originalInstagramUsername,
+            originalYoutubeUsername = originalYoutubeUsername,
             instagramUsername = originalInstagramUsername,
             youtubeUsername = originalYoutubeUsername,
         )
@@ -45,13 +47,6 @@ class SnsEditViewModel @Inject constructor(
 
     fun saveSns() {
         if (uiState.value.saving) return
-        if (
-            uiState.value.instagramUsername == originalInstagramUsername &&
-            uiState.value.youtubeUsername == originalYoutubeUsername
-        ) {
-            event(SnsEditEvent.Saved)
-            return
-        }
 
         _uiState.update { it.copy(saving = true) }
         viewModelScope.launch {

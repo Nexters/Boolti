@@ -26,9 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -121,7 +120,7 @@ private fun UserCodeEditScreen(
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            BTTextField(
+            BTClearableTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp)
@@ -144,11 +143,6 @@ private fun UserCodeEditScreen(
                 },
                 placeholder = stringResource(R.string.nickname_edit_placeholder),
                 singleLine = true,
-                trailingIcon = {
-                    if (userCode.isNotEmpty()) {
-                        BTTextFieldDefaults.ClearButton(onClick = { onChangeUserCode("") })
-                    }
-                },
             )
             Spacer(Modifier.height(20.dp))
             Text(

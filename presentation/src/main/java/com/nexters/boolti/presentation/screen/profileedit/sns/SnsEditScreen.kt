@@ -28,9 +28,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.extension.centerToTop
@@ -201,7 +200,7 @@ private fun SnsUsernameInput(
                 color = Grey30,
             )
         }
-        BTTextField(
+        BTClearableTextField(
             modifier = Modifier.weight(1f),
             text = username,
             supportingText = error.message,
@@ -209,13 +208,6 @@ private fun SnsUsernameInput(
             placeholder = stringResource(R.string.sns_username_placeholder),
             onValueChanged = onUsernameChanged,
             singleLine = true,
-            trailingIcon = {
-                if (username.isNotEmpty()) {
-                    BTTextFieldDefaults.ClearButton(onClick = { onUsernameChanged("") })
-                } else {
-                    null
-                }
-            },
         )
     }
 }

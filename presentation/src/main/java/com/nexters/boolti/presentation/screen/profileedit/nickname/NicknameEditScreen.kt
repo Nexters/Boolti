@@ -25,9 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -120,7 +119,8 @@ private fun NicknameEditScreen(
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            BTTextField(
+//            BTTextField(
+            BTClearableTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp)
@@ -147,11 +147,11 @@ private fun NicknameEditScreen(
                 },
                 placeholder = stringResource(R.string.nickname_edit_placeholder),
                 singleLine = true,
-                trailingIcon = {
+                /*trailingIcon = {
                     if (nickname.isNotEmpty()) {
                         BTTextFieldDefaults.ClearButton(onClick = { onChangeNickname("") })
                     }
-                },
+                },*/
             )
             Spacer(Modifier.height(20.dp))
             Text(

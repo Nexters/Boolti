@@ -30,9 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
@@ -131,7 +130,7 @@ fun VideoEditScreen(
                         text = stringResource(R.string.link_url),
                         color = Grey30,
                     )
-                    BTTextField(
+                    BTClearableTextField(
                         modifier = Modifier
                             .padding(start = 12.dp)
                             .fillMaxWidth(),
@@ -143,11 +142,6 @@ fun VideoEditScreen(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
                         ),
-                        trailingIcon = if (videoUrlFocused && videoUrl.isNotEmpty()) {
-                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeVideoUrl("") }) }
-                        } else {
-                            null
-                        },
                         interactionSource = videoUrlInteractionSource,
                     )
                 }

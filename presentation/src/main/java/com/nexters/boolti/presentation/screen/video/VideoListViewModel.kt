@@ -107,6 +107,7 @@ class VideoListViewModel @Inject constructor(
 
             uiState.value.editing -> {
                 _uiState.update { it.copy(editing = false) }
+                videoEditEvent(VideoEditEvent.Finish)
             }
 
             else -> {

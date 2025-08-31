@@ -341,7 +341,7 @@ fun VideoItem(
         ) {
             Text(
                 text = video.title.ifEmpty { stringResource(R.string.unknown_video) },
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 overflow = TextOverflow.Ellipsis,

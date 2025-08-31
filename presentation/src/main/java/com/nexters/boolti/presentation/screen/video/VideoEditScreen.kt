@@ -65,6 +65,7 @@ fun VideoEditScreen(
     VideoEditScreen(
         isEditMode = uiState.editingVideo?.localId?.isNotEmpty() == true,
         videoUrl = uiState.editingVideo?.url.orEmpty(),
+        completeEnabled = uiState.editingVideoCompleteEnabled,
         onClickBack = viewModel::tryBack,
         onClickComplete = viewModel::completeAddOrEditVideo,
         onChangeVideoUrl = viewModel::onVideoUrlChanged,
@@ -77,6 +78,7 @@ fun VideoEditScreen(
 fun VideoEditScreen(
     isEditMode: Boolean,
     videoUrl: String,
+    completeEnabled: Boolean,
     onClickBack: () -> Unit,
     onClickComplete: () -> Unit,
     onChangeVideoUrl: (String) -> Unit,
@@ -101,7 +103,7 @@ fun VideoEditScreen(
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
                         onClick = onClickComplete,
-                        enabled = videoUrl.isNotBlank(),
+                        enabled = completeEnabled,
                     )
                 },
                 title = if (isEditMode) {
@@ -203,6 +205,7 @@ private fun VideoEditScreenPreview() {
         VideoEditScreen(
             isEditMode = true,
             videoUrl = "https://www.youtube.com/watch?v=example",
+            completeEnabled = false,
             onClickBack = {},
             onClickComplete = {},
             onChangeVideoUrl = {},

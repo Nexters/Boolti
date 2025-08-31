@@ -6,6 +6,7 @@ data class VideoListState(
     val videos: List<YouTubeVideo> = emptyList(),
     val originalVideos: List<YouTubeVideo> = emptyList(),
     val editingVideo: YouTubeVideo? = null,
+    val editingVideoOriginalUrl: String? = null,
     val editing: Boolean = false,
     val saving: Boolean = false,
     val loading: Boolean = false,
@@ -17,4 +18,8 @@ data class VideoListState(
 
     val saveEnabled: Boolean
         get() = !saving && edited
+
+    val editingVideoCompleteEnabled: Boolean
+        get() = editingVideoOriginalUrl != null && editingVideo != null &&
+                editingVideo.url.isNotBlank() && editingVideoOriginalUrl != editingVideo.url
 }

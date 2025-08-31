@@ -82,6 +82,7 @@ class VideoListViewModel @Inject constructor(
                         saving = false,
                         editing = false,
                         editingVideo = null,
+                        editingVideoOriginalUrl = null,
                         originalVideos = uiState.value.videos,
                         showExitAlertDialog = false,
                     )
@@ -121,7 +122,12 @@ class VideoListViewModel @Inject constructor(
     ) {
         val targetVideo = uiState.value.videos.find { it.localId == videoId }
             ?: YouTubeVideo.EMPTY
-        _uiState.update { it.copy(editingVideo = targetVideo) }
+        _uiState.update {
+            it.copy(
+                editingVideo = targetVideo,
+                editingVideoOriginalUrl = targetVideo.url,
+            )
+        }
     }
 
     fun onVideoUrlChanged(
@@ -142,6 +148,7 @@ class VideoListViewModel @Inject constructor(
             it.copy(
                 videos = it.videos.filterNot { video -> video.localId == targetVideo.localId },
                 editingVideo = null,
+                editingVideoOriginalUrl = null,
             )
         }
         autoNavigatedToEdit = false
@@ -188,6 +195,7 @@ class VideoListViewModel @Inject constructor(
             it.copy(
                 videos = listOf(newVideo) + it.videos, // 최상단에 추가
                 editingVideo = null,
+                editingVideoOriginalUrl = null,
             )
         }
     }
@@ -201,6 +209,7 @@ class VideoListViewModel @Inject constructor(
                     if (old.localId == video.localId) video else old
                 },
                 editingVideo = null,
+                editingVideoOriginalUrl = null,
             )
         }
     }

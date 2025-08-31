@@ -275,7 +275,11 @@ private fun ProfileEditScreen(
                         count = snsCount,
                         defaultValue = stringResource(R.string.hint_add_sns),
                         onClick = onClickSns,
-                        right = { ArrowRight() },
+                        right = if (snsCount > 0) {
+                            { ArrowRight() }
+                        } else {
+                            null
+                        },
                     )
                 }
                 Spacer(Modifier.height(12.dp))
@@ -291,7 +295,7 @@ private fun ProfileEditScreen(
                         },
                         right = {
                             BtSwitch(
-                                checked = showUpcomingShows,
+                                checked = upcomingShowCount > 0 && showUpcomingShows,
                                 enabled = upcomingShowCount > 0,
                             )
                         },
@@ -307,7 +311,7 @@ private fun ProfileEditScreen(
                         },
                         right = {
                             BtSwitch(
-                                checked = showPerformedShows,
+                                checked = pastShowCount > 0 && showPerformedShows,
                                 enabled = pastShowCount > 0,
                             )
                         },
@@ -320,12 +324,22 @@ private fun ProfileEditScreen(
                         count = videoCount,
                         defaultValue = stringResource(R.string.video_add),
                         onClick = onClickVideo,
+                        right = if (videoCount > 0) {
+                            { ArrowRight() }
+                        } else {
+                            null
+                        },
                     )
                     SectionItem(
                         label = stringResource(R.string.link),
                         count = linkCount,
                         defaultValue = stringResource(R.string.link_add),
                         onClick = onClickLink,
+                        right = if (linkCount > 0) {
+                            { ArrowRight() }
+                        } else {
+                            null
+                        },
                     )
                 }
             }

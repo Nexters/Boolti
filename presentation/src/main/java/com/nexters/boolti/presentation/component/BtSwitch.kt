@@ -9,9 +9,11 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.theme.Orange01
 
 @Composable
 fun BtSwitch(
@@ -20,8 +22,14 @@ fun BtSwitch(
     enabled: Boolean = true,
     onCheckedChange: ((Boolean) -> Unit)? = null,
     colors: SwitchColors = SwitchDefaults.colors(
-        uncheckedThumbColor = Grey50,
+        checkedThumbColor = White,
+        checkedTrackColor = Orange01,
+        disabledCheckedThumbColor = Grey50,
+        disabledCheckedTrackColor = Grey80,
+        uncheckedThumbColor = White,
         uncheckedTrackColor = Grey80,
+        disabledUncheckedThumbColor = Grey50,
+        disabledUncheckedTrackColor = Grey80,
     ),
     thumbContent: @Composable () -> Unit = {
         Box(

@@ -326,37 +326,6 @@ fun ProfileScreen(
                 }
             }
 
-            /*if (user.link.previewItems.isNotEmpty() && user.performedShow.previewItems.isNotEmpty()) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = marginHorizontal),
-                    color = Grey85,
-                )
-            }
-
-            if (user.performedShow.previewItems.isNotEmpty()) { // 출연한 공연이 있으면
-                Section(
-                    title = stringResource(R.string.performed_shows),
-                    onClickShowAll = if (user.performedShow.hasMoreItems) {
-                        { navigateToPerformedShows() }
-                    } else {
-                        null
-                    },
-                ) {
-                    user.performedShow.previewItems.forEachIndexed { i, show ->
-                        ShowItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = if (i == 0) 0.dp else 20.dp)
-                                .padding(horizontal = marginHorizontal),
-                            show = show,
-                            backgroundColor = MaterialTheme.colorScheme.background,
-                            onClick = { navigateToShow(show.id) },
-                            contentPadding = PaddingValues(),
-                        )
-                    }
-                }
-            }*/
-
             Spacer(Modifier.size(32.dp))
         }
 

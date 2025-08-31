@@ -227,6 +227,7 @@ fun ProfileScreen(
                                 .padding(top = if (i == 0) 0.dp else 20.dp)
                                 .padding(horizontal = marginHorizontal),
                             show = show,
+                            showNameStyle = MaterialTheme.typography.titleMedium,
                             backgroundColor = MaterialTheme.colorScheme.background,
                             onClick = { navigateToShow(show.id) },
                             contentPadding = PaddingValues(),
@@ -274,7 +275,7 @@ fun ProfileScreen(
                 ) {
                     videos.forEachIndexed { i, video ->
                         Spacer(
-                            Modifier.height(if (i == 0) 16.dp else 20.dp)
+                            Modifier.height(if (i == 0) 0.dp else 20.dp)
                         )
 
                         VideoItem(
@@ -591,7 +592,7 @@ private fun Section(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = if (onClickShowAll != null) 0.dp else 16.dp),
+                .padding(vertical = if (onClickShowAll != null) 8.dp else 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

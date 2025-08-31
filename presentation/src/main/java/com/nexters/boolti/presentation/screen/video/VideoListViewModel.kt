@@ -86,7 +86,6 @@ class VideoListViewModel @Inject constructor(
                         showExitAlertDialog = false,
                     )
                 }
-                videoListEvent(VideoListEvent.Finish)
             }
         }
     }

@@ -82,7 +82,6 @@ class LinkListViewModel @Inject constructor(
                         showExitAlertDialog = false,
                     )
                 }
-                linkListEvent(LinkListEvent.Finish)
             }
         }
     }

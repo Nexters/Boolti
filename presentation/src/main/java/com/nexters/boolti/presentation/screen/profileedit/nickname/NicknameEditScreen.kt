@@ -135,6 +135,11 @@ private fun NicknameEditScreen(
                             1,
                         )
 
+                        NicknameError.MaxLength -> stringResource(
+                            R.string.input_upper_limit_text,
+                            12,
+                        )
+
                         NicknameError.NotTrimmed -> stringResource(R.string.validate_trimmed)
 
                         NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)

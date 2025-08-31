@@ -102,6 +102,7 @@ class LinkListViewModel @Inject constructor(
             }
 
             uiState.value.editing -> {
+                linkEditEvent(LinkEditEvent.Finish)
                 _uiState.update { it.copy(editing = false) }
             }
 

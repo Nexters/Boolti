@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -208,7 +209,12 @@ fun LinkEditScreen(
                 onClickNegativeButton = { showLinkRemoveDialog = false },
                 onDismiss = { showLinkRemoveDialog = false },
             ) {
-                Text(stringResource(R.string.remove_link_dialog_message))
+                Text(
+                    text = stringResource(R.string.remove_link_dialog_message),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }

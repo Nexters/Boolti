@@ -1,10 +1,10 @@
 [versions]
-minSdk = "26"
-targetSdk = "34"
+minSdk = "28"
+targetSdk = "35"
 versionCode = "45"
 versionName = "1.11.1"
 packageName = "com.nexters.boolti"
-compileSdk = "34"
+compileSdk = "35"
 targetJvm = "17"
 kotlin = "1.9.22"
 android = "8.2.2"

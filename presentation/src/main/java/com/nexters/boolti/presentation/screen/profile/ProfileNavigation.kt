@@ -19,13 +19,13 @@ fun NavGraphBuilder.profileScreen(
             modifier = modifier,
             onClickBack = navController::popBackStack,
             navigateToLinks = { userCode ->
-                navController.navigate(LinkListRoute.LinkListRoot(userCode))
+                navController.navigate(LinkListRoute.LinkListRoot(userCode, false))
             },
             navigateToUpcomingShows = {
 
             },
             navigateToVideos = { userCode ->
-                navController.navigate(VideoListRoute.VideoListRoot(userCode))
+                navController.navigate(VideoListRoute.VideoListRoot(userCode, false))
             },
             navigateToPerformedShows = { userCode ->
                 navController.navigate(MainRoute.PerformedShows(userCode))

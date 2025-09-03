@@ -10,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,9 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -68,6 +63,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSwitch
+import com.nexters.boolti.presentation.component.FixedWidthText
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -493,50 +489,11 @@ private fun SectionItem(
         modifier = modifier.padding(start = marginHorizontal, end = marginHorizontal - 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            modifier = Modifier
-                .width(100.dp)
-                .horizontalScroll(labelScrollState)
-                .drawWithContent {
-                    drawContent()
-
-                    val leftScrollShadowWidth = labelScrollState.value * 3f
-                    val rightScrollShadowWidth = (labelScrollState.maxValue - labelScrollState.value) * 3f
-
-                    // 오른쪽 페이드 (오른쪽에 더 많은 콘텐츠가 있을 때)
-                    if (rightScrollShadowWidth > 0) {
-                        val fadeWidth =
-                            (labelScrollState.maxValue - labelScrollState.value.toFloat()) * 3
-                        drawRect(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(Color.Transparent, Grey90),
-                                startX = size.width - fadeWidth,
-                                endX = size.width
-                            ),
-                            topLeft = Offset(size.width - fadeWidth, 0f),
-                            size = Size(fadeWidth, size.height),
-                        )
-                    }
-
-                    // 왼쪽 페이드 (왼쪽에 더 많은 콘텐츠가 있을 때)
-                    if (leftScrollShadowWidth > 0) {
-                        val fadeWidth = labelScrollState.value.toFloat() * 3
-                        drawRect(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(Grey90, Color.Transparent),
-                                startX = 0f,
-                                endX = fadeWidth
-                            ),
-                            topLeft = Offset.Zero,
-                            size = Size(fadeWidth, size.height),
-                        )
-                    }
-                },
+        FixedWidthText(
             text = label,
+            width = 100.dp,
             style = MaterialTheme.typography.bodyLarge,
             color = Grey30,
-            maxLines = 1,
-            overflow = TextOverflow.Visible,
         )
         Row(
             modifier = Modifier

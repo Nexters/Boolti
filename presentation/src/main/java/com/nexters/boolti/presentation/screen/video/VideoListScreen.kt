@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -152,7 +151,7 @@ private fun VideoListScreen(
             }
 
             is VideoListEvent.Finish -> navigateUp()
-            
+
             is VideoListEvent.NavigateToEdit -> navigateToEditVideo()
         }
     }
@@ -342,7 +341,6 @@ fun VideoItem(
             Text(
                 text = video.title.ifEmpty { stringResource(R.string.unknown_video) },
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 overflow = TextOverflow.Ellipsis,
                 lineHeight = 22.sp,

@@ -28,12 +28,18 @@ class VideoListViewModel @Inject constructor(
     private val getYouTubeVideoInfoByUrlUseCase: GetYouTubeVideoInfoByUrlUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val userCode = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>().userCode
+    private val route = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>()
+    private val userCode = route.userCode
     private val isMine = getUserUseCase()?.userCode == userCode
-    private var autoNavigatedToEdit = false
+    private val isEditModeAtFirst = route.isEditMode && isMine
+    private var autoNavigatedToEdit = isEditModeAtFirst
 
     private val _uiState = MutableStateFlow(
-        VideoListState(isMine = isMine, loading = true)
+        VideoListState(
+            isMine = isMine,
+            loading = true,
+            editing = isEditModeAtFirst,
+        )
     )
     val uiState = _uiState.asStateFlow()
 
@@ -55,7 +61,7 @@ class VideoListViewModel @Inject constructor(
                         it.copy(
                             videos = videos,
                             originalVideos = videos,
-                            editing = isMine && videos.isEmpty(),
+                            editing = it.editing || isMine && videos.isEmpty(),
                             loading = false,
                         )
                     }

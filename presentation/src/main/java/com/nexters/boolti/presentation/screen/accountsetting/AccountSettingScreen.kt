@@ -108,7 +108,9 @@ fun AccountSettingScreen(
                 modifier = Modifier.verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Section {
+                Section(
+                    modifier = Modifier.padding(top = 20.dp),
+                ) {
                     Title(stringResource(R.string.sns_provider))
                     KakaoChip(modifier = Modifier.padding(top = 16.dp))
                 }

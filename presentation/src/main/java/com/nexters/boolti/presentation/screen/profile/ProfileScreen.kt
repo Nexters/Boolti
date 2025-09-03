@@ -311,7 +311,7 @@ fun ProfileScreen(
                     user.link.previewItems.forEachIndexed { i, link ->
                         LinkItem(
                             modifier = Modifier
-                                .padding(top = 16.dp)
+                                .padding(top = if (i > 0) 16.dp else 0.dp)
                                 .padding(horizontal = marginHorizontal),
                             link = link,
                             onClick = {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -97,6 +98,7 @@ private fun PerformedShowsScreen(
                             show = show,
                             modifier = Modifier.fillMaxWidth(),
                             shape = RectangleShape,
+                            showNameStyle = MaterialTheme.typography.titleMedium,
                             onClick = { onClickShow(show) },
                         )
                     }

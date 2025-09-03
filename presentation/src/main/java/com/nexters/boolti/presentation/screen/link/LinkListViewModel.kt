@@ -26,12 +26,17 @@ class LinkListViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val userCode = savedStateHandle.toRoute<LinkListRoute.LinkListRoot>().userCode
+    private val route = savedStateHandle.toRoute<LinkListRoute.LinkListRoot>()
+    private val userCode = route.userCode
     private val isMine = getUserUseCase()?.userCode == userCode
-    private var autoNavigatedToEdit = false
+    private val isEditModeAtFirst = route.isEditMode && isMine
+    private var autoNavigatedToEdit = isEditModeAtFirst
 
     private val _uiState = MutableStateFlow(
-        LinkListState(isMine = isMine)
+        LinkListState(
+            isMine = isMine,
+            editing = isEditModeAtFirst,
+        )
     )
     val uiState = _uiState.asStateFlow()
 
@@ -53,7 +58,7 @@ class LinkListViewModel @Inject constructor(
                         it.copy(
                             links = links,
                             originalLinks = links,
-                            editing = isMine && links.isEmpty(),
+                            editing = it.editing || isMine && links.isEmpty(),
                         )
                     }
                     if (isMine && links.isEmpty()) {

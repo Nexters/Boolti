@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,6 +31,7 @@ import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.FixedWidthText
 import com.nexters.boolti.presentation.extension.centerToTop
 import com.nexters.boolti.presentation.extension.icon
 import com.nexters.boolti.presentation.extension.label
@@ -177,31 +177,35 @@ private fun SnsUsernameInput(
 ) {
     val icon = snsType.icon
     val label = snsType.label
+    val centerToTopSize = 24.dp
+
     Row(
         modifier = modifier.fillMaxWidth(),
     ) {
-        Row(
-            modifier = Modifier.centerToTop(24.dp),
-        ) {
+        Row {
             Icon(
                 modifier = Modifier
-                    .size(24.dp)
-                    .centerToTop(),
+                    .centerToTop(centerToTopSize)
+                    .size(24.dp),
                 imageVector = ImageVector.vectorResource(icon),
                 tint = Grey30,
                 contentDescription = "$label icon",
             )
-            Text(
+            FixedWidthText(
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 12.dp)
-                    .width(72.dp),
+                    .centerToTop(centerToTopSize)
+                    .padding(start = 8.dp, end = 12.dp),
                 text = label,
+                width = 72.dp,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Grey30,
+                shadowColor = MaterialTheme.colorScheme.background,
             )
         }
         BTClearableTextField(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .centerToTop(centerToTopSize),
             text = username,
             supportingText = error.message,
             isError = error != null,

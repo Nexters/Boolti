@@ -17,7 +17,7 @@ internal interface MemberService {
         @Path("userCode") userCode: String,
     ): List<EditProfileRequest.LinkDto>
 
-    @GET("/app/papi/v2/users/{userCode}/shows")
+    @GET("/app/papi/v2/users/{userCode}/previous-shows")
     suspend fun getPerformedShows(
         @Path("userCode") userCode: String,
     ): List<HostedShowDto>

@@ -11,6 +11,7 @@ data class UserCodeEditState(
 ) {
     val userCodeError: UserCodeError? = when {
         userCode.length < 4 -> UserCodeError.MinLength
+        userCode.length > 20 -> UserCodeError.MaxLength
         userCode.any { it.isWhitespace() } -> UserCodeError.ContainsWhitespace
         !UserCodeError.InvalidRegex.matches(userCode) -> UserCodeError.Invalid
         duplicatedUserCodes.contains(userCode) -> UserCodeError.Duplicated
@@ -21,7 +22,7 @@ data class UserCodeEditState(
 }
 
 enum class UserCodeError {
-    MinLength, Invalid, ContainsWhitespace, Duplicated;
+    MinLength, MaxLength, Invalid, ContainsWhitespace, Duplicated;
 
     companion object {
         val InvalidRegex = Regex("""^(?!\s)([0-9a-z_]{4,20})(?<!\s)$""")

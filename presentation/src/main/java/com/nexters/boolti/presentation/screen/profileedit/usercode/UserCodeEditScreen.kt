@@ -135,6 +135,11 @@ private fun UserCodeEditScreen(
                             4,
                         )
 
+                        UserCodeError.MaxLength -> stringResource(
+                            R.string.input_upper_limit_text,
+                            20,
+                        )
+
                         UserCodeError.ContainsWhitespace -> stringResource(R.string.validate_whitespace)
 
                         UserCodeError.Invalid -> stringResource(R.string.validate_edit_usercode)

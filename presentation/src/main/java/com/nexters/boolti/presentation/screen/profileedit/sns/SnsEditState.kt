@@ -18,6 +18,7 @@ data class SnsEditState(
         else -> null
     }
     val youtubeUsernameError: SnsError? = when {
+        youtubeUsername.contains('@') -> SnsError.ContainsAtSign
         youtubeUsername.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._-]+")) -> SnsError.ContainsUnsupportedCharacter
         else -> null
     }

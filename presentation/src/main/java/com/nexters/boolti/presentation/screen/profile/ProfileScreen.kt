@@ -16,9 +16,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,14 +63,17 @@ import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.model.emptyPreviewList
 import com.nexters.boolti.domain.model.url
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.HorizontalShowItem
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.video.VideoItem
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
@@ -85,8 +92,10 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
-    navigateToLinks: (userCode: String?) -> Unit,
-    navigateToPerformedShows: (userCode: String?) -> Unit,
+    navigateToLinks: (userCode: String) -> Unit,
+    navigateToVideos: (userCode: String) -> Unit,
+    navigateToUpcomingShows: (userCode: String) -> Unit,
+    navigateToPerformedShows: (userCode: String) -> Unit,
     navigateToShow: (showId: String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -96,21 +105,22 @@ fun ProfileScreen(
     ProfileScreen(
         modifier = modifier,
         user = uiState.user,
+        sections = uiState.profileSections,
         isMine = uiState.isMine,
         event = event,
         onClickBack = onClickBack,
         navigateToProfileEdit = navigateToProfileEdit,
         navigateToLinks = {
-            when (uiState.user) {
-                is User.My -> navigateToLinks(null)
-                is User.Others -> navigateToLinks(uiState.user.userCode)
-            }
+            navigateToLinks(uiState.user.userCode)
+        },
+        navigateToVideos = {
+            navigateToVideos(uiState.user.userCode)
+        },
+        navigateToUpcomingShows = {
+            navigateToUpcomingShows(uiState.user.userCode)
         },
         navigateToPerformedShows = {
-            when (uiState.user) {
-                is User.My -> navigateToPerformedShows(null)
-                is User.Others -> navigateToPerformedShows(uiState.user.userCode)
-            }
+            navigateToPerformedShows(uiState.user.userCode)
         },
         navigateToShow = navigateToShow,
     )
@@ -120,11 +130,14 @@ fun ProfileScreen(
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     user: User,
+    sections: List<ProfileSection>,
     isMine: Boolean,
     event: Flow<ProfileEvent>,
     onClickBack: () -> Unit,
     navigateToProfileEdit: () -> Unit,
     navigateToLinks: () -> Unit,
+    navigateToVideos: () -> Unit,
+    navigateToUpcomingShows: () -> Unit,
     navigateToPerformedShows: () -> Unit,
     navigateToShow: (showId: String) -> Unit,
 ) {
@@ -194,64 +207,124 @@ fun ProfileScreen(
                 },
             )
 
-            if (user.link.isNotEmpty() || user.performedShow.isNotEmpty()) {
-                Spacer(Modifier.size(8.dp))
-            }
+            Spacer(Modifier.size(8.dp))
 
-            if (user.link.isNotEmpty()) { // 링크가 있으면
-                Section(
-                    title = stringResource(R.string.profile_links_title),
-                    onClickShowAll = if (user.link.size >= 4) {
-                        { navigateToLinks() }
-                    } else {
-                        null
-                    },
-                ) {
-                    user.link.take(3).forEachIndexed { i, link ->
-                        LinkItem(
-                            modifier = Modifier
-                                .padding(top = if (i == 0) 0.dp else 16.dp)
-                                .padding(horizontal = marginHorizontal),
-                            link = link,
-                            onClick = {
-                                try {
-                                    uriHandler.openUri(link.url.toValidUrlString())
-                                } catch (e: ActivityNotFoundException) {
-                                    snackbarHostState.showMessage(invalidUrlMsg)
+            Column {
+                sections.forEachIndexed { i, section ->
+                    if (i > 0) Divider()
+
+                    when (section) {
+                        is ProfileSection.Link -> {
+                            Section(
+                                title = stringResource(R.string.profile_links_title),
+                                onClickShowAll = if (section.hasMoreItems) {
+                                    { navigateToLinks() }
+                                } else {
+                                    null
+                                },
+                            ) {
+                                section.links.forEachIndexed { i, link ->
+                                    LinkItem(
+                                        modifier = Modifier
+                                            .padding(top = if (i > 0) 16.dp else 0.dp)
+                                            .padding(horizontal = marginHorizontal),
+                                        link = link,
+                                        onClick = {
+                                            try {
+                                                uriHandler.openUri(link.url.toValidUrlString())
+                                            } catch (e: ActivityNotFoundException) {
+                                                snackbarHostState.showMessage(invalidUrlMsg)
+                                            }
+                                        },
+                                    )
                                 }
-                            },
-                        )
-                    }
-                }
-            }
+                            }
+                        }
 
-            if (user.link.isNotEmpty() && user.performedShow.isNotEmpty()) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = marginHorizontal),
-                    color = Grey85,
-                )
-            }
+                        is ProfileSection.PerformedShow -> {
+                            Section(
+                                title = stringResource(R.string.last_shows),
+                                onClickShowAll = if (section.hasMoreItems) {
+                                    { navigateToPerformedShows() }
+                                } else {
+                                    null
+                                },
+                            ) {
+                                LazyRow {
+                                    item { Spacer(Modifier.width(20.dp)) }
+                                    items(
+                                        items = section.shows,
+                                        key = { it.id },
+                                    ) { show ->
+                                        HorizontalShowItem(
+                                            modifier = Modifier.padding(end = 16.dp),
+                                            show = show,
+                                            onClick = { navigateToShow(show.id) },
+                                        )
+                                    }
+                                    item { Spacer(Modifier.width(4.dp)) }
+                                }
+                            }
+                        }
 
-            if (user.performedShow.isNotEmpty()) { // 출연한 공연이 있으면
-                Section(
-                    title = stringResource(R.string.performed_shows),
-                    onClickShowAll = if (user.performedShow.size >= 3) {
-                        { navigateToPerformedShows() }
-                    } else {
-                        null
-                    },
-                ) {
-                    user.performedShow.take(2).forEachIndexed { i, show ->
-                        ShowItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = if (i == 0) 0.dp else 20.dp)
-                                .padding(horizontal = marginHorizontal),
-                            show = show,
-                            backgroundColor = MaterialTheme.colorScheme.background,
-                            onClick = { navigateToShow(show.id) },
-                            contentPadding = PaddingValues(),
-                        )
+                        is ProfileSection.UpcomingShow -> {
+                            Section(
+                                title = stringResource(R.string.upcoming_shows),
+                                onClickShowAll = if (section.hasMoreItems) {
+                                    { navigateToUpcomingShows() }
+                                } else {
+                                    null
+                                },
+                            ) {
+                                section.shows.forEachIndexed { i, show ->
+                                    ShowItem(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = if (i == 0) 0.dp else 20.dp)
+                                            .padding(horizontal = marginHorizontal),
+                                        show = show,
+                                        showNameStyle = MaterialTheme.typography.titleMedium,
+                                        backgroundColor = MaterialTheme.colorScheme.background,
+                                        onClick = { navigateToShow(show.id) },
+                                        contentPadding = PaddingValues(),
+                                    )
+                                }
+                            }
+                        }
+
+                        is ProfileSection.Video -> {
+                            Section(
+                                title = stringResource(R.string.video),
+                                onClickShowAll = if (section.hasMoreItems) {
+                                    { navigateToVideos() }
+                                } else {
+                                    null
+                                },
+                            ) {
+                                section.videos.forEachIndexed { i, video ->
+                                    Spacer(
+                                        Modifier.height(if (i == 0) 0.dp else 20.dp)
+                                    )
+
+                                    VideoItem(
+                                        modifier = Modifier.padding(horizontal = marginHorizontal),
+                                        onClick = {
+                                            try {
+                                                uriHandler.openUri(video.url)
+                                            } catch (e: ActivityNotFoundException) {
+                                                e.printStackTrace()
+                                                snackbarHostState.showMessage(invalidUrlMsg)
+                                            } catch (e: IllegalArgumentException) {
+                                                e.printStackTrace()
+                                                snackbarHostState.showMessage(invalidUrlMsg)
+                                            }
+                                        },
+                                        video = video,
+                                        showHandle = false,
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -491,7 +564,7 @@ private fun Section(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = if (onClickShowAll != null) 0.dp else 16.dp),
+                .padding(vertical = if (onClickShowAll != null) 8.dp else 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -549,6 +622,14 @@ fun LinkItem(
     }
 }
 
+@Composable
+private fun Divider(modifier: Modifier = Modifier) {
+    HorizontalDivider(
+        modifier = modifier.padding(horizontal = marginHorizontal),
+        color = Grey85,
+    )
+}
+
 @Preview
 @Composable
 private fun SectionPreview() {
@@ -574,18 +655,37 @@ private fun ProfileScreenPreview() {
             Sns("1", Sns.SnsType.INSTAGRAM, "hey__suun"),
             Sns("1", Sns.SnsType.YOUTUBE, "tune_official"),
         ),
-        link = listOf(),
-        performedShow = listOf(),
+        link = emptyPreviewList(),
+        performedShow = emptyPreviewList(),
     )
+
+    val sections = listOf(
+        ProfileSection.UpcomingShow(
+            shows = user.upcomingShow.previewItems,
+            hasMoreItems = user.upcomingShow.hasMoreItems,
+        ),
+        ProfileSection.PerformedShow(
+            shows = user.performedShow.previewItems,
+            hasMoreItems = user.performedShow.hasMoreItems,
+        ),
+        ProfileSection.Link(
+            links = user.link.previewItems,
+            hasMoreItems = user.link.hasMoreItems,
+        )
+    )
+
     BooltiTheme {
         ProfileScreen(
             user = user,
+            sections = sections,
             isMine = false,
             event = emptyFlow(),
             onClickBack = {},
             navigateToProfileEdit = {},
             navigateToLinks = {},
+            navigateToVideos = {},
             navigateToShow = {},
+            navigateToUpcomingShows = {},
             navigateToPerformedShows = {},
         )
     }

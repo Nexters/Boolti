@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.profileedit.link
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -24,49 +25,53 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.screen.link.LinkEditEvent
+import com.nexters.boolti.presentation.screen.link.LinkListViewModel
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 
 @Composable
 fun LinkEditScreen(
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    onAddLink: (name: String, url: String) -> Unit,
-    onEditLink: (id: String, name: String, url: String) -> Unit,
-    onRemoveLink: (id: String) -> Unit,
-    navigateBack: () -> Unit = {},
-    viewModel: LinkEditViewModel = hiltViewModel(),
+    viewModel: LinkListViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event = viewModel.linkEditEvent
+
+    BackHandler {
+        viewModel.tryBack()
+    }
+
+    ObserveAsEvents(event) {
+        when (it) {
+            LinkEditEvent.Finish -> navigateUp()
+        }
+    }
 
     LinkEditScreen(
+        isEditMode = uiState.editingLink?.id?.isNotEmpty() == true,
+        linkName = uiState.editingLink?.name.orEmpty(),
+        linkUrl = uiState.editingLink?.url.orEmpty(),
+        onClickBack = viewModel::tryBack,
+        onClickComplete = viewModel::completeAddOrEditLink,
+        onChangeLinkName = viewModel::onLinkNameChanged,
+        onChangeLinkUrl = viewModel::onLinkUrlChanged,
+        requireRemove = viewModel::removeLink,
         modifier = modifier,
-        isEditMode = uiState.isEditMode,
-        linkName = uiState.linkName,
-        linkUrl = uiState.url,
-        onClickBack = navigateBack,
-        onClickComplete = {
-            if (uiState.isEditMode) {
-                onEditLink(viewModel.editLinkId, uiState.linkName, uiState.url)
-            } else {
-                onAddLink(uiState.linkName, uiState.url)
-            }
-        },
-        onChangeLinkName = viewModel::onChangeLinkName,
-        onChangeLinkUrl = viewModel::onChangeLinkUrl,
-        requireRemove = { if (viewModel.editLinkId.isNotBlank()) onRemoveLink(viewModel.editLinkId) },
     )
 }
 
@@ -126,8 +131,10 @@ fun LinkEditScreen(
                         text = stringResource(R.string.link_name),
                         color = Grey30,
                     )
-                    BTTextField(
-                        modifier = Modifier.padding(start = 12.dp),
+                    BTClearableTextField(
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .fillMaxWidth(),
                         text = linkName,
                         placeholder = stringResource(R.string.link_name_placeholder),
                         singleLine = true,
@@ -135,11 +142,6 @@ fun LinkEditScreen(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                         ),
-                        trailingIcon = if (linkNameFocused && linkName.isNotEmpty()) {
-                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeLinkName("") }) }
-                        } else {
-                            null
-                        },
                         interactionSource = linkNameInteractionSource,
                     )
                 }
@@ -152,8 +154,10 @@ fun LinkEditScreen(
                         text = stringResource(R.string.link_url),
                         color = Grey30,
                     )
-                    BTTextField(
-                        modifier = Modifier.padding(start = 12.dp),
+                    BTClearableTextField(
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .fillMaxWidth(),
                         text = linkUrl,
                         placeholder = stringResource(R.string.link_url_placeholder),
                         singleLine = true,
@@ -162,11 +166,6 @@ fun LinkEditScreen(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
                         ),
-                        trailingIcon = if (linkUrlFocused && linkUrl.isNotEmpty()) {
-                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeLinkUrl("") }) }
-                        } else {
-                            null
-                        },
                         interactionSource = linkUrlInteractionSource,
                     )
                 }
@@ -199,7 +198,12 @@ fun LinkEditScreen(
                 onClickNegativeButton = { showLinkRemoveDialog = false },
                 onDismiss = { showLinkRemoveDialog = false },
             ) {
-                Text(stringResource(R.string.remove_link_dialog_message))
+                Text(
+                    text = stringResource(R.string.remove_link_dialog_message),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }

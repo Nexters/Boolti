@@ -57,6 +57,87 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import okio.utf8Size
 
+/**
+ * 입력값이 있고, 포커즈를 받은 경우 Clear 버튼을 보여주는 텍스트 필드
+ *
+ * [trailingIcon] 이 null 이 아닌 경우 [trailingIcon] 을 보여주고, null 인 경우 조건에 충족하면 Clear 버튼을 보여준다.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BTClearableTextField(
+    text: String,
+    onValueChanged: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String? = null,
+    supportingText: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    bottomEndText: String? = null,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    readOnly: Boolean = false,
+    minHeight: Dp = 48.dp,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    singleLine: Boolean = false,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        errorTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        focusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        errorContainerColor = MaterialTheme.colorScheme.surfaceTint,
+        focusedPlaceholderColor = Grey70,
+        unfocusedPlaceholderColor = Grey70,
+        disabledPlaceholderColor = Grey70,
+        errorPlaceholderColor = Grey70,
+        focusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        unfocusedBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        disabledBorderColor = MaterialTheme.colorScheme.surfaceTint,
+        errorBorderColor = Error,
+        errorLabelColor = Error,
+    ),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    val focused by interactionSource.collectIsFocusedAsState()
+
+    BTTextField(
+        text = text,
+        onValueChanged = onValueChanged,
+        modifier = modifier,
+        placeholder = placeholder,
+        supportingText = supportingText,
+        trailingIcon = {
+            when {
+                trailingIcon != null -> trailingIcon()
+                focused && text.isNotEmpty() -> {
+                    BTTextFieldDefaults.ClearButton(onClick = { onValueChanged("") })
+                }
+                else -> null
+            }
+        },
+        bottomEndText = bottomEndText,
+        enabled = enabled,
+        isError = isError,
+        readOnly = readOnly,
+        minHeight = minHeight,
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        minLines = minLines,
+        colors = colors,
+        interactionSource = interactionSource,
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BTTextField(
@@ -302,8 +383,13 @@ fun BTTextFieldPreview() {
                     placeholder = "예) 재즈와 펑크락을 좋아해요",
                     onValueChanged = { text = it.takeForUnicode(maxLength) },
                     trailingIcon = {
-                        BTTextFieldDefaults.ClearButton(onClick = { /*TODO*/ },)
+                        BTTextFieldDefaults.ClearButton(onClick = { /*TODO*/ })
                     },
+                )
+                BTClearableTextField(
+                    text = text.takeForUnicode(maxLength),
+                    placeholder = "예) 재즈와 펑크락을 좋아해요",
+                    onValueChanged = { text = it.takeForUnicode(maxLength) },
                 )
             }
         }

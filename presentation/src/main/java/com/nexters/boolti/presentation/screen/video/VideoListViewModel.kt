@@ -1,0 +1,260 @@
+package com.nexters.boolti.presentation.screen.video
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.nexters.boolti.domain.model.YouTubeVideo
+import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetYouTubeVideoInfoByUrlUseCase
+import com.nexters.boolti.domain.usecase.GetYouTubeVideoListByUserCodeUseCase
+import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
+
+@HiltViewModel
+class VideoListViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    getUserUseCase: GetUserUsecase,
+    private val getYouTubeVideoListByUserCodeUseCase: GetYouTubeVideoListByUserCodeUseCase,
+    private val getYouTubeVideoInfoByUrlUseCase: GetYouTubeVideoInfoByUrlUseCase,
+    private val userConfigRepository: UserConfigRepository,
+) : ViewModel() {
+    private val route = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>()
+    private val userCode = route.userCode
+    private val isMine = getUserUseCase()?.userCode == userCode
+    private val isEditModeAtFirst = route.isEditMode && isMine
+    private var autoNavigatedToEdit = isEditModeAtFirst
+
+    private val _uiState = MutableStateFlow(
+        VideoListState(
+            isMine = isMine,
+            loading = true,
+            editing = isEditModeAtFirst,
+        )
+    )
+    val uiState = _uiState.asStateFlow()
+
+    private val _videoListEvent = Channel<VideoListEvent>()
+    val videoListEvent = _videoListEvent.receiveAsFlow()
+
+    private val _videoEditEvent = Channel<VideoEditEvent>()
+    val videoEditEvent = _videoEditEvent.receiveAsFlow()
+
+    init {
+        fetchVideos()
+    }
+
+    private fun fetchVideos() {
+        viewModelScope.launch {
+            getYouTubeVideoListByUserCodeUseCase(userCode, refresh = true)
+                .onSuccess { videos ->
+                    _uiState.update {
+                        it.copy(
+                            videos = videos,
+                            originalVideos = videos,
+                            editing = it.editing || isMine && videos.isEmpty(),
+                            loading = false,
+                        )
+                    }
+                    if (isMine && videos.isEmpty()) {
+                        autoNavigatedToEdit = true
+                        videoListEvent(VideoListEvent.NavigateToEdit)
+                    }
+                }
+                .onFailure {
+                    _uiState.update { it.copy(loading = false) }
+                    // TODO 에러 처리
+                }
+        }
+    }
+
+    fun save() {
+        _uiState.update { it.copy(saving = true) }
+        viewModelScope.launch {
+            userConfigRepository.saveVideos(
+                uiState.value.videos.map { it.url },
+            ).onSuccess {
+                _uiState.update {
+                    it.copy(
+                        saving = false,
+                        editing = false,
+                        editingVideo = null,
+                        editingVideoOriginalUrl = null,
+                        originalVideos = uiState.value.videos,
+                        showExitAlertDialog = false,
+                    )
+                }
+            }
+        }
+    }
+
+    fun tryBack() {
+        when {
+            uiState.value.editing && autoNavigatedToEdit && !uiState.value.saveEnabled -> {
+                videoEditEvent(VideoEditEvent.Finish)
+                videoListEvent(VideoListEvent.Finish)
+            }
+
+            uiState.value.editing && uiState.value.edited -> {
+                _uiState.update { it.copy(showExitAlertDialog = true) }
+            }
+
+            uiState.value.editing && uiState.value.originalVideos.isEmpty() -> {
+                videoListEvent(VideoListEvent.Finish)
+            }
+
+            uiState.value.editing -> {
+                _uiState.update { it.copy(editing = false) }
+                videoEditEvent(VideoEditEvent.Finish)
+            }
+
+            else -> {
+                videoListEvent(VideoListEvent.Finish)
+            }
+        }
+    }
+
+    fun startAddOrEditVideo(
+        videoId: String?,
+    ) {
+        val targetVideo = uiState.value.videos.find { it.localId == videoId }
+            ?: YouTubeVideo.EMPTY
+        _uiState.update {
+            it.copy(
+                editingVideo = targetVideo,
+                editingVideoOriginalUrl = targetVideo.url,
+            )
+        }
+    }
+
+    fun onVideoUrlChanged(
+        url: String,
+    ) {
+        if (uiState.value.editingVideo == null) startAddOrEditVideo(null)
+
+        _uiState.update {
+            it.copy(
+                editingVideo = it.editingVideo?.copy(url = url)
+            )
+        }
+    }
+
+    fun removeVideo() {
+        val targetVideo = uiState.value.editingVideo ?: return
+        _uiState.update {
+            it.copy(
+                videos = it.videos.filterNot { video -> video.localId == targetVideo.localId },
+                editingVideo = null,
+                editingVideoOriginalUrl = null,
+            )
+        }
+        autoNavigatedToEdit = false
+        videoEditEvent(VideoEditEvent.Finish)
+        videoListEvent(VideoListEvent.Removed)
+    }
+
+    fun completeAddOrEditVideo() {
+        val video = uiState.value.editingVideo ?: return
+        val editMode = video.localId.isNotEmpty()
+
+        viewModelScope.launch {
+            if (editMode) {
+                // 편집 모드일 때도 YouTube API로 정보 업데이트
+                val youTubeVideo = getYouTubeVideoInfoByUrlUseCase(video.url)
+                val updatedVideo = youTubeVideo?.copy(localId = video.localId)
+                    ?: createInvalidVideo(video.url).copy(localId = video.localId)
+                editVideo(updatedVideo)
+                videoEditEvent(VideoEditEvent.Finish)
+                videoListEvent(VideoListEvent.Edited)
+            } else {
+                // 새 동영상 추가 시 YouTube API로 정보 가져오기
+                val youTubeVideo = getYouTubeVideoInfoByUrlUseCase(video.url)
+                if (youTubeVideo != null) {
+                    addVideo(youTubeVideo)
+                    videoListEvent(VideoListEvent.Added)
+                } else {
+                    // 유효하지 않은 URL인 경우 기본 비디오 객체 생성하여 추가
+                    val invalidVideo = createInvalidVideo(video.url)
+                    addVideo(invalidVideo)
+                    videoListEvent(VideoListEvent.Added)
+                }
+                autoNavigatedToEdit = false
+                videoEditEvent(VideoEditEvent.Finish)
+            }
+        }
+    }
+
+    private fun addVideo(
+        video: YouTubeVideo,
+    ) {
+        val newVideo = video.copy(localId = UUID.randomUUID().toString())
+        _uiState.update {
+            it.copy(
+                videos = listOf(newVideo) + it.videos, // 최상단에 추가
+                editingVideo = null,
+                editingVideoOriginalUrl = null,
+            )
+        }
+    }
+
+    private fun editVideo(
+        video: YouTubeVideo,
+    ) {
+        _uiState.update {
+            it.copy(
+                videos = it.videos.map { old ->
+                    if (old.localId == video.localId) video else old
+                },
+                editingVideo = null,
+                editingVideoOriginalUrl = null,
+            )
+        }
+    }
+
+    fun reorder(from: Int, to: Int) {
+        val videos = uiState.value.videos.toMutableList()
+        if (from !in videos.indices || to !in videos.indices) return
+
+        _uiState.update {
+            it.copy(
+                videos = videos.apply { add(to, removeAt(from)) },
+            )
+        }
+    }
+
+    fun setEditMode() {
+        _uiState.update { it.copy(editing = true) }
+    }
+
+    fun dismissExitAlertDialog() {
+        _uiState.update { it.copy(showExitAlertDialog = false) }
+    }
+
+    private fun videoListEvent(event: VideoListEvent) {
+        viewModelScope.launch {
+            _videoListEvent.send(event)
+        }
+    }
+
+    private fun videoEditEvent(event: VideoEditEvent) {
+        viewModelScope.launch {
+            _videoEditEvent.send(event)
+        }
+    }
+
+    private fun createInvalidVideo(url: String): YouTubeVideo {
+        return YouTubeVideo.EMPTY.copy(
+            localId = UUID.randomUUID().toString(),
+            url = url,
+        )
+    }
+}

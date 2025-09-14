@@ -28,14 +28,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -47,15 +45,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
-import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.theme.BooltiTheme
-import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
-import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.KakaoYellow
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.util.copyToClipboard
 
 @Composable
 fun AccountSettingScreen(
@@ -73,7 +67,6 @@ fun AccountSettingScreen(
 
     AccountSettingScreen(
         modifier = modifier,
-        userCode = user?.userCode ?: "",
         onClickBack = navigateBack,
         requireLogout = viewModel::logout,
         onClickResign = onClickResign,
@@ -83,7 +76,6 @@ fun AccountSettingScreen(
 @Composable
 fun AccountSettingScreen(
     modifier: Modifier = Modifier,
-    userCode: String,
     onClickBack: () -> Unit = {},
     requireLogout: () -> Unit = {},
     onClickResign: () -> Unit = {},
@@ -91,8 +83,6 @@ fun AccountSettingScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val clipboardManager = LocalClipboardManager.current
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier,
@@ -121,34 +111,6 @@ fun AccountSettingScreen(
                 Section(
                     modifier = Modifier.padding(top = 20.dp),
                 ) {
-                    Title(stringResource(R.string.user_code))
-                    Row(
-                        modifier = Modifier.padding(top = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = "#$userCode",
-                            color = Grey30,
-                        )
-
-                        val copySuccessMessage = stringResource(R.string.code_copy_success_message)
-                        SmallButton(
-                            label = stringResource(R.string.copy_code_label),
-                            iconRes = R.drawable.ic_copy,
-                            backgroundColor = Grey80,
-                        ) {
-                            userCode.copyToClipboard(
-                                copySuccessMessage = copySuccessMessage,
-                                snackbarHostState = snackbarHostState,
-                                clipboardManager = clipboardManager,
-                                scope = scope,
-                            )
-                        }
-                    }
-                }
-
-                Section {
                     Title(stringResource(R.string.sns_provider))
                     KakaoChip(modifier = Modifier.padding(top = 16.dp))
                 }
@@ -295,7 +257,6 @@ private fun KakaoChipPreview() {
 private fun AccountSettingScreenPreview() {
     BooltiTheme {
         AccountSettingScreen(
-            userCode = "AB1800028",
             onClickBack = {},
             requireLogout = {},
         ) { }

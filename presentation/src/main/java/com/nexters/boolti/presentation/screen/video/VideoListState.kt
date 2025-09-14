@@ -1,0 +1,25 @@
+package com.nexters.boolti.presentation.screen.video
+
+import com.nexters.boolti.domain.model.YouTubeVideo
+
+data class VideoListState(
+    val videos: List<YouTubeVideo> = emptyList(),
+    val originalVideos: List<YouTubeVideo> = emptyList(),
+    val editingVideo: YouTubeVideo? = null,
+    val editingVideoOriginalUrl: String? = null,
+    val editing: Boolean = false,
+    val saving: Boolean = false,
+    val loading: Boolean = false,
+    val isMine: Boolean = false,
+    val showExitAlertDialog: Boolean = false,
+) {
+    val edited: Boolean
+        get() = videos != originalVideos
+
+    val saveEnabled: Boolean
+        get() = !saving && edited
+
+    val editingVideoCompleteEnabled: Boolean
+        get() = editingVideoOriginalUrl != null && editingVideo != null &&
+                editingVideo.url.isNotBlank() && editingVideoOriginalUrl != editingVideo.url
+}

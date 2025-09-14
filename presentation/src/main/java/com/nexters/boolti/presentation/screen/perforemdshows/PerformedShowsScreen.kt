@@ -2,12 +2,14 @@ package com.nexters.boolti.presentation.screen.perforemdshows
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,8 +24,10 @@ import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
+import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -69,28 +73,37 @@ private fun PerformedShowsScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             BtBackAppBar(
-                title = stringResource(R.string.performed_shows),
+                title = stringResource(R.string.last_shows),
                 onClickBack = onClickBack,
             )
         },
     ) { innerPadding ->
         Box(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
         ) {
-            LazyColumn(
-                contentPadding = PaddingValues(top = 20.dp, bottom = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(shows) { show ->
-                    ShowItem(
-                        show = show,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RectangleShape,
-                        onClick = { onClickShow(show) },
-                    )
+            Column {
+                ListToolbar(
+                    modifier = Modifier.padding(horizontal = marginHorizontal),
+                    totalCount = shows.size,
+                    onClickAdd = null,
+                )
+                LazyColumn(
+                    contentPadding = PaddingValues(top = 4.dp, bottom = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(shows, { it.id }) { show ->
+                        ShowItem(
+                            show = show,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RectangleShape,
+                            showNameStyle = MaterialTheme.typography.titleMedium,
+                            onClick = { onClickShow(show) },
+                        )
+                    }
                 }
             }
-
             if (loading) {
                 BtCircularProgressIndicator(
                     modifier = Modifier

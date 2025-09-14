@@ -11,6 +11,8 @@ import com.nexters.boolti.data.repository.ReservationRepositoryImpl
 import com.nexters.boolti.data.repository.ShowRepositoryImpl
 import com.nexters.boolti.data.repository.TicketRepositoryImpl
 import com.nexters.boolti.data.repository.TicketingRepositoryImpl
+import com.nexters.boolti.data.repository.UserConfigRepositoryImpl
+import com.nexters.boolti.data.repository.YouTubeRepositoryImpl
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ConfigRepository
 import com.nexters.boolti.domain.repository.FileRepository
@@ -22,6 +24,8 @@ import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.domain.repository.YouTubeRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -61,5 +65,11 @@ internal abstract class RepositoryModule {
     abstract fun bindMemberRepository(repository: MemberRepositoryImpl): MemberRepository
 
     @Binds
+    abstract fun bindUserConfigRepository(repository: UserConfigRepositoryImpl): UserConfigRepository
+
+    @Binds
     abstract fun bindPopupRepository(repository: PopupRepositoryImpl): PopupRepository
+
+    @Binds
+    abstract fun bindYouTubeRepository(repository: YouTubeRepositoryImpl): YouTubeRepository
 }

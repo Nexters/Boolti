@@ -5,36 +5,34 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,44 +40,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nexters.boolti.domain.model.Link
-import com.nexters.boolti.domain.model.Sns
+import coil.compose.AsyncImage
+import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
-import com.nexters.boolti.presentation.component.UserThumbnail
-import com.nexters.boolti.presentation.extension.icon
-import com.nexters.boolti.presentation.extension.label
-import com.nexters.boolti.presentation.extension.takeForUnicode
+import com.nexters.boolti.presentation.component.BtSwitch
+import com.nexters.boolti.presentation.component.FixedWidthText
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.theme.Grey15
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.ReorderableState
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -88,52 +81,37 @@ import java.io.IOException
 fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     navigateBack: () -> Unit,
-    navigateToSnsEdit: (Sns?) -> Unit,
-    navigateToLinkEdit: (Link?) -> Unit,
-    newLinkCallback: Flow<Link>,
-    editLinkCallback: Flow<Link>,
-    removeLinkCallback: Flow<String>,
-    newSnsCallback: Flow<Sns>,
-    editSnsCallback: Flow<Sns>,
-    removeSnsCallback: Flow<String>,
+    navigateToNicknameEdit: () -> Unit,
+    navigateToUserCodeEdit: () -> Unit,
+    navigateToIntroductionEdit: () -> Unit,
+    navigateToSnsEdit: () -> Unit,
+    navigateToLinkEdit: (userCode: UserCode) -> Unit,
+    navigateToVideoEdit: (userCode: UserCode) -> Unit,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
-    val context = LocalContext.current
-
-    LaunchedEffect(newLinkCallback) {
-        newLinkCallback.collect(viewModel::onNewLinkAdded)
-    }
-    LaunchedEffect(editLinkCallback) {
-        editLinkCallback.collect(viewModel::onLinkEdited)
-    }
-    LaunchedEffect(removeLinkCallback) {
-        removeLinkCallback.collect(viewModel::onLinkRemoved)
-    }
-    LaunchedEffect(newSnsCallback) {
-        newSnsCallback.collect(viewModel::onSnsAdded)
-    }
-    LaunchedEffect(editSnsCallback) {
-        editSnsCallback.collect(viewModel::onSnsEdited)
-    }
-    LaunchedEffect(removeSnsCallback) {
-        removeSnsCallback.collect(viewModel::onSnsRemoved)
-    }
 
     ProfileEditScreen(
         modifier = modifier,
         thumbnail = uiState.thumbnail,
         nickname = uiState.nickname,
-        nicknameError = uiState.nicknameError,
+        userCode = uiState.userCode,
         introduction = uiState.introduction,
-        snsList = uiState.snsList.toImmutableList(),
-        links = uiState.links.toImmutableList(),
+        snsCount = uiState.snsCount,
+        upcomingShowCount = uiState.upcomingShowCount,
+        pastShowCount = uiState.pastShowCount,
+        showUpcomingShows = uiState.showUpcomingShows,
+        showPerformedShows = uiState.showPerformedShows,
+        onClickUpcomingShows = viewModel::toggleShowUpcomingShows,
+        onClickPastShows = viewModel::toggleShowPerformedShows,
+        videoCount = uiState.videoCount,
+        linkCount = uiState.linkCount,
         saving = uiState.saving,
         event = event,
-        checkDataChanged = { viewModel.isDataChanged },
         navigateBack = navigateBack,
-        onClickComplete = {
+        onChangeThumbnail = {
             val file = it?.let { uri ->
                 val file = File(context.cacheDir, "temp_profile_image.jpg")
                 try {
@@ -147,41 +125,43 @@ fun ProfileEditScreen(
                 }
                 file
             }
-            viewModel.completeEdits(file)
+            viewModel.changeThumbnail(file)
         },
-        onChangeNickname = viewModel::changeNickname,
-        onChangeIntroduction = viewModel::changeIntroduction,
-        onClickAddSns = { navigateToSnsEdit(null) },
-        onClickAddLink = { navigateToLinkEdit(null) },
-        onClickEditSns = { sns -> navigateToSnsEdit(sns) },
-        onClickEditLink = { link -> navigateToLinkEdit(link) },
-        onReorderSns = viewModel::reorderSns,
-        onReorderLink = viewModel::reorderLink,
+        onClickNickname = navigateToNicknameEdit,
+        onClickUserCode = navigateToUserCodeEdit,
+        onClickIntroduction = navigateToIntroductionEdit,
+        onClickSns = navigateToSnsEdit,
+        onClickVideo = { navigateToVideoEdit(uiState.userCode) },
+        onClickLink = { navigateToLinkEdit(uiState.userCode) },
     )
 }
 
 @Composable
-fun ProfileEditScreen(
+private fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     thumbnail: String,
     nickname: String,
-    nicknameError: NicknameError? = null,
+    userCode: UserCode,
     introduction: String,
-    snsList: ImmutableList<Sns>,
-    links: ImmutableList<Link>,
+    snsCount: Int,
+    upcomingShowCount: Int,
+    pastShowCount: Int,
+    showUpcomingShows: Boolean,
+    showPerformedShows: Boolean,
+    onClickUpcomingShows: () -> Unit,
+    onClickPastShows: () -> Unit,
+    videoCount: Int,
+    linkCount: Int,
     saving: Boolean,
     event: Flow<ProfileEditEvent>,
-    checkDataChanged: () -> Boolean,
     navigateBack: () -> Unit,
-    onClickComplete: (uri: Uri?) -> Unit,
-    onChangeNickname: (String) -> Unit,
-    onChangeIntroduction: (String) -> Unit,
-    onClickAddSns: () -> Unit,
-    onClickAddLink: () -> Unit,
-    onClickEditSns: (Sns) -> Unit,
-    onClickEditLink: (Link) -> Unit,
-    onReorderSns: (from: Int, to: Int) -> Unit,
-    onReorderLink: (from: Int, to: Int) -> Unit,
+    onChangeThumbnail: (Uri?) -> Unit,
+    onClickNickname: () -> Unit,
+    onClickUserCode: () -> Unit,
+    onClickIntroduction: () -> Unit,
+    onClickSns: () -> Unit,
+    onClickVideo: () -> Unit,
+    onClickLink: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = LocalSnackbarController.current
@@ -195,18 +175,29 @@ fun ProfileEditScreen(
     val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
     val unknownErrorMsg = stringResource(R.string.message_unknown_error)
 
+    val appBarBgColor by animateColorAsState(
+        targetValue = if (scrollState.canScrollBackward) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            Color.Transparent
+        },
+        label = "appBarBgColor",
+    )
+
     var selectedImage by remember { mutableStateOf<Uri?>(null) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> selectedImage = uri }
+        onResult = { uri ->
+            selectedImage = uri
+            onChangeThumbnail(uri)
+        }
     )
 
-    var showExitAlertDialog by remember { mutableStateOf(false) }
     var showUnAuthorizedDialog by remember { mutableStateOf(false) }
 
     fun tryBack() {
-        if (checkDataChanged()) showExitAlertDialog = true else navigateBack()
+        navigateBack()
     }
 
     BackHandler { tryBack() }
@@ -230,240 +221,135 @@ fun ProfileEditScreen(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
+        modifier = modifier,
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ) {
             BtAppBar(
+                modifier = Modifier.zIndex(1f),
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
                         onClick = ::tryBack,
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
-                actionButtons = {
-                    BtAppBarDefaults.AppBarTextButton(
-                        label = stringResource(R.string.complete),
-                        onClick = { onClickComplete(selectedImage) },
-                        enabled = !saving && nicknameError == null,
-                    )
-                },
                 title = stringResource(R.string.profile_edit),
-                colors = BtAppBarDefaults.appBarColors(),
+                colors = BtAppBarDefaults.appBarColors(
+                    containerColor = appBarBgColor,
+                ),
             )
-        },
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState),
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(bottom = innerPadding.calculateBottomPadding()),
             ) {
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                ) {
-                    val (thumbnailImg, cameraIcon) = createRefs()
-                    UserThumbnail(
-                        modifier = Modifier.constrainAs(thumbnailImg) { centerTo(parent) },
-                        size = 100.dp,
-                        model = selectedImage ?: thumbnail,
-                        contentDescription = stringResource(R.string.description_user_thumbnail),
-                    )
-                    Surface(
-                        modifier = Modifier
-                            .constrainAs(cameraIcon) {
-                                end.linkTo(thumbnailImg.end, margin = (-7.5).dp)
-                                bottom.linkTo(thumbnailImg.bottom)
-                            }
-                            .size(40.dp),
-                        shape = CircleShape,
-                        color = Color.White,
-                        shadowElevation = 6.dp,
-                        onClick = {
-                            if (!saving) photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        },
-                    ) {
-                        Image(
-                            modifier = Modifier.padding(8.dp),
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_camera),
-                            contentDescription = stringResource(R.string.change_thumbnail_description),
+                ProfileHeader(
+                    modifier = Modifier.fillMaxWidth(),
+                    thumbnail = selectedImage ?: thumbnail,
+                    onClickPhotoButton = {
+                        if (!saving) photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     }
-                }
-                Section(title = stringResource(R.string.label_nickname)) {
-                    BTTextField(
-                        modifier = Modifier
-                            .padding(horizontal = marginHorizontal)
-                            .fillMaxWidth(),
-                        text = nickname,
-                        placeholder = stringResource(R.string.profile_edit_nickname_placeholder),
-                        onValueChanged = onChangeNickname,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                        ),
-                        singleLine = true,
-                        isError = nicknameError != null,
-                        supportingText = nicknameError?.let {
-                            when (it) {
-                                NicknameError.MinLength -> stringResource(
-                                    R.string.validate_min_length,
-                                    1
-                                )
-
-                                NicknameError.Invalid -> stringResource(R.string.validate_edit_nickname)
-                            }
+                )
+                Section(title = stringResource(R.string.label_information)) {
+                    SectionItem(
+                        label = stringResource(R.string.label_nickname),
+                        value = nickname,
+                        defaultValue = userCode,
+                        onClick = onClickNickname,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.label_id),
+                        value = userCode,
+                        defaultValue = userCode,
+                        onClick = onClickUserCode,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.label_introduction),
+                        value = introduction,
+                        defaultValue = stringResource(R.string.hint_add_introduction),
+                        onClick = onClickIntroduction,
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.sns),
+                        count = snsCount,
+                        defaultValue = stringResource(R.string.hint_add_sns),
+                        onClick = onClickSns,
+                        right = if (snsCount > 0) {
+                            { ArrowRight() }
+                        } else {
+                            null
                         },
-                        enabled = !saving,
                     )
                 }
-                Section(
-                    modifier = Modifier.padding(top = 12.dp),
-                    title = stringResource(R.string.label_introduction)
-                ) {
-                    val maxIntroduceLength = 60
-
-                    BTTextField(
-                        modifier = Modifier
-                            .padding(horizontal = marginHorizontal)
-                            .fillMaxWidth()
-                            .height(122.dp),
-                        text = introduction.takeForUnicode(maxIntroduceLength),
-                        placeholder = stringResource(R.string.profile_edit_introduction_placeholder),
-                        minHeight = 122.dp,
-                        bottomEndText = stringResource(
-                            R.string.input_limit,
-                            introduction.length,
-                            maxIntroduceLength
-                        ),
-                        onValueChanged = { onChangeIntroduction(it.takeForUnicode(maxIntroduceLength)) },
-                        enabled = !saving,
-                    )
-                }
-
-                val snsReorderState = rememberReorderableLazyListState(
-                    onMove = { from, to ->
-                        onReorderSns(from.index - 1, to.index - 1)
-                    },
-                )
-                Section(
-                    modifier = Modifier.padding(top = 12.dp),
-                    title = stringResource(R.string.profile_edit_sns_title),
-                ) {
-                    LazyColumn(
-                        state = snsReorderState.listState,
-                        modifier = Modifier
-                            .heightIn(max = 100.dp * (snsList.size + 1)) // 대충 넉넉하게 잡은 높이
-                            .reorderable(snsReorderState),
-                    ) {
-                        val snsAddable = !snsList
-                            .asSequence()
-                            .map { it.type }
-                            .toSet()
-                            .containsAll(Sns.SnsType.entries)
-
-                        if (snsAddable) {
-                            item(
-                                contentType = "SnsAddButton",
-                            ) {
-                                LinkAddButton(
-                                    modifier = Modifier.padding(top = 4.dp),
-                                    label = stringResource(R.string.sns_add),
-                                    onClick = onClickAddSns,
-                                    enabled = !saving,
-                                )
-                            }
-                        }
-                        items(
-                            items = snsList,
-                            key = { it.id },
-                            contentType = { "SnsItem" },
-                        ) { sns ->
-                            ReorderableItem(
-                                state = snsReorderState,
-                                key = sns.id,
-                            ) {
-                                SnsItem(
-                                    modifier = Modifier.padding(top = 12.dp),
-                                    sns = sns,
-                                    reorderableState = snsReorderState,
-                                ) { if (!saving) onClickEditSns(sns) }
-                            }
-                        }
-                    }
-                }
-
-                val linkReorderState = rememberReorderableLazyListState(
-                    onMove = { from, to ->
-                        onReorderLink(from.index - 1, to.index - 1)
-                    },
-                )
-                Section(
-                    modifier = Modifier.padding(top = 12.dp),
-                    title = stringResource(R.string.label_links),
-                ) {
-                    LazyColumn(
-                        state = linkReorderState.listState,
-                        modifier = Modifier
-                            .heightIn(max = 100.dp * (links.size + 1)) // 대충 넉넉하게 잡은 높이
-                            .reorderable(linkReorderState),
-                    ) {
-                        item(
-                            contentType = "LinkAddButton",
-                        ) {
-                            LinkAddButton(
-                                modifier = Modifier.padding(top = 4.dp),
-                                label = stringResource(R.string.link_add_btn),
-                                onClick = onClickAddLink,
-                                enabled = !saving,
+                Spacer(Modifier.height(12.dp))
+                Section(title = stringResource(R.string.label_activity_visibility)) {
+                    SectionItem(
+                        label = stringResource(R.string.label_upcoming_shows),
+                        count = upcomingShowCount,
+                        defaultValue = "-",
+                        onClick = if (upcomingShowCount > 0) {
+                            onClickUpcomingShows
+                        } else {
+                            null
+                        },
+                        right = {
+                            BtSwitch(
+                                checked = upcomingShowCount > 0 && showUpcomingShows,
+                                enabled = upcomingShowCount > 0,
                             )
-                        }
-                        items(
-                            items = links,
-                            key = { it.id },
-                            contentType = { "LinkItem" },
-                        ) { link ->
-                            ReorderableItem(
-                                state = linkReorderState,
-                                key = link.id,
-                            ) {
-                                LinkItem(
-                                    modifier = Modifier.padding(top = 12.dp),
-                                    title = link.name,
-                                    url = link.url,
-                                    reorderableState = linkReorderState,
-                                ) { if (!saving) onClickEditLink(link) }
-                            }
-                        }
-                    }
+                        },
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.label_past_shows),
+                        count = pastShowCount,
+                        defaultValue = "-",
+                        onClick = if (pastShowCount > 0) {
+                            onClickPastShows
+                        } else {
+                            null
+                        },
+                        right = {
+                            BtSwitch(
+                                checked = pastShowCount > 0 && showPerformedShows,
+                                enabled = pastShowCount > 0,
+                            )
+                        },
+                    )
                 }
-
-                Spacer(Modifier.size(32.dp))
+                Spacer(Modifier.height(12.dp))
+                Section(title = stringResource(R.string.label_video_and_link)) {
+                    SectionItem(
+                        label = stringResource(R.string.video),
+                        count = videoCount,
+                        defaultValue = stringResource(R.string.video_add),
+                        onClick = onClickVideo,
+                        right = if (videoCount > 0) {
+                            { ArrowRight() }
+                        } else {
+                            null
+                        },
+                    )
+                    SectionItem(
+                        label = stringResource(R.string.link),
+                        count = linkCount,
+                        defaultValue = stringResource(R.string.link_add),
+                        onClick = onClickLink,
+                        right = if (linkCount > 0) {
+                            { ArrowRight() }
+                        } else {
+                            null
+                        },
+                    )
+                }
             }
 
             if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-        if (showExitAlertDialog) {
-            BTDialog(
-                content = {
-                    Text(
-                        text = stringResource(R.string.profile_edit_alert_exit),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                },
-                positiveButtonLabel = stringResource(R.string.save),
-                negativeButtonLabel = stringResource(R.string.btn_exit),
-                onClickPositiveButton = { onClickComplete(selectedImage) },
-                onClickNegativeButton = navigateBack,
-                onDismiss = { showExitAlertDialog = false },
-            )
-        }
+
         if (showUnAuthorizedDialog) {
             BTDialog(
                 enableDismiss = false,
@@ -482,136 +368,62 @@ fun ProfileEditScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun LinkAddButton(
-    label: String,
-    onClick: () -> Unit,
+private fun ProfileHeader(
+    thumbnail: Any,
+    onClickPhotoButton: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(vertical = 10.dp, horizontal = marginHorizontal),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .border(1.dp, Grey50, CircleShape)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                modifier = Modifier.size(20.dp),
-                imageVector = Icons.Rounded.Add,
-                tint = Grey30,
-                contentDescription = label,
-            )
-        }
-        Text(
-            modifier = Modifier.padding(start = 16.dp),
-            text = label,
-            style = MaterialTheme.typography.titleMedium,
-        )
-    }
-}
+    val defaultProfile = painterResource(R.drawable.ic_profile_placeholder)
 
-@Composable
-private fun SnsItem(
-    sns: Sns,
-    modifier: Modifier = Modifier,
-    reorderableState: ReorderableState<*>,
-    onClickEdit: () -> Unit,
-) {
-    Row(
+    Box(
         modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClickEdit)
-            .padding(horizontal = marginHorizontal, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(bottom = 32.dp),
     ) {
-        Icon(
-            modifier = Modifier.size(24.dp),
-            imageVector = ImageVector.vectorResource(sns.type.icon),
-            tint = Grey30,
-            contentDescription = sns.type.label,
-        )
-        Text(
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .defaultMinSize(minWidth = 72.dp),
-            text = sns.type.label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Grey30,
-        )
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .weight(1f),
-            text = sns.username,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.titleMedium,
-            color = Grey15,
-        )
-        Icon(
-            modifier = Modifier
-                .padding(start = 20.dp)
-                .size(20.dp)
-                .detectReorder(reorderableState),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
-            tint = Grey50,
-            contentDescription = stringResource(R.string.sns_reorder_description),
-        )
-    }
-}
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+            ) {
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = thumbnail,
+                    contentScale = ContentScale.Crop,
+                    placeholder = defaultProfile,
+                    fallback = defaultProfile,
+                    contentDescription = stringResource(R.string.description_user_thumbnail),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(Grey90.copy(0.2f), Grey90.copy(1f))
+                            ),
+                        ),
+                )
 
-@Composable
-private fun LinkItem(
-    title: String,
-    url: String,
-    reorderableState: ReorderableState<*>,
-    modifier: Modifier = Modifier,
-    onClickEdit: () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClickEdit)
-            .padding(horizontal = marginHorizontal),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(vertical = 5.dp)
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = title,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleMedium,
-                color = Grey15,
-            )
-            Text(
-                text = url,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey30,
-                maxLines = 1,
-            )
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(20.dp)
+                        .size(40.dp),
+                    shape = CircleShape,
+                    color = Color.White,
+                    shadowElevation = 6.dp,
+                    onClick = onClickPhotoButton,
+                ) {
+                    Image(
+                        modifier = Modifier.padding(8.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_camera),
+                        contentDescription = stringResource(R.string.change_thumbnail_description),
+                    )
+                }
+            }
         }
-        Icon(
-            modifier = Modifier
-                .padding(start = 20.dp)
-                .size(20.dp)
-                .detectReorder(reorderableState),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_reordable_handle),
-            tint = Grey50,
-            contentDescription = stringResource(R.string.link_reorder_description),
-        )
     }
 }
 
@@ -640,4 +452,84 @@ private fun Section(
             content()
         }
     }
+}
+
+@Composable
+private fun SectionItem(
+    label: String,
+    count: Int,
+    defaultValue: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    right: (@Composable RowScope.() -> Unit)? = null,
+    labelScrollState: ScrollState = rememberScrollState(),
+) {
+    SectionItem(
+        label = label,
+        value = if (count != 0) stringResource(R.string.count, count) else "",
+        defaultValue = defaultValue,
+        modifier = modifier,
+        onClick = onClick,
+        right = right,
+        labelScrollState = labelScrollState,
+    )
+}
+
+@Composable
+private fun SectionItem(
+    label: String,
+    value: String,
+    defaultValue: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    right: (@Composable RowScope.() -> Unit)? = null,
+    labelScrollState: ScrollState = rememberScrollState(),
+) {
+    Row(
+        modifier = modifier.padding(start = marginHorizontal, end = marginHorizontal - 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FixedWidthText(
+            text = label,
+            width = 100.dp,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Grey30,
+        )
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(
+                    onClick = onClick ?: {},
+                    role = Role.Button,
+                    enabled = onClick != null,
+                    onClickLabel = label,
+                )
+                .padding(vertical = 10.dp, horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = value.ifEmpty { defaultValue },
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (value.isNotEmpty()) Grey05 else Grey70,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            right?.invoke(this)
+        }
+    }
+}
+
+@Composable
+private fun ArrowRight(
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+) {
+    Icon(
+        modifier = modifier.size(20.dp),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
+        contentDescription = contentDescription,
+        tint = Grey50,
+    )
 }

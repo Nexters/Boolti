@@ -4,6 +4,12 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.nexters.boolti.data.BuildConfig
 import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
+import com.nexters.boolti.data.di.qualifier.AuthOkHttpClient
+import com.nexters.boolti.data.di.qualifier.AuthRetrofit
+import com.nexters.boolti.data.di.qualifier.NonAuthOkHttpClient
+import com.nexters.boolti.data.di.qualifier.NonAuthRetrofit
+import com.nexters.boolti.data.di.qualifier.YouTubeOkHttpClient
+import com.nexters.boolti.data.di.qualifier.YouTubeRetrofit
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
 import com.nexters.boolti.data.network.api.AuthFileService
@@ -20,6 +26,7 @@ import com.nexters.boolti.data.network.api.SignUpService
 import com.nexters.boolti.data.network.api.TicketService
 import com.nexters.boolti.data.network.api.TicketingService
 import com.nexters.boolti.data.network.api.UserService
+import com.nexters.boolti.data.network.api.YouTubeService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,7 +38,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.create
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -39,8 +45,8 @@ import javax.inject.Singleton
 internal object NetworkModule {
     @Singleton
     @Provides
-    @Named("auth")
-    fun provideAuthRetrofit(@Named("auth") okHttpClient: OkHttpClient): Retrofit {
+    @AuthRetrofit
+    fun provideAuthRetrofit(@AuthOkHttpClient okHttpClient: OkHttpClient): Retrofit {
         val json = Json {
             isLenient = true
             prettyPrint = true
@@ -56,8 +62,8 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    @Named("non-auth")
-    fun provideNonAuthRetrofit(@Named("non-auth") okHttpClient: OkHttpClient): Retrofit {
+    @NonAuthRetrofit
+    fun provideNonAuthRetrofit(@NonAuthOkHttpClient okHttpClient: OkHttpClient): Retrofit {
         val json = Json {
             isLenient = true
             prettyPrint = true
@@ -93,16 +99,16 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    @Named("auth")
-    fun provideAuthApiService(@Named("auth") retrofit: Retrofit): LoginService = retrofit.create()
+    @AuthRetrofit
+    fun provideAuthApiService(@AuthRetrofit retrofit: Retrofit): LoginService = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideUserService(@Named("auth") retrofit: Retrofit): UserService = retrofit.create()
+    fun provideUserService(@AuthRetrofit retrofit: Retrofit): UserService = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideDeviceTokenService(@Named("auth") retrofit: Retrofit): DeviceTokenService =
+    fun provideDeviceTokenService(@AuthRetrofit retrofit: Retrofit): DeviceTokenService =
         retrofit.create()
 
     @Singleton
@@ -115,47 +121,86 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideTicketingService(@Named("auth") retrofit: Retrofit): TicketingService =
+    fun provideTicketingService(@AuthRetrofit retrofit: Retrofit): TicketingService =
         retrofit.create()
 
     @Singleton
     @Provides
-    fun provideGiftService(@Named("auth") retrofit: Retrofit): GiftService = retrofit.create()
+    fun provideGiftService(@AuthRetrofit retrofit: Retrofit): GiftService = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideTicketService(@Named("auth") retrofit: Retrofit): TicketService = retrofit.create()
+    fun provideTicketService(@AuthRetrofit retrofit: Retrofit): TicketService = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideReservationService(@Named("auth") retrofit: Retrofit): ReservationService =
+    fun provideReservationService(@AuthRetrofit retrofit: Retrofit): ReservationService =
         retrofit.create()
 
     @Singleton
     @Provides
-    fun provideHostService(@Named("auth") retrofit: Retrofit): HostService = retrofit.create()
+    fun provideHostService(@AuthRetrofit retrofit: Retrofit): HostService = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideAuthFileService(@Named("auth") retrofit: Retrofit): AuthFileService =
+    fun provideAuthFileService(@AuthRetrofit retrofit: Retrofit): AuthFileService =
         retrofit.create()
 
     @Singleton
     @Provides
-    fun provideFileService(@Named("non-auth") retrofit: Retrofit): FileService = retrofit.create()
+    fun provideFileService(@NonAuthRetrofit retrofit: Retrofit): FileService = retrofit.create()
 
     @Singleton
     @Provides
-    fun provideMemberService(@Named("non-auth") retrofit: Retrofit): MemberService =
+    fun provideMemberService(@NonAuthRetrofit retrofit: Retrofit): MemberService =
         retrofit.create()
 
     @Singleton
     @Provides
-    fun providePopupService(@Named("non-auth") retrofit: Retrofit): PopupService = retrofit.create()
+    fun providePopupService(@NonAuthRetrofit retrofit: Retrofit): PopupService = retrofit.create()
 
     @Singleton
     @Provides
-    @Named("auth")
+    @YouTubeRetrofit
+    fun provideYouTubeRetrofit(@YouTubeOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+        val json = Json {
+            isLenient = true
+            prettyPrint = true
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+        }
+        return Retrofit.Builder()
+            .baseUrl("https://www.googleapis.com/youtube/v3/")
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @YouTubeOkHttpClient
+    fun provideYouTubeOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+        return OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideYouTubeService(@YouTubeRetrofit retrofit: Retrofit): YouTubeService = retrofit.create()
+
+    @Singleton
+    @Provides
+    @AuthOkHttpClient
     fun provideAuthOkHttpClient(
         interceptor: AuthInterceptor,
         authenticator: AuthAuthenticator
@@ -196,7 +241,7 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    @Named("non-auth")
+    @NonAuthOkHttpClient
     fun provideNoneAuthOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {

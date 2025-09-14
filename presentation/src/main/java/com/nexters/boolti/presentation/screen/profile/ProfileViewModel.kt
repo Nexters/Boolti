@@ -6,6 +6,7 @@ import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.MemberRepository
+import com.nexters.boolti.domain.repository.YouTubeRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -27,10 +28,12 @@ class ProfileViewModel @Inject constructor(
     getUserUsecase: GetUserUsecase,
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
+    private val youTubeRepository: YouTubeRepository,
 ) : BaseViewModel() {
     private val _userCode: String? = savedStateHandle.toRoute<MainRoute.Profile>().userCode
     private val myProfile: User.My = getUserUsecase() ?: User.My("-999")
     private val isMyProfile = _userCode?.equals(myProfile.userCode) ?: true
+    private var previousVideoIds: List<String>? = null
 
     private val _uiState = MutableStateFlow(
         ProfileState(
@@ -62,6 +65,12 @@ class ProfileViewModel @Inject constructor(
             .filterNotNull()
             .onEach { user ->
                 _uiState.update { it.copy(user = user) }
+
+                val currentVideoIds = user.video.previewItems
+                if (currentVideoIds != previousVideoIds) {
+                    loadYouTubeVideos(currentVideoIds)
+                    previousVideoIds = currentVideoIds
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -70,8 +79,29 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch(recordExceptionHandler) {
             memberRepository.getMember(userCode).onSuccess { user ->
                 _uiState.update { it.copy(user = user) }
+                loadYouTubeVideos(user.video.previewItems)
             }.onFailure {
                 event(ProfileEvent.Invalid)
+            }
+        }
+    }
+
+    private fun loadYouTubeVideos(videoUrls: List<String>) {
+        if (videoUrls.isEmpty()) {
+            _uiState.update { it.copy(youtubeVideos = emptyList()) }
+            return
+        }
+
+        viewModelScope.launch(recordExceptionHandler) {
+            _uiState.update { it.copy(loading = true) }
+
+            val youtubeVideos = youTubeRepository.getVideoInfoByUrlList(videoUrls)
+
+            _uiState.update {
+                it.copy(
+                    youtubeVideos = youtubeVideos,
+                    loading = false
+                )
             }
         }
     }

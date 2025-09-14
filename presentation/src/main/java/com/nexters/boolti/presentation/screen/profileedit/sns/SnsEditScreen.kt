@@ -1,14 +1,13 @@
 package com.nexters.boolti.presentation.screen.profileedit.sns
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,261 +16,223 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.component.BTTextFieldDefaults
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.MainButtonDefaults
-import com.nexters.boolti.presentation.component.SelectableIcon
-import com.nexters.boolti.presentation.component.SelectableSnsStatus
+import com.nexters.boolti.presentation.component.FixedWidthText
 import com.nexters.boolti.presentation.extension.centerToTop
+import com.nexters.boolti.presentation.extension.icon
+import com.nexters.boolti.presentation.extension.label
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
-import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
+import com.nexters.boolti.presentation.util.ObserveAsEvents
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun SnsEditScreen(
     modifier: Modifier = Modifier,
-    onAddSns: (type: Sns.SnsType, username: String) -> Unit = { _, _ -> },
-    onEditSns: (id: String, type: Sns.SnsType, username: String) -> Unit = { _, _, _ -> },
-    onRemoveSns: (id: String) -> Unit,
-    navigateBack: () -> Unit,
+    navigateUp: () -> Unit,
     viewModel: SnsEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event = viewModel.event
+    val dismissDialogAndNavigateUp = {
+        viewModel.dismissExitAlertDialog()
+        navigateUp()
+    }
+
+    BackHandler {
+        val canExit = viewModel.checkCanExit()
+        if (canExit) dismissDialogAndNavigateUp()
+    }
 
     SnsEditScreen(
         modifier = modifier,
-        isEditMode = uiState.isEditMode,
-        selectedSns = uiState.selectedSns,
-        inUseSnsTypes = uiState.inUseSnsTypes.toPersistentList(),
-        username = uiState.username,
-        usernameHasError = uiState.usernameHasError,
-        onChangeSns = viewModel::setSns,
-        onChangeUsername = viewModel::setUsername,
-        onRemoveSns = { uiState.snsId?.let(onRemoveSns) },
-        onComplete = {
-            if (uiState.isEditMode) {
-                uiState.snsId?.let { id ->
-                    onEditSns(
-                        id,
-                        uiState.selectedSns,
-                        uiState.username,
-                    )
-                }
-            } else {
-                onAddSns(uiState.selectedSns, uiState.username)
-            }
+        instagramUsername = uiState.instagramUsername,
+        youtubeUsername = uiState.youtubeUsername,
+        onChangeInstagramUsername = viewModel::changeInstagramUsername,
+        onChangeYoutubeUsername = viewModel::changeYoutubeUsername,
+        tryBack = {
+            val canExit = viewModel.checkCanExit()
+            if (canExit) dismissDialogAndNavigateUp()
         },
-        navigateBack = navigateBack,
+        event = event,
+        instagramUsernameError = uiState.instagramUsernameError,
+        youtubeUsernameError = uiState.youtubeUsernameError,
+        showExitAlertDialog = uiState.showExitAlertDialog,
+        onDismissExitAlertDialog = dismissDialogAndNavigateUp,
+        navigateUp = dismissDialogAndNavigateUp,
+        saveEnabled = uiState.saveEnabled,
+        onSave = viewModel::saveSns,
     )
 }
 
 @Composable
 private fun SnsEditScreen(
     modifier: Modifier = Modifier,
-    isEditMode: Boolean = false,
-    selectedSns: Sns.SnsType = Sns.SnsType.YOUTUBE,
-    inUseSnsTypes: ImmutableList<Sns.SnsType> = persistentListOf(),
-    username: String = "",
-    usernameHasError: Boolean = false,
-    onChangeSns: (Sns.SnsType) -> Unit = {},
-    onChangeUsername: (String) -> Unit = {},
-    onRemoveSns: () -> Unit = {},
-    onComplete: () -> Unit = {},
-    navigateBack: () -> Unit = {},
+    instagramUsername: String = "",
+    youtubeUsername: String = "",
+    showExitAlertDialog: Boolean = false,
+    event: Flow<SnsEditEvent> = emptyFlow(),
+    saveEnabled: Boolean = true,
+    instagramUsernameError: SnsError? = null,
+    youtubeUsernameError: SnsError? = null,
+    onChangeInstagramUsername: (String) -> Unit = {},
+    onChangeYoutubeUsername: (String) -> Unit = {},
+    tryBack: () -> Unit = {}, // 이탈 가능 상태 확인 후 이탈
+    navigateUp: () -> Unit = {}, // 진짜로 화면 이탈
+    onSave: () -> Unit = {},
+    onDismissExitAlertDialog: () -> Unit = {},
 ) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    ObserveAsEvents(event) {
+        when (it) {
+            SnsEditEvent.Saved -> navigateUp()
+        }
+    }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         topBar = {
             BtAppBar(
-                title = if (isEditMode) {
-                    stringResource(R.string.sns_edit)
-                } else {
-                    stringResource(R.string.sns_add)
-                },
+                title = stringResource(R.string.sns),
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
+                        onClick = tryBack,
                         iconRes = R.drawable.ic_arrow_back,
-                        onClick = navigateBack,
                     )
                 },
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
-                        label = stringResource(R.string.complete),
-                        enabled = username.isNotBlank() && !usernameHasError,
-                        onClick = onComplete,
+                        label = stringResource(R.string.save_short),
+                        onClick = onSave,
+                        enabled = saveEnabled,
                     )
-                },
+                }
             )
         },
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .padding(horizontal = marginHorizontal),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = marginHorizontal),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+            SnsUsernameInput(
+                snsType = Sns.SnsType.INSTAGRAM,
+                username = instagramUsername,
+                onUsernameChanged = onChangeInstagramUsername,
+                error = instagramUsernameError,
+            )
+            SnsUsernameInput(
+                snsType = Sns.SnsType.YOUTUBE,
+                username = youtubeUsername,
+                onUsernameChanged = onChangeYoutubeUsername,
+                error = youtubeUsernameError,
+            )
+        }
+
+        if (showExitAlertDialog) {
+            BTDialog(
+                enableDismiss = true,
+                showCloseButton = true,
+                onDismiss = onDismissExitAlertDialog,
+                negativeButtonLabel = stringResource(R.string.btn_exit),
+                onClickNegativeButton = navigateUp,
+                positiveButtonLabel = stringResource(R.string.save),
+                onClickPositiveButton = onSave,
             ) {
-                // SNS
-                Row(
-                    modifier = Modifier.padding(top = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Label(stringResource(R.string.sns))
-
-                    val instagramStatus = when {
-                        selectedSns == Sns.SnsType.INSTAGRAM -> SelectableSnsStatus.ACTIVE
-                        Sns.SnsType.INSTAGRAM in inUseSnsTypes -> SelectableSnsStatus.DISABLE
-                        else -> SelectableSnsStatus.INACTIVE
-                    }
-
-                    val youtubeStatus = when {
-                        selectedSns == Sns.SnsType.YOUTUBE -> SelectableSnsStatus.ACTIVE
-                        Sns.SnsType.YOUTUBE in inUseSnsTypes -> SelectableSnsStatus.DISABLE
-                        else -> SelectableSnsStatus.INACTIVE
-                    }
-
-                    SelectableIcon(
-                        status = instagramStatus,
-                        iconRes = R.drawable.ic_logo_instagram,
-                        onClick = {
-                            if (instagramStatus == SelectableSnsStatus.INACTIVE) {
-                                onChangeSns(Sns.SnsType.INSTAGRAM)
-                            }
-                        },
-                        contentDescription = stringResource(R.string.sns_select_instagram_description),
-                    )
-                    SelectableIcon(
-                        modifier = Modifier.padding(start = 12.dp),
-                        status = youtubeStatus,
-                        iconRes = R.drawable.ic_logo_youtube,
-                        onClick = {
-                            if (youtubeStatus == SelectableSnsStatus.INACTIVE) {
-                                onChangeSns(Sns.SnsType.YOUTUBE)
-                            }
-                        },
-                        contentDescription = stringResource(R.string.sns_select_youtube_description),
-                    )
-                }
-
-                // Username
-                Row(
-                    modifier = Modifier.padding(bottom = 20.dp),
-                ) {
-                    Label(
-                        label = stringResource(R.string.username),
-                        modifier = Modifier.centerToTop(top = 24.dp),
-                    )
-                    BTTextField(
-                        modifier = Modifier.weight(1f),
-                        text = username,
-                        isError = usernameHasError,
-                        placeholder = stringResource(R.string.sns_username_placeholder),
-                        supportingText = when {
-                            username.contains('@') -> stringResource(R.string.sns_username_contains_at_error)
-                            usernameHasError -> stringResource(R.string.contains_unsupported_char_error)
-                            else -> null
-                        },
-                        trailingIcon = if (username.isNotEmpty()) {
-                            { BTTextFieldDefaults.ClearButton(onClick = { onChangeUsername("") }) }
-                        } else {
-                            null
-                        },
-                        singleLine = true,
-                        onValueChanged = onChangeUsername,
-                    )
-                }
-
-                Spacer(Modifier.weight(1f))
-                if (isEditMode) {
-                    MainButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 20.dp),
-                        colors = MainButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            contentColor = Grey90,
-                        ),
-                        label = stringResource(R.string.sns_delete),
-                        onClick = { showDeleteDialog = true },
-                    )
-                }
-            }
-
-            if (showDeleteDialog) {
-                BTDialog(
-                    onDismiss = { showDeleteDialog = false },
-                    positiveButtonLabel = stringResource(R.string.btn_delete),
-                    onClickNegativeButton = { showDeleteDialog = false },
-                    onClickPositiveButton = {
-                        showDeleteDialog = false
-                        onRemoveSns()
-                    },
-                ) {
-                    Text(
-                        text = stringResource(R.string.sns_delete_message),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.profile_edit_exit_alert),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun Label(
-    label: String,
+private fun SnsUsernameInput(
+    snsType: Sns.SnsType,
+    username: String,
+    onUsernameChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
+    error: SnsError? = null,
 ) {
-    Text(
-        modifier = modifier
-            .defaultMinSize(minWidth = 72.dp)
-            .padding(end = 12.dp),
-        text = label,
-        color = Grey30,
-        style = MaterialTheme.typography.bodySmall,
-    )
+    val icon = snsType.icon
+    val label = snsType.label
+    val centerToTopSize = 24.dp
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Row {
+            Icon(
+                modifier = Modifier
+                    .centerToTop(centerToTopSize)
+                    .size(24.dp),
+                imageVector = ImageVector.vectorResource(icon),
+                tint = Grey30,
+                contentDescription = "$label icon",
+            )
+            FixedWidthText(
+                modifier = Modifier
+                    .centerToTop(centerToTopSize)
+                    .padding(start = 8.dp, end = 12.dp),
+                text = label,
+                width = 72.dp,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30,
+                shadowColor = MaterialTheme.colorScheme.background,
+            )
+        }
+        BTClearableTextField(
+            modifier = Modifier
+                .weight(1f)
+                .centerToTop(centerToTopSize),
+            text = username,
+            supportingText = error.message,
+            isError = error != null,
+            placeholder = stringResource(R.string.sns_username_placeholder),
+            onValueChanged = onUsernameChanged,
+            singleLine = true,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SnsUsernameInputPreview() {
+    var username by remember { mutableStateOf("") }
+    val snsType = Sns.SnsType.INSTAGRAM
+
+    BooltiTheme {
+        SnsUsernameInput(
+            snsType, username, { username = it },
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun SnsEditPreview() {
-    var selectedSns by remember { mutableStateOf(Sns.SnsType.INSTAGRAM) }
-    var username by remember { mutableStateOf("") }
-    val usernameHasError: Boolean = when (selectedSns) {
-        Sns.SnsType.INSTAGRAM -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._]+"))
-        Sns.SnsType.YOUTUBE -> username.contains(Regex("[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣._-]+"))
-    }
-
     BooltiTheme {
-        SnsEditScreen(
-            isEditMode = true,
-            selectedSns = selectedSns,
-            username = username,
-            usernameHasError = usernameHasError,
-            onChangeSns = { selectedSns = it },
-            onChangeUsername = { username = it },
-        )
+        SnsEditScreen()
     }
 }

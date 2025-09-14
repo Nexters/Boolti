@@ -8,7 +8,6 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
-import java.time.LocalDate
 
 @Serializable
 internal data class AppSettings(
@@ -20,9 +19,21 @@ internal data class AppSettings(
     val photo: String? = null,
     val userCode: String? = null,
     val performedShow: List<ShowResponse> = emptyList(),
+    val hasMorePerformedShow: Boolean = false,
+    val performedShowCount: Int = 0,
+    val showPerformedShow: Boolean = false,
     val profileIntroduction: String = "",
     val profileLink: List<EditProfileRequest.LinkDto> = emptyList(),
+    val hasMoreLink: Boolean = false,
+    val profileLinkCount: Int = 0,
     val profileSns: List<EditProfileRequest.SnsDto> = emptyList(),
+    val upcomingShow: List<ShowResponse> = emptyList(),
+    val hasMoreUpcomingShow: Boolean = false,
+    val upcomingShowCount: Int = 0,
+    val showUpcomingShow: Boolean = false,
+    val videoCount: Int = 0,
+    val hasMoreVideoItem: Boolean = false,
+    val video: List<String> = emptyList(),
     val accessToken: String = "",
     val refreshToken: String = "",
     val refundPolicy: List<String> = emptyList(),

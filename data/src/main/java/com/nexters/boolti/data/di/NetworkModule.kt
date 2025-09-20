@@ -12,6 +12,7 @@ import com.nexters.boolti.data.di.qualifier.YouTubeOkHttpClient
 import com.nexters.boolti.data.di.qualifier.YouTubeRetrofit
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
+import com.nexters.boolti.data.network.CustomHeaderInterceptor
 import com.nexters.boolti.data.network.api.AuthFileService
 import com.nexters.boolti.data.network.api.DeviceTokenService
 import com.nexters.boolti.data.network.api.FileService
@@ -179,7 +180,7 @@ internal object NetworkModule {
     @Singleton
     @Provides
     @YouTubeOkHttpClient
-    fun provideYouTubeOkHttpClient(): OkHttpClient {
+    fun provideYouTubeOkHttpClient(customHeaderInterceptor: CustomHeaderInterceptor): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
@@ -190,19 +191,22 @@ internal object NetworkModule {
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor(customHeaderInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }
 
     @Singleton
     @Provides
-    fun provideYouTubeService(@YouTubeRetrofit retrofit: Retrofit): YouTubeService = retrofit.create()
+    fun provideYouTubeService(@YouTubeRetrofit retrofit: Retrofit): YouTubeService =
+        retrofit.create()
 
     @Singleton
     @Provides
     @AuthOkHttpClient
     fun provideAuthOkHttpClient(
-        interceptor: AuthInterceptor,
+        authInterceptor: AuthInterceptor,
+        customHeaderInterceptor: CustomHeaderInterceptor,
         authenticator: AuthAuthenticator
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -216,14 +220,18 @@ internal object NetworkModule {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .authenticator(authenticator)
-            .addInterceptor(interceptor)
+            .addInterceptor(customHeaderInterceptor)
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(interceptor: AuthInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        customHeaderInterceptor: CustomHeaderInterceptor,
+    ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
@@ -234,7 +242,8 @@ internal object NetworkModule {
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
-            .addInterceptor(interceptor)
+            .addInterceptor(customHeaderInterceptor)
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }
@@ -242,7 +251,7 @@ internal object NetworkModule {
     @Singleton
     @Provides
     @NonAuthOkHttpClient
-    fun provideNoneAuthOkHttpClient(): OkHttpClient {
+    fun provideNoneAuthOkHttpClient(customHeaderInterceptor: CustomHeaderInterceptor): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) {
                 HttpLoggingInterceptor.Level.BODY
@@ -253,6 +262,7 @@ internal object NetworkModule {
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor(customHeaderInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }

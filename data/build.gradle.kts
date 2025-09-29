@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation(projects.domain)
+    implementation(projects.common.tracker)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -70,8 +71,6 @@ dependencies {
     implementation(libs.firebase.config.ktx)
     implementation(libs.bundles.firebase)
     implementation(platform(libs.firebase.bom))
-
-    implementation(libs.mixpanel.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)

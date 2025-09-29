@@ -107,6 +107,7 @@ dependencies {
     implementation(projects.data)
     implementation(projects.presentation)
     implementation(projects.tosspayments)
+    implementation(projects.common.tracker)
 
     implementation(libs.bundles.coroutines)
 
@@ -119,8 +120,6 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
-
-    implementation(libs.mixpanel.android)
 }
 
 tasks.withType<Test>().configureEach {

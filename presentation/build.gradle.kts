@@ -27,7 +27,6 @@ android {
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("DEV_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
             buildConfigField("String", "DOMAIN", getLocalProperty("DEV_DOMAIN"))
-            buildConfigField("String", "MIXPANEL_TOKEN", getLocalProperty("DEV_MIXPANEL_TOKEN"))
         }
         release {
             isMinifyEnabled = false
@@ -39,7 +38,6 @@ android {
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
             buildConfigField("String", "DOMAIN", getLocalProperty("PROD_DOMAIN"))
-            buildConfigField("String", "MIXPANEL_TOKEN", getLocalProperty("PROD_MIXPANEL_TOKEN"))
         }
     }
     compileOptions {
@@ -66,6 +64,7 @@ android {
 dependencies {
     implementation(projects.domain)
     implementation(projects.tosspayments)
+    implementation(projects.common.tracker)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -99,8 +98,6 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
     implementation(libs.reorderable)
-
-    implementation(libs.mixpanel.android)
 
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))

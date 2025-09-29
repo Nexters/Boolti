@@ -25,7 +25,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             buildConfigField("String", "BASE_URL", getApiKey("PROD_BASE_URL"))
         }
         debug {
@@ -67,6 +70,8 @@ dependencies {
     implementation(libs.firebase.config.ktx)
     implementation(libs.bundles.firebase)
     implementation(platform(libs.firebase.bom))
+
+    implementation(libs.mixpanel.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)

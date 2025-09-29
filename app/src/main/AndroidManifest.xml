@@ -19,6 +19,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <application
         android:name=".ui.BooltiApplication"
         android:allowBackup="false"
@@ -34,8 +38,8 @@
         <activity
             android:name=".presentation.screen.MainActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/Theme.Boolti">
+            android:theme="@style/Theme.Boolti"
+            android:windowSoftInputMode="adjustPan">
 
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -114,6 +118,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
+
+        <meta-data
+            android:name="com.mixpanel.android.MPConfig.EnableDebugLogging"
+            android:value="true" />
 
         <service
             android:name=".presentation.service.BtFirebaseMessagingService"

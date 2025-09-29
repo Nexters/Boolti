@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
+import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import com.nexters.boolti.data.network.api.LoginService
@@ -81,6 +82,7 @@ internal class AuthDataSource @Inject constructor(
     suspend fun logout(): Result<Unit> = runCatching {
         localLogout()
         loginService.logout()
+        AppTracker.logout()
     }
 
     suspend fun localLogout() {

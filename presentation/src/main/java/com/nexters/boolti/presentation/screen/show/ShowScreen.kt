@@ -57,6 +57,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.search
+import com.nexters.boolti.common.tracker.field.Banner
+import com.nexters.boolti.common.tracker.field.Home
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
@@ -74,6 +81,8 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
 import com.nexters.boolti.presentation.theme.statusBarHeight
+
+private val screenField = Screen.Home
 
 @Composable
 fun ShowScreen(
@@ -151,7 +160,14 @@ fun ShowScreen(
             ) {
                 Banner(
                     modifier = Modifier.fillMaxWidth(),
-                    navigateToShowRegistration = navigateToShowRegistration,
+                    navigateToShowRegistration = {
+                        AppTracker.click(
+                            screen = screenField,
+                            objectRole = Role.Banner,
+                            objectValue = "RegisterShow",
+                        )
+                        navigateToShowRegistration()
+                    },
                 )
             }
 
@@ -245,7 +261,10 @@ fun ShowAppBar(
                 .padding(vertical = 16.dp),
             text = text,
             onKeywordChanged = onKeywordChanged,
-            search = search,
+            search = {
+                AppTracker.search(screenField, text)
+                search()
+            },
         )
     }
 }

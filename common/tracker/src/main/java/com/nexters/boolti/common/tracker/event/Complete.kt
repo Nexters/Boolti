@@ -6,6 +6,7 @@ fun AppTracker.complete(
     target: String,
     properties: Map<String, Any> = emptyMap(),
     trimPrefix: Boolean = true,
+    withLogcat: Boolean = true,
 ) {
     val eventName =
         "$COMPLETE_PREFIX${(if (trimPrefix) target.substringAfter(COMPLETE_PREFIX) else target)}"
@@ -13,6 +14,7 @@ fun AppTracker.complete(
     trackEvent(
         eventName = eventName,
         properties = properties,
+        withLogcat = withLogcat,
     )
 }
 

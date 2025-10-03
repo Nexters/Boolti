@@ -6,12 +6,14 @@ import com.nexters.boolti.common.tracker.field.Screen
 fun AppTracker.view(
     screen: Screen,
     properties: Map<String, Any> = emptyMap(),
+    withLogcat: Boolean = true,
 ) {
     trackEvent(
         eventName = "View Screen",
         properties = buildMap {
-            put("screen", screen)
+            put("screen", screen.value)
             putAll(properties)
-        }
+        },
+        withLogcat = withLogcat,
     )
 }

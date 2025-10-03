@@ -4,11 +4,25 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import com.nexters.boolti.common.tracker.AppTracker.identify
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.json.JSONObject
+import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object AppTracker {
     @SuppressLint("StaticFieldLeak")
     private lateinit var tracker: MixpanelAPI
+
+    private val logTimeFormatter =
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.systemDefault())
+
+    private val currentTime: String
+        get() = logTimeFormatter.format(Instant.now())
+
+    private val json = Json { prettyPrint = true }
 
     /**
      * [AppTracker] 를 초기화합니다.
@@ -42,11 +56,16 @@ object AppTracker {
         ).apply {
             this.flushBatchSize = flushBatchSize
         }
+
+        Timber
+            .tag(TAG)
+            .i("[AppTracker Initialized] flushBatchSize: $flushBatchSize, superProperties: $superProperties")
     }
 
     fun trackEvent(
         eventName: String,
         properties: Map<String, Any> = emptyMap(),
+        withLogcat: Boolean = true,
     ) {
         val jsonProperties = JSONObject(properties)
 
@@ -54,6 +73,10 @@ object AppTracker {
             tracker.track(eventName)
         } else {
             tracker.track(eventName, jsonProperties)
+        }
+
+        if (withLogcat) {
+            trackLogcat(eventName, properties)
         }
     }
 
@@ -94,20 +117,45 @@ object AppTracker {
     fun identify(
         properties: Map<String, Any>,
         userId: String? = null,
+        withLogcat: Boolean = true,
     ) {
         val jsonProperties = JSONObject(properties)
         if (userId != null) tracker.identify(userId)
         tracker.people.set(jsonProperties)
+
+        if (withLogcat) trackLogcat(
+            "identify",
+            buildMap {
+                put("userId", userId.orEmpty())
+                putAll(properties)
+            }
+        )
     }
 
     /**
      * 유저가 로그아웃 한 경우 호출합니다.
      *
      */
-    fun logout() {
+    fun logout(
+        withLogcat: Boolean = true,
+    ) {
         tracker.track("logout")
         tracker.reset()
+
+        if (withLogcat) trackLogcat("logout")
+    }
+
+    private fun trackLogcat(
+        eventName: String,
+        properties: Map<String, Any> = emptyMap(),
+    ) {
+        val message = json.encodeToString(properties.map { (key, value) -> "$key: $value" })
+
+        Timber
+            .tag(TAG)
+            .i("($currentTime) [$eventName]\n$message")
     }
 
     const val DEFAULT_FLUSH_BATCH_SIZE = 50
+    private const val TAG = "AppTracker"
 }

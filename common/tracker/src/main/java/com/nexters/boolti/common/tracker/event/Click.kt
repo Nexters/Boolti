@@ -9,14 +9,16 @@ fun AppTracker.click(
     objectRole: Role,
     objectValue: Any,
     properties: Map<String, Any> = emptyMap(),
+    withLogcat: Boolean = true,
 ) {
     trackEvent(
         eventName = "Click",
         properties = buildMap {
-            put("screen", screen)
-            put("object_role", objectRole)
+            put("screen", screen.value)
+            put("object_role", objectRole.value)
             put("object_value", objectValue)
             putAll(properties)
-        }
+        },
+        withLogcat = withLogcat,
     )
 }

@@ -36,7 +36,7 @@ class RecentSearchViewModel @Inject constructor(
             is RecentSearchIntent.DeleteSearchHistory -> deleteSearchHistory(intent.keyword)
             is RecentSearchIntent.ShowClearHistoriesDialog -> changeClearHistoriesDialogVisible(true)
             is RecentSearchIntent.DismissClearHistoriesDialog -> changeClearHistoriesDialogVisible(false)
-            is RecentSearchIntent.Search -> search(intent.keyword)
+            is RecentSearchIntent.Search -> search(intent.keyword.trim())
         }
     }
 

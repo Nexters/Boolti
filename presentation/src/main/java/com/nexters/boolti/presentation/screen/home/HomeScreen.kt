@@ -1,8 +1,6 @@
 package com.nexters.boolti.presentation.screen.home
 
 import android.net.Uri
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,13 +30,13 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navDeepLink
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.myScreen
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 import com.nexters.boolti.presentation.screen.navigation.homeRoutes
+import com.nexters.boolti.presentation.screen.search.searchScreen
 import com.nexters.boolti.presentation.screen.show.showScreen
 import com.nexters.boolti.presentation.screen.ticket.ticketScreen
 import com.nexters.boolti.presentation.theme.Grey10
@@ -49,6 +47,8 @@ import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
 @Composable
 fun HomeScreen(
     navigateToShowDetail: (showId: String) -> Unit,
+    navigateToRecentSearch: () -> Unit,
+    navigateToSearchDetail: (keyword: String) -> Unit,
     navigateToTicketDetail: (ticketId: String) -> Unit,
     navigateToQrScan: () -> Unit,
     navigateToAccountSetting: () -> Unit,
@@ -126,6 +126,13 @@ fun HomeScreen(
                 navigateToShowDetail = navigateToShowDetail,
                 navigateToBusiness = navigateToBusiness,
                 navigateToShowRegistration = navigateToShowRegistration,
+            )
+
+            searchScreen(
+                modifier = Modifier.padding(innerPadding),
+                navigateToRecentSearch = navigateToRecentSearch,
+                navigateToSearchDetail = navigateToSearchDetail,
+                navigateToShowDetail = navigateToShowDetail,
             )
 
             ticketScreen(

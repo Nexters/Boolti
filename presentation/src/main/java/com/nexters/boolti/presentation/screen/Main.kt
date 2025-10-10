@@ -34,6 +34,7 @@ import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
+import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
@@ -52,6 +53,8 @@ import com.nexters.boolti.presentation.screen.refund.refundScreen
 import com.nexters.boolti.presentation.screen.report.reportScreen
 import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
+import com.nexters.boolti.presentation.screen.search.detail.searchDetailNavigation
+import com.nexters.boolti.presentation.screen.search.recent.recentSearchScreen
 import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
 import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
@@ -147,6 +150,23 @@ fun MainNavigation(
             )
             reportScreen()
         }
+
+        recentSearchScreen(
+            navigateBack = navController::navigateUp,
+            search = { keyword ->
+                navController.navigate(SearchRoute.SearchDetail(keyword))
+            },
+        )
+
+        searchDetailNavigation(
+            navigateToShowDetail = { showId ->
+                navController.navigate(ShowRoute.ShowRoot(showId))
+            },
+            navigateToProfile = { userCode ->
+                navController.navigate(MainRoute.Profile(userCode))
+            },
+            navigateUp = navController::navigateUp,
+        )
 
         ticketingScreen()
 

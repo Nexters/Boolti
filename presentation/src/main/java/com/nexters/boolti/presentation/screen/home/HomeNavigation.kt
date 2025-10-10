@@ -7,6 +7,7 @@ import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalUser
 import com.nexters.boolti.presentation.screen.MainDestination
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 
@@ -20,6 +21,8 @@ fun NavGraphBuilder.homeScreen(
         HomeScreen(
             modifier = modifier,
             navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
+            navigateToRecentSearch = { navController.navigate(SearchRoute.RecentSearch) },
+            navigateToSearchDetail = { navController.navigate(SearchRoute.SearchDetail(keyword = it)) },
             navigateToTicketDetail = { navController.navigate(TicketRoute.TicketRoot(ticketId = it)) },
             navigateToQrScan = { navController.navigate(MainRoute.HostedShows) },
             navigateToAccountSetting = { navController.navigate(MainRoute.AccountSetting) },

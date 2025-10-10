@@ -2,7 +2,10 @@ package com.nexters.boolti.presentation.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,7 +21,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -43,8 +48,11 @@ fun BtSearchBar(
     search: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    showClearButtonOnFocus: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    val focused by interactionSource.collectIsFocusedAsState()
+
     val colors = TextFieldDefaults.colors(
         unfocusedIndicatorColor = Color.Transparent,
         focusedIndicatorColor = Color.Transparent,
@@ -58,6 +66,7 @@ fun BtSearchBar(
             .height(48.dp),
         value = keyword,
         enabled = enabled,
+        singleLine = true,
         onValueChange = onKeywordChanged,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { search() }),
@@ -75,22 +84,35 @@ fun BtSearchBar(
                     )
                 },
                 trailingIcon = {
-                    Icon(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .clickable(onClick = search, role = Role.Button, enabled = enabled)
-                            .padding(12.dp),
-                        painter = painterResource(id = R.drawable.ic_search),
-                        contentDescription = null,
-                        tint = Grey60,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (showClearButtonOnFocus && keyword.isNotEmpty() && focused) {
+                            BTTextFieldDefaults.ClearButton(
+                                onClick = { onKeywordChanged("") },
+                            )
+
+                            Spacer(Modifier.size(4.dp))
+                        }
+
+                        Icon(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .clickable(onClick = search, role = Role.Button, enabled = enabled)
+                                .padding(12.dp),
+                            painter = painterResource(id = R.drawable.ic_search),
+                            contentDescription = null,
+                            tint = Grey60,
+                        )
+                    }
                 },
                 colors = colors,
-                interactionSource = interactionSource,
+                interactionSource = remember { MutableInteractionSource() },
                 contentPadding = PaddingValues(horizontal = 12.dp),
             )
         },
+        interactionSource = interactionSource,
         cursorBrush = SolidColor(Color.White),
         textStyle = MaterialTheme.typography.bodyLarge.copy(color = Grey15),
     )

@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -72,6 +73,13 @@ fun RecentSearchScreen(
             }
 
             is RecentSearchEvent.Search -> search(it.keyword)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.onIntent(RecentSearchIntent.ClearKeyword)
+            viewModel.onIntent(RecentSearchIntent.DismissClearHistoriesDialog)
         }
     }
 
@@ -291,7 +299,7 @@ private fun ClearDialog(
         onClickNegativeButton = onDismiss,
         onClickPositiveButton = onClickClear,
         positiveButtonLabel = stringResource(R.string.btn_delete_all),
-        negativeButtonLabel = stringResource(R.string.btn_delete),
+        negativeButtonLabel = stringResource(R.string.cancel),
     ) {
         Text(
             text = stringResource(R.string.search_clear_history_dialog),

@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -92,7 +93,9 @@ fun Main(
         Scaffold(
             snackbarHost = {
                 ToastSnackbarHost(
-                    modifier = Modifier.padding(bottom = 80.dp),
+                    modifier = Modifier
+                        .imePadding()
+                        .padding(bottom = 80.dp),
                     hostState = snackbarHostState,
                 )
             },

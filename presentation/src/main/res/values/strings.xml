@@ -68,6 +68,7 @@
     <string name="btn_delete">삭제하기</string>
     <string name="btn_exit">나가기</string>
     <string name="btn_finish">종료하기</string>
+    <string name="btn_delete_all">전체삭제</string>
     <string name="login">로그인</string>
     <string name="message_unknown_error">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="copy">복사</string>
@@ -268,6 +269,8 @@
     <string name="search_search_hint">공연명, 아티스트명으로 찾아보세요</string>
     <string name="search_recent_keyword">최근 검색어</string>
     <string name="search_no_recent_keyword">최근 검색 내역이 없어요.</string>
+    <string name="search_clear_history_dialog">최근 검색어를\n모두 삭제하시겠습니까?</string>
+    <string name="search_search_empty">검색어를 입력해 주세요.</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

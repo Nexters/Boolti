@@ -18,7 +18,7 @@ import javax.inject.Inject
 class RecentSearchViewModel @Inject constructor(
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : BaseViewModel() {
-    private val _uiState = MutableStateFlow(RecentSearchUiState.Default)
+    private val _uiState = MutableStateFlow(RecentSearchUiState.Mock) // TODO Mock 제거
     val uiState = _uiState.asStateFlow()
 
     private val _event = Channel<RecentSearchEvent>()

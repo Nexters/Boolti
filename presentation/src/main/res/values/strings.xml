@@ -18,6 +18,7 @@
     <string name="description_expand">확장하기</string>
     <string name="description_qr_icon">QR 스캔 아이콘</string>
     <string name="description_clear_button">모두 지우기</string>
+    <string name="description_search_text">%s 검색</string>
 
     <string name="dialog_hide_today">오늘 하루 그만 보기</string>
 

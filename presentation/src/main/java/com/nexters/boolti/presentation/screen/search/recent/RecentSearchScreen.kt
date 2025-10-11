@@ -4,11 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +33,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtSearchBar
+import com.nexters.boolti.presentation.extension.highlightMatches
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.search.ClearSearchHistoriesDialog
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -84,10 +89,12 @@ fun RecentSearchScreen(
 
     RecentSearchScreen(
         keyword = uiState.keyword,
+        searchKeyword = uiState.searchKeyword,
         onKeywordChanged = { keyword ->
             viewModel.onIntent(RecentSearchIntent.ChangeKeyword(keyword))
         },
         recentKeywords = uiState.recentSearchKeywords,
+        recommendedKeywords = uiState.recommendedKeywords,
         deleteKeyword = { keyword ->
             viewModel.onIntent(RecentSearchIntent.DeleteSearchHistory(keyword))
         },
@@ -113,8 +120,10 @@ fun RecentSearchScreen(
 @Composable
 private fun RecentSearchScreen(
     keyword: String,
+    searchKeyword: String,
     onKeywordChanged: (String) -> Unit,
     recentKeywords: List<String>,
+    recommendedKeywords: List<String>,
     deleteKeyword: (keyword: String) -> Unit,
     onClickClearButton: () -> Unit,
     onClickClear: () -> Unit,
@@ -167,7 +176,8 @@ private fun RecentSearchScreen(
                 )
             } else {
                 SearchingContent(
-                    keyword = keyword,
+                    searchKeyword = searchKeyword,
+                    recommendedKeywords = recommendedKeywords,
                     onClickKeyword = search,
                 )
             }
@@ -286,11 +296,48 @@ private fun RecentSearchHistories(
 
 @Composable
 private fun SearchingContent(
-    keyword: String,
+    searchKeyword: String,
+    recommendedKeywords: List<String>,
     onClickKeyword: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LazyColumn(
+        modifier = modifier.padding(top = 12.dp),
+    ) {
+        itemsIndexed(recommendedKeywords) { index, keyword ->
+            Column {
+                if (index > 0) HorizontalDivider(thickness = 1.dp, color = Grey85)
 
+                Row(
+                    modifier = Modifier
+                        .clickable(onClick = { onClickKeyword(keyword) })
+                        .defaultMinSize(minHeight = 24.dp)
+                        .padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_search),
+                        tint = Grey60,
+                        contentDescription = stringResource(R.string.description_search_text, keyword),
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .weight(1f),
+                        text = keyword.highlightMatches(
+                            target = searchKeyword,
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                            ),
+                        ),
+                        color = Grey05,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Preview
@@ -299,8 +346,10 @@ private fun RecentSearchScreenPreview_Empty() {
     BooltiTheme {
         RecentSearchScreen(
             keyword = "",
+            searchKeyword = "",
             onKeywordChanged = {},
             recentKeywords = listOf("불목", "서강대", "이한세"),
+            recommendedKeywords = listOf("바나나차차", "바다", "바다의 왕자", "바람", "바라보다", "가바나", "하바나"),
             deleteKeyword = {},
             onClickClearButton = {},
             onClickClear = {},
@@ -319,8 +368,10 @@ private fun RecentSearchScreenPreview_EmptyHistory() {
     BooltiTheme {
         RecentSearchScreen(
             keyword = "",
+            searchKeyword = "",
             onKeywordChanged = {},
             recentKeywords = emptyList(),
+            recommendedKeywords = listOf("바나나차차", "바다", "바다의 왕자", "바람", "바라보다", "가바나", "하바나"),
             deleteKeyword = {},
             onClickClearButton = {},
             onClickClear = {},
@@ -338,9 +389,11 @@ private fun RecentSearchScreenPreview_EmptyHistory() {
 private fun RecentSearchScreenPreview_Searching() {
     BooltiTheme {
         RecentSearchScreen(
-            keyword = "검색중",
+            keyword = "바ㅣ",
+            searchKeyword = "바",
             onKeywordChanged = {},
             recentKeywords = emptyList(),
+            recommendedKeywords = listOf("바나나차차", "바다", "바다의 왕자", "바람", "바라보다", "가바나", "하바나"),
             deleteKeyword = {},
             onClickClearButton = {},
             onClickClear = {},
@@ -359,8 +412,10 @@ private fun RecentSearchScreenPreview_ClearDialog() {
     BooltiTheme {
         RecentSearchScreen(
             keyword = "",
+            searchKeyword = "",
             onKeywordChanged = {},
             recentKeywords = listOf("불목", "서강대", "이한세"),
+            recommendedKeywords = listOf("바나나차차", "바다", "바다의 왕자", "바람", "바라보다", "가바나", "하바나"),
             deleteKeyword = {},
             onClickClearButton = {},
             onClickClear = {},

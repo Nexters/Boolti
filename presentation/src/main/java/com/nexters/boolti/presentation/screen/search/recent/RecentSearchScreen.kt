@@ -30,16 +30,15 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.search.ClearSearchHistoriesDialog
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -175,7 +174,7 @@ private fun RecentSearchScreen(
         }
 
         if (showClearDialog) {
-            ClearDialog(
+            ClearSearchHistoriesDialog(
                 onDismiss = dismissClearDialog,
                 onClickClear = onClickClear,
             )
@@ -281,30 +280,6 @@ private fun RecentSearchHistories(
             text = stringResource(R.string.btn_delete_all),
             style = MaterialTheme.typography.bodyMedium,
             color = Grey50,
-        )
-    }
-}
-
-@Composable
-private fun ClearDialog(
-    onClickClear: () -> Unit,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    BTDialog(
-        modifier = modifier,
-        showCloseButton = false,
-        enableDismiss = true,
-        onDismiss = onDismiss,
-        onClickNegativeButton = onDismiss,
-        onClickPositiveButton = onClickClear,
-        positiveButtonLabel = stringResource(R.string.btn_delete_all),
-        negativeButtonLabel = stringResource(R.string.cancel),
-    ) {
-        Text(
-            text = stringResource(R.string.search_clear_history_dialog),
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
         )
     }
 }

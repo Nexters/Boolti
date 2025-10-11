@@ -129,7 +129,7 @@ fun HomeScreen(
             )
 
             searchScreen(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                 navigateToRecentSearch = navigateToRecentSearch,
                 navigateToSearchDetail = navigateToSearchDetail,
                 navigateToShowDetail = navigateToShowDetail,

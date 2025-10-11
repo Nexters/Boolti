@@ -276,6 +276,8 @@
     <string name="search_new_shows_label">새로 등록된 공연</string>
     <string name="search_rising_keywords_label">요즘 뜨는 검색어</string>
     <string name="search_rising_keywords_time">%s 기준</string>
+    <string name="search_no_result">와 관련된 결과가 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_reset_searched_keyword_button">검색어 초기화</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

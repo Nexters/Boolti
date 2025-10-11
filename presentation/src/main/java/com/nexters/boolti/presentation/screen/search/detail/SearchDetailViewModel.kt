@@ -9,11 +9,13 @@ import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SearchDetailViewModel @Inject constructor(
@@ -40,6 +42,7 @@ class SearchDetailViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             _uiState.update { it.copy(loading = true) }
 
+            delay(2.seconds)
             launch(Dispatchers.IO) {
                 searchHistoryRepository.saveSearchHistory(keyword)
             }

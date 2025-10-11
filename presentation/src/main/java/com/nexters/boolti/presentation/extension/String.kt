@@ -164,3 +164,10 @@ fun String.highlightMatches(target: String, style: SpanStyle): AnnotatedString {
         }
     }
 }
+
+fun String.ellipsis(maxLength: Int): String =
+    if (length <= maxLength) {
+        this
+    } else {
+        this.substring(0, maxLength) + "…"
+    }

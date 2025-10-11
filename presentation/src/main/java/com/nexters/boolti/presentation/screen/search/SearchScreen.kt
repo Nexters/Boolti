@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +41,7 @@ import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -126,6 +129,12 @@ private fun SearchScreen(
             NewShowsSection(
                 newShows = newShows,
                 onClickShow = onClickShow,
+            )
+
+            RisingKeywordsSection(
+                risingKeywords = risingKeywords,
+                risingKeywordsTime = risingKeywordsTime,
+                onClickKeyword = onSearch,
             )
         }
 
@@ -253,6 +262,67 @@ private fun NewShowsSection(
     }
 
     Divider(modifier = Modifier.padding(vertical = 24.dp))
+}
+
+@Composable
+private fun RisingKeywordsSection(
+    risingKeywords: List<String>,
+    risingKeywordsTime: String,
+    onClickKeyword: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier.padding(horizontal = marginHorizontal),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.search_rising_keywords_label),
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleLarge,
+            color = Grey05,
+        )
+
+        if (risingKeywordsTime.isNotBlank()) {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(R.string.search_rising_keywords_time, risingKeywordsTime),
+                color = Grey50,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+    Spacer(Modifier.height(12.dp))
+
+    risingKeywords.forEachIndexed { index, keyword ->
+        if (index > 0) Divider(Modifier.padding(horizontal = marginHorizontal))
+
+        Row(
+            modifier = Modifier
+                .defaultMinSize(minHeight = 48.dp)
+                .fillMaxWidth()
+                .padding(horizontal = marginHorizontal)
+                .clickable(onClick = { onClickKeyword(keyword) })
+                .padding(vertical = 11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = (index + 1).toString(),
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleLarge,
+                color = Grey05,
+            )
+
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = keyword,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+
+    Spacer(Modifier.height(24.dp))
 }
 
 @Composable

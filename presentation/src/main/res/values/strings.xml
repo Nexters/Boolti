@@ -273,6 +273,8 @@
     <string name="search_clear_history_dialog">최근 검색어를\n모두 삭제하시겠습니까?</string>
     <string name="search_search_empty">검색어를 입력해 주세요.</string>
     <string name="search_new_shows_label">새로 등록된 공연</string>
+    <string name="search_rising_keywords_label">요즘 뜨는 검색어</string>
+    <string name="search_rising_keywords_time">%s 기준</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

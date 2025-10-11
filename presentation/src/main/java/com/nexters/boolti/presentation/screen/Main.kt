@@ -168,7 +168,15 @@ fun MainNavigation(
             navigateToProfile = { userCode ->
                 navController.navigate(MainRoute.Profile(userCode))
             },
-            navigateUp = navController::navigateUp,
+            navigateUp = {
+                navController.popBackStack()
+                navController.navigate(SearchRoute.RecentSearch) {
+                    popUpTo<SearchRoute.RecentSearch> {
+                        inclusive = false
+                    }
+                    launchSingleTop = true
+                }
+            },
         )
 
         ticketingScreen()

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.search.detail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -13,6 +14,10 @@ fun NavGraphBuilder.searchDetailNavigation(
     modifier: Modifier = Modifier,
 ) {
     composable<SearchRoute.SearchDetail> {
+        BackHandler {
+            navigateUp()
+        }
+
         SearchDetailScreen(
             navigateToShowDetail = navigateToShowDetail,
             navigateToProfile = navigateToProfile,

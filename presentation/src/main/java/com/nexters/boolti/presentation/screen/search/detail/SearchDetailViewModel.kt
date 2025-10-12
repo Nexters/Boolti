@@ -37,6 +37,14 @@ class SearchDetailViewModel @Inject constructor(
         search(route.keyword)
     }
 
+    fun onIntent(intent: SearchDetailIntent) {
+        when (intent) {
+            is SearchDetailIntent.ChangeTabIndex -> changeTabIndex(intent.index)
+            is SearchDetailIntent.KeywordChanged -> onKeywordChanged(intent.keyword)
+            is SearchDetailIntent.Search -> search(intent.keyword)
+        }
+    }
+
     private fun search(keyword: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -55,5 +63,13 @@ class SearchDetailViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun changeTabIndex(index: Int) {
+        _uiState.update { it.copy(tabIndex = index.takeIf { i -> i < 3 } ?: 0) }
+    }
+
+    private fun onKeywordChanged(keyword: String) {
+        _uiState.update { it.copy(keyword = keyword) }
     }
 }

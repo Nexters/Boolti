@@ -48,16 +48,22 @@ fun SearchDetailScreen(
 
     SearchDetailScreen(
         keyword = uiState.keyword,
-        onChangeKeyword = {},
+        onChangeKeyword = {
+            viewModel.onIntent(SearchDetailIntent.KeywordChanged(it))
+        },
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,
         profiles = uiState.profiles,
         tabIndex = uiState.tabIndex,
-        onChangeIndex = {},
+        onChangeIndex = {
+            viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(it))
+        },
         onClickShow = navigateToShowDetail,
         onClickProfile = navigateToProfile,
-        search = {},
+        search = {
+            viewModel.onIntent(SearchDetailIntent.Search(it))
+        },
         navigateUp = navigateUp,
         modifier = modifier,
     )

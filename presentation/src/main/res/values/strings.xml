@@ -277,6 +277,8 @@
     <string name="search_rising_keywords_label">요즘 뜨는 검색어</string>
     <string name="search_rising_keywords_time">%s 기준</string>
     <string name="search_no_result">와 관련된 결과가 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_no_show_result">와 관련된 공연이 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_no_artist_result">와 관련된 아티스트가 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_reset_searched_keyword_button">검색어 초기화</string>
     <string name="search_tab_all">전체</string>
     <string name="search_tab_show">공연(%d)</string>

@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -130,6 +129,7 @@ private fun SearchDetailScreen(
             TabContainer(
                 shows = shows,
                 profiles = profiles,
+                keyword = keyword,
                 onClickShow = onClickShow,
                 onClickProfile = onClickProfile,
                 tabIndex = tabIndex,
@@ -167,35 +167,42 @@ private fun SearchDetailScreen(
 }
 
 @Composable
-private fun ColumnScope.EmptyContents(
+private fun EmptyContents(
     keyword: String,
-    onClickResetKeyword: () -> Unit,
+    content: String,
     modifier: Modifier = Modifier,
+    onClickResetKeyword: (() -> Unit)? = null,
 ) {
-    Text(
-        modifier = modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(top = 120.dp),
-        text = buildAnnotatedString {
-            withStyle(SpanStyle(color = Grey15)) {
-                append("'${keyword.ellipsis(5)}'")
-            }
-            append(stringResource(R.string.search_no_result))
-        },
-        color = Grey50,
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.bodyLarge,
-        lineHeight = 24.sp,
-    )
+    Column(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Text(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 120.dp),
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(color = Grey15)) {
+                    append("'${keyword.ellipsis(5)}'")
+                }
+                append(content)
+            },
+            color = Grey50,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            lineHeight = 24.sp,
+        )
 
-    MainButton(
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(top = 20.dp),
-        label = stringResource(R.string.search_reset_searched_keyword_button),
-        colors = MainButtonDefaults.buttonColors(containerColor = Grey70),
-        onClick = onClickResetKeyword,
-    )
+        onClickResetKeyword?.let {
+            MainButton(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 20.dp),
+                label = stringResource(R.string.search_reset_searched_keyword_button),
+                colors = MainButtonDefaults.buttonColors(containerColor = Grey70),
+                onClick = onClickResetKeyword,
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -203,6 +210,7 @@ private fun ColumnScope.EmptyContents(
 private fun TabContainer(
     shows: List<Show>,
     profiles: List<User.Others>,
+    keyword: String,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
     tabIndex: Int,
@@ -240,12 +248,23 @@ private fun TabContainer(
         ) { tabIndex ->
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = "Tab #$tabIndex",
-                    style = MaterialTheme.typography.displayLarge,
-                )
+                when (tabs[tabIndex]) {
+                    is SearchDetailTab.All -> Text(
+                        text = "Tab #$tabIndex",
+                        style = MaterialTheme.typography.displayLarge,
+                    )
+
+                    is SearchDetailTab.Show -> EmptyContents(
+                        keyword = keyword,
+                        content = stringResource(R.string.search_no_show_result),
+                    )
+
+                    is SearchDetailTab.Artist -> EmptyContents(
+                        keyword = keyword,
+                        content = stringResource(R.string.search_no_artist_result),
+                    )
+                }
             }
         }
     }

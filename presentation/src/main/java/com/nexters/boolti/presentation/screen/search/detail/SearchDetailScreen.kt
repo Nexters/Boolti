@@ -1,22 +1,38 @@
 package com.nexters.boolti.presentation.screen.search.detail
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,9 +47,11 @@ import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.extension.ellipsis
+import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
+import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
@@ -109,12 +127,32 @@ private fun SearchDetailScreen(
                 search = { search(keyword) },
             )
 
-            if (!loading && shows.isEmpty() && profiles.isEmpty()) {
-                EmptyContents(
-                    keyword = searchedKeyword,
-                    onClickResetKeyword = navigateUp,
-                )
-            }
+            TabContainer(
+                shows = shows,
+                profiles = profiles,
+                onClickShow = onClickShow,
+                onClickProfile = onClickProfile,
+                tabIndex = tabIndex,
+                onChangeIndex = onChangeIndex,
+            )
+
+            /*
+                        if (!loading && shows.isEmpty() && profiles.isEmpty()) {
+                            EmptyContents(
+                                keyword = searchedKeyword,
+                                onClickResetKeyword = navigateUp,
+                            )
+                        } else if (!loading) {
+                            TabContainer(
+                                shows = shows,
+                                profiles = profiles,
+                                onClickShow = onClickShow,
+                                onClickProfile = onClickProfile,
+                                tabIndex = tabIndex,
+                                onChangeIndex = onChangeIndex,
+                            )
+                        }
+            */
         }
 
         if (loading) {
@@ -158,4 +196,147 @@ private fun ColumnScope.EmptyContents(
         colors = MainButtonDefaults.buttonColors(containerColor = Grey70),
         onClick = onClickResetKeyword,
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TabContainer(
+    shows: List<Show>,
+    profiles: List<User.Others>,
+    onClickShow: (id: String) -> Unit,
+    onClickProfile: (userCode: UserCode) -> Unit,
+    tabIndex: Int,
+    onChangeIndex: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tabs = remember(shows.size, profiles.size) {
+        listOf(
+            SearchDetailTab.All,
+            SearchDetailTab.Show(shows.size),
+            SearchDetailTab.Artist(profiles.size),
+        )
+    }
+    val pagerState = rememberPagerState { 3 }
+
+    LaunchedEffect(tabIndex) {
+        pagerState.animateScrollToPage(tabIndex)
+    }
+
+    LaunchedEffect(pagerState.targetPage) {
+        onChangeIndex(pagerState.targetPage)
+    }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        TabRow(
+            selectedIndex = tabIndex,
+            tabs = tabs.map { it.toLabel() },
+            onClickTab = onChangeIndex,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        HorizontalPager(
+            state = pagerState,
+        ) { tabIndex ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Tab #$tabIndex",
+                    style = MaterialTheme.typography.displayLarge,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TabRow(
+    selectedIndex: Int,
+    tabs: List<String>,
+    onClickTab: (index: Int) -> Unit,
+    modifier: Modifier = Modifier,
+    divider: @Composable () -> Unit = {
+        HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Grey85)
+    },
+    indicatorColor: Color = Grey15,
+    tabLabelStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    selectedContentColor: Color = Grey05,
+    unselectedContentColor: Color = Grey70,
+    edgePadding: Dp = marginHorizontal,
+    spaceBetween: Dp = 24.dp,
+    verticalPadding: Dp = 12.dp,
+) {
+    val scrollState = rememberScrollState()
+
+    Box(
+        modifier = modifier,
+    ) {
+        Box(modifier = Modifier.align(Alignment.BottomStart)) {
+            divider()
+        }
+        Row(modifier = Modifier.horizontalScroll(scrollState)) {
+            val edgeMargin = (edgePadding - spaceBetween / 2)
+
+            tabs.forEachIndexed { index, tabLabel ->
+                val tabModifier = when (index) {
+                    0 -> {
+                        Modifier
+                            .padding(start = edgeMargin.coerceAtLeast(0.dp))
+                            .clickable(onClick = { onClickTab(index) }, indication = null, interactionSource = null)
+                            .padding(
+                                start = if (edgeMargin >= 0.dp) spaceBetween / 2 else edgePadding,
+                                end = spaceBetween / 2,
+                            )
+                    }
+
+                    else -> {
+                        Modifier
+                            .clickable(onClick = { onClickTab(index) }, indication = null, interactionSource = null)
+                            .padding(horizontal = spaceBetween / 2)
+                    }
+                }
+                Text(
+                    text = tabLabel,
+                    style = tabLabelStyle,
+                    color = if (selectedIndex == index) selectedContentColor else unselectedContentColor,
+                    modifier = tabModifier
+                        .padding(vertical = verticalPadding)
+                        .drawWithContent(
+                            onDraw = {
+                                drawContent()
+                                if (index == selectedIndex) {
+                                    val y = size.height + verticalPadding.roundToPx() - 1.dp.roundToPx()
+                                    drawLine(
+                                        color = indicatorColor,
+                                        start = Offset(
+                                            x = 0f,
+                                            y = y,
+                                        ),
+                                        end = Offset(
+                                            x = size.width,
+                                            y = y,
+                                        ),
+                                    )
+                                }
+                            },
+                        ),
+                )
+            }
+        }
+    }
+}
+
+private sealed interface SearchDetailTab {
+    data object All : SearchDetailTab
+    data class Show(val count: Int) : SearchDetailTab
+    data class Artist(val count: Int) : SearchDetailTab
+}
+
+@Composable
+private fun SearchDetailTab.toLabel(): String = when (this) {
+    is SearchDetailTab.All -> stringResource(R.string.search_tab_all)
+    is SearchDetailTab.Show -> stringResource(R.string.search_tab_show, count)
+    is SearchDetailTab.Artist -> stringResource(R.string.search_tab_artist, count)
 }

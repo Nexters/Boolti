@@ -278,6 +278,9 @@
     <string name="search_rising_keywords_time">%s 기준</string>
     <string name="search_no_result">와 관련된 결과가 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_reset_searched_keyword_button">검색어 초기화</string>
+    <string name="search_tab_all">전체</string>
+    <string name="search_tab_show">공연(%d)</string>
+    <string name="search_tab_artist">아티스트(%d)</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

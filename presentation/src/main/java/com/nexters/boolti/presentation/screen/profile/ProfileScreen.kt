@@ -382,6 +382,11 @@ private fun ProfileAppBar(
             )
         },
         actionButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_share,
+                description = stringResource(R.string.share),
+                onClick = { /* TODO: 공유 기능 구현 */ },
+            )
             if (isMine) {
                 BtAppBarDefaults.AppBarIconButton(
                     iconRes = R.drawable.ic_edit_pen,

@@ -85,6 +85,7 @@
 
     <string name="complete">완료</string>
     <string name="edit">편집</string>
+    <string name="share">공유</string>
 
     <string name="input_lower_limit_text">%d자 이상 입력해 주세요</string>
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>

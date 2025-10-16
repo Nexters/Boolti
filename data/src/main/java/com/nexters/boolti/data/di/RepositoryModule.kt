@@ -9,6 +9,7 @@ import com.nexters.boolti.data.repository.MemberRepositoryImpl
 import com.nexters.boolti.data.repository.PopupRepositoryImpl
 import com.nexters.boolti.data.repository.ReservationRepositoryImpl
 import com.nexters.boolti.data.repository.SearchHistoryRepositoryImpl
+import com.nexters.boolti.data.repository.SearchRepositoryImpl
 import com.nexters.boolti.data.repository.ShowRepositoryImpl
 import com.nexters.boolti.data.repository.TicketRepositoryImpl
 import com.nexters.boolti.data.repository.TicketingRepositoryImpl
@@ -23,6 +24,7 @@ import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
+import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
@@ -77,4 +79,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindSearchHistoryRepository(repository: SearchHistoryRepositoryImpl): SearchHistoryRepository
+
+    @Binds
+    abstract fun bindSearchRepository(repository: SearchRepositoryImpl): SearchRepository
 }

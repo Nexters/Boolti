@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.search
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtChip
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -58,7 +61,12 @@ fun SearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchNewShowsAndRisingKeywords()
+    }
+
     SearchScreen(
+        loading = uiState.loading,
         newShows = uiState.newShows,
         risingKeywords = uiState.risingKeywords,
         risingKeywordsTime = uiState.risingKeywordsTime,
@@ -85,6 +93,7 @@ fun SearchScreen(
 
 @Composable
 private fun SearchScreen(
+    loading: Boolean,
     newShows: List<Show>,
     risingKeywords: List<String>,
     risingKeywordsTime: String,
@@ -104,45 +113,56 @@ private fun SearchScreen(
     Scaffold(
         modifier = modifier,
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
-                .verticalScroll(scrollState)
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            SearchBar(
-                modifier = Modifier.padding(horizontal = marginHorizontal),
-                onClick = onClickSearchBar,
-            )
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scrollState)
+                    .fillMaxSize(),
+            ) {
+                SearchBar(
+                    modifier = Modifier.padding(horizontal = marginHorizontal),
+                    onClick = onClickSearchBar,
+                )
 
-            Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(24.dp))
 
-            if (recentSearchKeywords.isNotEmpty()) {
-                SearchHistorySection(
-                    recentSearchKeywords = recentSearchKeywords,
+                if (recentSearchKeywords.isNotEmpty()) {
+                    SearchHistorySection(
+                        recentSearchKeywords = recentSearchKeywords,
+                        onClickKeyword = onSearch,
+                        deleteSearchHistory = deleteSearchHistory,
+                        onClickClearButton = onClickClearButton,
+                    )
+                }
+
+                NewShowsSection(
+                    newShows = newShows,
+                    onClickShow = onClickShow,
+                )
+
+                RisingKeywordsSection(
+                    risingKeywords = risingKeywords,
+                    risingKeywordsTime = risingKeywordsTime,
                     onClickKeyword = onSearch,
-                    deleteSearchHistory = deleteSearchHistory,
-                    onClickClearButton = onClickClearButton,
                 )
             }
 
-            NewShowsSection(
-                newShows = newShows,
-                onClickShow = onClickShow,
-            )
+            if (loading) {
+                BtCircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
 
-            RisingKeywordsSection(
-                risingKeywords = risingKeywords,
-                risingKeywordsTime = risingKeywordsTime,
-                onClickKeyword = onSearch,
-            )
-        }
-
-        if (showClearHistoriesDialog) {
-            ClearSearchHistoriesDialog(
-                onClickClear = clearSearchHistories,
-                onDismiss = dismissClearHistoriesDialog,
-            )
+            if (showClearHistoriesDialog) {
+                ClearSearchHistoriesDialog(
+                    onClickClear = clearSearchHistories,
+                    onDismiss = dismissClearHistoriesDialog,
+                )
+            }
         }
     }
 }
@@ -351,6 +371,7 @@ private fun SearchScreenPreview() {
     }
     BooltiTheme {
         SearchScreen(
+            loading = false,
             newShows = shows,
             risingKeywords = listOf("keyword1", "keyword2", "keyword3"),
             risingKeywordsTime = "2024.01.20 18:00",
@@ -372,6 +393,7 @@ private fun SearchScreenPreview() {
 private fun SearchScreenEmptyPreview() {
     BooltiTheme {
         SearchScreen(
+            loading = false,
             newShows = emptyList(),
             risingKeywords = emptyList(),
             risingKeywordsTime = "2024.01.20 18:00",

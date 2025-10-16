@@ -147,16 +147,6 @@ private fun SearchDetailScreen(
                 search = { search(keyword) },
             )
 
-            TabContainer(
-                shows = shows,
-                profiles = profiles,
-                keyword = keyword,
-                onClickShow = onClickShow,
-                onClickProfile = onClickProfile,
-                tabIndex = tabIndex,
-                onChangeIndex = onChangeIndex,
-            )
-
             if (!loading && shows.isEmpty() && profiles.isEmpty()) {
                 EmptyContents(
                     keyword = searchedKeyword,

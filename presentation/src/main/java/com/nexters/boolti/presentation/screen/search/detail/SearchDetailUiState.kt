@@ -69,7 +69,38 @@ data class SearchDetailUiState(
                     thumbnailImage = "",
                 ),
             ),
-            profiles = emptyList(),
+            profiles = listOf(
+                User.Others(
+                    nickname = "아티스트 닉네임은 최대 12자",
+                    photo = null,
+                    userCode = "1",
+                ),
+                User.Others(
+                    nickname = "김람지",
+                    photo = null,
+                    userCode = "2",
+                ),
+                User.Others(
+                    nickname = "스튜디오 불티",
+                    photo = null,
+                    userCode = "3",
+                ),
+                User.Others(
+                    nickname = "아티스트 닉네임은 최대 12자",
+                    photo = null,
+                    userCode = "4",
+                ),
+                User.Others(
+                    nickname = "김람지",
+                    photo = null,
+                    userCode = "5",
+                ),
+                User.Others(
+                    nickname = "스튜디오 불티",
+                    photo = null,
+                    userCode = "6",
+                ),
+            ),
             tabIndex = 0,
         )
     }

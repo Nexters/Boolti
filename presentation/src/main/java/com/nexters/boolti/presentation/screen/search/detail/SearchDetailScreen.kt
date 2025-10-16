@@ -49,6 +49,7 @@ import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.component.ProfileItem
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.ellipsis
 import com.nexters.boolti.presentation.theme.Grey05
@@ -272,10 +273,17 @@ private fun TabContainer(
                         )
                     }
 
-                    is SearchDetailTab.Artist -> EmptyContents(
-                        keyword = keyword,
-                        content = stringResource(R.string.search_no_artist_result),
-                    )
+                    is SearchDetailTab.Artist -> if (profiles.isEmpty()) {
+                        EmptyContents(
+                            keyword = keyword,
+                            content = stringResource(R.string.search_no_artist_result),
+                        )
+                    } else {
+                        ArtistTab(
+                            profiles = profiles,
+                            onClickProfile = onClickProfile,
+                        )
+                    }
                 }
             }
         }
@@ -380,6 +388,29 @@ private fun ShowsTab(
                 backgroundColor = MaterialTheme.colorScheme.background,
                 contentPadding = PaddingValues(0.dp),
                 onClick = { onClickShow(show.id) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ArtistTab(
+    profiles: List<User.Others>,
+    onClickProfile: (UserCode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        items(profiles, key = { it.userCode }) { profile ->
+            ProfileItem(
+                profile = profile,
+                onClick = onClickProfile,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal),
             )
         }
     }

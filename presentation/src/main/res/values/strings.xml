@@ -281,6 +281,8 @@
     <string name="search_no_artist_result">와 관련된 아티스트가 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_reset_searched_keyword_button">검색어 초기화</string>
     <string name="search_tab_all">전체</string>
+    <string name="search_tab_show_section">공연</string>
+    <string name="search_tab_artist_section">아티스트</string>
     <string name="search_tab_show">공연(%d)</string>
     <string name="search_tab_artist">아티스트(%d)</string>
 

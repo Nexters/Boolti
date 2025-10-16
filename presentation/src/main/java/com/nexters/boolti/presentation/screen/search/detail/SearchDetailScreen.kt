@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.search.detail
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -7,14 +9,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -68,6 +75,14 @@ fun SearchDetailScreen(
     viewModel: SearchDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler {
+        if (uiState.tabIndex > 0) {
+            viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(0))
+        } else {
+            navigateUp()
+        }
+    }
 
     SearchDetailScreen(
         keyword = uiState.keyword,
@@ -142,23 +157,23 @@ private fun SearchDetailScreen(
                 onChangeIndex = onChangeIndex,
             )
 
-            /*
-                        if (!loading && shows.isEmpty() && profiles.isEmpty()) {
-                            EmptyContents(
-                                keyword = searchedKeyword,
-                                onClickResetKeyword = navigateUp,
-                            )
-                        } else if (!loading) {
-                            TabContainer(
-                                shows = shows,
-                                profiles = profiles,
-                                onClickShow = onClickShow,
-                                onClickProfile = onClickProfile,
-                                tabIndex = tabIndex,
-                                onChangeIndex = onChangeIndex,
-                            )
-                        }
-            */
+            if (!loading && shows.isEmpty() && profiles.isEmpty()) {
+                EmptyContents(
+                    keyword = searchedKeyword,
+                    onClickResetKeyword = navigateUp,
+                    content = stringResource(R.string.search_no_result),
+                )
+            } else if (!loading) {
+                TabContainer(
+                    shows = shows,
+                    profiles = profiles,
+                    keyword = keyword,
+                    onClickShow = onClickShow,
+                    onClickProfile = onClickProfile,
+                    tabIndex = tabIndex,
+                    onChangeIndex = onChangeIndex,
+                )
+            }
         }
 
         if (loading) {
@@ -256,10 +271,24 @@ private fun TabContainer(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 when (tabs[tabIndex]) {
-                    is SearchDetailTab.All -> Text(
-                        text = "Tab #$tabIndex",
-                        style = MaterialTheme.typography.displayLarge,
-                    )
+                    is SearchDetailTab.All -> {
+                        AllTab(
+                            shows = shows.take(3),
+                            profiles = profiles.take(3),
+                            onClickShow = onClickShow,
+                            onClickProfile = onClickProfile,
+                            onClickAllShows = if (shows.size > 3) {
+                                { onChangeIndex(1) }
+                            } else {
+                                null
+                            },
+                            onClickAllArtists = if (profiles.size > 3) {
+                                { onChangeIndex(2) }
+                            } else {
+                                null
+                            },
+                        )
+                    }
 
                     is SearchDetailTab.Show -> if (shows.isEmpty()) {
                         EmptyContents(
@@ -363,6 +392,129 @@ private fun TabRow(
                         ),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun AllTab(
+    shows: List<Show>,
+    profiles: List<User.Others>,
+    onClickShow: (String) -> Unit,
+    onClickProfile: (UserCode) -> Unit,
+    onClickAllShows: (() -> Unit)?,
+    onClickAllArtists: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+    ) {
+        if (shows.isNotEmpty()) {
+            AllTabSection(
+                title = stringResource(R.string.search_tab_show_section),
+                onClickAll = onClickAllShows,
+            ) {
+                shows.forEachIndexed { index, show ->
+                    if (index > 0) Spacer(Modifier.height(20.dp))
+
+                    ShowItem(
+                        show = show,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = marginHorizontal),
+                        showNameStyle = MaterialTheme.typography.titleLarge,
+                        backgroundColor = MaterialTheme.colorScheme.background,
+                        contentPadding = PaddingValues(0.dp),
+                        onClick = { onClickShow(show.id) },
+                    )
+                }
+            }
+        }
+
+        if (shows.isNotEmpty() && profiles.isNotEmpty()) {
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal),
+                thickness = 1.dp,
+                color = Grey85
+            )
+        }
+
+        if (profiles.isNotEmpty()) {
+            AllTabSection(
+                title = stringResource(R.string.search_tab_artist_section),
+                onClickAll = onClickAllArtists,
+            ) {
+                profiles.forEachIndexed { index, profile ->
+                    if (index > 0) Spacer(Modifier.height(16.dp))
+
+                    ProfileItem(
+                        profile = profile,
+                        onClick = { onClickProfile(profile.userCode) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = marginHorizontal),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AllTabSection(
+    title: String,
+    onClickAll: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+    ) {
+        AllTabSectionTitle(
+            title = title,
+            onClickAll = onClickAll,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+
+        content()
+    }
+}
+
+@Composable
+private fun AllTabSectionTitle(
+    title: String,
+    onClickAll: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = Grey05,
+        )
+        onClickAll?.let {
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .clickable(onClick = onClickAll)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                text = stringResource(R.string.show_all),
+                style = MaterialTheme.typography.bodySmall,
+                color = Grey50,
+            )
         }
     }
 }

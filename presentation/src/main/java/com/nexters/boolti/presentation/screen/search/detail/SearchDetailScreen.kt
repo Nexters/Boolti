@@ -2,12 +2,16 @@ package com.nexters.boolti.presentation.screen.search.detail
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +49,7 @@ import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.ellipsis
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -255,10 +260,17 @@ private fun TabContainer(
                         style = MaterialTheme.typography.displayLarge,
                     )
 
-                    is SearchDetailTab.Show -> EmptyContents(
-                        keyword = keyword,
-                        content = stringResource(R.string.search_no_show_result),
-                    )
+                    is SearchDetailTab.Show -> if (shows.isEmpty()) {
+                        EmptyContents(
+                            keyword = keyword,
+                            content = stringResource(R.string.search_no_show_result),
+                        )
+                    } else {
+                        ShowsTab(
+                            shows = shows,
+                            onClickShow = onClickShow,
+                        )
+                    }
 
                     is SearchDetailTab.Artist -> EmptyContents(
                         keyword = keyword,
@@ -343,6 +355,32 @@ private fun TabRow(
                         ),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ShowsTab(
+    shows: List<Show>,
+    onClickShow: (id: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        items(shows, key = { it.id }) { show ->
+            ShowItem(
+                show = show,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal),
+                showNameStyle = MaterialTheme.typography.titleLarge,
+                backgroundColor = MaterialTheme.colorScheme.background,
+                contentPadding = PaddingValues(0.dp),
+                onClick = { onClickShow(show.id) },
+            )
         }
     }
 }

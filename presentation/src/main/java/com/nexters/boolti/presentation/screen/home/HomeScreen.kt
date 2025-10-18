@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -137,7 +137,6 @@ fun HomeScreen(
 
             ticketScreen(
                 modifier = Modifier.padding(innerPadding),
-                isLoggedIn = isLoggedIn,
                 navigateToLogin = navigateToLogin,
                 navigateToTicketDetail = navigateToTicketDetail,
             )

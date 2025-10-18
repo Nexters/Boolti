@@ -4,11 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
-import com.nexters.boolti.domain.model.Popup
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.nexters.boolti.domain.repository.AuthRepository
-import com.nexters.boolti.domain.repository.ConfigRepository
 import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute

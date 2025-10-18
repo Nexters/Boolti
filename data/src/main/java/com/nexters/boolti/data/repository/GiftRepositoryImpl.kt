@@ -1,7 +1,7 @@
 package com.nexters.boolti.data.repository
 
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.nexters.boolti.data.datasource.GiftDataSource
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.toDomains

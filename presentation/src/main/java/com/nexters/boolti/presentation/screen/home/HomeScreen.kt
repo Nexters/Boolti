@@ -137,7 +137,6 @@ fun HomeScreen(
 
             ticketScreen(
                 modifier = Modifier.padding(innerPadding),
-                isLoggedIn = isLoggedIn,
                 navigateToLogin = navigateToLogin,
                 navigateToTicketDetail = navigateToTicketDetail,
             )

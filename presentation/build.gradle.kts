@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.material)
+    implementation(libs.material.icons.extended)
     implementation(libs.bundles.lifecycle)
     implementation(libs.bundles.compose)
     implementation(libs.immutable)

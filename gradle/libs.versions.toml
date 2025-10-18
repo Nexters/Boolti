@@ -22,7 +22,7 @@ navigationCompose = "2.9.5"
 core-ktx = "1.17.0"
 datastore = "1.1.7"
 espresso = "3.7.0"
-firebase-bom = "32.8.1"
+firebase-bom = "34.4.0"
 coroutines = "1.10.2"
 hilt = "2.57.2"
 hiltNavigationCompose = "1.3.0"
@@ -39,8 +39,7 @@ materialIcons = "1.7.8"
 retrofit = "3.0.0"
 room = "2.8.2"
 google-services = "4.4.4"
-firebase-crashlytics = "2.9.9"
-firebase-config = "21.6.3"
+firebase-crashlytics = "3.0.6"
 kotest = "6.0.4"
 zoomable = "2.8.2"
 zxing = "4.3.0"
@@ -58,14 +57,14 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
-andoridx-compose-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-androidx-compose-ui-ui = { module = "androidx.compose.ui:ui", version.require = "false" }
-androidx-compose-ui-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.require = "false" }
-androidx-compose-ui-ui-util = { module = "androidx.compose.ui:ui-util", version.require = "false" }
-androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.require = "false" }
-androidx-compose-ui-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
-androidx-compose-ui-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-androidx-compose-ui-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+andoridx-compose-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
@@ -103,12 +102,11 @@ androidx-material3-android = { group = "androidx.compose.material3", name = "mat
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIcons" }
 payments-toss = { module = "com.github.tosspayments:payment-sdk-android", version.ref = "tosspayments" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.require = "false" }
-firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.require = "false" }
-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.require = "false" }
-firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebase-config" }
-firebase-dynamic-links = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.require = "false" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxing" }
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
@@ -137,7 +135,7 @@ lifecycle = ["androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-ktx
 android-test = ["junit", "androidx-junit", "androidx-espresso-core", "kotlinx-coroutines-test"]
 network = ["retrofit", "logging-interceptor"]
 db = ["androidx-datastore", "androidx-datastore-preferences-core", "androidx-room-runtime", "androidx-room-ktx"]
-firebase = ["firebase-analytics-ktx", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-dynamic-links"]
+firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-messaging"]
 kotest = ["kotest-property", "kotest-runner-junit5", "kotest-extentions-junitxml"]
 coil = ["coil", "coil-compose"]
 compose = ["androidx-activity-compose", "androidx-navigation-compose", "androidx-material3-android", "androidx-compose-ui-ui", "androidx-compose-ui-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-ui-ui-util", "androidx-lifecycle-runtime-compose"]

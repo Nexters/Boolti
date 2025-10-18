@@ -31,12 +31,12 @@ junit = "4.13.2"
 coil = "2.7.0"
 kotlinx-serialization-json = "1.9.0"
 serializationConverter = "1.0.0"
-logging-interceptor = "4.11.0"
+logging-interceptor = "5.2.1"
 lottie = "6.6.10"
 material = "1.13.0"
 material3Android = "1.4.0"
 materialIcons = "1.7.8"
-retrofit = "2.9.0"
+retrofit = "3.0.0"
 room = "2.8.2"
 google-services = "4.4.4"
 firebase-crashlytics = "2.9.9"
@@ -82,7 +82,6 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }

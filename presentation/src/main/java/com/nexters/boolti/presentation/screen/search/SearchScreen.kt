@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -110,59 +109,53 @@ private fun SearchScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    Scaffold(
-        modifier = modifier,
-    ) { innerPadding ->
-        Box(
+    Box(
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .verticalScroll(scrollState)
+                .fillMaxSize(),
         ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(scrollState)
-                    .fillMaxSize(),
-            ) {
-                SearchBar(
-                    modifier = Modifier.padding(horizontal = marginHorizontal),
-                    onClick = onClickSearchBar,
-                )
+            SearchBar(
+                modifier = Modifier.padding(horizontal = marginHorizontal),
+                onClick = onClickSearchBar,
+            )
 
-                Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-                if (recentSearchKeywords.isNotEmpty()) {
-                    SearchHistorySection(
-                        recentSearchKeywords = recentSearchKeywords,
-                        onClickKeyword = onSearch,
-                        deleteSearchHistory = deleteSearchHistory,
-                        onClickClearButton = onClickClearButton,
-                    )
-                }
-
-                NewShowsSection(
-                    newShows = newShows,
-                    onClickShow = onClickShow,
-                )
-
-                RisingKeywordsSection(
-                    risingKeywords = risingKeywords,
-                    risingKeywordsTime = risingKeywordsTime,
+            if (recentSearchKeywords.isNotEmpty()) {
+                SearchHistorySection(
+                    recentSearchKeywords = recentSearchKeywords,
                     onClickKeyword = onSearch,
+                    deleteSearchHistory = deleteSearchHistory,
+                    onClickClearButton = onClickClearButton,
                 )
             }
 
-            if (loading) {
-                BtCircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                )
-            }
+            NewShowsSection(
+                newShows = newShows,
+                onClickShow = onClickShow,
+            )
 
-            if (showClearHistoriesDialog) {
-                ClearSearchHistoriesDialog(
-                    onClickClear = clearSearchHistories,
-                    onDismiss = dismissClearHistoriesDialog,
-                )
-            }
+            RisingKeywordsSection(
+                risingKeywords = risingKeywords,
+                risingKeywordsTime = risingKeywordsTime,
+                onClickKeyword = onSearch,
+            )
+        }
+
+        if (loading) {
+            BtCircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+
+        if (showClearHistoriesDialog) {
+            ClearSearchHistoriesDialog(
+                onClickClear = clearSearchHistories,
+                onDismiss = dismissClearHistoriesDialog,
+            )
         }
     }
 }

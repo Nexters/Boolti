@@ -4,24 +4,47 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.domain.model.UserCode
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
 fun NavGraphBuilder.searchDetailNavigation(
-    navigateToShowDetail: (id: String) -> Unit,
-    navigateToProfile: (userCode: UserCode) -> Unit,
-    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     composable<SearchRoute.SearchDetail> {
+        val navController = LocalNavController.current
+
+        val navigateUp: () -> Unit = {
+            navController.popBackStack()
+            navController.navigate(SearchRoute.RecentSearch) {
+                popUpTo<SearchRoute.RecentSearch> {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            }
+        }
+
         BackHandler {
             navigateUp()
         }
 
         SearchDetailScreen(
-            navigateToShowDetail = navigateToShowDetail,
-            navigateToProfile = navigateToProfile,
-            navigateUp = navigateUp,
+            navigateToShowDetail = { showId ->
+                navController.navigate(ShowRoute.ShowRoot(showId))
+            },
+            navigateToProfile = { userCode ->
+                navController.navigate(MainRoute.Profile(userCode))
+            },
+            navigateUp = {
+                navController.popBackStack()
+                navController.navigate(SearchRoute.RecentSearch) {
+                    popUpTo<SearchRoute.RecentSearch> {
+                        inclusive = false
+                    }
+                    launchSingleTop = true
+                }
+            },
             modifier = modifier,
         )
     }

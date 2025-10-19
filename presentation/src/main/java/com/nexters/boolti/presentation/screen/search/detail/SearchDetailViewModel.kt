@@ -8,7 +8,6 @@ import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,16 +50,14 @@ class SearchDetailViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             _uiState.update { it.copy(loading = true) }
 
-            launch(Dispatchers.IO) {
-                searchHistoryRepository.saveSearchHistory(keyword)
-            }
+            searchHistoryRepository.saveSearchHistory(keyword)
 
             // 공연 검색과 프로필 검색을 동시에 실행
-            val showsDeferred = async(Dispatchers.IO) {
+            val showsDeferred = async {
                 searchRepository.searchShows(keyword)
             }
 
-            val profilesDeferred = async(Dispatchers.IO) {
+            val profilesDeferred = async {
                 searchRepository.searchProfiles(keyword)
             }
 

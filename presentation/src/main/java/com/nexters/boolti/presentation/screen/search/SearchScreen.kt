@@ -313,7 +313,7 @@ private fun RisingKeywordsSection(
     Spacer(Modifier.height(12.dp))
 
     risingKeywords.forEachIndexed { index, keyword ->
-        if (index > 0) Divider(Modifier.padding(horizontal = marginHorizontal))
+        if (index > 0) Divider(Modifier.fillMaxWidth())
 
         Row(
             modifier = Modifier

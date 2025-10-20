@@ -309,6 +309,8 @@
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
+    <string name="profile_share_only_url">URL만 공유하기</string>
+    <string name="profile_share_with_artist">아티스트 정보 힘께 공유하기</string>
 
     <string name="sns">SNS</string>
     <string name="sns_edit_error_contains_at_sign">\@을 제외하고 입력해 주세요</string>

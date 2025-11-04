@@ -374,7 +374,10 @@ fun ProfileScreen(
                         .clickable {
                             val sendIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "") // TODO: FE에서 url 확정되면 넣어주기
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "https://profile.boolti.in/${user.userCode}"
+                                )
                                 type = "text/plain"
                             }
                             val shareIntent = Intent.createChooser(sendIntent, null)
@@ -390,6 +393,13 @@ fun ProfileScreen(
                         color = Grey10,
                     )
                 }
+
+                val sharingText = stringResource(
+                    R.string.profile_share_detail,
+                    user.nickname,
+                    user.upcomingShow.totalSize + user.performedShow.totalSize,
+                    "https://profile.boolti.in/${user.userCode}"
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -397,7 +407,7 @@ fun ProfileScreen(
                         .clickable {
                             val sendIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "") // TODO: FE에서 url 확정되면 넣어주기. 근데 이제 텍스트를 곁들인
+                                putExtra(Intent.EXTRA_TEXT, sharingText)
                                 type = "text/plain"
                             }
                             val shareIntent = Intent.createChooser(sendIntent, null)

@@ -312,8 +312,8 @@
     <string name="profile_share_only_url">URL만 공유하기</string>
     <string name="profile_share_with_artist">아티스트 정보 힘께 공유하기</string>
     <string name="profile_share_detail">이 아티스트 어때요?\n\n
-- 닉네임 : #%s\n
-- 크레딧 : 참여 공연 #%d\n
+- 닉네임 : %s\n
+- 크레딧 : 참여 공연 %d\n
 프로필 ▼\n
 %s</string>
 

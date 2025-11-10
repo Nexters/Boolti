@@ -423,6 +423,11 @@ fun ProfileScreen(
                         color = Grey10,
                     )
                 }
+                Spacer(
+                    modifier = Modifier.padding(
+                        bottom = 28.dp
+                    )
+                )
             }
         }
     }

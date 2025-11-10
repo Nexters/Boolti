@@ -43,7 +43,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -89,6 +88,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtBottomSheet
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.component.InquiryBottomSheet
@@ -456,20 +456,9 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
         previewUrl
     )
 
-    ModalBottomSheet(
-        containerColor = Grey85,
+    BtBottomSheet (
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(top = 12.dp, bottom = 24.dp)
-                    .size(45.dp, 4.dp)
-                    .clip(CircleShape)
-                    .background(Grey70),
-            )
-        },
     ) {
         Column(
             modifier = Modifier.padding(bottom = 28.dp)

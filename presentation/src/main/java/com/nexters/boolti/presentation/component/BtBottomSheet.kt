@@ -24,24 +24,31 @@ import com.nexters.boolti.presentation.theme.Grey70
 @Composable
 fun BtBottomSheet(
     onDismissRequest: () -> Unit,
+    dragHandle: @Composable (() -> Unit)? = { BtBottomSheetDefault.DragHandle() },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
         containerColor = MaterialTheme.colorScheme.surfaceTint,
         onDismissRequest = onDismissRequest,
         windowInsets = WindowInsets(0, 0, 0, 0),
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(top = 12.dp, bottom = 24.dp)
-                    .size(45.dp, 4.dp)
-                    .clip(CircleShape)
-                    .background(color = Grey70)
-            )
-        },
+        dragHandle = dragHandle,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     ) {
         content()
         Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+    }
+}
+
+object BtBottomSheetDefault {
+
+    @Composable
+    fun DragHandle() {
+        Box(
+            modifier = Modifier
+                .padding(top = 12.dp, bottom = 24.dp)
+                .size(45.dp, 4.dp)
+                .clip(CircleShape)
+                .background(color = Grey70)
+        )
     }
 }

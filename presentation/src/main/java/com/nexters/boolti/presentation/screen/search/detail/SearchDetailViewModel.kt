@@ -26,6 +26,8 @@ class SearchDetailViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<SearchRoute.SearchDetail>()
     private var searchJob: Job? = null
+    private var searchShowsJob: Job? = null
+    private var searchProfilesJob: Job? = null
 
     private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel(emptyList(), 0, 0))
     private val profiles = MutableStateFlow<PagingDataUiModel<User.Others>>(PagingDataUiModel(emptyList(), 0, 0))
@@ -58,6 +60,8 @@ class SearchDetailViewModel @Inject constructor(
             is SearchDetailIntent.ChangeTabIndex -> changeTabIndex(intent.index)
             is SearchDetailIntent.KeywordChanged -> onKeywordChanged(intent.keyword)
             is SearchDetailIntent.Search -> search(intent.keyword)
+            is SearchDetailIntent.OnProfilesPageReached -> loadNextProfilesPage()
+            is SearchDetailIntent.OnShowsPageReached -> loadNextShowsPage()
         }
     }
 
@@ -103,5 +107,55 @@ class SearchDetailViewModel @Inject constructor(
 
     private fun onKeywordChanged(keyword: String) {
         _uiState.update { it.copy(keyword = keyword) }
+    }
+
+    private fun loadNextShowsPage() {
+        if (searchShowsJob?.isActive == true) return
+        _uiState.update { it.copy(showsLoading = true) }
+
+        searchShowsJob = viewModelScope.launch {
+            val currentPage = shows.value.currentPage
+            val nextPage = currentPage + 1
+            val currentItems = shows.value.items
+
+            searchRepository.searchShows(uiState.value.searchedKeyword, nextPage).onSuccess { searchResult ->
+                if (searchResult.items.isNotEmpty()) {
+                    val appendedItems = (currentItems + searchResult.items).distinctBy { it.id }
+                    shows.update {
+                        it.copy(
+                            items = appendedItems,
+                            totalCount = searchResult.totalElements,
+                            currentPage = nextPage,
+                        )
+                    }
+                }
+            }
+            _uiState.update { it.copy(showsLoading = false) }
+        }
+    }
+
+    private fun loadNextProfilesPage() {
+        if (searchProfilesJob?.isActive == true) return
+        _uiState.update { it.copy(profilesLoading = true) }
+
+        searchProfilesJob = viewModelScope.launch {
+            val currentPage = profiles.value.currentPage
+            val nextPage = currentPage + 1
+            val currentItems = profiles.value.items
+
+            searchRepository.searchProfiles(uiState.value.searchedKeyword, nextPage).onSuccess { profilesResult ->
+                if (profilesResult.items.isNotEmpty()) {
+                    val appendedItems = (currentItems + profilesResult.items).distinctBy { it.userCode }
+                    profiles.update {
+                        it.copy(
+                            items = appendedItems,
+                            totalCount = profilesResult.totalElements,
+                            currentPage = nextPage,
+                        )
+                    }
+                }
+            }
+            _uiState.update { it.copy(profilesLoading = false) }
+        }
     }
 }

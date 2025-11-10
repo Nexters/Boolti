@@ -1,6 +1,9 @@
 package com.nexters.boolti.presentation.screen.search.detail
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -58,6 +62,7 @@ import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ProfileItem
 import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.extension.OnBottomReached
 import com.nexters.boolti.presentation.extension.ellipsis
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -93,8 +98,10 @@ fun SearchDetailScreen(
         loading = uiState.loading,
         shows = uiState.shows,
         showsTotalCount = uiState.showsTotalCount,
+        showsLoading = uiState.showsLoading,
         profiles = uiState.profiles,
         profilesTotalCount = uiState.profilesTotalCount,
+        profilesLoading = uiState.profilesLoading,
         tabIndex = uiState.tabIndex,
         onChangeIndex = {
             viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(it))
@@ -103,6 +110,12 @@ fun SearchDetailScreen(
         onClickProfile = navigateToProfile,
         search = {
             viewModel.onIntent(SearchDetailIntent.Search(it))
+        },
+        onShowsPageReached = {
+            viewModel.onIntent(SearchDetailIntent.OnShowsPageReached)
+        },
+        onProfilesPageReached = {
+            viewModel.onIntent(SearchDetailIntent.OnProfilesPageReached)
         },
         navigateUp = navigateUp,
         modifier = modifier,
@@ -117,13 +130,17 @@ private fun SearchDetailScreen(
     loading: Boolean,
     shows: List<Show>,
     showsTotalCount: Long,
+    showsLoading: Boolean,
     profiles: List<User.Others>,
     profilesTotalCount: Long,
+    profilesLoading: Boolean,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
     search: (keyword: String) -> Unit,
+    onShowsPageReached: () -> Unit,
+    onProfilesPageReached: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -161,13 +178,17 @@ private fun SearchDetailScreen(
                 TabContainer(
                     shows = shows,
                     showsTotalCount = showsTotalCount,
+                    showsLoading = showsLoading,
                     profiles = profiles,
                     profilesTotalCount = profilesTotalCount,
+                    profilesLoading = profilesLoading,
                     keyword = keyword,
                     onClickShow = onClickShow,
                     onClickProfile = onClickProfile,
                     tabIndex = tabIndex,
                     onChangeIndex = onChangeIndex,
+                    onShowsPageReached = onShowsPageReached,
+                    onProfilesPageReached = onProfilesPageReached,
                 )
             }
         }
@@ -227,13 +248,17 @@ private fun EmptyContents(
 private fun TabContainer(
     shows: List<Show>,
     showsTotalCount: Long,
+    showsLoading: Boolean,
     profiles: List<User.Others>,
     profilesTotalCount: Long,
+    profilesLoading: Boolean,
     keyword: String,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
+    onShowsPageReached: () -> Unit,
+    onProfilesPageReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tabs = remember(shows.size, profiles.size) {
@@ -296,7 +321,9 @@ private fun TabContainer(
                     } else {
                         ShowsTab(
                             shows = shows,
+                            isLoading = showsLoading,
                             onClickShow = onClickShow,
+                            onBottomReached = onShowsPageReached,
                         )
                     }
 
@@ -308,7 +335,9 @@ private fun TabContainer(
                     } else {
                         ArtistTab(
                             profiles = profiles,
+                            isLoading = profilesLoading,
                             onClickProfile = onClickProfile,
+                            onBottomReached = onProfilesPageReached,
                         )
                     }
                 }
@@ -520,10 +549,19 @@ private fun AllTabSectionTitle(
 @Composable
 private fun ShowsTab(
     shows: List<Show>,
+    isLoading: Boolean,
     onClickShow: (id: String) -> Unit,
+    onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+
+    listState.OnBottomReached {
+        onBottomReached()
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -540,16 +578,42 @@ private fun ShowsTab(
                 onClick = { onClickShow(show.id) },
             )
         }
+
+        item(key = "loading_indicator") {
+            AnimatedVisibility(
+                visible = isLoading,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    BtCircularProgressIndicator()
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun ArtistTab(
     profiles: List<User.Others>,
+    isLoading: Boolean,
     onClickProfile: (UserCode) -> Unit,
+    onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+
+    listState.OnBottomReached {
+        onBottomReached()
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -562,6 +626,23 @@ private fun ArtistTab(
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal),
             )
+        }
+
+        item(key = "loading_indicator") {
+            AnimatedVisibility(
+                visible = isLoading,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    BtCircularProgressIndicator()
+                }
+            }
         }
     }
 }

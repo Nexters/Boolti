@@ -3,15 +3,17 @@ package com.nexters.boolti.presentation.screen.search.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
+import com.nexters.boolti.presentation.extension.stateInUi
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,15 +25,25 @@ class SearchDetailViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<SearchRoute.SearchDetail>()
-
     private var searchJob: Job? = null
+
+    private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel(emptyList(), 0, 0))
 
     private val _uiState = MutableStateFlow(
         SearchDetailUiState.Default.copy(
             keyword = route.keyword,
         )
     )
-    val uiState = _uiState.asStateFlow()
+
+    val uiState = combine(
+        _uiState,
+        shows,
+    ) { uiState, shows ->
+        uiState.copy(
+            shows = shows.items,
+            showsTotalCount = shows.totalCount,
+        )
+    }.stateInUi(viewModelScope, SearchDetailUiState.Default.copy(keyword = route.keyword))
 
     init {
         search(route.keyword)
@@ -53,24 +65,23 @@ class SearchDetailViewModel @Inject constructor(
             searchHistoryRepository.saveSearchHistory(keyword)
 
             // 공연 검색과 프로필 검색을 동시에 실행
-            val showsDeferred = async {
-                searchRepository.searchShows(keyword)
-            }
-
             val profilesDeferred = async {
                 searchRepository.searchProfiles(keyword)
             }
 
-            // 두 결과를 모두 기다림
-            val showsResult = showsDeferred.await()
-            val profilesResult = profilesDeferred.await()
+            searchRepository.searchShows(keyword, 0).onSuccess { showsResponse ->
+                shows.update {
+                    PagingDataUiModel(
+                        items = showsResponse.items,
+                        totalCount = showsResponse.totalElements,
+                        currentPage = 0,
+                    )
+                }
+            }
 
-            // UiState 업데이트
             _uiState.update {
                 it.copy(
                     searchedKeyword = keyword,
-                    shows = showsResult.getOrElse { emptyList() },
-                    profiles = profilesResult.getOrElse { emptyList() },
                     loading = false,
                 )
             }

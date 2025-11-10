@@ -92,7 +92,9 @@ fun SearchDetailScreen(
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,
+        showsTotalCount = uiState.showsTotalCount,
         profiles = uiState.profiles,
+        profilesTotalCount = uiState.profilesTotalCount,
         tabIndex = uiState.tabIndex,
         onChangeIndex = {
             viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(it))
@@ -114,7 +116,9 @@ private fun SearchDetailScreen(
     searchedKeyword: String,
     loading: Boolean,
     shows: List<Show>,
+    showsTotalCount: Long,
     profiles: List<User.Others>,
+    profilesTotalCount: Long,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
     onClickShow: (id: String) -> Unit,
@@ -156,7 +160,9 @@ private fun SearchDetailScreen(
             } else if (!loading) {
                 TabContainer(
                     shows = shows,
+                    showsTotalCount = showsTotalCount,
                     profiles = profiles,
+                    profilesTotalCount = profilesTotalCount,
                     keyword = keyword,
                     onClickShow = onClickShow,
                     onClickProfile = onClickProfile,
@@ -220,7 +226,9 @@ private fun EmptyContents(
 @Composable
 private fun TabContainer(
     shows: List<Show>,
+    showsTotalCount: Long,
     profiles: List<User.Others>,
+    profilesTotalCount: Long,
     keyword: String,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
@@ -231,8 +239,8 @@ private fun TabContainer(
     val tabs = remember(shows.size, profiles.size) {
         listOf(
             SearchDetailTab.All,
-            SearchDetailTab.Show(shows.size),
-            SearchDetailTab.Artist(profiles.size),
+            SearchDetailTab.Show(showsTotalCount),
+            SearchDetailTab.Artist(profilesTotalCount),
         )
     }
     val pagerState = rememberPagerState { 3 }
@@ -560,8 +568,8 @@ private fun ArtistTab(
 
 private sealed interface SearchDetailTab {
     data object All : SearchDetailTab
-    data class Show(val count: Int) : SearchDetailTab
-    data class Artist(val count: Int) : SearchDetailTab
+    data class Show(val count: Long) : SearchDetailTab
+    data class Artist(val count: Long) : SearchDetailTab
 }
 
 @Composable

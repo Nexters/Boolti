@@ -2,13 +2,12 @@ package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.SearchDataSource
 import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
+import com.nexters.boolti.domain.model.PagingData
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.emptyPreviewList
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.domain.util.suspendRunCatching
-import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 internal class SearchRepositoryImpl @Inject constructor(
@@ -28,59 +27,6 @@ internal class SearchRepositoryImpl @Inject constructor(
         }
 
         return Result.success(recommendations)
-    }
-
-    override suspend fun searchShows(keyword: String): Result<List<Show>> {
-        val allShows = listOf(
-            Show(
-                id = "1",
-                name = "불티 밴드 첫 공연",
-                date = LocalDateTime.now().plusDays(7),
-                salesStartDate = LocalDate.now().minusDays(3),
-                salesEndDate = LocalDate.now().plusDays(5),
-                thumbnailImage = "https://picsum.photos/200/300"
-            ),
-            Show(
-                id = "2",
-                name = "여름밤 재즈 콘서트",
-                date = LocalDateTime.now().plusDays(14),
-                salesStartDate = LocalDate.now().minusDays(1),
-                salesEndDate = LocalDate.now().plusDays(12),
-                thumbnailImage = "https://picsum.photos/200/301"
-            ),
-            Show(
-                id = "3",
-                name = "클래식 기타 독주회",
-                date = LocalDateTime.now().plusDays(21),
-                salesStartDate = LocalDate.now(),
-                salesEndDate = LocalDate.now().plusDays(19),
-                thumbnailImage = "https://picsum.photos/200/302"
-            ),
-            Show(
-                id = "4",
-                name = "록 페스티벌 2024",
-                date = LocalDateTime.now().plusDays(30),
-                salesStartDate = LocalDate.now().plusDays(1),
-                salesEndDate = LocalDate.now().plusDays(28),
-                thumbnailImage = "https://picsum.photos/200/303"
-            ),
-            Show(
-                id = "5",
-                name = "어쿠스틱 라이브",
-                date = LocalDateTime.now().plusDays(10),
-                salesStartDate = LocalDate.now().minusDays(5),
-                salesEndDate = LocalDate.now().plusDays(8),
-                thumbnailImage = "https://picsum.photos/200/304"
-            ),
-        )
-
-        val filteredShows = if (keyword.isBlank()) {
-            allShows
-        } else {
-            allShows.filter { it.name.contains(keyword, ignoreCase = true) }
-        }
-
-        return Result.success(filteredShows)
     }
 
     override suspend fun searchProfiles(keyword: String): Result<List<User.Others>> {
@@ -142,5 +88,12 @@ internal class SearchRepositoryImpl @Inject constructor(
         }
 
         return Result.success(filteredProfiles)
+    }
+
+    override suspend fun searchShows(
+        keyword: String,
+        page: Int
+    ): Result<PagingData<Show>> = suspendRunCatching {
+        searchDataSource.getShows(keyword, page, 10)
     }
 }

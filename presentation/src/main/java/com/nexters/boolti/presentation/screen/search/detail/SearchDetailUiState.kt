@@ -10,7 +10,9 @@ data class SearchDetailUiState(
     val keyword: String,
     val searchedKeyword: String,
     val shows: List<Show>,
+    val showsTotalCount: Long,
     val profiles: List<User.Others>,
+    val profilesTotalCount: Long,
     val tabIndex: Int,
 ) {
     companion object {
@@ -19,7 +21,9 @@ data class SearchDetailUiState(
             keyword = "",
             searchedKeyword = "",
             shows = emptyList(),
+            showsTotalCount = 0L,
             profiles = emptyList(),
+            profilesTotalCount = 0L,
             tabIndex = 0,
         )
     }

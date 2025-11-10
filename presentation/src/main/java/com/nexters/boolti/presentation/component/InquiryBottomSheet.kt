@@ -41,19 +41,8 @@ fun InquiryBottomSheet(
     val textId = if (isTelephone) R.string.show_call_to_ask else R.string.show_text_to_ask
     val context = LocalContext.current
 
-    ModalBottomSheet(
-        containerColor = MaterialTheme.colorScheme.surfaceTint,
+    BtBottomSheet(
         onDismissRequest = onDismissRequest,
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(top = 12.dp, bottom = 24.dp)
-                    .size(45.dp, 4.dp)
-                    .clip(CircleShape)
-                    .background(color = Grey70)
-            )
-        },
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     ) {
         Box(
             Modifier

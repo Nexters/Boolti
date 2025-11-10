@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Show
+import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -11,7 +12,6 @@ import com.nexters.boolti.presentation.extension.stateInUi
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -28,6 +28,7 @@ class SearchDetailViewModel @Inject constructor(
     private var searchJob: Job? = null
 
     private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel(emptyList(), 0, 0))
+    private val profiles = MutableStateFlow<PagingDataUiModel<User.Others>>(PagingDataUiModel(emptyList(), 0, 0))
 
     private val _uiState = MutableStateFlow(
         SearchDetailUiState.Default.copy(
@@ -38,10 +39,13 @@ class SearchDetailViewModel @Inject constructor(
     val uiState = combine(
         _uiState,
         shows,
-    ) { uiState, shows ->
+        profiles,
+    ) { uiState, shows, profiles ->
         uiState.copy(
             shows = shows.items,
             showsTotalCount = shows.totalCount,
+            profiles = profiles.items,
+            profilesTotalCount = profiles.totalCount,
         )
     }.stateInUi(viewModelScope, SearchDetailUiState.Default.copy(keyword = route.keyword))
 
@@ -64,16 +68,21 @@ class SearchDetailViewModel @Inject constructor(
 
             searchHistoryRepository.saveSearchHistory(keyword)
 
-            // 공연 검색과 프로필 검색을 동시에 실행
-            val profilesDeferred = async {
-                searchRepository.searchProfiles(keyword)
-            }
-
             searchRepository.searchShows(keyword, 0).onSuccess { showsResponse ->
                 shows.update {
                     PagingDataUiModel(
                         items = showsResponse.items,
                         totalCount = showsResponse.totalElements,
+                        currentPage = 0,
+                    )
+                }
+            }
+
+            searchRepository.searchProfiles(keyword, 0).onSuccess { profilesResponse ->
+                profiles.update {
+                    PagingDataUiModel(
+                        items = profilesResponse.items,
+                        totalCount = profilesResponse.totalElements,
                         currentPage = 0,
                     )
                 }

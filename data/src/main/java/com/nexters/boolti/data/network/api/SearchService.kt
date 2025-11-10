@@ -18,4 +18,14 @@ internal interface SearchService {
         @Query("size")
         size: Int,
     ): JsonObject
+
+    @GET("/app/papi/v1/shows/artists")
+    suspend fun requestProfiles(
+        @Query("keyword")
+        keyword: String,
+        @Query("page")
+        page: Int,
+        @Query("size")
+        size: Int,
+    ): JsonObject
 }

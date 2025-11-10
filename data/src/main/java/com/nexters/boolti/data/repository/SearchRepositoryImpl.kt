@@ -5,7 +5,7 @@ import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
 import com.nexters.boolti.domain.model.PagingData
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
-import com.nexters.boolti.domain.model.emptyPreviewList
+import com.nexters.boolti.domain.model.map
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.domain.util.suspendRunCatching
 import javax.inject.Inject
@@ -29,71 +29,17 @@ internal class SearchRepositoryImpl @Inject constructor(
         return Result.success(recommendations)
     }
 
-    override suspend fun searchProfiles(keyword: String): Result<List<User.Others>> {
-        val allProfiles = listOf(
-            User.Others(
-                nickname = "불티밴드",
-                photo = "https://picsum.photos/100/100",
-                userCode = "boolti_band",
-                introduction = "인디 밴드 불티입니다. 열정적인 공연을 선보입니다!",
-                sns = emptyList(),
-                link = emptyPreviewList(),
-                performedShow = emptyPreviewList(),
-                upcomingShow = emptyPreviewList(),
-                video = emptyPreviewList(),
-            ),
-            User.Others(
-                nickname = "재즈퀸",
-                photo = "https://picsum.photos/100/101",
-                userCode = "jazz_queen",
-                introduction = "재즈 보컬리스트입니다. 감미로운 목소리로 여러분을 찾아갑니다.",
-                sns = emptyList(),
-                link = emptyPreviewList(),
-                performedShow = emptyPreviewList(),
-                upcomingShow = emptyPreviewList(),
-                video = emptyPreviewList(),
-            ),
-            User.Others(
-                nickname = "클래식기타리스트",
-                photo = "https://picsum.photos/100/102",
-                userCode = "classical_guitarist",
-                introduction = "클래식 기타 연주자입니다. 아름다운 선율을 선사합니다.",
-                sns = emptyList(),
-                link = emptyPreviewList(),
-                performedShow = emptyPreviewList(),
-                upcomingShow = emptyPreviewList(),
-                video = emptyPreviewList(),
-            ),
-            User.Others(
-                nickname = "록스타",
-                photo = "https://picsum.photos/100/103",
-                userCode = "rockstar",
-                introduction = "록 음악을 사랑하는 뮤지션입니다.",
-                sns = emptyList(),
-                link = emptyPreviewList(),
-                performedShow = emptyPreviewList(),
-                upcomingShow = emptyPreviewList(),
-                video = emptyPreviewList(),
-            ),
-        )
-
-        val filteredProfiles = if (keyword.isBlank()) {
-            allProfiles
-        } else {
-            allProfiles.filter {
-                it.nickname.contains(keyword, ignoreCase = true) ||
-                        it.userCode.contains(keyword, ignoreCase = true) ||
-                        it.introduction.contains(keyword, ignoreCase = true)
-            }
-        }
-
-        return Result.success(filteredProfiles)
-    }
-
     override suspend fun searchShows(
         keyword: String,
         page: Int
     ): Result<PagingData<Show>> = suspendRunCatching {
         searchDataSource.getShows(keyword, page, 10)
+    }
+
+    override suspend fun searchProfiles(
+        keyword: String,
+        page: Int
+    ): Result<PagingData<User.Others>> = suspendRunCatching {
+        searchDataSource.getProfiles(keyword, page, 10).map { it.toDomain() }
     }
 }

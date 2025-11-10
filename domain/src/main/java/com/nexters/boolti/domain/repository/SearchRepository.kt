@@ -8,6 +8,6 @@ import com.nexters.boolti.domain.model.User
 interface SearchRepository {
     suspend fun getNewShowsAndRisingKeywords(): Result<NewShowsAndRisingKeywords>
     suspend fun getRecommendKeyword(searchKeyword: String): Result<List<String>>
-    suspend fun searchProfiles(keyword: String): Result<List<User.Others>>
     suspend fun searchShows(keyword: String, page: Int): Result<PagingData<Show>>
+    suspend fun searchProfiles(keyword: String, page: Int): Result<PagingData<User.Others>>
 }

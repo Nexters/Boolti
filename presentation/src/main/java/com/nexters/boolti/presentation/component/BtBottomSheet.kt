@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,12 +26,14 @@ import com.nexters.boolti.presentation.theme.Grey70
 @Composable
 fun BtBottomSheet(
     onDismissRequest: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(),
     dragHandle: @Composable (() -> Unit)? = { BtBottomSheetDefault.DragHandle() },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
-        containerColor = MaterialTheme.colorScheme.surfaceTint,
         onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceTint,
         windowInsets = WindowInsets(0, 0, 0, 0),
         dragHandle = dragHandle,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),

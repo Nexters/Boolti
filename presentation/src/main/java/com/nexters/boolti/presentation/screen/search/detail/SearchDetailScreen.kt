@@ -1,9 +1,6 @@
 package com.nexters.boolti.presentation.screen.search.detail
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -17,9 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -58,11 +53,11 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSearchBar
+import com.nexters.boolti.presentation.component.InfiniteScrollLazyColumn
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ProfileItem
 import com.nexters.boolti.presentation.component.ShowItem
-import com.nexters.boolti.presentation.extension.OnBottomReached
 import com.nexters.boolti.presentation.extension.ellipsis
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
@@ -554,14 +549,9 @@ private fun ShowsTab(
     onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState()
-
-    listState.OnBottomReached {
-        onBottomReached()
-    }
-
-    LazyColumn(
-        state = listState,
+    InfiniteScrollLazyColumn(
+        isLoading = isLoading,
+        onBottomReached = onBottomReached,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -578,23 +568,6 @@ private fun ShowsTab(
                 onClick = { onClickShow(show.id) },
             )
         }
-
-        item(key = "loading_indicator") {
-            AnimatedVisibility(
-                visible = isLoading,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    BtCircularProgressIndicator()
-                }
-            }
-        }
     }
 }
 
@@ -606,14 +579,9 @@ private fun ArtistTab(
     onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState()
-
-    listState.OnBottomReached {
-        onBottomReached()
-    }
-
-    LazyColumn(
-        state = listState,
+    InfiniteScrollLazyColumn(
+        isLoading = isLoading,
+        onBottomReached = onBottomReached,
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -626,23 +594,6 @@ private fun ArtistTab(
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal),
             )
-        }
-
-        item(key = "loading_indicator") {
-            AnimatedVisibility(
-                visible = isLoading,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    BtCircularProgressIndicator()
-                }
-            }
         }
     }
 }

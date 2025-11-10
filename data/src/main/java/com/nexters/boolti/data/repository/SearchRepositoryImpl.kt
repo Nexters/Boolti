@@ -1,51 +1,21 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.datasource.SearchDataSource
 import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.emptyPreviewList
 import com.nexters.boolti.domain.repository.SearchRepository
-import kotlinx.coroutines.delay
+import com.nexters.boolti.domain.util.suspendRunCatching
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
-class SearchRepositoryImpl @Inject constructor() : SearchRepository {
-    override suspend fun getNewShowsAndRisingKeywords(): Result<NewShowsAndRisingKeywords> {
-        delay(2.seconds)
-        return Result.success(
-            NewShowsAndRisingKeywords(
-                newShows = listOf(
-                    Show(
-                        id = "1",
-                        name = "불티 밴드 첫 공연",
-                        date = LocalDateTime.now().plusDays(7),
-                        salesStartDate = LocalDate.now().minusDays(3),
-                        salesEndDate = LocalDate.now().plusDays(5),
-                        thumbnailImage = "https://picsum.photos/200/300"
-                    ),
-                    Show(
-                        id = "2",
-                        name = "여름밤 재즈 콘서트",
-                        date = LocalDateTime.now().plusDays(14),
-                        salesStartDate = LocalDate.now().minusDays(1),
-                        salesEndDate = LocalDate.now().plusDays(12),
-                        thumbnailImage = "https://picsum.photos/200/301"
-                    ),
-                    Show(
-                        id = "3",
-                        name = "클래식 기타 독주회",
-                        date = LocalDateTime.now().plusDays(21),
-                        salesStartDate = LocalDate.now(),
-                        salesEndDate = LocalDate.now().plusDays(19),
-                        thumbnailImage = "https://picsum.photos/200/302"
-                    ),
-                ),
-                risingKeywords = listOf("불티", "재즈", "클래식", "밴드", "콘서트"),
-                risingKeywordsTime = LocalDateTime.now()
-            )
-        )
+internal class SearchRepositoryImpl @Inject constructor(
+    private val searchDataSource: SearchDataSource,
+) : SearchRepository {
+    override suspend fun getNewShowsAndRisingKeywords(): Result<NewShowsAndRisingKeywords> = suspendRunCatching {
+        searchDataSource.getOverview()
     }
 
     override suspend fun getRecommendKeyword(searchKeyword: String): Result<List<String>> {
@@ -166,8 +136,8 @@ class SearchRepositoryImpl @Inject constructor() : SearchRepository {
         } else {
             allProfiles.filter {
                 it.nickname.contains(keyword, ignoreCase = true) ||
-                it.userCode.contains(keyword, ignoreCase = true) ||
-                it.introduction.contains(keyword, ignoreCase = true)
+                        it.userCode.contains(keyword, ignoreCase = true) ||
+                        it.introduction.contains(keyword, ignoreCase = true)
             }
         }
 

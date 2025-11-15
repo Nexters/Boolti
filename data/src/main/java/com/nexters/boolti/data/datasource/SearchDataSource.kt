@@ -32,4 +32,9 @@ internal class SearchDataSource @Inject constructor(
         page: Int,
         size: Int,
     ): PagingData<MemberResponse> = getPagingData { searchService.requestProfiles(keyword, page, size) }
+
+    suspend fun getAutoCompleteKeywords(
+        keyword: String,
+        limit: Int,
+    ): List<String> = searchService.requestAutoCompleteKeywords(keyword, limit)
 }

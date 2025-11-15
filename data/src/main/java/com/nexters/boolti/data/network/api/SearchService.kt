@@ -28,4 +28,12 @@ internal interface SearchService {
         @Query("size")
         size: Int,
     ): JsonObject
+
+    @GET("/app/papi/v1/shows/autocomplete")
+    suspend fun requestAutoCompleteKeywords(
+        @Query("keyword")
+        keyword: String,
+        @Query("limit")
+        limit: Int,
+    ): List<String>
 }

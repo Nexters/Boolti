@@ -29,8 +29,8 @@ class SearchDetailViewModel @Inject constructor(
     private var searchShowsJob: Job? = null
     private var searchProfilesJob: Job? = null
 
-    private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel(emptyList(), 0, 0))
-    private val profiles = MutableStateFlow<PagingDataUiModel<User.Others>>(PagingDataUiModel(emptyList(), 0, 0))
+    private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel.default())
+    private val profiles = MutableStateFlow<PagingDataUiModel<User.Others>>(PagingDataUiModel.default())
 
     private val _uiState = MutableStateFlow(
         SearchDetailUiState.Default.copy(
@@ -78,6 +78,8 @@ class SearchDetailViewModel @Inject constructor(
                         items = showsResponse.items,
                         totalCount = showsResponse.totalElements,
                         currentPage = 0,
+                        totalPages = showsResponse.totalPages,
+                        hasNext = showsResponse.hasNext,
                     )
                 }
             }
@@ -88,6 +90,8 @@ class SearchDetailViewModel @Inject constructor(
                         items = profilesResponse.items,
                         totalCount = profilesResponse.totalElements,
                         currentPage = 0,
+                        totalPages = profilesResponse.totalPages,
+                        hasNext = profilesResponse.hasNext,
                     )
                 }
             }
@@ -110,7 +114,7 @@ class SearchDetailViewModel @Inject constructor(
     }
 
     private fun loadNextShowsPage() {
-        if (searchShowsJob?.isActive == true) return
+        if (searchShowsJob?.isActive == true || !shows.value.hasNext) return
         _uiState.update { it.copy(showsLoading = true) }
 
         searchShowsJob = viewModelScope.launch {
@@ -126,6 +130,8 @@ class SearchDetailViewModel @Inject constructor(
                             items = appendedItems,
                             totalCount = searchResult.totalElements,
                             currentPage = nextPage,
+                            totalPages = searchResult.totalPages,
+                            hasNext = searchResult.hasNext,
                         )
                     }
                 }
@@ -135,7 +141,7 @@ class SearchDetailViewModel @Inject constructor(
     }
 
     private fun loadNextProfilesPage() {
-        if (searchProfilesJob?.isActive == true) return
+        if (searchProfilesJob?.isActive == true || !profiles.value.hasNext) return
         _uiState.update { it.copy(profilesLoading = true) }
 
         searchProfilesJob = viewModelScope.launch {
@@ -143,14 +149,16 @@ class SearchDetailViewModel @Inject constructor(
             val nextPage = currentPage + 1
             val currentItems = profiles.value.items
 
-            searchRepository.searchProfiles(uiState.value.searchedKeyword, nextPage).onSuccess { profilesResult ->
-                if (profilesResult.items.isNotEmpty()) {
-                    val appendedItems = (currentItems + profilesResult.items).distinctBy { it.userCode }
+            searchRepository.searchProfiles(uiState.value.searchedKeyword, nextPage).onSuccess { searchResult ->
+                if (searchResult.items.isNotEmpty()) {
+                    val appendedItems = (currentItems + searchResult.items).distinctBy { it.userCode }
                     profiles.update {
                         it.copy(
                             items = appendedItems,
-                            totalCount = profilesResult.totalElements,
+                            totalCount = searchResult.totalElements,
                             currentPage = nextPage,
+                            totalPages = searchResult.totalPages,
+                            hasNext = searchResult.hasNext,
                         )
                     }
                 }

@@ -18,20 +18,12 @@ internal data class PopularSearchKeywordsDto(
     @SerialName("referenceTime")
     val referenceTime: String,
     @SerialName("popularSearchKeywords")
-    val popularSearchKeywords: List<RankAndKeywordDto>,
-) {
-    @Serializable
-    data class RankAndKeywordDto(
-        @SerialName("rank")
-        val rank: Int,
-        @SerialName("keyword")
-        val keyword: String,
-    )
-}
+    val popularSearchKeywords: List<String>,
+)
 
 internal fun SearchOverviewResponse.toNewShowsAndRisingKeywords(): NewShowsAndRisingKeywords =
     NewShowsAndRisingKeywords(
         newShows = newCreatedShows.map { it.toDomain() },
-        risingKeywords = popularSearchKeywords.popularSearchKeywords.map { it.keyword },
+        risingKeywords = popularSearchKeywords.popularSearchKeywords,
         risingKeywordsTime = popularSearchKeywords.referenceTime.toLocalDateTime(),
     )

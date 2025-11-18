@@ -44,7 +44,7 @@ class ShowViewModel @Inject constructor(
     val events: SharedFlow<ShowEvent> = _events.asSharedFlow()
 
     init {
-        search()
+        loadShows()
         fetchPopup()
     }
 
@@ -54,19 +54,14 @@ class ShowViewModel @Inject constructor(
         }
     }
 
-    fun search() {
+    private fun loadShows() {
         viewModelScope.launch {
-            showRepository.search(uiState.value.keyword).onSuccess { shows ->
+            showRepository.search("").onSuccess { shows ->
                 _uiState.update { it.copy(shows = shows) }
-                sendEvent(ShowEvent.Search)
             }.onFailure {
                 Timber.e(it)
             }
         }
-    }
-
-    fun updateKeyword(newKeyword: String) {
-        _uiState.update { it.copy(keyword = newKeyword) }
     }
 
     private fun fetchPopup() {

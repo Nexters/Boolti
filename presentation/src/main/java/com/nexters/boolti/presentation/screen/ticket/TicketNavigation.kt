@@ -5,10 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import com.nexters.boolti.presentation.screen.LocalUser
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
 fun NavGraphBuilder.ticketScreen(
-    isLoggedIn: Boolean?,
     navigateToTicketDetail: (String) -> Unit,
     navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
@@ -21,6 +21,8 @@ fun NavGraphBuilder.ticketScreen(
             }
         )
     ) {
+        val isLoggedIn = LocalUser.current != null
+
         when (isLoggedIn) {
             true -> TicketScreen(
                 modifier = modifier,
@@ -31,8 +33,6 @@ fun NavGraphBuilder.ticketScreen(
                 modifier = modifier,
                 onLoginClick = navigateToLogin
             )
-
-            else -> Unit // 로그인 여부를 불러오는 중
         }
     }
 }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -54,6 +53,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtSearchBar
+import com.nexters.boolti.presentation.component.InfiniteScrollLazyColumn
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ProfileItem
@@ -92,7 +92,11 @@ fun SearchDetailScreen(
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,
+        showsTotalCount = uiState.showsTotalCount,
+        showsLoading = uiState.showsLoading,
         profiles = uiState.profiles,
+        profilesTotalCount = uiState.profilesTotalCount,
+        profilesLoading = uiState.profilesLoading,
         tabIndex = uiState.tabIndex,
         onChangeIndex = {
             viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(it))
@@ -101,6 +105,12 @@ fun SearchDetailScreen(
         onClickProfile = navigateToProfile,
         search = {
             viewModel.onIntent(SearchDetailIntent.Search(it))
+        },
+        onShowsPageReached = {
+            viewModel.onIntent(SearchDetailIntent.OnShowsPageReached)
+        },
+        onProfilesPageReached = {
+            viewModel.onIntent(SearchDetailIntent.OnProfilesPageReached)
         },
         navigateUp = navigateUp,
         modifier = modifier,
@@ -114,12 +124,18 @@ private fun SearchDetailScreen(
     searchedKeyword: String,
     loading: Boolean,
     shows: List<Show>,
+    showsTotalCount: Long,
+    showsLoading: Boolean,
     profiles: List<User.Others>,
+    profilesTotalCount: Long,
+    profilesLoading: Boolean,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
     search: (keyword: String) -> Unit,
+    onShowsPageReached: () -> Unit,
+    onProfilesPageReached: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -156,12 +172,18 @@ private fun SearchDetailScreen(
             } else if (!loading) {
                 TabContainer(
                     shows = shows,
+                    showsTotalCount = showsTotalCount,
+                    showsLoading = showsLoading,
                     profiles = profiles,
+                    profilesTotalCount = profilesTotalCount,
+                    profilesLoading = profilesLoading,
                     keyword = keyword,
                     onClickShow = onClickShow,
                     onClickProfile = onClickProfile,
                     tabIndex = tabIndex,
                     onChangeIndex = onChangeIndex,
+                    onShowsPageReached = onShowsPageReached,
+                    onProfilesPageReached = onProfilesPageReached,
                 )
             }
         }
@@ -220,19 +242,25 @@ private fun EmptyContents(
 @Composable
 private fun TabContainer(
     shows: List<Show>,
+    showsTotalCount: Long,
+    showsLoading: Boolean,
     profiles: List<User.Others>,
+    profilesTotalCount: Long,
+    profilesLoading: Boolean,
     keyword: String,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
+    onShowsPageReached: () -> Unit,
+    onProfilesPageReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tabs = remember(shows.size, profiles.size) {
         listOf(
             SearchDetailTab.All,
-            SearchDetailTab.Show(shows.size),
-            SearchDetailTab.Artist(profiles.size),
+            SearchDetailTab.Show(showsTotalCount),
+            SearchDetailTab.Artist(profilesTotalCount),
         )
     }
     val pagerState = rememberPagerState { 3 }
@@ -288,7 +316,9 @@ private fun TabContainer(
                     } else {
                         ShowsTab(
                             shows = shows,
+                            isLoading = showsLoading,
                             onClickShow = onClickShow,
+                            onBottomReached = onShowsPageReached,
                         )
                     }
 
@@ -300,7 +330,9 @@ private fun TabContainer(
                     } else {
                         ArtistTab(
                             profiles = profiles,
+                            isLoading = profilesLoading,
                             onClickProfile = onClickProfile,
+                            onBottomReached = onProfilesPageReached,
                         )
                     }
                 }
@@ -512,10 +544,14 @@ private fun AllTabSectionTitle(
 @Composable
 private fun ShowsTab(
     shows: List<Show>,
+    isLoading: Boolean,
     onClickShow: (id: String) -> Unit,
+    onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
+    InfiniteScrollLazyColumn(
+        isLoading = isLoading,
+        onBottomReached = onBottomReached,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -538,10 +574,14 @@ private fun ShowsTab(
 @Composable
 private fun ArtistTab(
     profiles: List<User.Others>,
+    isLoading: Boolean,
     onClickProfile: (UserCode) -> Unit,
+    onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
+    InfiniteScrollLazyColumn(
+        isLoading = isLoading,
+        onBottomReached = onBottomReached,
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -560,8 +600,8 @@ private fun ArtistTab(
 
 private sealed interface SearchDetailTab {
     data object All : SearchDetailTab
-    data class Show(val count: Int) : SearchDetailTab
-    data class Artist(val count: Int) : SearchDetailTab
+    data class Show(val count: Long) : SearchDetailTab
+    data class Artist(val count: Long) : SearchDetailTab
 }
 
 @Composable

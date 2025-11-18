@@ -56,7 +56,7 @@ class SearchViewModel @Inject constructor(
                             loading = false,
                             newShows = newShowsAndRisingKeywords.newShows,
                             risingKeywords = newShowsAndRisingKeywords.risingKeywords,
-                            risingKeywordsTime = newShowsAndRisingKeywords.risingKeywordsTime.format("hh:mm"),
+                            risingKeywordsTime = newShowsAndRisingKeywords.risingKeywordsTime.format("HH:mm"),
                         )
                     }
                 }

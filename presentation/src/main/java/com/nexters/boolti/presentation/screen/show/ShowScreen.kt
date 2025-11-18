@@ -1,17 +1,14 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -25,40 +22,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.NoticeDialog
 import com.nexters.boolti.presentation.component.ShowFeed
-import com.nexters.boolti.presentation.component.StatusBarCover
 import com.nexters.boolti.presentation.extension.extractEmphasizedText
-import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
-import com.nexters.boolti.presentation.theme.statusBarHeight
 
 @Composable
 fun ShowScreen(
@@ -73,55 +59,47 @@ fun ShowScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val lazyGridState = rememberLazyGridState()
-    val appbarHeight = 196.dp
-    val searchBarHeight = 80.dp
-    val changeableAppBarHeightPx = (appbarHeight - searchBarHeight).toPx()
-    var appbarOffsetHeightPx by rememberSaveable { mutableFloatStateOf(0f) }
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                appbarOffsetHeightPx += available.y
-
-                return Offset.Zero
-            }
-
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                appbarOffsetHeightPx -= available.y
-                return super.onPostScroll(consumed, available, source)
-            }
-        }
-    }
     var popupToShow: Popup? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                ShowEvent.Search -> appbarOffsetHeightPx = 0f
                 is ShowEvent.ShowPopup -> popupToShow = event.popup
             }
         }
     }
 
     Box(
-        modifier = modifier.nestedScroll(nestedScrollConnection),
+        modifier = modifier.statusBarsPadding(),
         contentAlignment = Alignment.TopCenter,
     ) {
-        StatusBarCover()
         LazyVerticalGrid(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(horizontal = marginHorizontal),
             state = lazyGridState,
             columns = GridCells.Adaptive(minSize = 150.dp),
             horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalArrangement = Arrangement.spacedBy(28.dp),
-            contentPadding = PaddingValues(top = statusBarHeight + appbarHeight + 12.dp),
         ) {
+            item(
+                span = { GridItemSpan(2) },
+                contentType = "AppBar",
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 28.dp),
+                    text = stringResource(
+                        id = R.string.home_sub_title,
+                        nickname.ifBlank { stringResource(id = R.string.nickname_default) }),
+                    style = point4,
+                )
+            }
+
             items(
                 count = uiState.shows.size.coerceAtMost(4),
+                contentType = { "Show" },
                 key = { index -> uiState.shows[index].id }) { index ->
                 ShowFeed(
                     show = uiState.shows[index],
@@ -143,6 +121,7 @@ fun ShowScreen(
             // 나머지 공연 목록
             items(
                 count = (uiState.shows.size - 4).coerceAtLeast(0),
+                contentType = { "Show" },
                 key = { index -> uiState.shows[index + 4].id }) { index ->
                 ShowFeed(
                     show = uiState.shows[index + 4],
@@ -152,6 +131,7 @@ fun ShowScreen(
             }
 
             item(
+                contentType = "BusinessInformation",
                 span = { GridItemSpan(2) },
             ) {
                 BusinessInformation(
@@ -160,18 +140,6 @@ fun ShowScreen(
                 )
             }
         }
-        ShowAppBar(
-            modifier = Modifier.offset {
-                IntOffset(
-                    x = 0,
-                    y = appbarOffsetHeightPx.coerceAtLeast(-changeableAppBarHeightPx).toInt(),
-                )
-            },
-            nickname = nickname.ifBlank { stringResource(id = R.string.nickname_default) },
-            text = uiState.keyword,
-            onKeywordChanged = viewModel::updateKeyword,
-            search = viewModel::search,
-        )
 
         popupToShow?.let { popup ->
             when (popup) {
@@ -198,41 +166,6 @@ fun ShowScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ShowAppBar(
-    text: String,
-    nickname: String,
-    onKeywordChanged: (keyword: String) -> Unit,
-    search: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-            .padding(horizontal = marginHorizontal)
-    ) {
-        Spacer(modifier = Modifier.height(40.dp))
-        Text(
-            modifier = Modifier
-                .fillMaxWidth(),
-            text = stringResource(id = R.string.home_sub_title, nickname),
-            style = point4,
-        )
-        BtSearchBar(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .background(color = MaterialTheme.colorScheme.background)
-                .padding(vertical = 16.dp),
-            keyword = text,
-            onKeywordChanged = onKeywordChanged,
-            hint = stringResource(id = R.string.search_bar_hint),
-            search = search,
-        )
     }
 }
 

@@ -1,7 +1,9 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.response.MemberResponse
+import com.nexters.boolti.data.network.response.PagingResponse
 import com.nexters.boolti.data.network.response.SearchOverviewResponse
-import kotlinx.serialization.json.JsonObject
+import com.nexters.boolti.data.network.response.ShowResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -17,7 +19,7 @@ internal interface SearchService {
         page: Int,
         @Query("size")
         size: Int,
-    ): JsonObject
+    ): PagingResponse<ShowResponse>
 
     @GET("/app/papi/v1/shows/artists")
     suspend fun requestProfiles(
@@ -27,7 +29,7 @@ internal interface SearchService {
         page: Int,
         @Query("size")
         size: Int,
-    ): JsonObject
+    ): PagingResponse<MemberResponse>
 
     @GET("/app/papi/v1/shows/autocomplete")
     suspend fun requestAutoCompleteKeywords(

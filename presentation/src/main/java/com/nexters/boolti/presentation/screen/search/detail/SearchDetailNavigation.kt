@@ -30,6 +30,9 @@ fun NavGraphBuilder.searchDetailNavigation(
         }
 
         SearchDetailScreen(
+            navigateToRecentSearch = {
+                navController.navigate(SearchRoute.RecentSearch)
+            },
             navigateToShowDetail = { showId ->
                 navController.navigate(ShowRoute.ShowRoot(showId))
             },
@@ -37,13 +40,7 @@ fun NavGraphBuilder.searchDetailNavigation(
                 navController.navigate(MainRoute.Profile(userCode))
             },
             navigateUp = {
-                navController.popBackStack()
-                navController.navigate(SearchRoute.RecentSearch) {
-                    popUpTo<SearchRoute.RecentSearch> {
-                        inclusive = false
-                    }
-                    launchSingleTop = true
-                }
+                navController.popBackStack(MainRoute.Home, false)
             },
             modifier = modifier,
         )

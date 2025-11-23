@@ -69,6 +69,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun SearchDetailScreen(
+    navigateToRecentSearch: () -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     navigateToProfile: (userCode: UserCode) -> Unit,
     navigateUp: () -> Unit,
@@ -87,9 +88,7 @@ fun SearchDetailScreen(
 
     SearchDetailScreen(
         keyword = uiState.keyword,
-        onChangeKeyword = {
-            viewModel.onIntent(SearchDetailIntent.KeywordChanged(it))
-        },
+        onClickSearchBar = navigateToRecentSearch,
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,
@@ -104,9 +103,6 @@ fun SearchDetailScreen(
         },
         onClickShow = navigateToShowDetail,
         onClickProfile = navigateToProfile,
-        search = {
-            viewModel.onIntent(SearchDetailIntent.Search(it))
-        },
         onShowsPageReached = {
             viewModel.onIntent(SearchDetailIntent.OnShowsPageReached)
         },
@@ -121,7 +117,7 @@ fun SearchDetailScreen(
 @Composable
 private fun SearchDetailScreen(
     keyword: String,
-    onChangeKeyword: (String) -> Unit,
+    onClickSearchBar: () -> Unit,
     searchedKeyword: String,
     loading: Boolean,
     shows: List<Show>,
@@ -134,7 +130,6 @@ private fun SearchDetailScreen(
     onChangeIndex: (Int) -> Unit,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
-    search: (keyword: String) -> Unit,
     onShowsPageReached: () -> Unit,
     onProfilesPageReached: () -> Unit,
     navigateUp: () -> Unit,
@@ -157,11 +152,17 @@ private fun SearchDetailScreen(
             BtSearchBar(
                 modifier = Modifier
                     .padding(vertical = 12.dp)
-                    .padding(horizontal = marginHorizontal),
+                    .padding(horizontal = marginHorizontal)
+                    .clickable(
+                        interactionSource = null,
+                        indication = null,
+                        onClick = onClickSearchBar,
+                    ),
                 keyword = keyword,
+                enabled = false,
                 hint = stringResource(R.string.search_search_hint),
-                onKeywordChanged = onChangeKeyword,
-                search = { search(keyword) },
+                onKeywordChanged = {},
+                search = {},
             )
 
             if (!loading && shows.isEmpty() && profiles.isEmpty()) {

@@ -34,7 +34,6 @@ fun BtBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceTint,
-        windowInsets = WindowInsets(0, 0, 0, 0),
         dragHandle = dragHandle,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     ) {

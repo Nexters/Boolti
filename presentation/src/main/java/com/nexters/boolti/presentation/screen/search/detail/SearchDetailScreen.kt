@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -68,6 +69,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun SearchDetailScreen(
+    navigateToRecentSearch: () -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     navigateToProfile: (userCode: UserCode) -> Unit,
     navigateUp: () -> Unit,
@@ -86,9 +88,7 @@ fun SearchDetailScreen(
 
     SearchDetailScreen(
         keyword = uiState.keyword,
-        onChangeKeyword = {
-            viewModel.onIntent(SearchDetailIntent.KeywordChanged(it))
-        },
+        onClickSearchBar = navigateToRecentSearch,
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,
@@ -103,9 +103,6 @@ fun SearchDetailScreen(
         },
         onClickShow = navigateToShowDetail,
         onClickProfile = navigateToProfile,
-        search = {
-            viewModel.onIntent(SearchDetailIntent.Search(it))
-        },
         onShowsPageReached = {
             viewModel.onIntent(SearchDetailIntent.OnShowsPageReached)
         },
@@ -120,7 +117,7 @@ fun SearchDetailScreen(
 @Composable
 private fun SearchDetailScreen(
     keyword: String,
-    onChangeKeyword: (String) -> Unit,
+    onClickSearchBar: () -> Unit,
     searchedKeyword: String,
     loading: Boolean,
     shows: List<Show>,
@@ -133,7 +130,6 @@ private fun SearchDetailScreen(
     onChangeIndex: (Int) -> Unit,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
-    search: (keyword: String) -> Unit,
     onShowsPageReached: () -> Unit,
     onProfilesPageReached: () -> Unit,
     navigateUp: () -> Unit,
@@ -156,11 +152,17 @@ private fun SearchDetailScreen(
             BtSearchBar(
                 modifier = Modifier
                     .padding(vertical = 12.dp)
-                    .padding(horizontal = marginHorizontal),
+                    .padding(horizontal = marginHorizontal)
+                    .clickable(
+                        interactionSource = null,
+                        indication = null,
+                        onClick = onClickSearchBar,
+                    ),
                 keyword = keyword,
+                enabled = false,
                 hint = stringResource(R.string.search_search_hint),
-                onKeywordChanged = onChangeKeyword,
-                search = { search(keyword) },
+                onKeywordChanged = {},
+                search = {},
             )
 
             if (!loading && shows.isEmpty() && profiles.isEmpty()) {
@@ -351,6 +353,7 @@ private fun TabRow(
         HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Grey85)
     },
     indicatorColor: Color = Grey15,
+    indicatorHeight: Dp = 2.dp,
     tabLabelStyle: TextStyle = MaterialTheme.typography.titleMedium,
     selectedContentColor: Color = Grey05,
     unselectedContentColor: Color = Grey70,
@@ -397,17 +400,14 @@ private fun TabRow(
                             onDraw = {
                                 drawContent()
                                 if (index == selectedIndex) {
-                                    val y = size.height + verticalPadding.roundToPx() - 1.dp.roundToPx()
-                                    drawLine(
+                                    val y = size.height + verticalPadding.roundToPx() - indicatorHeight.roundToPx()
+                                    drawRect(
                                         color = indicatorColor,
-                                        start = Offset(
+                                        topLeft = Offset(
                                             x = 0f,
                                             y = y,
                                         ),
-                                        end = Offset(
-                                            x = size.width,
-                                            y = y,
-                                        ),
+                                        size = Size(width = size.width, height = indicatorHeight.toPx()),
                                     )
                                 }
                             },
@@ -448,6 +448,7 @@ private fun AllTab(
                             .fillMaxWidth()
                             .padding(horizontal = marginHorizontal),
                         showNameStyle = MaterialTheme.typography.titleLarge,
+                        showDateStyle = MaterialTheme.typography.bodySmall.copy(color = Grey50),
                         backgroundColor = MaterialTheme.colorScheme.background,
                         contentPadding = PaddingValues(0.dp),
                         onClick = { onClickShow(show.id) },
@@ -524,7 +525,7 @@ private fun AllTabSectionTitle(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = Grey05,
         )
         onClickAll?.let {

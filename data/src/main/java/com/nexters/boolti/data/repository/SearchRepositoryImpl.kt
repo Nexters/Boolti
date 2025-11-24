@@ -5,7 +5,6 @@ import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
 import com.nexters.boolti.domain.model.PagingData
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
-import com.nexters.boolti.domain.model.map
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.domain.util.suspendRunCatching
 import javax.inject.Inject
@@ -32,6 +31,6 @@ internal class SearchRepositoryImpl @Inject constructor(
         keyword: String,
         page: Int
     ): Result<PagingData<User.Others>> = suspendRunCatching {
-        searchDataSource.getProfiles(keyword, page, 10).map { it.toDomain() }
+        searchDataSource.getProfiles(keyword, page, 10)
     }
 }

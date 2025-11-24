@@ -28,6 +28,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
+import com.nexters.boolti.presentation.theme.Grey85
 
 @Composable
 fun BtChip(
@@ -41,6 +42,7 @@ fun BtChip(
         border = null,
         onClick = onClick,
         shape = RoundedCornerShape(100.dp),
+        color = Grey85,
     ) {
         Row(
             modifier = Modifier

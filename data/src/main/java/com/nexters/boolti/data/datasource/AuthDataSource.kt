@@ -2,9 +2,9 @@ package com.nexters.boolti.data.datasource
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.analytics.analytics
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import com.nexters.boolti.data.network.api.LoginService
@@ -25,52 +25,47 @@ internal class AuthDataSource @Inject constructor(
     private val dataStore: DataStore<AppSettings>
         get() = context.dataStore
 
-    private val data: Flow<AppSettings>
-        get() = dataStore.data
+    private val data: Flow<AppSettings> = dataStore.data
 
-    val user: Flow<UserResponse?>
-        get() {
-            return dataStore.data.map {
-                if (it.userId == null) {
-                    null
-                } else {
-                    UserResponse(
-                        id = it.userId,
-                        nickname = it.nickname ?: "",
-                        email = it.email ?: "",
-                        imgPath = it.photo,
-                        userCode = it.userCode,
-                        introduction = it.profileIntroduction,
-                        sns = it.profileSns,
-                        link = PreviewList(
-                            totalSize = it.profileLinkCount,
-                            hasMoreItems = it.hasMoreLink,
-                            previewItems = it.profileLink,
-                        ),
-                        comingSoonShow = PreviewList(
-                            totalSize = it.upcomingShowCount,
-                            hasMoreItems = it.hasMoreUpcomingShow,
-                            previewItems = it.upcomingShow,
-                            isVisible = it.showUpcomingShow,
-                        ),
-                        performedShow = PreviewList(
-                            totalSize = it.performedShowCount,
-                            hasMoreItems = it.hasMorePerformedShow,
-                            previewItems = it.performedShow,
-                            isVisible = it.showPerformedShow,
-                        ),
-                        video = PreviewList(
-                            totalSize = it.videoCount,
-                            hasMoreItems = it.hasMoreVideoItem,
-                            previewItems = it.video,
-                        ),
-                    )
-                }
-            }
+    val user: Flow<UserResponse?> = dataStore.data.map {
+        if (it.userId == null) {
+            null
+        } else {
+            UserResponse(
+                id = it.userId,
+                nickname = it.nickname ?: "",
+                email = it.email ?: "",
+                imgPath = it.photo,
+                userCode = it.userCode,
+                introduction = it.profileIntroduction,
+                sns = it.profileSns,
+                link = PreviewList(
+                    totalSize = it.profileLinkCount,
+                    hasMoreItems = it.hasMoreLink,
+                    previewItems = it.profileLink,
+                ),
+                comingSoonShow = PreviewList(
+                    totalSize = it.upcomingShowCount,
+                    hasMoreItems = it.hasMoreUpcomingShow,
+                    previewItems = it.upcomingShow,
+                    isVisible = it.showUpcomingShow,
+                ),
+                performedShow = PreviewList(
+                    totalSize = it.performedShowCount,
+                    hasMoreItems = it.hasMorePerformedShow,
+                    previewItems = it.performedShow,
+                    isVisible = it.showPerformedShow,
+                ),
+                video = PreviewList(
+                    totalSize = it.videoCount,
+                    hasMoreItems = it.hasMoreVideoItem,
+                    previewItems = it.video,
+                ),
+            )
         }
+    }
 
-    val loggedIn: Flow<Boolean>
-        get() = data.map { it.accessToken.isNotBlank() }
+    val loggedIn: Flow<Boolean> = dataStore.data.map { it.accessToken.isNotBlank() }
 
     suspend fun login(request: LoginRequest) = runCatching {
         loginService.kakaoLogin(request)

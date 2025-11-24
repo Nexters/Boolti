@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -14,7 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -52,6 +53,8 @@ import com.nexters.boolti.presentation.screen.refund.refundScreen
 import com.nexters.boolti.presentation.screen.report.reportScreen
 import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
+import com.nexters.boolti.presentation.screen.search.detail.searchDetailNavigation
+import com.nexters.boolti.presentation.screen.search.recent.recentSearchScreen
 import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
 import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
 import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
@@ -89,7 +92,9 @@ fun Main(
         Scaffold(
             snackbarHost = {
                 ToastSnackbarHost(
-                    modifier = Modifier.padding(bottom = 80.dp),
+                    modifier = Modifier
+                        .imePadding()
+                        .padding(bottom = 80.dp),
                     hostState = snackbarHostState,
                 )
             },
@@ -147,6 +152,9 @@ fun MainNavigation(
             )
             reportScreen()
         }
+
+        recentSearchScreen()
+        searchDetailNavigation()
 
         ticketingScreen()
 

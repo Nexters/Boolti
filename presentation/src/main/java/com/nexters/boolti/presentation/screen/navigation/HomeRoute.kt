@@ -14,6 +14,12 @@ sealed interface HomeRoute {
     }
 
     @Serializable
+    data object Search : HomeRoute {
+        override val label: Int = R.string.menu_search
+        override val icon: Int = R.drawable.ic_search
+    }
+
+    @Serializable
     data object Ticket : HomeRoute {
         override val label = R.string.menu_tickets
         override val icon = R.drawable.ic_ticket
@@ -26,4 +32,9 @@ sealed interface HomeRoute {
     }
 }
 
-val homeRoutes = listOf(HomeRoute.Show, HomeRoute.Ticket, HomeRoute.My)
+val homeRoutes = listOf(
+    HomeRoute.Show,
+    HomeRoute.Search,
+    HomeRoute.Ticket,
+    HomeRoute.My
+)

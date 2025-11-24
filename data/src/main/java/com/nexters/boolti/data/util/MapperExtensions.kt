@@ -1,7 +1,18 @@
 package com.nexters.boolti.data.util
 
+import com.nexters.boolti.domain.model.PagingData
 import com.nexters.boolti.domain.model.PaymentType
 import com.nexters.boolti.domain.model.ReservationState
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
+import kotlinx.serialization.serializer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -47,3 +58,43 @@ internal fun File.toImageMultipartBody(): MultipartBody.Part = MultipartBody.Par
     filename = name,
     body = asRequestBody("image/*".toMediaType())
 )
+
+private val json = Json {
+    ignoreUnknownKeys = true
+    isLenient = true
+    explicitNulls = false
+}
+
+internal fun <T> JsonObject.toPagingData(
+    itemSerializer: KSerializer<T>,
+): PagingData<T> {
+    val currentPage = this["currentPage"]?.jsonPrimitive?.int ?: 0
+    val pageSize = this["pageSize"]?.jsonPrimitive?.int ?: 0
+    val totalElements = this["totalElements"]?.jsonPrimitive?.long ?: 0L
+    val totalPages = this["totalPages"]?.jsonPrimitive?.int ?: 0
+    val hasNext = this["hasNext"]?.jsonPrimitive?.boolean ?: false
+
+    // 배열 필드 하나 찾기
+    val firstArray = entries
+        .firstOrNull { (_, v) -> v is JsonArray }
+        ?.value as? JsonArray
+
+    val items: List<T> = if (firstArray == null) {
+        emptyList()
+    } else {
+        json.decodeFromJsonElement(ListSerializer(itemSerializer), firstArray)
+    }
+
+    return PagingData(
+        items = items,
+        currentPage = currentPage,
+        pageSize = pageSize,
+        totalElements = totalElements,
+        totalPages = totalPages,
+        hasNext = hasNext,
+    )
+}
+
+internal suspend inline fun <reified T> getPagingData(
+    call: suspend () -> JsonObject,
+): PagingData<T> = call().toPagingData(serializer<T>())

@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
     val loggedIn = authRepository.loggedIn.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
+        SharingStarted.Lazily,
         null,
     )
 

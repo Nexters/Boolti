@@ -9,14 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
+import com.nexters.boolti.presentation.component.BtBottomSheet
 import com.nexters.boolti.presentation.component.BtCloseableAppBar
 import com.nexters.boolti.presentation.component.KakaoLoginButton
 import com.nexters.boolti.presentation.component.MainButton
@@ -52,7 +50,6 @@ fun LoginScreen(
 ) {
     val snackbarController = LocalSnackbarController.current
 
-    val sheetState = rememberModalBottomSheetState()
     var showSignOutCancelledDialog by remember { mutableStateOf(false) }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
     val loginFailedMessage = stringResource(id = R.string.login_failed)
@@ -73,15 +70,13 @@ fun LoginScreen(
     BackHandler(onBack = onBackPressed)
 
     if (isSheetOpen) {
-        ModalBottomSheet(
-            sheetState = sheetState,
+        BtBottomSheet(
             onDismissRequest = {
                 isSheetOpen = false
             },
-            dragHandle = {},
-            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            dragHandle = null,
         ) {
-            SignUpBottomSheet(
+            SignUpBottomSheetContent(
                 signUp = viewModel::signUp,
             )
         }
@@ -128,7 +123,7 @@ fun LoginScreen(
 }
 
 @Composable
-private fun SignUpBottomSheet(
+private fun SignUpBottomSheetContent(
     signUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -141,7 +136,6 @@ private fun SignUpBottomSheet(
     Column(
         modifier = modifier
             .padding(horizontal = 24.dp)
-            .navigationBarsPadding(),
     ) {
         Text(
             modifier = Modifier

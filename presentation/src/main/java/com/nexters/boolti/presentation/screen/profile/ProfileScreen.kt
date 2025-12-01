@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.profile
 
 import android.content.ActivityNotFoundException
+import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +50,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -69,12 +72,14 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtBottomSheet
 import com.nexters.boolti.presentation.component.HorizontalShowItem
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.video.VideoItem
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey30
@@ -126,6 +131,7 @@ fun ProfileScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
@@ -142,6 +148,7 @@ fun ProfileScreen(
     navigateToShow: (showId: String) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     val snackbarHostState = LocalSnackbarController.current
     val invalidUrlMsg = stringResource(R.string.invalid_link)
 
@@ -168,6 +175,7 @@ fun ProfileScreen(
     val invalidUserMessage = stringResource(R.string.profile_invalid_user_message)
     val withdrawUserMessage = stringResource(R.string.profile_withdraw_user_message)
     val reportFinishedMessage = stringResource(R.string.report_finished)
+    var showShareBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(event) {
         event.collectLatest {
@@ -189,6 +197,7 @@ fun ProfileScreen(
             bgColor = appBarBgColor,
             navigateToProfileEdit = navigateToProfileEdit,
             onReportFinished = { snackbarHostState.showMessage(reportFinishedMessage) },
+            showShareBottomSheet = { showShareBottomSheet = true },
         )
         Column(
             modifier = Modifier
@@ -353,6 +362,76 @@ fun ProfileScreen(
                 )
             }
         }
+
+        if (showShareBottomSheet) {
+            BtBottomSheet(
+                onDismissRequest = {
+                    showShareBottomSheet = false
+                }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(58.dp)
+                        .clickable {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "https://profile.boolti.in/${user.userCode}"
+                                )
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+
+                            context.startActivity(shareIntent)
+                        },
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        text = stringResource(R.string.profile_share_only_url),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Grey10,
+                    )
+                }
+
+                val sharingText = stringResource(
+                    R.string.profile_share_detail,
+                    user.nickname,
+                    user.upcomingShow.totalSize + user.performedShow.totalSize,
+                    "https://profile.boolti.in/${user.userCode}"
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(58.dp)
+                        .clickable {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, sharingText)
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+
+                            context.startActivity(shareIntent)
+                        },
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        text = stringResource(R.string.profile_share_with_artist),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Grey10,
+                    )
+                }
+                Spacer(
+                    modifier = Modifier.padding(
+                        bottom = 28.dp
+                    )
+                )
+            }
+        }
     }
 }
 
@@ -365,6 +444,7 @@ private fun ProfileAppBar(
     bgColor: Color,
     navigateToProfileEdit: () -> Unit,
     onReportFinished: () -> Unit,
+    showShareBottomSheet: () -> Unit,
 ) {
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -382,6 +462,11 @@ private fun ProfileAppBar(
             )
         },
         actionButtons = {
+            BtAppBarDefaults.AppBarIconButton(
+                iconRes = R.drawable.ic_share,
+                description = stringResource(R.string.share),
+                onClick = showShareBottomSheet,
+            )
             if (isMine) {
                 BtAppBarDefaults.AppBarIconButton(
                     iconRes = R.drawable.ic_edit_pen,

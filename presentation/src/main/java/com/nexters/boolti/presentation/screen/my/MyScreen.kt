@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.field.Button
 import com.nexters.boolti.common.tracker.field.MyPage
+import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.BuildConfig
@@ -77,10 +80,17 @@ fun MyScreen(
     MyScreen(
         modifier = modifier,
         user = user,
-        onClickHeaderButton = if (user != null) {
-            { navigateToProfile(Screen.MyPage.value) }
-        } else {
-            requireLogin
+        onClickHeaderButton = {
+            AppTracker.click(
+                screen = Screen.MyPage,
+                objectRole = Role.Button,
+                objectValue = "ViewProfile",
+            )
+            if (user != null) {
+                navigateToProfile(Screen.MyPage.value)
+            } else {
+                requireLogin()
+            }
         },
         onClickAccountSetting = if (user != null) {
             onClickAccountSetting
@@ -92,12 +102,24 @@ fun MyScreen(
         } else {
             requireLogin
         },
-        onClickRegisterShow = if (user != null) {
-            navigateToShowRegistration
-        } else {
-            requireLogin
+        onClickRegisterShow = {
+            AppTracker.click(
+                screen = Screen.MyPage,
+                objectRole = Role.Button,
+                objectValue = "CreateEvent",
+            )
+            if (user != null) {
+                navigateToShowRegistration()
+            } else {
+                requireLogin()
+            }
         },
         onClickManageShow = {
+            AppTracker.click(
+                screen = Screen.MyPage,
+                objectRole = Role.Button,
+                objectValue = "ManageEvent",
+            )
             uriHandler.openUri(homeUrl)
             Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
         }, // TODO 추후 인앱 공연 관리 반영 시 처리
@@ -268,7 +290,7 @@ private fun MyMenu(
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
             .clickable(
-                role = Role.Button,
+                role = androidx.compose.ui.semantics.Role.Button,
                 onClick = onClick,
             )
             .padding(vertical = 12.dp, horizontal = marginHorizontal),

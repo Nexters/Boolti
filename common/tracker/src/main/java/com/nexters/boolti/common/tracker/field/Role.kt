@@ -24,5 +24,8 @@ val Role.Companion.Banner
 val Role.Companion.Link
     get() = Role("Link")
 
+val Role.Companion.Item
+    get() = Role("Item")
+
 val Role.Companion.Tab
     get() = Role("Tab")

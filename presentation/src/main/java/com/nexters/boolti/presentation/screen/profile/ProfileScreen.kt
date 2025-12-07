@@ -64,8 +64,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.Link
 import com.nexters.boolti.common.tracker.field.Profile
+import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
@@ -138,6 +143,11 @@ fun ProfileScreen(
             navigateToLinks(uiState.user.userCode)
         },
         navigateToVideos = {
+            AppTracker.click(
+                screen = Screen.Profile,
+                objectRole = Role.Button,
+                objectValue = "PlayVideo",
+            )
             navigateToVideos(uiState.user.userCode)
         },
         navigateToUpcomingShows = {
@@ -146,7 +156,14 @@ fun ProfileScreen(
         navigateToPerformedShows = {
             navigateToPerformedShows(uiState.user.userCode)
         },
-        navigateToShow = navigateToShow,
+        navigateToShow = { showId ->
+            AppTracker.click(
+                screen = Screen.Profile,
+                objectRole = Role.Item,
+                objectValue = showId,
+            )
+            navigateToShow(showId)
+        },
     )
 }
 
@@ -227,6 +244,11 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 user = user,
                 onClickSns = { sns ->
+                    AppTracker.click(
+                        screen = Screen.Profile,
+                        objectRole = Role.Link,
+                        objectValue = sns.type.name,
+                    )
                     try {
                         uriHandler.openUri(sns.url.toValidUrlString())
                     } catch (e: ActivityNotFoundException) {
@@ -258,6 +280,11 @@ fun ProfileScreen(
                                             .padding(horizontal = marginHorizontal),
                                         link = link,
                                         onClick = {
+                                            AppTracker.click(
+                                                screen = Screen.Profile,
+                                                objectRole = Role.Link,
+                                                objectValue = link.name,
+                                            )
                                             try {
                                                 uriHandler.openUri(link.url.toValidUrlString())
                                             } catch (e: ActivityNotFoundException) {

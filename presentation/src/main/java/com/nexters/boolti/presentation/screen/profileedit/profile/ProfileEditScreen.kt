@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +57,10 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.ProfileEdit
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -92,6 +97,10 @@ fun ProfileEditScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
+
+    LaunchedEffect(Unit) {
+        AppTracker.view(Screen.ProfileEdit)
+    }
 
     ProfileEditScreen(
         modifier = modifier,

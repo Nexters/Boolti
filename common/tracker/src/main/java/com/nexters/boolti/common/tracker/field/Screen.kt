@@ -30,5 +30,5 @@ val Screen.Companion.ProfileEdit
 val Screen.Companion.MyPage
     get() = Screen("MyPage")
 
-val Screen.RegisterShow
+val Screen.Companion.RegisterShow
     get() = Screen("RegisterShow")

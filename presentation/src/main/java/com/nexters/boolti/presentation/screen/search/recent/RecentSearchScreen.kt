@@ -38,6 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.field.Discovery
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtSearchBar
@@ -178,7 +184,17 @@ private fun RecentSearchScreen(
                 SearchingContent(
                     searchKeyword = searchKeyword,
                     recommendedKeywords = recommendedKeywords,
-                    onClickKeyword = search,
+                    onClickKeyword = { keyword ->
+                        AppTracker.click(
+                            screen = Screen.Discovery,
+                            objectRole = Role.Item,
+                            objectValue = "Autocomplete",
+                            properties = mapOf(
+                                "keyword" to keyword,
+                            ),
+                        )
+                        search(keyword)
+                    },
                 )
             }
         }

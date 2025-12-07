@@ -35,6 +35,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Chip
+import com.nexters.boolti.common.tracker.field.Discovery
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtChip
@@ -59,6 +66,12 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        AppTracker.view(
+            screen = Screen.Discovery,
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchNewShowsAndRisingKeywords()
@@ -127,7 +140,17 @@ private fun SearchScreen(
             if (recentSearchKeywords.isNotEmpty()) {
                 SearchHistorySection(
                     recentSearchKeywords = recentSearchKeywords,
-                    onClickKeyword = onSearch,
+                    onClickKeyword = { keyword ->
+                        AppTracker.click(
+                            screen = Screen.Discovery,
+                            objectRole = Role.Chip,
+                            objectValue = "RecentKeyword",
+                            properties = mapOf(
+                                "keyword" to keyword,
+                            ),
+                        )
+                        onSearch(keyword)
+                    },
                     deleteSearchHistory = deleteSearchHistory,
                     onClickClearButton = onClickClearButton,
                 )
@@ -141,7 +164,17 @@ private fun SearchScreen(
             RisingKeywordsSection(
                 risingKeywords = risingKeywords,
                 risingKeywordsTime = risingKeywordsTime,
-                onClickKeyword = onSearch,
+                onClickKeyword = { keyword ->
+                    AppTracker.click(
+                        screen = Screen.Discovery,
+                        objectRole = Role.Chip,
+                        objectValue = "TrendingKeyword",
+                        properties = mapOf(
+                            "keyword" to keyword,
+                        ),
+                    )
+                    onSearch(keyword)
+                },
             )
         }
 

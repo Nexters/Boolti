@@ -29,3 +29,6 @@ val Role.Companion.Item
 
 val Role.Companion.Tab
     get() = Role("Tab")
+
+val Role.Companion.Chip
+    get() = Role("Chip")

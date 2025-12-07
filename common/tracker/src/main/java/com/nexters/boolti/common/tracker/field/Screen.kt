@@ -36,6 +36,9 @@ val Screen.Companion.RegisterShow
 val Screen.Companion.Discovery
     get() = Screen("Discovery")
 
+val Screen.Companion.DiscoveryResult
+    get() = Screen("DiscoveryResult")
+
 val Screen.Companion.Ticket
     get() = Screen("Ticket")
 

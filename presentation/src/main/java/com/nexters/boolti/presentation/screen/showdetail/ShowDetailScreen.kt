@@ -342,8 +342,28 @@ fun ShowDetailScreen(
         ) {
             ShowDetailButtons(
                 showState = showState,
-                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
+                onTicketingClicked = {
+                    AppTracker.click(
+                        screen = Screen.ShowDetail,
+                        objectRole = Role.Button,
+                        objectValue = "StartBooking",
+                        properties = mapOf(
+                            "booking_type" to "Direct",
+                        ),
+                    )
+                    onTicketClicked(TicketBottomSheetType.PURCHASE)
+                },
+                onGiftClicked = {
+                    AppTracker.click(
+                        screen = Screen.ShowDetail,
+                        objectRole = Role.Button,
+                        objectValue = "StartBooking",
+                        properties = mapOf(
+                            "booking_type" to "Gift",
+                        ),
+                    )
+                    onTicketClicked(TicketBottomSheetType.GIFT)
+                },
                 onHeightChanged = { buttonsHeight = it },
             )
         }

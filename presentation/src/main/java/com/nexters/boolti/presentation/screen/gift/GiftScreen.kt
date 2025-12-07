@@ -34,6 +34,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.complete
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Payment
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.Currency
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
@@ -74,6 +79,21 @@ fun GiftScreen(
     var policyPageUrl: String? by remember { mutableStateOf(null) }
     var bottomButtonHeight by remember { mutableStateOf(0.dp) }
 
+    LaunchedEffect(uiState.showName) {
+        if (uiState.showName.isNotEmpty()) {
+            AppTracker.view(
+                screen = Screen.Payment,
+                properties = mapOf(
+                    "booking_type" to "Gift",
+                    "event_id" to viewModel.showId,
+                    "ticket_type" to "NORMAL",
+                    "ticket_quantity" to uiState.ticketCount,
+                    "total_amount" to uiState.totalPrice,
+                ),
+            )
+        }
+    }
+
     val paymentLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             when (result.resultCode) {
@@ -81,6 +101,17 @@ fun GiftScreen(
                     val intent = result.data ?: return@rememberLauncherForActivityResult
                     val giftId = intent.getStringExtra("giftId")
                         ?: return@rememberLauncherForActivityResult
+
+                    AppTracker.complete(
+                        target = "Purchase",
+                        properties = mapOf(
+                            "booking_type" to "Gift",
+                            "event_id" to viewModel.showId,
+                            "event_name" to uiState.showName,
+                            "ticket_quantity" to uiState.ticketCount,
+                            "total_amount" to uiState.totalPrice,
+                        ),
+                    )
 
                     navigateToComplete(giftId)
                 }
@@ -95,6 +126,17 @@ fun GiftScreen(
             .collect { event ->
                 when (event) {
                     is GiftEvent.GiftSuccess -> {
+                        AppTracker.complete(
+                            target = "Purchase",
+                            properties = mapOf(
+                                "booking_type" to "Gift",
+                                "event_id" to viewModel.showId,
+                                "event_name" to uiState.showName,
+                                "ticket_quantity" to uiState.ticketCount,
+                                "total_amount" to uiState.totalPrice,
+                            ),
+                        )
+
                         navigateToComplete(event.giftId)
                     }
 

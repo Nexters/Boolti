@@ -1,5 +1,6 @@
 <resources>
     <string name="menu_show">홈</string>
+    <string name="menu_search">탐색</string>
     <string name="menu_tickets">티켓</string>
     <string name="menu_my">마이</string>
 
@@ -17,6 +18,7 @@
     <string name="description_expand">확장하기</string>
     <string name="description_qr_icon">QR 스캔 아이콘</string>
     <string name="description_clear_button">모두 지우기</string>
+    <string name="description_search_text">%s 검색</string>
 
     <string name="dialog_hide_today">오늘 하루 그만 보기</string>
 
@@ -67,6 +69,7 @@
     <string name="btn_delete">삭제하기</string>
     <string name="btn_exit">나가기</string>
     <string name="btn_finish">종료하기</string>
+    <string name="btn_delete_all">전체삭제</string>
     <string name="login">로그인</string>
     <string name="message_unknown_error">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="copy">복사</string>
@@ -85,6 +88,7 @@
 
     <string name="complete">완료</string>
     <string name="edit">편집</string>
+    <string name="share">공유</string>
 
     <string name="input_lower_limit_text">%d자 이상 입력해 주세요</string>
     <string name="input_upper_limit_text">%d자 이내로 입력해 주세요</string>
@@ -263,6 +267,26 @@
     <string name="copy_code_label">코드 복사</string>
     <string name="code_copy_success_message">식별 코드를 복사했어요</string>
 
+    <!-- 탐색 -->
+    <string name="search_search_hint">공연명, 아티스트명으로 찾아보세요</string>
+    <string name="search_recent_keyword">최근 검색어</string>
+    <string name="search_recent_keyword_label">최근 검색</string>
+    <string name="search_no_recent_keyword">최근 검색 내역이 없어요.</string>
+    <string name="search_clear_history_dialog">최근 검색어를\n모두 삭제하시겠습니까?</string>
+    <string name="search_search_empty">검색어를 입력해 주세요.</string>
+    <string name="search_new_shows_label">새로 등록된 공연</string>
+    <string name="search_rising_keywords_label">요즘 뜨는 검색어</string>
+    <string name="search_rising_keywords_time">%s 기준</string>
+    <string name="search_no_result">와 관련된 결과가 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_no_show_result">와 관련된 공연이 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_no_artist_result">와 관련된 아티스트가 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_reset_searched_keyword_button">검색어 초기화</string>
+    <string name="search_tab_all">전체</string>
+    <string name="search_tab_show_section">공연</string>
+    <string name="search_tab_artist_section">아티스트</string>
+    <string name="search_tab_show">공연(%d)</string>
+    <string name="search_tab_artist">아티스트(%d)</string>
+
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
     <string name="account_transfer_description">입금 마감일까지 입금이 확인되지 않는 경우\n주문이 자동 취소됩니다.</string>
@@ -308,6 +332,13 @@
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
+    <string name="profile_share_only_url">URL만 공유하기</string>
+    <string name="profile_share_with_artist">아티스트 정보 힘께 공유하기</string>
+    <string name="profile_share_detail">이 아티스트 어때요?\n\n
+- 닉네임 : %s\n
+- 크레딧 : 참여 공연 %d\n\n
+프로필 ▼\n
+%s</string>
 
     <string name="sns">SNS</string>
     <string name="sns_edit_error_contains_at_sign">\@을 제외하고 입력해 주세요</string>

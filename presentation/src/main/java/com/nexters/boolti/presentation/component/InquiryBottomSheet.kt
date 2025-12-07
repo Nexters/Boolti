@@ -1,35 +1,24 @@
 package com.nexters.boolti.presentation.component
 
 import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.theme.Grey10
-import com.nexters.boolti.presentation.theme.Grey70
-import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,19 +30,8 @@ fun InquiryBottomSheet(
     val textId = if (isTelephone) R.string.show_call_to_ask else R.string.show_text_to_ask
     val context = LocalContext.current
 
-    ModalBottomSheet(
-        containerColor = MaterialTheme.colorScheme.surfaceTint,
+    BtBottomSheet(
         onDismissRequest = onDismissRequest,
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(top = 12.dp, bottom = 24.dp)
-                    .size(45.dp, 4.dp)
-                    .clip(CircleShape)
-                    .background(color = Grey70)
-            )
-        },
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
     ) {
         Box(
             Modifier

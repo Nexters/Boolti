@@ -58,7 +58,7 @@ fun ShowItem(
     show: Show,
     modifier: Modifier = Modifier,
     showNameStyle: TextStyle = point1,
-    showDateStyle : TextStyle = MaterialTheme.typography.bodySmall,
+    showDateStyle: TextStyle = MaterialTheme.typography.bodySmall,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     shape: Shape = RoundedCornerShape(4.dp),
@@ -101,7 +101,7 @@ fun ShowItem(
     showDate: LocalDateTime,
     modifier: Modifier = Modifier,
     showNameStyle: TextStyle = point1,
-    showDateStyle : TextStyle = MaterialTheme.typography.bodySmall,
+    showDateStyle: TextStyle = MaterialTheme.typography.bodySmall,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shape: Shape = RoundedCornerShape(4.dp),
@@ -144,7 +144,7 @@ fun ShowItem(
     description: String,
     modifier: Modifier = Modifier,
     titleStyle: TextStyle = point1,
-    descriptionStyle : TextStyle = MaterialTheme.typography.bodySmall,
+    descriptionStyle: TextStyle = MaterialTheme.typography.bodySmall,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shape: Shape = RoundedCornerShape(4.dp),
@@ -183,13 +183,13 @@ fun ShowItem(
                 Text(
                     text = title,
                     style = titleStyle,
-                    color = Grey05,
+                    color = if (titleStyle.color == Color.Unspecified) Grey05 else titleStyle.color,
                 )
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
                     text = description,
                     style = descriptionStyle,
-                    color = Grey30,
+                    color = if (descriptionStyle.color == Color.Unspecified) Grey30 else descriptionStyle.color,
                 )
             }
         }

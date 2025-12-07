@@ -1,4 +1,9 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
+import java.util.Properties
+
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties()
+localProperties.load(FileInputStream(localPropertiesFile))
 
 plugins {
     alias(libs.plugins.android.library)
@@ -68,9 +73,9 @@ dependencies {
 
     implementation(libs.bundles.network)
 
-    implementation(libs.firebase.config.ktx)
-    implementation(libs.bundles.firebase)
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.config)
+    implementation(libs.bundles.firebase)
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)
@@ -79,5 +84,5 @@ dependencies {
 }
 
 fun getApiKey(propertyKey: String): String {
-    return gradleLocalProperties(rootDir).getProperty(propertyKey)
+    return providers.gradleProperty(propertyKey).orNull ?: localProperties.getProperty(propertyKey)
 }

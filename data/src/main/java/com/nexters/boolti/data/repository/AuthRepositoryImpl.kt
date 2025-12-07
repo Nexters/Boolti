@@ -31,11 +31,9 @@ internal class AuthRepositoryImpl @Inject constructor(
     private val userDateSource: UserDataSource,
     private val deviceTokenDataSource: DeviceTokenDataSource,
 ) : AuthRepository {
-    override val loggedIn: Flow<Boolean>
-        get() = authDataSource.loggedIn
+    override val loggedIn: Flow<Boolean> = authDataSource.loggedIn
 
-    override val cachedUser: Flow<User.My?>
-        get() = authDataSource.user.map { it?.toDomain() }
+    override val cachedUser: Flow<User.My?> = authDataSource.user.map { it?.toDomain() }
 
     override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
         return authDataSource.login(request).onSuccess { response ->

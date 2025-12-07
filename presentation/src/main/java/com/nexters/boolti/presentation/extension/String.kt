@@ -1,6 +1,10 @@
 package com.nexters.boolti.presentation.extension
 
 import android.content.Context
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import com.nexters.boolti.presentation.R
 import java.net.MalformedURLException
 import java.net.URL
@@ -94,3 +98,76 @@ fun String.extractEmphasizedText(): Pair<String, String> {
         "" to this
     }
 }
+
+/**
+ * 문자열에서 특정 문자열을 포함하는 모든 위치를 찾아 반환
+ *
+ * @param target 찾을 문자열
+ * @return 매칭된 위치의 [시작 인덱스, 끝 인덱스) 쌍의 리스트
+ *
+ * 예시:
+ * - "banana".matchIndices("ana") → [(1, 4), (3, 6)]
+ * - "hello".matchIndices("ll") → [(2, 4)]
+ * - "hello".matchIndices("x") → []
+ */
+fun String.matchIndices(target: String): List<Pair<Int, Int>> {
+    if (target.isEmpty() || isEmpty()) return emptyList()
+
+    val result = mutableListOf<Pair<Int, Int>>()
+    var startIndex = 0
+
+    while (startIndex <= length - target.length) {
+        val index = indexOf(target, startIndex)
+        if (index == -1) break
+
+        result.add(index to index + target.length)
+        startIndex = index + 1
+    }
+
+    return result
+}
+
+/**
+ * 문자열에서 특정 문자열과 매칭되는 부분을 지정된 스타일로 강조한 AnnotatedString 생성
+ *
+ * @param target 강조할 문자열
+ * @param style 매칭된 부분에 적용할 SpanStyle
+ * @return 매칭된 부분이 지정된 스타일로 강조된 AnnotatedString
+ *
+ * 예시:
+ * ```
+ * val primaryColor = MaterialTheme.colorScheme.primary
+ * "hello world".highlightMatches("o", SpanStyle(color = primaryColor))
+ * ```
+ */
+fun String.highlightMatches(target: String, style: SpanStyle): AnnotatedString {
+    val indices = matchIndices(target)
+
+    return buildAnnotatedString {
+        var lastIndex = 0
+
+        indices.forEach { (start, end) ->
+            // 매칭되지 않은 부분 추가
+            append(substring(lastIndex, start))
+
+            // 매칭된 부분을 지정된 스타일로 강조
+            withStyle(style = style) {
+                append(substring(start, end))
+            }
+
+            lastIndex = end
+        }
+
+        // 남은 부분 추가
+        if (lastIndex < this@highlightMatches.length) {
+            append(substring(lastIndex))
+        }
+    }
+}
+
+fun String.ellipsis(maxLength: Int): String =
+    if (length <= maxLength) {
+        this
+    } else {
+        this.substring(0, maxLength) + "…"
+    }

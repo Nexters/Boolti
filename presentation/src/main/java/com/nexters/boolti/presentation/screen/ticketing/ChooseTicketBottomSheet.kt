@@ -16,13 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -43,11 +41,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.nexters.boolti.domain.model.SalesTicket
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.Badge
+import com.nexters.boolti.presentation.component.BtBottomSheet
 import com.nexters.boolti.presentation.component.HorizontalCountStepper
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.sliceAtMost
@@ -57,7 +56,6 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
-import com.nexters.boolti.presentation.theme.Grey85
 
 enum class TicketBottomSheetType {
     PURCHASE,
@@ -80,13 +78,12 @@ fun ChooseTicketBottomSheet(
         viewModel.load()
     }
 
-    ModalBottomSheet(
+    BtBottomSheet(
         onDismissRequest = {
             onDismissRequest()
             viewModel.unSelectTicket()
         },
         sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         dragHandle = {
             Box(
                 modifier = Modifier
@@ -96,8 +93,6 @@ fun ChooseTicketBottomSheet(
                     .background(Grey70),
             )
         },
-        contentColor = MaterialTheme.colorScheme.surfaceTint,
-        containerColor = Grey85,
     ) {
         Box(
             modifier = Modifier.heightIn(max = 564.dp)

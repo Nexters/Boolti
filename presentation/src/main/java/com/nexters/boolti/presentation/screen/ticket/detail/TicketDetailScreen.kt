@@ -42,8 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,7 +63,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -79,8 +77,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -162,7 +159,7 @@ private fun TicketDetailScreen(
         ticketGroup.tickets.getOrElse(pagerState.currentPage) { TicketGroup.Ticket() }
     }
 
-    val pullToRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val entranceSuccessMsg = stringResource(R.string.message_ticket_validated)
     val failedToRefundMsg = stringResource(R.string.refund_failed_to_registered_gift)
@@ -190,14 +187,6 @@ private fun TicketDetailScreen(
         }
     }
 
-    LaunchedEffect(pullToRefreshState.isRefreshing) {
-        if (pullToRefreshState.isRefreshing) {
-            viewModel.refresh().invokeOnCompletion {
-                pullToRefreshState.endRefresh()
-            }
-        }
-    }
-
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }
             .collect(viewModel::syncCurrentPage)
@@ -212,18 +201,18 @@ private fun TicketDetailScreen(
             )
         },
     ) { innerPadding ->
-        Box(
+        PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .nestedScroll(pullToRefreshState.nestedScrollConnection),
+                .padding(innerPadding),
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                viewModel.refresh().invokeOnCompletion {
+                    isRefreshing = false
+                }
+            },
         ) {
-            PullToRefreshContainer(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .zIndex(1f),
-                state = pullToRefreshState,
-            )
             Column(
                 modifier = Modifier
                     .padding(horizontal = 29.dp)

@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.field.MyPage
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
@@ -55,7 +57,7 @@ fun MyScreen(
     requireLogin: () -> Unit,
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
-    navigateToProfile: () -> Unit,
+    navigateToProfile: (String) -> Unit,
     navigateToShowRegistration: () -> Unit,
     onClickQrScan: () -> Unit,
     modifier: Modifier = Modifier,
@@ -75,15 +77,35 @@ fun MyScreen(
     MyScreen(
         modifier = modifier,
         user = user,
-        onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
-        onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
-        onClickReservations = if (user != null) navigateToReservations else requireLogin,
-        onClickRegisterShow = if (user != null) navigateToShowRegistration else requireLogin,
+        onClickHeaderButton = if (user != null) {
+            { navigateToProfile(Screen.MyPage.value) }
+        } else {
+            requireLogin
+        },
+        onClickAccountSetting = if (user != null) {
+            onClickAccountSetting
+        } else {
+            requireLogin
+        },
+        onClickReservations = if (user != null) {
+            navigateToReservations
+        } else {
+            requireLogin
+        },
+        onClickRegisterShow = if (user != null) {
+            navigateToShowRegistration
+        } else {
+            requireLogin
+        },
         onClickManageShow = {
             uriHandler.openUri(homeUrl)
             Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
         }, // TODO 추후 인앱 공연 관리 반영 시 처리
-        onClickQrScan = if (user != null) onClickQrScan else requireLogin,
+        onClickQrScan = if (user != null) {
+            onClickQrScan
+        } else {
+            requireLogin
+        },
     )
 }
 

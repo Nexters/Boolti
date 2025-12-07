@@ -63,6 +63,10 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Profile
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
@@ -106,6 +110,21 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
+
+    LaunchedEffect(uiState.user.userCode) {
+        if (uiState.user.userCode.isNotEmpty()) {
+            AppTracker.view(
+                screen = Screen.Profile,
+                properties = buildMap {
+                    put("artist_id", uiState.user.userCode)
+                    if (viewModel.source.isNotEmpty()) {
+                        put("source", viewModel.source)
+                    }
+                    put("is_own_profile", uiState.isMine)
+                },
+            )
+        }
+    }
 
     ProfileScreen(
         modifier = modifier,

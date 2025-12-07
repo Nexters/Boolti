@@ -39,7 +39,7 @@ fun NavGraphBuilder.searchDetailNavigation(
                 navController.navigate(ShowRoute.ShowRoot(showId, source = Screen.Search.value))
             },
             navigateToProfile = { userCode ->
-                navController.navigate(MainRoute.Profile(userCode))
+                navController.navigate(MainRoute.Profile(userCode = userCode, source = Screen.Search.value))
             },
             navigateUp = {
                 navController.popBackStack(MainRoute.Home, false)

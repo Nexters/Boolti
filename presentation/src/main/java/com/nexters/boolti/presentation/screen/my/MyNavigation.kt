@@ -9,7 +9,7 @@ fun NavGraphBuilder.myScreen(
     navigateToLogin: () -> Unit,
     navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
-    navigateToProfile: () -> Unit,
+    navigateToProfile: (source: String) -> Unit,
     navigateToShowRegistration: () -> Unit,
     navigateToQrScan: () -> Unit,
     modifier: Modifier = Modifier,

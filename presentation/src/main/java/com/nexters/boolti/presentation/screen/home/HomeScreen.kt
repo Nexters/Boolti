@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.home
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
@@ -53,7 +53,7 @@ fun HomeScreen(
     navigateToQrScan: () -> Unit,
     navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
-    navigateToProfile: () -> Unit,
+    navigateToProfile: (source: String) -> Unit,
     navigateToBusiness: () -> Unit,
     navigateToShowRegistration: () -> Unit,
     navigateToLogin: () -> Unit,
@@ -73,7 +73,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                is HomeEvent.DeepLinkEvent -> navController.navigate(Uri.parse(event.deepLink))
+                is HomeEvent.DeepLinkEvent -> navController.navigate(event.deepLink.toUri())
                 is HomeEvent.GiftNotification -> {
                     dialog = event.status
                 }

@@ -32,3 +32,18 @@ val Screen.Companion.MyPage
 
 val Screen.Companion.RegisterShow
     get() = Screen("RegisterShow")
+
+val Screen.Companion.Search
+    get() = Screen("Search")
+
+val Screen.Companion.Ticket
+    get() = Screen("Ticket")
+
+val Screen.Companion.PaymentComplete
+    get() = Screen("PaymentComplete")
+
+val Screen.Companion.PerformedShows
+    get() = Screen("PerformedShows")
+
+val Screen.Companion.WebBridge
+    get() = Screen("WebBridge")

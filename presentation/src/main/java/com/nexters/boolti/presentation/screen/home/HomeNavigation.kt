@@ -3,6 +3,8 @@ package com.nexters.boolti.presentation.screen.home
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.nexters.boolti.common.tracker.field.Home
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalUser
 import com.nexters.boolti.presentation.screen.MainDestination
@@ -20,7 +22,7 @@ fun NavGraphBuilder.homeScreen(
 
         HomeScreen(
             modifier = modifier,
-            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
+            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it, source = Screen.Home.value)) },
             navigateToRecentSearch = { navController.navigate(SearchRoute.RecentSearch) },
             navigateToSearchDetail = { navController.navigate(SearchRoute.SearchDetail(keyword = it)) },
             navigateToTicketDetail = { navController.navigate(TicketRoute.TicketRoot(ticketId = it)) },

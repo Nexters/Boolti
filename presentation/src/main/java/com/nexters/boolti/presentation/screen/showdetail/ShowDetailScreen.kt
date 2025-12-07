@@ -80,6 +80,10 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.ShowDetail
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
@@ -165,6 +169,22 @@ fun ShowDetailScreen(
                     viewModel.preventEvents()
                 }
             }
+        }
+    }
+
+    LaunchedEffect(uiState.showDetail) {
+        uiState.showDetail?.let { showDetail ->
+            AppTracker.view(
+                screen = Screen.ShowDetail,
+                properties = buildMap {
+                    put("show_id", showDetail.id)
+                    put("show_name", showDetail.name)
+                    put("artist_name", showDetail.hostName)
+                    if (viewModel.source.isNotEmpty()) {
+                        put("source", viewModel.source)
+                    }
+                }
+            )
         }
     }
 

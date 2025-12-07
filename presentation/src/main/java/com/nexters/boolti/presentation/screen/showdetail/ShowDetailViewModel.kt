@@ -33,7 +33,9 @@ class ShowDetailViewModel @Inject constructor(
     private val popupRepository: PopupRepository,
     authRepository: AuthRepository,
 ) : ViewModel() {
-    val showId: String = checkNotNull(savedStateHandle.toRoute<ShowRoute.ShowRoot>().showId)
+    private val route = checkNotNull(savedStateHandle.toRoute<ShowRoute.ShowRoot>())
+    val showId: String = route.showId
+    val source: String = route.source
 
     private val _uiState = MutableStateFlow(ShowDetailUiState())
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()

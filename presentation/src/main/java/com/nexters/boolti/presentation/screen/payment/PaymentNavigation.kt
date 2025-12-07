@@ -4,6 +4,8 @@ import androidx.core.net.toUri
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.nexters.boolti.common.tracker.field.PaymentComplete
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -19,7 +21,7 @@ fun NavGraphBuilder.paymentCompleteScreen() {
             onClickHome = navController::navigateToHome,
             onClickClose = {
                 navController.popBackStack<ShowRoute.ShowRoot>(inclusive = true)
-                navController.navigate(ShowRoute.ShowRoot(showId = showId))
+                navController.navigate(ShowRoute.ShowRoot(showId = showId, source = Screen.PaymentComplete.value))
             },
             navigateToReservation = { reservation ->
                 navController.navigate(

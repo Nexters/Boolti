@@ -5,7 +5,7 @@ data class QrScanException(
 ) : Exception(errorType?.name)
 
 enum class QrErrorType {
-    ShowNotToday, UsedTicket, TicketNotFound;
+    ShowNotToday, UsedTicket, TicketNotFound, InvalidTicket;
 
     companion object {
         fun fromString(type: String?): QrErrorType? = when (type?.trim()?.uppercase()) {

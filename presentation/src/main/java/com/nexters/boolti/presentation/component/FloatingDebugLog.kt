@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.component
 
 import android.text.format.DateFormat
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -80,16 +81,17 @@ fun FloatingDebugLog() {
     var dragOffsetX by remember { mutableFloatStateOf(0f) }
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
 
-    Box(
+    AnimatedContent(
+        targetState = state.isExpanded,
         modifier = Modifier
             .offset {
                 IntOffset(
                     x = with(density) { state.offsetX.toPx().roundToInt() } + dragOffsetX.roundToInt(),
                     y = with(density) { state.offsetY.toPx().roundToInt() } + dragOffsetY.roundToInt()
                 )
-            }
-    ) {
-        if (state.isExpanded) {
+            },
+    ) { isExpanded ->
+        if (isExpanded) {
             ExpandedLogViewer(
                 onDrag = { dragAmount ->
                     dragOffsetX += dragAmount.x
@@ -251,8 +253,8 @@ private fun MinimizedLogBubble(
                 }
             }
             .clip(CircleShape)
-            .background(Color.Black.copy(alpha = 0.8f)),
-        contentAlignment = Alignment.Center
+            .background(Color.White.copy(alpha = 0.8f)),
+        contentAlignment = Alignment.Center,
     ) {
         IconButton(
             onClick = {
@@ -264,7 +266,7 @@ private fun MinimizedLogBubble(
             Icon(
                 painter = painterResource(R.drawable.ic_list),
                 contentDescription = "로그 확장",
-                tint = Color.White
+                tint = Color.Black,
             )
         }
     }

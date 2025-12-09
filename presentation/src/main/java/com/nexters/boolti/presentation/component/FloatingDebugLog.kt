@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,14 +151,16 @@ private fun ExpandedLogViewer(
     onDrag: (androidx.compose.ui.geometry.Offset) -> Unit,
     onDragEnd: () -> Unit
 ) {
-    val logs by LogCollector.allLogs.collectAsStateWithLifecycle()
+    val logs by LogCollector
+        .getLogsByTag(setOf("AppTracker"))
+        .collectAsStateWithLifecycle(emptyList())
 
     Column(
         modifier = Modifier
             .width(300.dp)
             .fillMaxHeight(0.5f)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.Black.copy(alpha = 0.95f))
+            .background(Color.Black.copy(alpha = 0.8f))
     ) {
         // 헤더 (드래그 가능)
         Row(
@@ -179,7 +182,7 @@ private fun ExpandedLogViewer(
             Text(
                 text = "Debug Logs (${logs.size})",
                 style = MaterialTheme.typography.titleSmall,
-                color = Color.White
+                color = Color.White,
             )
             Row {
                 IconButton(
@@ -189,7 +192,7 @@ private fun ExpandedLogViewer(
                     Icon(
                         painter = painterResource(R.drawable.ic_arrow_down),
                         contentDescription = "최소화",
-                        tint = Color.White
+                        tint = Color.White,
                     )
                 }
                 IconButton(
@@ -199,7 +202,7 @@ private fun ExpandedLogViewer(
                     Icon(
                         painter = painterResource(R.drawable.ic_close),
                         contentDescription = "닫기",
-                        tint = Color.White
+                        tint = Color.White,
                     )
                 }
             }
@@ -211,9 +214,9 @@ private fun ExpandedLogViewer(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
-            items(logs.reversed()) { log ->
+            items(logs.reversed(), key = { it.timestamp }) { log ->
                 LogItem(log)
                 Spacer(modifier = Modifier.height(4.dp))
             }
@@ -269,7 +272,7 @@ private fun MinimizedLogBubble(
 
 @Composable
 private fun LogItem(log: LogData) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     val logColor = when (log.level) {
         2 -> Color(0xFF2196F3) // VERBOSE - Blue
@@ -284,7 +287,7 @@ private fun LogItem(log: LogData) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
-            .background(Color(0xFF1E1E1E))
+            .background(Color(0xE61E1E1E))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = { isExpanded = !isExpanded }
@@ -297,18 +300,18 @@ private fun LogItem(log: LogData) {
                 text = log.tag ?: "NO_TAG",
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 9.sp
+                    fontSize = 9.sp,
                 ),
-                color = logColor
+                color = logColor,
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = DateFormat.format("HH:mm:ss", log.timestamp).toString(),
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 9.sp
+                    fontSize = 9.sp,
                 ),
-                color = Grey50
+                color = Grey50,
             )
         }
         Spacer(modifier = Modifier.height(2.dp))
@@ -316,10 +319,10 @@ private fun LogItem(log: LogData) {
             text = log.message,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp
+                fontSize = 10.sp,
             ),
             color = Color.White,
-            maxLines = if (isExpanded) Int.MAX_VALUE else 2
+            maxLines = if (isExpanded) Int.MAX_VALUE else 2,
         )
     }
 }

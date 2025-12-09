@@ -13,13 +13,17 @@ object LogCollector {
     private val _logs = MutableStateFlow<List<LogData>>(emptyList())
     val allLogs: StateFlow<List<LogData>> = _logs.asStateFlow()
 
-    fun getLogsByTag(tag: String, exactMatch: Boolean = false): Flow<List<LogData>> =
-        allLogs.map { logList ->
-            logList.filter { logData ->
-                if (exactMatch) {
-                    logData.tag == tag
-                } else {
-                    logData.tag?.contains(tag, ignoreCase = true) == true
+    fun getLogsByTag(tags: Set<String> = emptySet(), exactMatch: Boolean = false): Flow<List<LogData>> =
+        if (tags.isEmpty()) {
+            allLogs
+        } else {
+            allLogs.map { logList ->
+                logList.filter { logData ->
+                    if (exactMatch) {
+                        tags.contains(logData.tag)
+                    } else {
+                        tags.any { tag -> logData.tag?.contains(tag, ignoreCase = true) == true }
+                    }
                 }
             }
         }

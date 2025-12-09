@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.component
 import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -268,6 +269,8 @@ private fun MinimizedLogBubble(
 
 @Composable
 private fun LogItem(log: LogData) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     val logColor = when (log.level) {
         2 -> Color(0xFF2196F3) // VERBOSE - Blue
         3 -> Color(0xFF4CAF50) // DEBUG - Green
@@ -280,7 +283,13 @@ private fun LogItem(log: LogData) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF1E1E1E), shape = RoundedCornerShape(4.dp))
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFF1E1E1E))
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { isExpanded = !isExpanded }
+                )
+            }
             .padding(4.dp)
     ) {
         Row {
@@ -310,7 +319,7 @@ private fun LogItem(log: LogData) {
                 fontSize = 10.sp
             ),
             color = Color.White,
-            maxLines = 2
+            maxLines = if (isExpanded) Int.MAX_VALUE else 2
         )
     }
 }

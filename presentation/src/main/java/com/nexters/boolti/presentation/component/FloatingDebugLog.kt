@@ -21,14 +21,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -46,6 +52,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -153,16 +160,23 @@ private fun ExpandedLogViewer(
     onDrag: (androidx.compose.ui.geometry.Offset) -> Unit,
     onDragEnd: () -> Unit
 ) {
-    val logs by LogCollector
-        .getLogsByTag(setOf("AppTracker"))
-        .collectAsStateWithLifecycle(emptyList())
+    val state = DebugManager.logViewerState
+    val filterTags = state.filterTags
+
+    val logs by if (filterTags.isEmpty()) {
+        LogCollector.allLogs
+    } else {
+        LogCollector.getLogsByTag(filterTags)
+    }.collectAsStateWithLifecycle(emptyList())
+
+    val pagerState = rememberPagerState(pageCount = { 2 })
 
     Column(
         modifier = Modifier
             .width(300.dp)
             .fillMaxHeight(0.5f)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.Black.copy(alpha = 0.8f))
+            .background(Color.Black.copy(alpha = state.opacity))
     ) {
         // 헤더 (드래그 가능)
         Row(
@@ -182,7 +196,7 @@ private fun ExpandedLogViewer(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Debug Logs (${logs.size})",
+                text = if (pagerState.currentPage == 0) "Debug Logs (${logs.size})" else "설정",
                 style = MaterialTheme.typography.titleSmall,
                 color = Color.White,
             )
@@ -212,16 +226,123 @@ private fun ExpandedLogViewer(
 
         HorizontalDivider(color = Grey50)
 
-        // 로그 리스트
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-        ) {
-            items(logs.reversed(), key = { it.timestamp }) { log ->
-                LogItem(log)
-                Spacer(modifier = Modifier.height(4.dp))
+        // HorizontalPager로 로그 리스트와 설정 화면 전환
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            when (page) {
+                0 -> {
+                    // 로그 리스트
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                    ) {
+                        items(logs.reversed(), key = { it.id }) { log ->
+                            LogItem(log)
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                    }
+                }
+
+                1 -> {
+                    // 설정 화면
+                    SettingsScreen()
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun SettingsScreen() {
+    val state = DebugManager.logViewerState
+    val presetTags = listOf(
+        "AppTracker",
+        "MixpanelAPI",
+        "OkHttp",
+        "Config",
+        "rememberNavControllerWithLog",
+        "recordExceptionHandler"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // 태그 필터
+        Text(
+            text = "필터 태그",
+            style = MaterialTheme.typography.titleSmall,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        // 프리셋 태그
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(presetTags) { tag ->
+                FilterChip(
+                    selected = state.filterTags.contains(tag),
+                    onClick = {
+                        val newTags = if (state.filterTags.contains(tag)) {
+                            state.filterTags - tag
+                        } else {
+                            state.filterTags + tag
+                        }
+                        DebugManager.updateFilterTags(newTags)
+                    },
+                    label = {
+                        Text(
+                            text = tag,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                )
+            }
+        }
+
+        HorizontalDivider(
+            color = Grey50,
+            modifier = Modifier.padding(vertical = 12.dp)
+        )
+
+        // 투명도 설정
+        Text(
+            text = "창 투명도: ${(state.opacity * 100).toInt()}%",
+            style = MaterialTheme.typography.titleSmall,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Slider(
+            value = state.opacity,
+            onValueChange = { DebugManager.updateOpacity(it) },
+            valueRange = 0.3f..1f,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        HorizontalDivider(
+            color = Grey50,
+            modifier = Modifier.padding(vertical = 12.dp)
+        )
+
+        // 로그 지우기
+        TextButton(
+            onClick = { LogCollector.clear() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "로그 전체 삭제",
+                color = Color(0xFFF44336),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

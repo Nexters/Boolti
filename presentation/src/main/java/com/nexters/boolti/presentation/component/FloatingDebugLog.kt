@@ -81,74 +81,76 @@ fun FloatingDebugLog() {
     val systemBarsLeft = with(density) { systemBars.getLeft(this, layoutDirection).toFloat() }
     val systemBarsRight = with(density) { systemBars.getRight(this, layoutDirection).toFloat() }
 
-    val screenWidthPx = with(density) { containerSize.width }
-    val screenHeightPx = with(density) { containerSize.height }
+    val screenWidthPx = containerSize.width
+    val screenHeightPx = containerSize.height
 
-    // 드래그 중 임시 offset
-    var dragOffsetX by remember { mutableFloatStateOf(0f) }
-    var dragOffsetY by remember { mutableFloatStateOf(0f) }
+    // 실제 화면 위치 (픽셀 단위로 관리)
+    var currentOffsetX by remember { mutableFloatStateOf(with(density) { state.offsetX.toPx() }) }
+    var currentOffsetY by remember { mutableFloatStateOf(with(density) { state.offsetY.toPx() }) }
 
     AnimatedContent(
         targetState = state.isExpanded,
         modifier = Modifier
             .offset {
                 IntOffset(
-                    x = with(density) { state.offsetX.toPx().roundToInt() } + dragOffsetX.roundToInt(),
-                    y = with(density) { state.offsetY.toPx().roundToInt() } + dragOffsetY.roundToInt()
+                    x = currentOffsetX.roundToInt(),
+                    y = currentOffsetY.roundToInt()
                 )
             },
     ) { isExpanded ->
         if (isExpanded) {
             ExpandedLogViewer(
                 onDrag = { dragAmount ->
-                    dragOffsetX += dragAmount.x
-                    dragOffsetY += dragAmount.y
+                    currentOffsetX += dragAmount.x
+                    currentOffsetY += dragAmount.y
                 },
                 onDragEnd = {
                     val expandedWidth = with(density) { 300.dp.toPx() }
-                    val expandedHeight = with(density) { (screenHeightPx * 0.5f) }
+                    val expandedHeight = screenHeightPx * 0.5f
 
-                    val newOffsetX = with(density) {
-                        (state.offsetX.toPx() + dragOffsetX).coerceIn(
-                            systemBarsLeft,
-                            screenWidthPx - systemBarsRight - expandedWidth
-                        ).toDp()
+                    val newOffsetX = currentOffsetX.coerceIn(
+                        systemBarsLeft,
+                        screenWidthPx - systemBarsRight - expandedWidth
+                    )
+                    val newOffsetY = currentOffsetY.coerceIn(
+                        systemBarsTop,
+                        screenHeightPx - systemBarsBottom - expandedHeight
+                    )
+
+                    currentOffsetX = newOffsetX
+                    currentOffsetY = newOffsetY
+
+                    // DebugManager에도 위치 저장 (Dp 단위로 변환)
+                    with(density) {
+                        DebugManager.updatePosition(newOffsetX.toDp(), newOffsetY.toDp())
                     }
-                    val newOffsetY = with(density) {
-                        (state.offsetY.toPx() + dragOffsetY).coerceIn(
-                            systemBarsTop,
-                            screenHeightPx - systemBarsBottom - expandedHeight
-                        ).toDp()
-                    }
-                    DebugManager.updatePosition(newOffsetX, newOffsetY)
-                    dragOffsetX = 0f
-                    dragOffsetY = 0f
                 }
             )
         } else {
             MinimizedLogBubble(
                 onDrag = { dragAmount ->
-                    dragOffsetX += dragAmount.x
-                    dragOffsetY += dragAmount.y
+                    currentOffsetX += dragAmount.x
+                    currentOffsetY += dragAmount.y
                 },
                 onDragEnd = {
                     val bubbleSize = with(density) { 60.dp.toPx() }
 
-                    val newOffsetX = with(density) {
-                        (state.offsetX.toPx() + dragOffsetX).coerceIn(
-                            systemBarsLeft,
-                            screenWidthPx - systemBarsRight - bubbleSize
-                        ).toDp()
+                    val newOffsetX = currentOffsetX.coerceIn(
+                        systemBarsLeft,
+                        screenWidthPx - systemBarsRight - bubbleSize
+                    )
+                    val newOffsetY = currentOffsetY.coerceIn(
+                        systemBarsTop,
+                        screenHeightPx - systemBarsBottom - bubbleSize
+                    )
+
+                    currentOffsetX = newOffsetX
+                    currentOffsetY = newOffsetY
+
+                    // DebugManager에도 위치 저장 (Dp 단위로 변환)
+                    with(density) {
+                        DebugManager.updatePosition(newOffsetX.toDp(), newOffsetY.toDp())
                     }
-                    val newOffsetY = with(density) {
-                        (state.offsetY.toPx() + dragOffsetY).coerceIn(
-                            systemBarsTop,
-                            screenHeightPx - systemBarsBottom - bubbleSize
-                        ).toDp()
-                    }
-                    DebugManager.updatePosition(newOffsetX, newOffsetY)
-                    dragOffsetX = 0f
-                    dragOffsetY = 0f
                 }
             )
         }
@@ -170,6 +172,7 @@ private fun ExpandedLogViewer(
     }.collectAsStateWithLifecycle(emptyList())
 
     val pagerState = rememberPagerState(pageCount = { 2 })
+    var isDraggingWindow by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -184,8 +187,15 @@ private fun ExpandedLogViewer(
                 .fillMaxWidth()
                 .pointerInput(Unit) {
                     detectDragGestures(
-                        onDragEnd = { onDragEnd() },
-                        onDragCancel = { onDragEnd() }
+                        onDragStart = { isDraggingWindow = true },
+                        onDragEnd = {
+                            isDraggingWindow = false
+                            onDragEnd()
+                        },
+                        onDragCancel = {
+                            isDraggingWindow = false
+                            onDragEnd()
+                        }
                     ) { change, dragAmount ->
                         change.consume()
                         onDrag(dragAmount)
@@ -229,7 +239,8 @@ private fun ExpandedLogViewer(
         // HorizontalPager로 로그 리스트와 설정 화면 전환
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            userScrollEnabled = !isDraggingWindow
         ) { page ->
             when (page) {
                 0 -> {

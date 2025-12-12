@@ -40,7 +40,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -173,6 +172,7 @@ private fun ExpandedLogViewer(
 
     val pagerState = rememberPagerState(pageCount = { 2 })
     var isDraggingWindow by remember { mutableStateOf(false) }
+    var expandedLogIds by remember { mutableStateOf(setOf<String>()) }
 
     Column(
         modifier = Modifier
@@ -251,7 +251,17 @@ private fun ExpandedLogViewer(
                             .padding(8.dp),
                     ) {
                         items(logs.reversed(), key = { it.id }) { log ->
-                            LogItem(log)
+                            LogItem(
+                                log = log,
+                                isExpanded = expandedLogIds.contains(log.id),
+                                onToggle = {
+                                    expandedLogIds = if (expandedLogIds.contains(log.id)) {
+                                        expandedLogIds - log.id
+                                    } else {
+                                        expandedLogIds + log.id
+                                    }
+                                }
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
@@ -405,9 +415,11 @@ private fun MinimizedLogBubble(
 }
 
 @Composable
-private fun LogItem(log: LogData) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
-
+private fun LogItem(
+    log: LogData,
+    isExpanded: Boolean,
+    onToggle: () -> Unit
+) {
     val logColor = when (log.level) {
         2 -> Color(0xFF2196F3) // VERBOSE - Blue
         3 -> Color(0xFF4CAF50) // DEBUG - Green
@@ -424,7 +436,7 @@ private fun LogItem(log: LogData) {
             .background(Color(0xE61E1E1E))
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { isExpanded = !isExpanded }
+                    onTap = { onToggle() }
                 )
             }
             .padding(4.dp)

@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -36,8 +37,11 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -172,7 +176,6 @@ private fun ExpandedLogViewer(
 
     val pagerState = rememberPagerState(pageCount = { 2 })
     var isDraggingWindow by remember { mutableStateOf(false) }
-    var expandedLogIds by remember { mutableStateOf(setOf<String>()) }
 
     Column(
         modifier = Modifier
@@ -245,7 +248,26 @@ private fun ExpandedLogViewer(
             when (page) {
                 0 -> {
                     // 로그 리스트
+                    val listState = rememberLazyListState()
+                    var previousLogCount by remember { mutableIntStateOf(logs.size) }
+
+                    // 스크롤이 최상단 근처에 있는지 확인
+                    val isNearTop by remember {
+                        derivedStateOf {
+                            listState.firstVisibleItemIndex <= 2
+                        }
+                    }
+
+                    // 로그가 추가되고 스크롤이 최상단 근처에 있을 때만 자동 스크롤
+                    LaunchedEffect(logs.size) {
+                        if (logs.size > previousLogCount && isNearTop) {
+                            listState.animateScrollToItem(0)
+                        }
+                        previousLogCount = logs.size
+                    }
+
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(8.dp),
@@ -253,14 +275,8 @@ private fun ExpandedLogViewer(
                         items(logs.reversed(), key = { it.id }) { log ->
                             LogItem(
                                 log = log,
-                                isExpanded = expandedLogIds.contains(log.id),
-                                onToggle = {
-                                    expandedLogIds = if (expandedLogIds.contains(log.id)) {
-                                        expandedLogIds - log.id
-                                    } else {
-                                        expandedLogIds + log.id
-                                    }
-                                }
+                                isExpanded = state.expandedLogIds.contains(log.id),
+                                onToggle = { DebugManager.toggleLogExpanded(log.id) }
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                         }

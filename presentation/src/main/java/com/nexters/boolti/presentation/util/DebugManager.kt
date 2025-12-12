@@ -14,6 +14,7 @@ data class LogViewerState(
     val showSettings: Boolean = false,
     val opacity: Float = 0.95f,
     val filterTags: Set<String> = emptySet(),
+    val expandedLogIds: Set<String> = emptySet(),
 )
 
 object DebugManager {
@@ -67,6 +68,17 @@ object DebugManager {
     fun removeFilterTag(tag: String) {
         logViewerState = logViewerState.copy(
             filterTags = logViewerState.filterTags - tag
+        )
+    }
+
+    fun toggleLogExpanded(logId: String) {
+        val expandedIds = logViewerState.expandedLogIds
+        logViewerState = logViewerState.copy(
+            expandedLogIds = if (expandedIds.contains(logId)) {
+                expandedIds - logId
+            } else {
+                expandedIds + logId
+            }
         )
     }
 }

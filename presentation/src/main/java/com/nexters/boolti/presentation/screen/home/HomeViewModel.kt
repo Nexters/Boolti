@@ -7,6 +7,7 @@ import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.DeepLinkEvent
+import com.nexters.boolti.presentation.screen.navigation.deeplink.PATH_BASE_HOME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -60,7 +61,7 @@ class HomeViewModel @Inject constructor(
 
     private fun collectDeepLinkEvent() {
         deepLinkEvent.events
-            .filter { it.startsWith("https://app.boolti.in/home") }
+            .filter { it.startsWith(PATH_BASE_HOME) }
             .onEach { sendEvent(HomeEvent.DeepLinkEvent(it)) }
             .launchIn(viewModelScope)
     }

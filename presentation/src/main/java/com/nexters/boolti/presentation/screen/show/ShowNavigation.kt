@@ -16,7 +16,7 @@ fun NavGraphBuilder.showScreen(
     composable<HomeRoute.Show>(
         deepLinks = listOf(
             navDeepLink {
-                uriPattern = "https://app.boolti.in/home/shows"
+                uriPattern = HomeRoute.Show.deeplinkUrl
                 action = Intent.ACTION_VIEW
             }
         )

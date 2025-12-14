@@ -1,8 +1,10 @@
 package com.nexters.boolti.presentation.service
 
+import com.nexters.boolti.presentation.screen.navigation.deeplink.DEEPLINK_TICKETS
+
 enum class BtNotification(val id: Int, val type: String, val deepLink: String?) {
-    RESERVATION_COMPLETED(id = 0, type = "RESERVATION_COMPLETED", deepLink = "https://app.boolti.in/home/tickets"),
-    ENTER_NOTIFICATION(id = 3, type = "ENTER_NOTIFICATION", deepLink = "https://app.boolti.in/home/tickets"),
+    RESERVATION_COMPLETED(id = 0, type = "RESERVATION_COMPLETED", deepLink = DEEPLINK_TICKETS),
+    ENTER_NOTIFICATION(id = 3, type = "ENTER_NOTIFICATION", deepLink = DEEPLINK_TICKETS),
     UNDEFINED(id = -1, type = "UNDEFINED", deepLink = null),
 }
 

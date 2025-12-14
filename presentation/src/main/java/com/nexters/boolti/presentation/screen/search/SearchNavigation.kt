@@ -16,7 +16,7 @@ fun NavGraphBuilder.searchScreen(
     composable<HomeRoute.Search>(
         deepLinks = listOf(
             navDeepLink {
-                uriPattern = "https://app.boolti.in/home/search"
+                uriPattern = HomeRoute.Search.deeplinkUrl
                 action = Intent.ACTION_VIEW
             }
         ),

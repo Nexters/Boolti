@@ -16,7 +16,7 @@ fun NavGraphBuilder.ticketScreen(
     composable<HomeRoute.Ticket>(
         deepLinks = listOf(
             navDeepLink {
-                uriPattern = "https://app.boolti.in/home/tickets"
+                uriPattern = HomeRoute.Ticket.deeplinkUrl
                 action = Intent.ACTION_VIEW
             }
         )

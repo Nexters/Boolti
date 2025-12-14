@@ -40,6 +40,7 @@ import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
+import com.nexters.boolti.presentation.screen.navigation.deeplink.PATH_BASE_TICKETS
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
@@ -169,7 +170,7 @@ fun MainNavigation(
             startDestination = TicketRoute.TicketDetail,
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "https://app.boolti.in/tickets/{ticketId}"
+                    uriPattern = "$PATH_BASE_TICKETS/{ticketId}"
                     action = Intent.ACTION_VIEW
                 }
             ),

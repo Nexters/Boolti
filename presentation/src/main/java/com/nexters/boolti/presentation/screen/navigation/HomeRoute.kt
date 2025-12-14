@@ -1,9 +1,10 @@
 package com.nexters.boolti.presentation.screen.navigation
 
+import androidx.navigation3.runtime.NavKey
 import com.nexters.boolti.presentation.R
 import kotlinx.serialization.Serializable
 
-sealed interface HomeRoute {
+sealed interface HomeRoute : NavKey {
     val label: Int
     val icon: Int
 

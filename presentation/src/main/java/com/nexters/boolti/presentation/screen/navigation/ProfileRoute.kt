@@ -1,9 +1,10 @@
 package com.nexters.boolti.presentation.screen.navigation
 
+import androidx.navigation3.runtime.NavKey
 import com.nexters.boolti.domain.model.Link
 import kotlinx.serialization.Serializable
 
-sealed interface ProfileRoute {
+sealed interface ProfileRoute : NavKey {
     @Serializable
     data object ProfileRoot : ProfileRoute
 

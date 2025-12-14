@@ -1,8 +1,9 @@
 package com.nexters.boolti.presentation.screen.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface ShowRoute {
+sealed interface ShowRoute : NavKey {
     @Serializable
     data class ShowRoot(
         val showId: String,

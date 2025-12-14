@@ -47,5 +47,5 @@ val homeRoutes = listOf(
     HomeRoute.Show,
     HomeRoute.Search,
     HomeRoute.Ticket,
-    HomeRoute.My
+    HomeRoute.My,
 )

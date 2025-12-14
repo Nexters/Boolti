@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,11 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.requireActivity
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -62,7 +61,12 @@ fun HomeScreen(
 ) {
     val snackbarController = LocalSnackbarController.current
     val navController = rememberNavControllerWithLog()
-    val currentBackStack by navController.currentBackStackEntryAsState()
+
+    val navigationState = rememberHomeNavigationState(
+        startRoute = HomeRoute.Show,
+        topLevelRoutes = homeRoutes.toSet(),
+    )
+    val navigator = remember { HomeNavigator(navigationState) }
 
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -105,52 +109,45 @@ fun HomeScreen(
     Scaffold(
         bottomBar = {
             HomeNavigationBar(
-                currentDestination = currentBackStack?.destination,
-                onDestinationChanged = { dest ->
-                    navController.navigate(dest) {
-                        popUpTo(navController.graph.findStartDestination().id)
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
+                currentDestination = navigationState.topLevelRoute,
+                onDestinationChanged = { dest -> navigator.navigate(dest) },
             )
         }
     ) { innerPadding ->
-        NavHost(
+        NavDisplay(
+            entries = navigationState.toEntries(
+                entryProvider {
+                    showScreen(
+                        modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+                        navigateToShowDetail = navigateToShowDetail,
+                        navigateToBusiness = navigateToBusiness,
+                        navigateToShowRegistration = navigateToShowRegistration,
+                    )
+                    searchScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        navigateToRecentSearch = navigateToRecentSearch,
+                        navigateToSearchDetail = navigateToSearchDetail,
+                        navigateToShowDetail = navigateToShowDetail,
+                    )
+                    ticketScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        navigateToLogin = navigateToLogin,
+                        navigateToTicketDetail = navigateToTicketDetail,
+                    )
+                    myScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        navigateToLogin = navigateToLogin,
+                        navigateToAccountSetting = navigateToAccountSetting,
+                        navigateToReservations = navigateToReservations,
+                        navigateToProfile = navigateToProfile,
+                        navigateToShowRegistration = navigateToShowRegistration,
+                        navigateToQrScan = navigateToQrScan,
+                    )
+                }
+            ),
+            onBack = { navigator.goBack() },
             modifier = modifier,
-            navController = navController,
-            startDestination = HomeRoute.Show,
-        ) {
-            showScreen(
-                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
-                navigateToShowDetail = navigateToShowDetail,
-                navigateToBusiness = navigateToBusiness,
-                navigateToShowRegistration = navigateToShowRegistration,
-            )
-
-            searchScreen(
-                modifier = Modifier.padding(innerPadding),
-                navigateToRecentSearch = navigateToRecentSearch,
-                navigateToSearchDetail = navigateToSearchDetail,
-                navigateToShowDetail = navigateToShowDetail,
-            )
-
-            ticketScreen(
-                modifier = Modifier.padding(innerPadding),
-                navigateToLogin = navigateToLogin,
-                navigateToTicketDetail = navigateToTicketDetail,
-            )
-
-            myScreen(
-                modifier = Modifier.padding(innerPadding),
-                navigateToLogin = navigateToLogin,
-                navigateToAccountSetting = navigateToAccountSetting,
-                navigateToReservations = navigateToReservations,
-                navigateToProfile = navigateToProfile,
-                navigateToShowRegistration = navigateToShowRegistration,
-                navigateToQrScan = navigateToQrScan,
-            )
-        }
+        )
     }
 
     if (dialog != null) {
@@ -175,7 +172,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeNavigationBar(
-    currentDestination: NavDestination?,
+    currentDestination: NavKey?,
     onDestinationChanged: (HomeRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -190,7 +187,7 @@ private fun HomeNavigationBar(
             containerColor = MaterialTheme.colorScheme.background,
         ) {
             homeRoutes.forEach { dest ->
-                val selected = currentDestination?.hasRoute(dest::class) ?: false
+                val selected = currentDestination == dest
                 val label = stringResource(dest.label)
                 NavigationBarItem(
                     selected = selected,

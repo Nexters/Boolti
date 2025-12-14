@@ -1,11 +1,11 @@
 package com.nexters.boolti.presentation.screen.my
 
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
-fun NavGraphBuilder.myScreen(
+fun EntryProviderScope<NavKey>.myScreen(
     navigateToLogin: () -> Unit,
     navigateToAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
@@ -14,7 +14,7 @@ fun NavGraphBuilder.myScreen(
     navigateToQrScan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    composable<HomeRoute.My> {
+    entry<HomeRoute.My> {
         MyScreen(
             requireLogin = navigateToLogin,
             onClickAccountSetting = navigateToAccountSetting,

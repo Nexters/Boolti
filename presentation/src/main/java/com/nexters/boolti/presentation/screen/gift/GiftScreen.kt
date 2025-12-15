@@ -86,7 +86,7 @@ fun GiftScreen(
                 properties = mapOf(
                     "booking_type" to "Gift",
                     "event_id" to viewModel.showId,
-                    "ticket_type" to "NORMAL",
+                    "ticket_type" to "Normal",
                     "ticket_quantity" to uiState.ticketCount,
                     "total_amount" to uiState.totalPrice,
                 ),

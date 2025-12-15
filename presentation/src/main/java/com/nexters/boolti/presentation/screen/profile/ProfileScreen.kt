@@ -72,6 +72,7 @@ import com.nexters.boolti.common.tracker.field.Link
 import com.nexters.boolti.common.tracker.field.Profile
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.domain.extension.YN
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
@@ -125,7 +126,7 @@ fun ProfileScreen(
                     if (viewModel.source.isNotEmpty()) {
                         put("source", viewModel.source)
                     }
-                    put("is_own_profile", uiState.isMine)
+                    put("is_own_profile", uiState.isMine.YN)
                 },
             )
         }
@@ -247,7 +248,7 @@ fun ProfileScreen(
                     AppTracker.click(
                         screen = Screen.Profile,
                         objectRole = Role.Link,
-                        objectValue = sns.type.name,
+                        objectValue = sns.type.name.lowercase().replaceFirstChar(Char::uppercase),
                     )
                     try {
                         uriHandler.openUri(sns.url.toValidUrlString())

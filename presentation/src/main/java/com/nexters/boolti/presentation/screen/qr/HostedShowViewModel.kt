@@ -17,7 +17,7 @@ import javax.inject.Inject
 class HostedShowViewModel @Inject constructor(
     private val repository: HostRepository,
 ) : BaseViewModel() {
-    private val _uiState = MutableStateFlow(HostedShowState())
+    private val _uiState = MutableStateFlow(HostedShowState.EMPTY)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -28,9 +28,9 @@ class HostedShowViewModel @Inject constructor(
         viewModelScope.launch(recordExceptionHandler) {
             repository.getHostedShows()
                 .onStart {
-                    _uiState.update { it.copy(loading = true) }
+                    _uiState.update { it.copy(loading = true, error = false) }
                 }.catch { e ->
-                    _uiState.update { it.copy(loading = false) }
+                    _uiState.update { it.copy(loading = false, error = true) }
                     throw e
                 }.singleOrNull()?.let { shows ->
                     _uiState.update { it.copy(loading = false, shows = shows) }

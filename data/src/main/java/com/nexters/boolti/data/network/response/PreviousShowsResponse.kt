@@ -4,7 +4,9 @@ import com.nexters.boolti.data.util.toLocalDate
 import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.Show
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PreviousShowsResponse(
     @SerialName("id") val id: String,
     @SerialName("name") val name: String,

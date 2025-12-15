@@ -1,8 +1,6 @@
 package com.nexters.boolti.presentation.screen.search.detail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
@@ -10,21 +8,23 @@ import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.extension.stateInUi
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SearchDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = SearchDetailViewModel.Factory::class)
+class SearchDetailViewModel @AssistedInject constructor(
+    @Assisted navKey: SearchRoute.SearchDetail,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val searchRepository: SearchRepository,
 ) : BaseViewModel() {
-    private val route = savedStateHandle.toRoute<SearchRoute.SearchDetail>()
+    private val keyword = navKey.keyword
     private var searchJob: Job? = null
     private var searchShowsJob: Job? = null
     private var searchProfilesJob: Job? = null
@@ -34,7 +34,7 @@ class SearchDetailViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         SearchDetailUiState.Default.copy(
-            keyword = route.keyword,
+            keyword = keyword,
         )
     )
 
@@ -49,10 +49,10 @@ class SearchDetailViewModel @Inject constructor(
             profiles = profiles.items,
             profilesTotalCount = profiles.totalCount,
         )
-    }.stateInUi(viewModelScope, SearchDetailUiState.Default.copy(keyword = route.keyword))
+    }.stateInUi(viewModelScope, SearchDetailUiState.Default.copy(keyword = keyword))
 
     init {
-        search(route.keyword)
+        search(keyword)
     }
 
     fun onIntent(intent: SearchDetailIntent) {
@@ -159,5 +159,10 @@ class SearchDetailViewModel @Inject constructor(
             }
             _uiState.update { it.copy(profilesLoading = false) }
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: SearchRoute.SearchDetail): SearchDetailViewModel
     }
 }

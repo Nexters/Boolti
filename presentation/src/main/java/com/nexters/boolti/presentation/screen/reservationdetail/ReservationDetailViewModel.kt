@@ -1,11 +1,14 @@
 package com.nexters.boolti.presentation.screen.reservationdetail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,20 +19,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.plus
-import javax.inject.Inject
 
-@HiltViewModel
-class ReservationDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = ReservationDetailViewModel.Factory::class)
+class ReservationDetailViewModel @AssistedInject constructor(
+    @Assisted val navKey: MainRoute.ReservationDetail,
     private val reservationRepository: ReservationRepository,
     private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
-        "reservationId가 전달되어야 합니다."
-    }
+    private val reservationId: String = navKey.reservationId
 
-    private val isGift: Boolean = savedStateHandle["isGift"] ?: false
+    private val isGift: Boolean = navKey.isGift
 
     private val _uiState: MutableStateFlow<ReservationDetailUiState> =
         MutableStateFlow(ReservationDetailUiState.Loading)
@@ -69,5 +69,10 @@ class ReservationDetailViewModel @Inject constructor(
                 _refundPolicy.value = refundPolicy
             }
             .launchIn(viewModelScope + recordExceptionHandler)
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: MainRoute.ReservationDetail): ReservationDetailViewModel
     }
 }

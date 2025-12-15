@@ -5,6 +5,9 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import com.nexters.boolti.presentation.screen.LocalBackStack
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 
@@ -20,6 +23,21 @@ fun NavGraphBuilder.showImagesScreen(
             index = index,
             viewModel = showViewModel,
             onBackPressed = navController::popBackStack,
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.showImagesScreen(
+    viewModel: ShowDetailViewModel,
+) {
+    entry<ShowRoute.Images> { key ->
+        val backStack = LocalBackStack.current
+        val index = key.index
+
+        ShowImagesScreen(
+            index = index,
+            viewModel = viewModel,
+            onBackPressed = backStack::removeLastOrNull,
         )
     }
 }

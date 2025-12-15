@@ -3,8 +3,11 @@ package com.nexters.boolti.presentation.screen.home
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.nexters.boolti.common.tracker.field.Home
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.presentation.screen.LocalBackStack
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalUser
 import com.nexters.boolti.presentation.screen.MainDestination
@@ -47,6 +50,42 @@ fun NavGraphBuilder.homeScreen(
                     navController.navigate(MainRoute.Login)
             },
             navigateToLogin = { navController.navigate(MainRoute.Login) },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.homeScreen(
+    modifier: Modifier = Modifier,
+) {
+    entry<MainRoute.Home> {
+        val backStack = LocalBackStack.current
+        val user = LocalUser.current
+
+        HomeScreen(
+            modifier = modifier,
+            navigateToShowDetail = {
+                backStack.add(
+                    ShowRoute.ShowRoot(
+                        showId = it,
+                        source = Screen.Home.value,
+                    )
+                )
+            },
+            navigateToRecentSearch = { backStack.add(SearchRoute.RecentSearch) },
+            navigateToSearchDetail = { backStack.add(SearchRoute.SearchDetail(keyword = it)) },
+            navigateToTicketDetail = { /*navController.navigate(TicketRoute.TicketRoot(ticketId = it))*/ },
+            navigateToQrScan = { /*navController.navigate(MainRoute.HostedShows)*/ },
+            navigateToAccountSetting = { backStack.add(MainRoute.AccountSetting) },
+            navigateToReservations = { backStack.add(MainRoute.Reservations) },
+            navigateToProfile = { source -> backStack.add(MainRoute.Profile(source = source)) },
+            navigateToBusiness = { /*navController.navigate(MainRoute.Business)*/ },
+            navigateToShowRegistration = {
+//                if (user != null)
+//                    navController.navigate(MainDestination.ShowRegistration.route)
+//                else
+//                    navController.navigate(MainRoute.Login)
+            },
+            navigateToLogin = { backStack.add(MainRoute.Login) },
         )
     }
 }

@@ -1,15 +1,16 @@
 package com.nexters.boolti.presentation.screen.showdetail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -24,18 +25,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class ShowDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = ShowDetailViewModel.Factory::class)
+class ShowDetailViewModel @AssistedInject constructor(
+    @Assisted navKey: ShowRoute.ShowRoot,
     private val showRepository: ShowRepository,
     private val popupRepository: PopupRepository,
     authRepository: AuthRepository,
 ) : ViewModel() {
-    private val route = checkNotNull(savedStateHandle.toRoute<ShowRoute.ShowRoot>())
-    val showId: String = route.showId
-    val source: String = route.source
+    val showId: String = navKey.showId
+    val source: String = navKey.source
 
     private val _uiState = MutableStateFlow(ShowDetailUiState())
     val uiState: StateFlow<ShowDetailUiState> = _uiState.asStateFlow()
@@ -108,5 +107,10 @@ class ShowDetailViewModel @Inject constructor(
 
     fun preventEvents() {
         _events.cancel()
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: ShowRoute.ShowRoot): ShowDetailViewModel
     }
 }

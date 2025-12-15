@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation.screen
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -18,54 +17,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.navigation
-import androidx.navigation.navDeepLink
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.component.FloatingDebugLog
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
-import com.nexters.boolti.presentation.screen.business.businessScreen
-import com.nexters.boolti.presentation.screen.gift.giftScreen
-import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
-import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
-import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
-import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
-import com.nexters.boolti.presentation.screen.navigation.ShowRoute
-import com.nexters.boolti.presentation.screen.navigation.TicketRoute
-import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
-import com.nexters.boolti.presentation.screen.navigation.deeplink.PATH_BASE_TICKETS
-import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
-import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
-import com.nexters.boolti.presentation.screen.profileedit.introduce.profileIntroduceEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.link.linkEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.nickname.profileNicknameEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.profile.profileEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.sns.profileSnsEditScreen
-import com.nexters.boolti.presentation.screen.profileedit.usercode.profileUserCodeEditScreen
-import com.nexters.boolti.presentation.screen.qr.hostedShowScreen
-import com.nexters.boolti.presentation.screen.qr.qrFullScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
-import com.nexters.boolti.presentation.screen.report.reportScreen
 import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
 import com.nexters.boolti.presentation.screen.search.detail.searchDetailNavigation
 import com.nexters.boolti.presentation.screen.search.recent.recentSearchScreen
-import com.nexters.boolti.presentation.screen.showdetail.showDetailScreen
-import com.nexters.boolti.presentation.screen.showdetail.showImagesScreen
-import com.nexters.boolti.presentation.screen.showregistration.addShowRegistration
+import com.nexters.boolti.presentation.screen.showdetail.showRoot
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
-import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
-import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
-import com.nexters.boolti.presentation.screen.video.videoEditScreen
-import com.nexters.boolti.presentation.screen.video.videoListScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -76,6 +52,10 @@ val LocalSnackbarController = staticCompositionLocalOf {
 
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("No NavController provided")
+}
+
+val LocalBackStack = compositionLocalOf<NavBackStack<NavKey>> {
+    error("No NavBackStack provided")
 }
 
 val LocalUser = compositionLocalOf<User?> { null }
@@ -109,6 +89,7 @@ fun Main(
                         scope,
                     ),
                     LocalNavController provides rootNavController,
+                    LocalBackStack provides rememberNavBackStack(MainRoute.Home),
                     LocalUser provides user,
                 ) {
                     MainNavigation(
@@ -130,106 +111,138 @@ fun MainNavigation(
     modifier: Modifier = Modifier,
 ) {
     val navController = LocalNavController.current
+    val backStack = LocalBackStack.current
 
-    NavHost(
+    NavDisplay(
         modifier = modifier,
-        navController = navController,
-        startDestination = MainRoute.Home,
-    ) {
-        homeScreen()
-        loginScreen()
-        signoutScreen()
-        reservationsScreen()
-        reservationDetailScreen()
-        refundScreen()
+        backStack = backStack,
+        onBack = {
+            backStack.removeLastOrNull()
+        },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
+        entryProvider = entryProvider {
+            homeScreen()
+            loginScreen()
+            signoutScreen()
+            reservationsScreen()
+            reservationDetailScreen()
+            refundScreen()
 
-        navigation<ShowRoute.ShowRoot>(
-            startDestination = ShowRoute.Detail,
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "https://preview.boolti.in/show/{showId}"
-                    action = Intent.ACTION_VIEW
-                },
-            ),
-        ) {
-            showDetailScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() }
-            )
-            showImagesScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() }
-            )
-            reportScreen()
+            showRoot()
+
+            recentSearchScreen()
+            searchDetailNavigation()
+
+
+            profileScreen()
+            accountSettingScreen()
         }
+    )
 
-        recentSearchScreen()
-        searchDetailNavigation()
-
-        ticketingScreen()
-
-        navigation<TicketRoute.TicketRoot>(
-            startDestination = TicketRoute.TicketDetail,
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "$PATH_BASE_TICKETS/{ticketId}"
-                    action = Intent.ACTION_VIEW
-                }
-            ),
+    /*
+        NavHost(
+            modifier = modifier,
+            navController = navController,
+            startDestination = MainRoute.Home,
         ) {
-            ticketDetailScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
+            homeScreen()
+            loginScreen()
+            signoutScreen()
+            reservationsScreen()
+            reservationDetailScreen()
+            refundScreen()
+
+            navigation<ShowRoute.ShowRoot>(
+                startDestination = ShowRoute.Detail,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "https://preview.boolti.in/show/{showId}"
+                        action = Intent.ACTION_VIEW
+                    },
+                ),
+            ) {
+                showDetailScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() }
+                )
+                showImagesScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() }
+                )
+                reportScreen()
+            }
+
+            recentSearchScreen()
+            searchDetailNavigation()
+
+            ticketingScreen()
+
+            navigation<TicketRoute.TicketRoot>(
+                startDestination = TicketRoute.TicketDetail,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "$PATH_BASE_TICKETS/{ticketId}"
+                        action = Intent.ACTION_VIEW
+                    }
+                ),
+            ) {
+                ticketDetailScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+                )
+                qrFullScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+                )
+            }
+
+            giftScreen()
+
+            hostedShowScreen(
+                onClickShow = onClickQrScan,
             )
-            qrFullScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
+
+            paymentCompleteScreen()
+            giftCompleteScreen()
+            businessScreen()
+            accountSettingScreen()
+            profileScreen()
+            navigation<ProfileRoute.ProfileRoot>(
+                startDestination = ProfileRoute.ProfileEdit,
+            ) {
+                profileEditScreen()
+                profileSnsEditScreen()
+                profileNicknameEditScreen()
+                profileUserCodeEditScreen()
+                profileIntroduceEditScreen()
+            }
+
+            navigation<LinkListRoute.LinkListRoot>(
+                startDestination = LinkListRoute.LinkList,
+            ) {
+                linkListScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+                )
+                linkEditScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+                )
+            }
+
+            navigation<VideoListRoute.VideoListRoot>(
+                startDestination = VideoListRoute.VideoList,
+            ) {
+                videoListScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+                )
+                videoEditScreen(
+                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+                )
+            }
+
+            performedShowsScreen()
+
+            addShowRegistration()
         }
-
-        giftScreen()
-
-        hostedShowScreen(
-            onClickShow = onClickQrScan,
-        )
-
-        paymentCompleteScreen()
-        giftCompleteScreen()
-        businessScreen()
-        accountSettingScreen()
-        profileScreen()
-        navigation<ProfileRoute.ProfileRoot>(
-            startDestination = ProfileRoute.ProfileEdit,
-        ) {
-            profileEditScreen()
-            profileSnsEditScreen()
-            profileNicknameEditScreen()
-            profileUserCodeEditScreen()
-            profileIntroduceEditScreen()
-        }
-
-        navigation<LinkListRoute.LinkListRoot>(
-            startDestination = LinkListRoute.LinkList,
-        ) {
-            linkListScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-            linkEditScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-        }
-
-        navigation<VideoListRoute.VideoListRoot>(
-            startDestination = VideoListRoute.VideoList,
-        ) {
-            videoListScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-            videoEditScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-        }
-
-        performedShowsScreen()
-
-        addShowRegistration()
-    }
+    */
 }
 
 @Composable

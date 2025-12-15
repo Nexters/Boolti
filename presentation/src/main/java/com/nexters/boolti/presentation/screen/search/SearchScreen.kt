@@ -37,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.search
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Chip
 import com.nexters.boolti.common.tracker.field.Discovery
@@ -149,6 +150,13 @@ private fun SearchScreen(
                                 "keyword" to keyword,
                             ),
                         )
+                        AppTracker.search(
+                            screen = Screen.Discovery,
+                            keyword = keyword,
+                            properties = mapOf(
+                                "search_source" to "Recent",
+                            ),
+                        )
                         onSearch(keyword)
                     },
                     deleteSearchHistory = deleteSearchHistory,
@@ -171,6 +179,13 @@ private fun SearchScreen(
                         objectValue = "TrendingKeyword",
                         properties = mapOf(
                             "keyword" to keyword,
+                        ),
+                    )
+                    AppTracker.search(
+                        screen = Screen.Discovery,
+                        keyword = keyword,
+                        properties = mapOf(
+                            "search_source" to "Trending",
                         ),
                     )
                     onSearch(keyword)

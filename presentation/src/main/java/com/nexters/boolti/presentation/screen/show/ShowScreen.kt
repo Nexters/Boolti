@@ -37,7 +37,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
-import com.nexters.boolti.common.tracker.event.search
 import com.nexters.boolti.common.tracker.field.Banner
 import com.nexters.boolti.common.tracker.field.Home
 import com.nexters.boolti.common.tracker.field.Role

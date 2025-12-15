@@ -518,7 +518,7 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
                             objectRole = Role.Button,
                             objectValue = "Share",
                             properties = mapOf(
-                                "share_method" to "Link Copy"
+                                "share_method" to "LinkCopy"
                             ),
                         )
 
@@ -551,7 +551,7 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
                             objectRole = Role.Button,
                             objectValue = "Share",
                             properties = mapOf(
-                                "share_method" to "With Info"
+                                "share_method" to "WithInfo"
                             ),
                         )
 
@@ -839,7 +839,7 @@ private fun trackNaverMap() {
         screen = Screen.ShowDetail,
         objectRole = Role.Link,
         objectValue = "Map",
-        properties = mapOf("map_provider" to "Naver Map"),
+        properties = mapOf("map_provider" to "NaverMap"),
     )
 }
 

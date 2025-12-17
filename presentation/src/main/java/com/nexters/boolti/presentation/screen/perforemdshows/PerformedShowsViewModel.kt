@@ -48,7 +48,6 @@ class PerformedShowsViewModel @Inject constructor(
                     }
                 }
                 .onFailure { e ->
-                    e.printStackTrace()
                     _uiState.update {
                         it.copy(loading = false)
                     }

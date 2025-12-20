@@ -6,13 +6,10 @@ import kotlinx.serialization.Serializable
 
 sealed interface VideoListRoute : NavKey {
     @Serializable
-    data class VideoListRoot(
+    data class VideoList(
         val userCode: UserCode,
         val isEditMode: Boolean,
     ) : VideoListRoute
-
-    @Serializable
-    data object VideoList : VideoListRoute
 
     @Serializable
     data class VideoEdit(val isEditMode: Boolean) : VideoListRoute

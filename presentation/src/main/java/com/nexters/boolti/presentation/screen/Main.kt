@@ -35,6 +35,7 @@ import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.decorator.rememberSharedViewModelStoreNavEntryDecorator
 import com.nexters.boolti.presentation.screen.profile.profileScreen
+import com.nexters.boolti.presentation.screen.profileedit.profileEditScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
 import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
 import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
@@ -43,6 +44,7 @@ import com.nexters.boolti.presentation.screen.search.recent.recentSearchScreen
 import com.nexters.boolti.presentation.screen.showdetail.showRoot
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
+import com.nexters.boolti.presentation.screen.video.videoListScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -141,7 +143,9 @@ fun MainNavigation(
             ticketDetailScreen()
 
             profileScreen()
+            profileEditScreen()
             accountSettingScreen()
+            videoListScreen()
         }
     )
 
@@ -209,15 +213,15 @@ fun MainNavigation(
             businessScreen()
 //            accountSettingScreen()
 //            profileScreen()
-            navigation<ProfileRoute.ProfileRoot>(
-                startDestination = ProfileRoute.ProfileEdit,
-            ) {
-                profileEditScreen()
-                profileSnsEditScreen()
-                profileNicknameEditScreen()
-                profileUserCodeEditScreen()
-                profileIntroduceEditScreen()
-            }
+//            navigation<ProfileRoute.ProfileRoot>(
+//                startDestination = ProfileRoute.ProfileEdit,
+//            ) {
+//                profileEditScreen()
+//                profileSnsEditScreen()
+//                profileNicknameEditScreen()
+//                profileUserCodeEditScreen()
+//                profileIntroduceEditScreen()
+//            }
 
             navigation<LinkListRoute.LinkListRoot>(
                 startDestination = LinkListRoute.LinkList,
@@ -230,16 +234,16 @@ fun MainNavigation(
                 )
             }
 
-            navigation<VideoListRoute.VideoListRoot>(
-                startDestination = VideoListRoute.VideoList,
-            ) {
-                videoListScreen(
-                    getSharedViewModel = { entry -> entry.sharedViewModel() },
-                )
-                videoEditScreen(
-                    getSharedViewModel = { entry -> entry.sharedViewModel() },
-                )
-            }
+//            navigation<VideoListRoute.VideoListRoot>(
+//                startDestination = VideoListRoute.VideoList,
+//            ) {
+//                videoListScreen(
+//                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+//                )
+//                videoEditScreen(
+//                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+//                )
+//            }
 
             performedShowsScreen()
 

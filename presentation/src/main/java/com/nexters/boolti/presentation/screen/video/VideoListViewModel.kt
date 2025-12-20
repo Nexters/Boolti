@@ -1,15 +1,16 @@
 package com.nexters.boolti.presentation.screen.video
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.domain.usecase.GetYouTubeVideoInfoByUrlUseCase
 import com.nexters.boolti.domain.usecase.GetYouTubeVideoListByUserCodeUseCase
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,20 +19,18 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Inject
 
-@HiltViewModel
-class VideoListViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = VideoListViewModel.Factory::class)
+class VideoListViewModel @AssistedInject constructor(
+    @Assisted navKey: VideoListRoute.VideoList,
     getUserUseCase: GetUserUsecase,
     private val getYouTubeVideoListByUserCodeUseCase: GetYouTubeVideoListByUserCodeUseCase,
     private val getYouTubeVideoInfoByUrlUseCase: GetYouTubeVideoInfoByUrlUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>()
-    private val userCode = route.userCode
+    private val userCode = navKey.userCode
     private val isMine = getUserUseCase()?.userCode == userCode
-    private val isEditModeAtFirst = route.isEditMode && isMine
+    private val isEditModeAtFirst = navKey.isEditMode && isMine
     private var autoNavigatedToEdit = isEditModeAtFirst
 
     private val _uiState = MutableStateFlow(
@@ -256,5 +255,10 @@ class VideoListViewModel @Inject constructor(
             localId = UUID.randomUUID().toString(),
             url = url,
         )
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: VideoListRoute.VideoList): VideoListViewModel
     }
 }

@@ -1,43 +1,49 @@
 package com.nexters.boolti.presentation.screen.video
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.LocalNavController
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import com.nexters.boolti.presentation.screen.LocalBackStack
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
+import com.nexters.boolti.presentation.screen.navigation.decorator.SharedViewModelStoreNavEntryDecorator
 
-fun NavGraphBuilder.videoListScreen(
+private val videoListContentKey: String = VideoListRoute.VideoList::class.qualifiedName ?: "VideoEdit"
+
+fun EntryProviderScope<NavKey>.videoListScreen(
     modifier: Modifier = Modifier,
-    getSharedViewModel: @Composable (NavBackStackEntry) -> VideoListViewModel,
 ) {
-    composable<VideoListRoute.VideoList> { entry ->
-        val navController = LocalNavController.current
+    entry<VideoListRoute.VideoList>(
+        clazzContentKey = { videoListContentKey },
+    ) { key ->
+        val viewModel = hiltViewModel<VideoListViewModel, VideoListViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(key)
+            }
+        )
+        val backStack = LocalBackStack.current
+
         VideoListScreen(
             modifier = modifier,
-            navigateUp = navController::navigateUp,
             navigateToAddVideo = {
-                navController.navigate(VideoListRoute.VideoEdit(false))
+                backStack.add(VideoListRoute.VideoEdit(false))
             },
             navigateToEditVideo = {
-                navController.navigate(VideoListRoute.VideoEdit(true))
+                backStack.add(VideoListRoute.VideoEdit(true))
             },
-            viewModel = getSharedViewModel(entry),
+            navigateUp = backStack::removeLastOrNull,
+            viewModel = viewModel,
         )
     }
-}
 
-fun NavGraphBuilder.videoEditScreen(
-    modifier: Modifier = Modifier,
-    getSharedViewModel: @Composable (NavBackStackEntry) -> VideoListViewModel,
-) {
-    composable<VideoListRoute.VideoEdit> { entry ->
-        val navController = LocalNavController.current
+    entry<VideoListRoute.VideoEdit>(
+        metadata =
+            SharedViewModelStoreNavEntryDecorator.parent(videoListContentKey),
+    ) {
+        val backStack = LocalBackStack.current
         VideoEditScreen(
             modifier = modifier,
-            navigateUp = navController::navigateUp,
-            viewModel = getSharedViewModel(entry),
+            navigateUp = backStack::removeLastOrNull,
         )
     }
 }

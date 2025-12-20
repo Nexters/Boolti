@@ -4,10 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.nexters.boolti.domain.model.Link
 import kotlinx.serialization.Serializable
 
-sealed interface ProfileRoute : NavKey {
-    @Serializable
-    data object ProfileRoot : ProfileRoute
-
+sealed interface ProfileRoute : NavKey, MainRoute {
     @Serializable
     data object ProfileEdit : ProfileRoute
 

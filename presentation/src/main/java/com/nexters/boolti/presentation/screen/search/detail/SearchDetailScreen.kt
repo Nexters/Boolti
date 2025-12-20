@@ -92,7 +92,7 @@ fun SearchDetailScreen(
             screen = Screen.SearchDetail,
             properties = mapOf(
                 "keyword" to uiState.keyword,
-                "tab_name" to "All",
+                "tab" to "All",
             ),
         )
     }
@@ -327,8 +327,32 @@ private fun TabContainer(
                         AllTab(
                             shows = shows.take(3),
                             profiles = profiles.take(3),
-                            onClickShow = onClickShow,
-                            onClickProfile = onClickProfile,
+                            onClickShow = { index, showId ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = showId,
+                                    properties = mapOf(
+                                        "tab" to "All",
+                                        "item_category" to "Show",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickShow(showId)
+                            },
+                            onClickProfile = { index, userCode ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = userCode,
+                                    properties = mapOf(
+                                        "tab" to "All",
+                                        "item_category" to "Artist",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickProfile(userCode)
+                            },
                             onClickAllShows = if (shows.size > 3) {
                                 {
                                     AppTracker.click(
@@ -336,7 +360,7 @@ private fun TabContainer(
                                         objectRole = Role.Button,
                                         objectValue = "ViewAll",
                                         properties = mapOf(
-                                            "tab_name" to "Show",
+                                            "tab" to "Show",
                                         ),
                                     )
                                     onChangeIndex(1)
@@ -351,7 +375,7 @@ private fun TabContainer(
                                         objectRole = Role.Button,
                                         objectValue = "ViewAll",
                                         properties = mapOf(
-                                            "tab_name" to "Artist",
+                                            "tab" to "Artist",
                                         ),
                                     )
                                     onChangeIndex(2)
@@ -377,6 +401,7 @@ private fun TabContainer(
                                     objectRole = Role.Item,
                                     objectValue = showId,
                                     properties = mapOf(
+                                        "tab" to "Show",
                                         "item_category" to "Show",
                                         "item_rank" to index + 1,
                                     ),
@@ -402,6 +427,7 @@ private fun TabContainer(
                                     objectRole = Role.Item,
                                     objectValue = userCode,
                                     properties = mapOf(
+                                        "tab" to "Artist",
                                         "item_category" to "Artist",
                                         "item_rank" to index + 1,
                                     ),
@@ -496,8 +522,8 @@ private fun TabRow(
 private fun AllTab(
     shows: List<Show>,
     profiles: List<User.Others>,
-    onClickShow: (String) -> Unit,
-    onClickProfile: (UserCode) -> Unit,
+    onClickShow: (Int, String) -> Unit,
+    onClickProfile: (Int, UserCode) -> Unit,
     onClickAllShows: (() -> Unit)?,
     onClickAllArtists: (() -> Unit)?,
     modifier: Modifier = Modifier,
@@ -525,7 +551,7 @@ private fun AllTab(
                         showDateStyle = MaterialTheme.typography.bodySmall.copy(color = Grey50),
                         backgroundColor = MaterialTheme.colorScheme.background,
                         contentPadding = PaddingValues(0.dp),
-                        onClick = { onClickShow(show.id) },
+                        onClick = { onClickShow(index, show.id) },
                     )
                 }
             }
@@ -551,7 +577,7 @@ private fun AllTab(
 
                     ProfileItem(
                         profile = profile,
-                        onClick = { onClickProfile(profile.userCode) },
+                        onClick = { onClickProfile(index, profile.userCode) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = marginHorizontal),

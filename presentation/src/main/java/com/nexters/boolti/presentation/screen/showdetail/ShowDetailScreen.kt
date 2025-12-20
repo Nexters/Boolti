@@ -84,7 +84,7 @@ import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Button
-import com.nexters.boolti.common.tracker.field.Link
+import com.nexters.boolti.common.tracker.field.Item
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.ShowDetail
@@ -838,7 +838,7 @@ fun getIntentFromUri(uri: String): Intent? {
 private fun trackNaverMap() {
     AppTracker.click(
         screen = Screen.ShowDetail,
-        objectRole = Role.Link,
+        objectRole = Role.Item,
         objectValue = "Map",
         properties = mapOf("map_provider" to "NaverMap"),
     )

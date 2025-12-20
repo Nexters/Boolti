@@ -65,10 +65,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.clickLink
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Button
 import com.nexters.boolti.common.tracker.field.Item
-import com.nexters.boolti.common.tracker.field.Link
 import com.nexters.boolti.common.tracker.field.Profile
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
@@ -245,9 +245,9 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 user = user,
                 onClickSns = { sns ->
-                    AppTracker.click(
+                    AppTracker.clickLink(
                         screen = Screen.Profile,
-                        objectRole = Role.Link,
+                        url = sns.url,
                         objectValue = sns.type.name.lowercase().replaceFirstChar(Char::uppercase),
                     )
                     try {
@@ -281,10 +281,13 @@ fun ProfileScreen(
                                             .padding(horizontal = marginHorizontal),
                                         link = link,
                                         onClick = {
-                                            AppTracker.click(
+                                            AppTracker.clickLink(
                                                 screen = Screen.Profile,
-                                                objectRole = Role.Link,
+                                                url = link.url,
                                                 objectValue = link.name,
+                                                properties = mapOf(
+                                                    "rank" to i + 1,
+                                                ),
                                             )
                                             try {
                                                 uriHandler.openUri(link.url.toValidUrlString())
@@ -367,6 +370,14 @@ fun ProfileScreen(
                                         onClick = {
                                             try {
                                                 uriHandler.openUri(video.url)
+                                                AppTracker.clickLink(
+                                                    screen = Screen.Profile,
+                                                    url = video.url,
+                                                    objectValue = "PlayVideo",
+                                                    properties = mapOf(
+                                                        "rank" to i + 1,
+                                                    ),
+                                                )
                                             } catch (e: ActivityNotFoundException) {
                                                 e.printStackTrace()
                                                 snackbarHostState.showMessage(invalidUrlMsg)

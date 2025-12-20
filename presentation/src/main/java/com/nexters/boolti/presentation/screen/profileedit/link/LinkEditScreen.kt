@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTClearableTextField
@@ -47,7 +48,7 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 fun LinkEditScreen(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LinkListViewModel,
+    viewModel: LinkListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.linkEditEvent
@@ -76,7 +77,7 @@ fun LinkEditScreen(
 }
 
 @Composable
-fun LinkEditScreen(
+private fun LinkEditScreen(
     isEditMode: Boolean,
     linkName: String,
     linkUrl: String,

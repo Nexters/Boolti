@@ -38,7 +38,7 @@ fun EntryProviderScope<NavKey>.profileEditScreen(
                 backStack.add(VideoListRoute.VideoList(userCode, true))
             },
             navigateToLinkEdit = { userCode ->
-                backStack.add(LinkListRoute.LinkListRoot(userCode, true))
+                backStack.add(LinkListRoute.LinkList(userCode, true))
             },
         )
     }

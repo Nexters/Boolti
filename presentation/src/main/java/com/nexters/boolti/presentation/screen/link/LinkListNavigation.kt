@@ -1,29 +1,54 @@
 package com.nexters.boolti.presentation.screen.link
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.screen.LocalNavController
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import com.nexters.boolti.presentation.screen.LocalBackStack
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
+import com.nexters.boolti.presentation.screen.navigation.decorator.SharedViewModelStoreNavEntryDecorator
+import com.nexters.boolti.presentation.screen.profileedit.link.LinkEditScreen
 
-fun NavGraphBuilder.linkListScreen(
+private val linkListContentKey: String = LinkListRoute.LinkList::class.qualifiedName ?: "LinkList"
+
+fun EntryProviderScope<NavKey>.linkListScreen(
     modifier: Modifier = Modifier,
-    getSharedViewModel: @Composable (NavBackStackEntry) -> LinkListViewModel,
 ) {
-    composable<LinkListRoute.LinkList> { entry ->
-        val navController = LocalNavController.current
+    entry<LinkListRoute.LinkList>(
+        clazzContentKey = { linkListContentKey },
+    ) { key ->
+        val viewModel = hiltViewModel<LinkListViewModel, LinkListViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(key)
+            }
+        )
+        val backStack = LocalBackStack.current
+
         LinkListScreen(
             modifier = modifier,
-            navigateUp = navController::navigateUp,
+            navigateUp = backStack::removeLastOrNull,
             navigateToAddLink = {
-                navController.navigate(LinkListRoute.LinkEdit(isEditMode = false))
+                backStack.add(LinkListRoute.LinkEdit(isEditMode = true))
             },
             navigateToEditLink = {
-                navController.navigate(LinkListRoute.LinkEdit(isEditMode = true))
+                backStack.add(LinkListRoute.LinkEdit(isEditMode = false))
             },
-            viewModel = getSharedViewModel(entry),
+            viewModel = viewModel,
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.linkEditScreen(
+    modifier: Modifier = Modifier,
+) {
+    entry<LinkListRoute.LinkEdit>(
+        metadata = SharedViewModelStoreNavEntryDecorator.parent(linkListContentKey),
+    ) {
+        val backStack = LocalBackStack.current
+
+        LinkEditScreen(
+            modifier = modifier,
+            navigateUp = backStack::removeLastOrNull,
         )
     }
 }

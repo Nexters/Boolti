@@ -6,13 +6,10 @@ import kotlinx.serialization.Serializable
 
 sealed interface LinkListRoute : NavKey {
     @Serializable
-    data class LinkListRoot(
+    data class LinkList(
         val userCode: UserCode,
         val isEditMode: Boolean,
     ) : LinkListRoute
-
-    @Serializable
-    data object LinkList : LinkListRoute
 
     @Serializable
     data class LinkEdit(val isEditMode: Boolean) : LinkListRoute

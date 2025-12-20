@@ -1,14 +1,15 @@
 package com.nexters.boolti.presentation.screen.link
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,19 +18,17 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Inject
 
-@HiltViewModel
-class LinkListViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = LinkListViewModel.Factory::class)
+class LinkListViewModel @AssistedInject constructor(
+    @Assisted navKey: LinkListRoute.LinkList,
     getUserUseCase: GetUserUsecase,
     private val memberRepository: MemberRepository,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<LinkListRoute.LinkListRoot>()
-    private val userCode = route.userCode
+    private val userCode = navKey.userCode
     private val isMine = getUserUseCase()?.userCode == userCode
-    private val isEditModeAtFirst = route.isEditMode && isMine
+    private val isEditModeAtFirst = navKey.isEditMode && isMine
     private var autoNavigatedToEdit = isEditModeAtFirst
 
     private val _uiState = MutableStateFlow(
@@ -235,5 +234,10 @@ class LinkListViewModel @Inject constructor(
         viewModelScope.launch {
             _linkEditEvent.send(event)
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: LinkListRoute.LinkList): LinkListViewModel
     }
 }

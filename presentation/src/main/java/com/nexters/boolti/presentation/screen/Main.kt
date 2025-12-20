@@ -31,6 +31,8 @@ import com.nexters.boolti.presentation.component.FloatingDebugLog
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
+import com.nexters.boolti.presentation.screen.link.linkEditScreen
+import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.decorator.rememberSharedViewModelStoreNavEntryDecorator
@@ -145,6 +147,10 @@ fun MainNavigation(
             profileScreen()
             profileEditScreen()
             accountSettingScreen()
+
+            linkListScreen()
+            linkEditScreen()
+
             videoListScreen()
         }
     )
@@ -223,16 +229,16 @@ fun MainNavigation(
 //                profileIntroduceEditScreen()
 //            }
 
-            navigation<LinkListRoute.LinkListRoot>(
-                startDestination = LinkListRoute.LinkList,
-            ) {
-                linkListScreen(
-                    getSharedViewModel = { entry -> entry.sharedViewModel() },
-                )
-                linkEditScreen(
-                    getSharedViewModel = { entry -> entry.sharedViewModel() },
-                )
-            }
+//            navigation<LinkListRoute.LinkListRoot>(
+//                startDestination = LinkListRoute.LinkList,
+//            ) {
+//                linkListScreen(
+//                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+//                )
+//                linkEditScreen(
+//                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+//                )
+//            }
 
 //            navigation<VideoListRoute.VideoListRoot>(
 //                startDestination = VideoListRoute.VideoList,

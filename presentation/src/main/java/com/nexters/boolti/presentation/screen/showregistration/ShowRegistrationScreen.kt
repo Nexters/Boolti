@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation3.runtime.NavKey
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -50,7 +51,7 @@ import timber.log.Timber
 fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
-    navigateTo: (route: Any) -> Unit,
+    navigateTo: (route: NavKey) -> Unit,
     navigateToHome: () -> Unit,
     viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
@@ -81,7 +82,7 @@ fun ShowRegistrationScreen(
                         return TokenDto(token = accessToken.token)
                     }
 
-                    override fun <T : Any> navigate(route: T, navigateOption: NavigateOption) {
+                    override fun <T : NavKey> navigate(route: T, navigateOption: NavigateOption) {
                         when (navigateOption) {
                             NavigateOption.PUSH -> navigateTo(route)
                             NavigateOption.HOME -> navigateToHome()

@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.util.bridge
 
 import androidx.compose.material3.SnackbarDuration
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 /**
@@ -10,7 +11,7 @@ import kotlinx.serialization.Serializable
  */
 interface BridgeCallbackHandler {
     suspend fun fetchToken(): TokenDto
-    fun <T : Any> navigate(route: T, navigateOption: NavigateOption = NavigateOption.PUSH)
+    fun <T : NavKey> navigate(route: T, navigateOption: NavigateOption = NavigateOption.PUSH)
     fun showSnackbar(message: String, duration: SnackbarDuration = SnackbarDuration.Short)
 }
 

@@ -44,6 +44,7 @@ import com.nexters.boolti.presentation.screen.reservations.reservationsScreen
 import com.nexters.boolti.presentation.screen.search.detail.searchDetailNavigation
 import com.nexters.boolti.presentation.screen.search.recent.recentSearchScreen
 import com.nexters.boolti.presentation.screen.showdetail.showRoot
+import com.nexters.boolti.presentation.screen.showregistration.showRegistrationScreen
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.video.videoListScreen
@@ -152,6 +153,7 @@ fun MainNavigation(
             linkEditScreen()
 
             videoListScreen()
+            showRegistrationScreen()
         }
     )
 
@@ -253,7 +255,7 @@ fun MainNavigation(
 
             performedShowsScreen()
 
-            addShowRegistration()
+//            addShowRegistration()
         }
     */
 }

@@ -80,10 +80,11 @@ fun EntryProviderScope<NavKey>.homeScreen(
             navigateToProfile = { source -> backStack.add(MainRoute.Profile(source = source)) },
             navigateToBusiness = { /*navController.navigate(MainRoute.Business)*/ },
             navigateToShowRegistration = {
-//                if (user != null)
-//                    navController.navigate(MainDestination.ShowRegistration.route)
-//                else
-//                    navController.navigate(MainRoute.Login)
+                if (user != null) {
+                    backStack.add(MainRoute.ShowRegistration)
+                } else {
+                    backStack.add(MainRoute.Login)
+                }
             },
             navigateToLogin = { backStack.add(MainRoute.Login) },
         )

@@ -79,4 +79,7 @@ sealed interface MainRoute : NavKey {
 
     @Serializable
     data object Qr : MainRoute
+
+    @Serializable
+    data object ShowRegistration : MainRoute
 }

@@ -51,10 +51,10 @@ import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Button
-import com.nexters.boolti.common.tracker.field.DiscoveryResult
 import com.nexters.boolti.common.tracker.field.Item
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.SearchDetail
 import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
@@ -89,7 +89,7 @@ fun SearchDetailScreen(
 
     LaunchedEffect(Unit) {
         AppTracker.view(
-            screen = Screen.DiscoveryResult,
+            screen = Screen.SearchDetail,
             properties = mapOf(
                 "keyword" to uiState.keyword,
                 "tab_name" to "All",
@@ -303,7 +303,7 @@ private fun TabContainer(
             onClickTab = { index ->
                 // 0: All, 1: Show, 2: Artist
                 AppTracker.click(
-                    screen = Screen.DiscoveryResult,
+                    screen = Screen.SearchDetail,
                     objectRole = Role.Tab,
                     objectValue = when (index) {
                         0 -> "All"
@@ -332,7 +332,7 @@ private fun TabContainer(
                             onClickAllShows = if (shows.size > 3) {
                                 {
                                     AppTracker.click(
-                                        screen = Screen.DiscoveryResult,
+                                        screen = Screen.SearchDetail,
                                         objectRole = Role.Button,
                                         objectValue = "ViewAll",
                                         properties = mapOf(
@@ -347,7 +347,7 @@ private fun TabContainer(
                             onClickAllArtists = if (profiles.size > 3) {
                                 {
                                     AppTracker.click(
-                                        screen = Screen.DiscoveryResult,
+                                        screen = Screen.SearchDetail,
                                         objectRole = Role.Button,
                                         objectValue = "ViewAll",
                                         properties = mapOf(
@@ -373,7 +373,7 @@ private fun TabContainer(
                             isLoading = showsLoading,
                             onClickShow = { index, showId ->
                                 AppTracker.click(
-                                    screen = Screen.DiscoveryResult,
+                                    screen = Screen.SearchDetail,
                                     objectRole = Role.Item,
                                     objectValue = showId,
                                     properties = mapOf(
@@ -398,7 +398,7 @@ private fun TabContainer(
                             isLoading = profilesLoading,
                             onClickProfile = { index, userCode ->
                                 AppTracker.click(
-                                    screen = Screen.DiscoveryResult,
+                                    screen = Screen.SearchDetail,
                                     objectRole = Role.Item,
                                     objectValue = userCode,
                                     properties = mapOf(

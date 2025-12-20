@@ -33,11 +33,11 @@ val Screen.Companion.MyPage
 val Screen.Companion.RegisterShow
     get() = Screen("RegisterShow")
 
-val Screen.Companion.Discovery
-    get() = Screen("Discovery")
+val Screen.Companion.Search
+    get() = Screen("Search")
 
-val Screen.Companion.DiscoveryResult
-    get() = Screen("DiscoveryResult")
+val Screen.Companion.SearchDetail
+    get() = Screen("SearchDetail")
 
 val Screen.Companion.Ticket
     get() = Screen("Ticket")

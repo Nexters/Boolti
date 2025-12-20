@@ -40,9 +40,9 @@ import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.search
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Chip
-import com.nexters.boolti.common.tracker.field.Discovery
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.Search
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtChip
@@ -70,7 +70,7 @@ fun SearchScreen(
 
     LaunchedEffect(Unit) {
         AppTracker.view(
-            screen = Screen.Discovery,
+            screen = Screen.Search,
         )
     }
 
@@ -143,7 +143,7 @@ private fun SearchScreen(
                     recentSearchKeywords = recentSearchKeywords,
                     onClickKeyword = { keyword ->
                         AppTracker.click(
-                            screen = Screen.Discovery,
+                            screen = Screen.Search,
                             objectRole = Role.Chip,
                             objectValue = "RecentKeyword",
                             properties = mapOf(
@@ -151,7 +151,7 @@ private fun SearchScreen(
                             ),
                         )
                         AppTracker.search(
-                            screen = Screen.Discovery,
+                            screen = Screen.Search,
                             keyword = keyword,
                             properties = mapOf(
                                 "search_source" to "Recent",
@@ -174,7 +174,7 @@ private fun SearchScreen(
                 risingKeywordsTime = risingKeywordsTime,
                 onClickKeyword = { keyword ->
                     AppTracker.click(
-                        screen = Screen.Discovery,
+                        screen = Screen.Search,
                         objectRole = Role.Chip,
                         objectValue = "TrendingKeyword",
                         properties = mapOf(
@@ -182,7 +182,7 @@ private fun SearchScreen(
                         ),
                     )
                     AppTracker.search(
-                        screen = Screen.Discovery,
+                        screen = Screen.Search,
                         keyword = keyword,
                         properties = mapOf(
                             "search_source" to "Trending",

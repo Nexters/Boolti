@@ -4,8 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.common.tracker.field.Discovery
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.SearchDetail
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
@@ -36,10 +36,10 @@ fun NavGraphBuilder.searchDetailNavigation(
                 navController.navigate(SearchRoute.RecentSearch)
             },
             navigateToShowDetail = { showId ->
-                navController.navigate(ShowRoute.ShowRoot(showId, source = Screen.Discovery.value))
+                navController.navigate(ShowRoute.ShowRoot(showId, source = Screen.SearchDetail.value))
             },
             navigateToProfile = { userCode ->
-                navController.navigate(MainRoute.Profile(userCode = userCode, source = Screen.Discovery.value))
+                navController.navigate(MainRoute.Profile(userCode = userCode, source = Screen.SearchDetail.value))
             },
             navigateUp = {
                 navController.popBackStack(MainRoute.Home, false)

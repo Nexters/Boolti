@@ -809,6 +809,7 @@ fun preUriLoading(
             val lng = fallbackUri.getQueryParameter("lng")
             val name = fallbackUri.getQueryParameter("name")
 
+            trackNaverMap()
             uriHandler.openUri("https://map.naver.com/?lat=${lat}&lng=${lng}&title=${name}")
         }
         return true

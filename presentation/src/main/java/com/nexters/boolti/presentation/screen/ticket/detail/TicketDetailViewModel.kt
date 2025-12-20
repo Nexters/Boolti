@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.ticket.detail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.ManagerCodeException
 import com.nexters.boolti.domain.exception.TicketException
@@ -9,6 +8,10 @@ import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -22,19 +25,16 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import javax.inject.Inject
 
-@HiltViewModel
-class TicketDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = TicketDetailViewModel.Factory::class)
+class TicketDetailViewModel @AssistedInject constructor(
+    @Assisted navKey: MainRoute.TicketDetail,
     private val repository: TicketRepository,
     private val giftRepository: GiftRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
     // 실제로는 reservationId가 들어온다. api 변경에 따른 수정
-    private val ticketId: String = requireNotNull(savedStateHandle["ticketId"]) {
-        "TicketDetailViewModel 에 ticketId 가 전달되지 않았습니다."
-    }
+    private val ticketId: String = navKey.ticketId
 
     private val _uiState = MutableStateFlow(TicketDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -117,5 +117,10 @@ class TicketDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _event.send(event)
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(navKey: MainRoute.TicketDetail): TicketDetailViewModel
     }
 }

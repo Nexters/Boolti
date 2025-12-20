@@ -133,7 +133,7 @@ fun NavGraphBuilder.ticketDetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TicketDetailScreen(
+fun TicketDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: TicketDetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,

@@ -73,7 +73,7 @@ fun EntryProviderScope<NavKey>.homeScreen(
             },
             navigateToRecentSearch = { backStack.add(SearchRoute.RecentSearch) },
             navigateToSearchDetail = { backStack.add(SearchRoute.SearchDetail(keyword = it)) },
-            navigateToTicketDetail = { /*navController.navigate(TicketRoute.TicketRoot(ticketId = it))*/ },
+            navigateToTicketDetail = { backStack.add(MainRoute.TicketDetail(ticketId = it)) },
             navigateToQrScan = { /*navController.navigate(MainRoute.HostedShows)*/ },
             navigateToAccountSetting = { backStack.add(MainRoute.AccountSetting) },
             navigateToReservations = { backStack.add(MainRoute.Reservations) },

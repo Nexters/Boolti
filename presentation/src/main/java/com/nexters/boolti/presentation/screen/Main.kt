@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -34,6 +33,7 @@ import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScree
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
+import com.nexters.boolti.presentation.screen.navigation.decorator.rememberSharedViewModelStoreNavEntryDecorator
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.refund.refundScreen
 import com.nexters.boolti.presentation.screen.reservationdetail.reservationDetailScreen
@@ -42,6 +42,7 @@ import com.nexters.boolti.presentation.screen.search.detail.searchDetailNavigati
 import com.nexters.boolti.presentation.screen.search.recent.recentSearchScreen
 import com.nexters.boolti.presentation.screen.showdetail.showRoot
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
+import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.util.SnackbarController
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
@@ -121,7 +122,7 @@ fun MainNavigation(
         },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
+            rememberSharedViewModelStoreNavEntryDecorator(),
         ),
         entryProvider = entryProvider {
             homeScreen()
@@ -137,6 +138,8 @@ fun MainNavigation(
             searchDetailNavigation()
 
 
+            ticketDetailScreen()
+
             profileScreen()
             accountSettingScreen()
         }
@@ -148,12 +151,12 @@ fun MainNavigation(
             navController = navController,
             startDestination = MainRoute.Home,
         ) {
-            homeScreen()
-            loginScreen()
-            signoutScreen()
-            reservationsScreen()
-            reservationDetailScreen()
-            refundScreen()
+//            homeScreen()
+//            loginScreen()
+//            signoutScreen()
+//            reservationsScreen()
+//            reservationDetailScreen()
+//            refundScreen()
 
             navigation<ShowRoute.ShowRoot>(
                 startDestination = ShowRoute.Detail,
@@ -173,27 +176,27 @@ fun MainNavigation(
                 reportScreen()
             }
 
-            recentSearchScreen()
-            searchDetailNavigation()
+//            recentSearchScreen()
+//            searchDetailNavigation()
 
             ticketingScreen()
 
-            navigation<TicketRoute.TicketRoot>(
-                startDestination = TicketRoute.TicketDetail,
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "$PATH_BASE_TICKETS/{ticketId}"
-                        action = Intent.ACTION_VIEW
-                    }
-                ),
-            ) {
-                ticketDetailScreen(
-                    getSharedViewModel = { entry -> entry.sharedViewModel() },
-                )
-                qrFullScreen(
-                    getSharedViewModel = { entry -> entry.sharedViewModel() },
-                )
-            }
+//            navigation<TicketRoute.TicketRoot>(
+//                startDestination = TicketRoute.TicketDetail,
+//                deepLinks = listOf(
+//                    navDeepLink {
+//                        uriPattern = "$PATH_BASE_TICKETS/{ticketId}"
+//                        action = Intent.ACTION_VIEW
+//                    }
+//                ),
+//            ) {
+//                ticketDetailScreen(
+//                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+//                )
+//                qrFullScreen(
+//                    getSharedViewModel = { entry -> entry.sharedViewModel() },
+//                )
+//            }
 
             giftScreen()
 
@@ -204,8 +207,8 @@ fun MainNavigation(
             paymentCompleteScreen()
             giftCompleteScreen()
             businessScreen()
-            accountSettingScreen()
-            profileScreen()
+//            accountSettingScreen()
+//            profileScreen()
             navigation<ProfileRoute.ProfileRoot>(
                 startDestination = ProfileRoute.ProfileEdit,
             ) {

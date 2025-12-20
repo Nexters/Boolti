@@ -73,4 +73,10 @@ sealed interface MainRoute : NavKey {
     data class PerformedShows(
         val userCode: String,
     ) : MainRoute
+
+    @Serializable
+    data class TicketDetail(val ticketId: String) : MainRoute
+
+    @Serializable
+    data object Qr : MainRoute
 }

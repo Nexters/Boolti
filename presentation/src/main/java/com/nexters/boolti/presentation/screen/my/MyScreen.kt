@@ -119,7 +119,7 @@ fun MyScreen(
             AppTracker.click(
                 screen = Screen.MyPage,
                 objectRole = Role.Button,
-                objectValue = "CreateEvent",
+                objectValue = "RegisterShow",
             )
             if (user != null) {
                 navigateToShowRegistration()
@@ -131,7 +131,7 @@ fun MyScreen(
             AppTracker.click(
                 screen = Screen.MyPage,
                 objectRole = Role.Button,
-                objectValue = "ManageEvent",
+                objectValue = "ManageShow",
             )
             uriHandler.openUri(homeUrl)
             Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()

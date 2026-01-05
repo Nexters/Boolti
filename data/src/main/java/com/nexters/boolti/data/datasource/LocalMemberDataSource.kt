@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.response.HostedShowDto
+import com.nexters.boolti.data.network.response.PreviousShowsResponse
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.domain.request.EditProfileRequest
 import java.util.concurrent.ConcurrentHashMap
@@ -9,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 internal class LocalMemberDataSource {
     private val linksCache = ConcurrentHashMap<UserCode, List<EditProfileRequest.LinkDto>>(300)
-    private val performedShowsCache = ConcurrentHashMap<UserCode, List<HostedShowDto>>(300)
+    private val performedShowsCache = ConcurrentHashMap<UserCode, List<PreviousShowsResponse>>(300)
     private val videosCache = ConcurrentHashMap<UserCode, List<String>>(300)
 
     fun getLinks(userCode: UserCode): List<EditProfileRequest.LinkDto>? {
@@ -24,11 +25,11 @@ internal class LocalMemberDataSource {
         linksCache.remove(userCode)
     }
 
-    fun getPerformedShows(userCode: UserCode): List<HostedShowDto>? {
+    fun getPerformedShows(userCode: UserCode): List<PreviousShowsResponse>? {
         return performedShowsCache[userCode]
     }
 
-    fun setPerformedShows(userCode: UserCode, shows: List<HostedShowDto>) {
+    fun setPerformedShows(userCode: UserCode, shows: List<PreviousShowsResponse>) {
         performedShowsCache[userCode] = shows
     }
 

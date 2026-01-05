@@ -1,7 +1,7 @@
 package com.nexters.boolti.data.network.api
 
-import com.nexters.boolti.data.network.response.HostedShowDto
 import com.nexters.boolti.data.network.response.MemberResponse
+import com.nexters.boolti.data.network.response.PreviousShowsResponse
 import com.nexters.boolti.domain.request.EditProfileRequest
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -20,7 +20,7 @@ internal interface MemberService {
     @GET("/app/papi/v2/users/{userCode}/previous-shows")
     suspend fun getPerformedShows(
         @Path("userCode") userCode: String,
-    ): List<HostedShowDto>
+    ): List<PreviousShowsResponse>
 
     @GET("/app/papi/v2/users/{userCode}/videos")
     suspend fun getVideoLinks(

@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.qr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -60,18 +61,26 @@ fun HostedShowScreen(
             )
         }
     ) { innerPadding ->
-        if (uiState.shows.isEmpty()) {
-            EmptyHostedShow(modifier = modifier
-                .padding(innerPadding)
-                .fillMaxSize())
-        } else {
-            HostedShows(
-                modifier = modifier
+        when {
+            uiState.error -> {
+                ErrorHostedShow(modifier = modifier
                     .padding(innerPadding)
-                    .fillMaxWidth(),
-                shows = uiState.shows,
-                onClick = onClickShow,
-            )
+                    .fillMaxSize())
+            }
+            uiState.shows.isEmpty() -> {
+                EmptyHostedShow(modifier = modifier
+                    .padding(innerPadding)
+                    .fillMaxSize())
+            }
+            else -> {
+                HostedShows(
+                    modifier = modifier
+                        .padding(innerPadding)
+                        .fillMaxWidth(),
+                    shows = uiState.shows,
+                    onClick = onClickShow,
+                )
+            }
         }
     }
 }
@@ -119,6 +128,39 @@ private fun HostedShowItem(
             tint = tint,
             contentDescription = stringResource(R.string.description_qr_icon),
         )
+    }
+}
+
+@Composable
+fun ErrorHostedShow(
+    modifier: Modifier = Modifier,
+) {
+    ConstraintLayout(
+        modifier = modifier,
+    ) {
+        val columnRef = createRef()
+        Column(
+            modifier = Modifier.constrainAs(columnRef) {
+                centerHorizontallyTo(parent)
+                centerVerticallyTo(parent, 0.4f)
+            },
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.hosted_shows_error_label),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onPrimary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            Text(
+                text = stringResource(R.string.hosted_shows_error_desc),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Grey30,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.size(28.dp))
+        }
     }
 }
 

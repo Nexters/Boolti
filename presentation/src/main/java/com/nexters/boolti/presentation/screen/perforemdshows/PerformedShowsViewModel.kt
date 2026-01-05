@@ -47,7 +47,7 @@ class PerformedShowsViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure {
+                .onFailure { e ->
                     _uiState.update {
                         it.copy(loading = false)
                     }

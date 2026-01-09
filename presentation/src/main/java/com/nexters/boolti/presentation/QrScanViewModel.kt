@@ -56,7 +56,7 @@ class QrScanViewModel @Inject constructor(
      * 입장 확인
      */
     private fun requestEntrance(entryCode: String) {
-        if (!entryCode.startsWith("btec")) {
+        if (!entryCode.startsWith(QR_PREFIX)) {
             event(QrScanEvent.ScanError(QrErrorType.InvalidTicket))
             return
         }
@@ -92,6 +92,10 @@ class QrScanViewModel @Inject constructor(
         viewModelScope.launch {
             _eventChannel.send(event)
         }
+    }
+
+    companion object {
+        private const val QR_PREFIX = "btec"
     }
 }
 

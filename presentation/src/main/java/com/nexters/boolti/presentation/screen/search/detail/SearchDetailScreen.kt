@@ -88,7 +88,7 @@ fun SearchDetailScreen(
 
     SearchDetailScreen(
         keyword = uiState.keyword,
-        onClickSearchBar = navigateToRecentSearch,
+        navigateToRecentSearch = navigateToRecentSearch,
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,
@@ -117,7 +117,7 @@ fun SearchDetailScreen(
 @Composable
 private fun SearchDetailScreen(
     keyword: String,
-    onClickSearchBar: () -> Unit,
+    navigateToRecentSearch: () -> Unit,
     searchedKeyword: String,
     loading: Boolean,
     shows: List<Show>,
@@ -156,7 +156,7 @@ private fun SearchDetailScreen(
                     .clickable(
                         interactionSource = null,
                         indication = null,
-                        onClick = onClickSearchBar,
+                        onClick = navigateToRecentSearch,
                     ),
                 keyword = keyword,
                 enabled = false,
@@ -168,7 +168,7 @@ private fun SearchDetailScreen(
             if (!loading && shows.isEmpty() && profiles.isEmpty()) {
                 EmptyContents(
                     keyword = searchedKeyword,
-                    onClickResetKeyword = navigateUp,
+                    onClickResetKeyword = navigateToRecentSearch,
                     content = stringResource(R.string.search_no_result),
                 )
             } else if (!loading) {

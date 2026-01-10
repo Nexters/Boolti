@@ -38,6 +38,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.search
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.Search
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtSearchBar
@@ -159,7 +166,16 @@ private fun RecentSearchScreen(
                 keyword = keyword,
                 onKeywordChanged = onKeywordChanged,
                 hint = stringResource(R.string.search_search_hint),
-                search = { search(keyword) },
+                search = {
+                    search(keyword)
+                    AppTracker.search(
+                        screen = Screen.Search,
+                        keyword = keyword,
+                        properties = mapOf(
+                            "search_source" to "Direct",
+                        ),
+                    )
+                },
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .fillMaxWidth()
@@ -170,7 +186,16 @@ private fun RecentSearchScreen(
                 EmptyKeywordContent(
                     recentKeywords = recentKeywords,
                     showClearButton = showClearButton,
-                    onClickKeyword = { search(it) },
+                    onClickKeyword = {
+                        search(it)
+                        AppTracker.search(
+                            screen = Screen.Search,
+                            keyword = it,
+                            properties = mapOf(
+                                "search_source" to "Recent",
+                            ),
+                        )
+                    },
                     onClickDeleteButton = deleteKeyword,
                     onClickClearButton = onClickClearButton,
                 )
@@ -178,7 +203,24 @@ private fun RecentSearchScreen(
                 SearchingContent(
                     searchKeyword = searchKeyword,
                     recommendedKeywords = recommendedKeywords,
-                    onClickKeyword = search,
+                    onClickKeyword = { keyword ->
+                        AppTracker.click(
+                            screen = Screen.Search,
+                            objectRole = Role.Item,
+                            objectValue = "AutoComplete",
+                            properties = mapOf(
+                                "keyword" to keyword,
+                            ),
+                        )
+                        AppTracker.search(
+                            screen = Screen.Search,
+                            keyword = keyword,
+                            properties = mapOf(
+                                "search_source" to "AutoComplete",
+                            ),
+                        )
+                        search(keyword)
+                    },
                 )
             }
         }

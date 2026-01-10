@@ -35,6 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.field.Banner
+import com.nexters.boolti.common.tracker.field.Home
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.Popup
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BusinessInformation
@@ -45,6 +51,8 @@ import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.point4
+
+private val screenField = Screen.Home
 
 @Composable
 fun ShowScreen(
@@ -114,7 +122,14 @@ fun ShowScreen(
             ) {
                 Banner(
                     modifier = Modifier.fillMaxWidth(),
-                    navigateToShowRegistration = navigateToShowRegistration,
+                    navigateToShowRegistration = {
+                        AppTracker.click(
+                            screen = screenField,
+                            objectRole = Role.Banner,
+                            objectValue = "RegisterShow",
+                        )
+                        navigateToShowRegistration()
+                    },
                 )
             }
 

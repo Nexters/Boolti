@@ -30,7 +30,9 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val youTubeRepository: YouTubeRepository,
 ) : BaseViewModel() {
-    private val _userCode: String? = savedStateHandle.toRoute<MainRoute.Profile>().userCode
+    private val route = savedStateHandle.toRoute<MainRoute.Profile>()
+    private val _userCode: String? = route.userCode
+    val source: String = route.source
     private val myProfile: User.My = getUserUsecase() ?: User.My("-999")
     private val isMyProfile = _userCode?.equals(myProfile.userCode) ?: true
     private var previousVideoIds: List<String>? = null

@@ -6,6 +6,7 @@ sealed interface ShowRoute {
     @Serializable
     data class ShowRoot(
         val showId: String,
+        val source: String = "",
     ) : ShowRoute
 
     @Serializable

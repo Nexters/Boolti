@@ -3,6 +3,13 @@ package com.nexters.boolti.presentation.screen.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.complete
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Login
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.OauthType
@@ -16,7 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +36,13 @@ class LoginViewModel @Inject constructor(
     val event = _event.receiveAsFlow()
 
     fun loginWithKaKao(accessToken: String, idToken: String) {
+        AppTracker.click(
+            screen = Screen.Login,
+            objectRole = Role.Button,
+            objectValue = "Login",
+            properties = mapOf("login_method" to "Kakao")
+        )
+
         updateUserInfoFromKaKao(idToken = idToken)
 
         viewModelScope.launch {
@@ -77,6 +90,10 @@ class LoginViewModel @Inject constructor(
                     oauthIdentity = loginState.userId,
                 )
             ).onSuccess {
+                AppTracker.complete(
+                    target = "SignUp",
+                    properties = mapOf("login_method" to "Kakao")
+                )
                 event(LoginEvent.Success)
             }.onFailure {
                 FirebaseCrashlytics.getInstance().setCustomKey("SIGNUP", "FAILED")

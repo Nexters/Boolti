@@ -1,6 +1,8 @@
 package com.nexters.boolti.presentation.screen.home
 
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -109,6 +111,12 @@ class HomeViewModel @Inject constructor(
         giftRepository.receiveGift(giftUuid)
             .onEach { isSuccessful ->
                 if (isSuccessful) {
+                    AppTracker.complete(
+                        target = "GiftRegistration",
+                        properties = mapOf(
+                            "gift_id" to giftUuid,
+                        ),
+                    )
                     sendEvent(HomeEvent.GiftRegistered)
                 } else {
                     sendEvent(HomeEvent.GiftNotification(GiftStatus.FAILED))

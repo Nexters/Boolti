@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.DeviceTokenDataSource
@@ -61,6 +62,14 @@ internal class AuthRepositoryImpl @Inject constructor(
         val response = userDateSource.getUser()
         response?.let {
             authDataSource.updateUser(it)
+            AppTracker.identify(
+                userId = it.id,
+                properties = buildMap {
+                    it.userCode?.let { userCode -> put("userCode", userCode) }
+                    it.email?.let { email -> put("email", email) }
+                    it.nickname?.let { nickname -> put("nickname", nickname) }
+                },
+            )
         }
 
         emit(response?.toDomain())

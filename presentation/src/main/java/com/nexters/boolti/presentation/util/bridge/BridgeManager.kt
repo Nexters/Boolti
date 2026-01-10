@@ -3,13 +3,14 @@ package com.nexters.boolti.presentation.util.bridge
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.material3.SnackbarDuration
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.WebBridge
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.contentOrNull
@@ -52,7 +53,7 @@ class BridgeManager(
                     Handler(Looper.getMainLooper()).post {
                         Timber.tag("bridge").d("공연 상세 화면으로 이동 $showId")
                         callbackHandler.navigate(
-                            route = ShowRoute.ShowRoot(showId),
+                            route = ShowRoute.ShowRoot(showId, source = Screen.WebBridge.value),
                             navigateOption = NavigateOption.CLOSE_AND_OPEN,
                         )
                     }

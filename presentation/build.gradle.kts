@@ -36,7 +36,10 @@ android {
         }
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
 
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
@@ -67,6 +70,8 @@ android {
 dependencies {
     implementation(projects.domain)
     implementation(projects.tosspayments)
+    implementation(projects.common.tracker)
+    implementation(projects.common.logger)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -90,8 +95,6 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.zoomable)
     kapt(libs.hilt.compiler)
-
-    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.lottie)
     implementation(libs.bundles.coil)

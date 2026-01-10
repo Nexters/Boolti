@@ -3,6 +3,8 @@ package com.nexters.boolti.presentation.screen.profile
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.nexters.boolti.common.tracker.field.Profile
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -31,7 +33,7 @@ fun NavGraphBuilder.profileScreen(
                 navController.navigate(MainRoute.PerformedShows(userCode))
             },
             navigateToProfileEdit = { navController.navigate(ProfileRoute.ProfileEdit) },
-            navigateToShow = { showId -> navController.navigate(ShowRoute.ShowRoot(showId = showId)) },
+            navigateToShow = { showId -> navController.navigate(ShowRoute.ShowRoot(showId = showId, source = Screen.Profile.value)) },
         )
     }
 }

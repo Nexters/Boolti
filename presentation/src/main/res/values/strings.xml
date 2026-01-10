@@ -533,4 +533,7 @@
         <item>문의전화 : 0507–1363–5690</item>
         <item>이메일 : studio.boolti@gmail.com</item>
     </string-array>
+
+    <!-- 디버깅 옵션 -->
+    <string name="debug_show_log">로그 보기</string>
 </resources>

@@ -7,22 +7,31 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,23 +47,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.MyPage
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BtBottomSheet
 import com.nexters.boolti.presentation.component.SmallButton
 import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
+import com.nexters.boolti.presentation.util.DebugManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun MyScreen(
     requireLogin: () -> Unit,
     onClickAccountSetting: () -> Unit,
     navigateToReservations: () -> Unit,
-    navigateToProfile: () -> Unit,
+    navigateToProfile: (String) -> Unit,
     navigateToShowRegistration: () -> Unit,
     onClickQrScan: () -> Unit,
     modifier: Modifier = Modifier,
@@ -75,18 +93,58 @@ fun MyScreen(
     MyScreen(
         modifier = modifier,
         user = user,
-        onClickHeaderButton = if (user != null) navigateToProfile else requireLogin,
-        onClickAccountSetting = if (user != null) onClickAccountSetting else requireLogin,
-        onClickReservations = if (user != null) navigateToReservations else requireLogin,
-        onClickRegisterShow = if (user != null) navigateToShowRegistration else requireLogin,
+        onClickHeaderButton = {
+            AppTracker.click(
+                screen = Screen.MyPage,
+                objectRole = Role.Button,
+                objectValue = "ViewProfile",
+            )
+            if (user != null) {
+                navigateToProfile(Screen.MyPage.value)
+            } else {
+                requireLogin()
+            }
+        },
+        onClickAccountSetting = if (user != null) {
+            onClickAccountSetting
+        } else {
+            requireLogin
+        },
+        onClickReservations = if (user != null) {
+            navigateToReservations
+        } else {
+            requireLogin
+        },
+        onClickRegisterShow = {
+            AppTracker.click(
+                screen = Screen.MyPage,
+                objectRole = Role.Button,
+                objectValue = "CreateEvent",
+            )
+            if (user != null) {
+                navigateToShowRegistration()
+            } else {
+                requireLogin()
+            }
+        },
         onClickManageShow = {
+            AppTracker.click(
+                screen = Screen.MyPage,
+                objectRole = Role.Button,
+                objectValue = "ManageEvent",
+            )
             uriHandler.openUri(homeUrl)
             Toast.makeText(context, "공연 관리를 위해 웹으로 이동합니다", Toast.LENGTH_LONG).show()
         }, // TODO 추후 인앱 공연 관리 반영 시 처리
-        onClickQrScan = if (user != null) onClickQrScan else requireLogin,
+        onClickQrScan = if (user != null) {
+            onClickQrScan
+        } else {
+            requireLogin
+        },
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyScreen(
     modifier: Modifier = Modifier,
@@ -99,6 +157,9 @@ fun MyScreen(
     onClickQrScan: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
+    var showDebugBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
 
     Surface {
         Box(
@@ -162,6 +223,15 @@ fun MyScreen(
                         label = stringResource(R.string.my_scan_qr),
                         onClick = onClickQrScan,
                     )
+
+                    // 디버그 메뉴 (디버그 빌드에서만 표시)
+                    if (BuildConfig.DEBUG) {
+                        MyMenu(
+                            iconRes = R.drawable.ic_manage_show,
+                            label = "디버그 옵션",
+                            onClick = { showDebugBottomSheet = true },
+                        )
+                    }
                 }
             }
             Column(
@@ -184,6 +254,55 @@ fun MyScreen(
                 )
             }
         }
+    }
+
+    if (showDebugBottomSheet) {
+        DebugOptionsBottomSheet(
+            sheetState = sheetState,
+            onDismiss = {
+                scope.launch {
+                    sheetState.hide()
+                    showDebugBottomSheet = false
+                }
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DebugOptionsBottomSheet(
+    sheetState: androidx.compose.material3.SheetState,
+    onDismiss: () -> Unit,
+) {
+    BtBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        // 로그 보기 옵션
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    DebugManager.openLogViewer()
+                    onDismiss()
+                }
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_list),
+                contentDescription = null,
+                tint = Grey10,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = stringResource(R.string.debug_show_log),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+
+        Spacer(Modifier.height(100.dp))
     }
 }
 
@@ -246,7 +365,7 @@ private fun MyMenu(
             .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
             .clickable(
-                role = Role.Button,
+                role = androidx.compose.ui.semantics.Role.Button,
                 onClick = onClick,
             )
             .padding(vertical = 12.dp, horizontal = marginHorizontal),

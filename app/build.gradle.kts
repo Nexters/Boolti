@@ -107,6 +107,8 @@ dependencies {
     implementation(projects.data)
     implementation(projects.presentation)
     implementation(projects.tosspayments)
+    implementation(projects.common.tracker)
+    implementation(projects.common.logger)
 
     implementation(libs.bundles.coroutines)
 

@@ -80,6 +80,15 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.ShowDetail
+import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
@@ -165,6 +174,22 @@ fun ShowDetailScreen(
                     viewModel.preventEvents()
                 }
             }
+        }
+    }
+
+    LaunchedEffect(uiState.showDetail) {
+        uiState.showDetail?.let { showDetail ->
+            AppTracker.view(
+                screen = Screen.ShowDetail,
+                properties = buildMap {
+                    put("show_id", showDetail.id)
+                    put("show_name", showDetail.name)
+                    put("artist_name", showDetail.hostName)
+                    if (viewModel.source.isNotEmpty()) {
+                        put("source", viewModel.source)
+                    }
+                }
+            )
         }
     }
 
@@ -317,8 +342,28 @@ fun ShowDetailScreen(
         ) {
             ShowDetailButtons(
                 showState = showState,
-                onTicketingClicked = { onTicketClicked(TicketBottomSheetType.PURCHASE) },
-                onGiftClicked = { onTicketClicked(TicketBottomSheetType.GIFT) },
+                onTicketingClicked = {
+                    AppTracker.click(
+                        screen = Screen.ShowDetail,
+                        objectRole = Role.Button,
+                        objectValue = "StartBooking",
+                        properties = mapOf(
+                            "booking_type" to "Direct",
+                        ),
+                    )
+                    onTicketClicked(TicketBottomSheetType.PURCHASE)
+                },
+                onGiftClicked = {
+                    AppTracker.click(
+                        screen = Screen.ShowDetail,
+                        objectRole = Role.Button,
+                        objectValue = "StartBooking",
+                        properties = mapOf(
+                            "booking_type" to "Gift",
+                        ),
+                    )
+                    onTicketClicked(TicketBottomSheetType.GIFT)
+                },
                 onHeightChanged = { buttonsHeight = it },
             )
         }
@@ -456,7 +501,7 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
         previewUrl
     )
 
-    BtBottomSheet (
+    BtBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     ) {
@@ -468,6 +513,15 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
                     .fillMaxWidth()
                     .height(58.dp)
                     .clickable {
+                        AppTracker.click(
+                            screen = Screen.ShowDetail,
+                            objectRole = Role.Button,
+                            objectValue = "Share",
+                            properties = mapOf(
+                                "share_method" to "LinkCopy"
+                            ),
+                        )
+
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, previewUrl)
@@ -492,6 +546,15 @@ private fun ShareBottomSheet(showDetail: ShowDetail, onDismiss: () -> Unit) {
                     .fillMaxWidth()
                     .height(58.dp)
                     .clickable {
+                        AppTracker.click(
+                            screen = Screen.ShowDetail,
+                            objectRole = Role.Button,
+                            objectValue = "Share",
+                            properties = mapOf(
+                                "share_method" to "WithInfo"
+                            ),
+                        )
+
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, sharingText)
@@ -552,12 +615,26 @@ private fun ContentTabRow(
             ContentTab(
                 selected = selectedTabIndex == 0,
                 label = stringResource(R.string.show_tab_info),
-                onSelect = { onSelectTab(0) },
+                onSelect = {
+                    AppTracker.click(
+                        screen = Screen.ShowDetail,
+                        objectRole = Role.Tab,
+                        objectValue = "ShowInfo",
+                    )
+                    onSelectTab(0)
+                },
             )
             ContentTab(
                 selected = selectedTabIndex == 1,
                 label = stringResource(R.string.show_tab_cast),
-                onSelect = { onSelectTab(1) },
+                onSelect = {
+                    AppTracker.click(
+                        screen = Screen.ShowDetail,
+                        objectRole = Role.Tab,
+                        objectValue = "CastList",
+                    )
+                    onSelectTab(1)
+                },
             )
         }
     }
@@ -602,6 +679,9 @@ private fun LazyListScope.ShowInfoTab(
 
         LaunchedEffect(intentToNavigateTo) {
             if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
+                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
+                    trackNaverMap()
+                }
                 context.startActivity(intentToNavigateTo)
                 intentToNavigateTo = null
             }
@@ -663,6 +743,9 @@ private fun LazyListScope.ShowInfoTab(
                 },
                 positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
                 onClickPositiveButton = {
+                    if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
+                        trackNaverMap()
+                    }
                     context.startActivity(intentToNavigateTo)
                     doNotShowNaverMapDialog()
                     intentToNavigateTo = null
@@ -726,6 +809,7 @@ fun preUriLoading(
             val lng = fallbackUri.getQueryParameter("lng")
             val name = fallbackUri.getQueryParameter("name")
 
+            trackNaverMap()
             uriHandler.openUri("https://map.naver.com/?lat=${lat}&lng=${lng}&title=${name}")
         }
         return true
@@ -749,6 +833,15 @@ fun getIntentFromUri(uri: String): Intent? {
         FirebaseCrashlytics.getInstance().recordException(e)
         return null
     }
+}
+
+private fun trackNaverMap() {
+    AppTracker.click(
+        screen = Screen.ShowDetail,
+        objectRole = Role.Item,
+        objectValue = "Map",
+        properties = mapOf("map_provider" to "NaverMap"),
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)

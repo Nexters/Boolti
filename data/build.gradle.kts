@@ -30,7 +30,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             buildConfigField("String", "BASE_URL", getApiKey("PROD_BASE_URL"))
         }
         debug {
@@ -51,6 +54,7 @@ android {
 
 dependencies {
     implementation(projects.domain)
+    implementation(projects.common.tracker)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

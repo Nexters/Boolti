@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -47,6 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.SearchDetail
+import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.UserCode
@@ -78,6 +87,16 @@ fun SearchDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        AppTracker.view(
+            screen = Screen.SearchDetail,
+            properties = mapOf(
+                "keyword" to uiState.keyword,
+                "tab" to "All",
+            ),
+        )
+    }
+
     BackHandler {
         if (uiState.tabIndex > 0) {
             viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(0))
@@ -98,8 +117,8 @@ fun SearchDetailScreen(
         profilesTotalCount = uiState.profilesTotalCount,
         profilesLoading = uiState.profilesLoading,
         tabIndex = uiState.tabIndex,
-        onChangeIndex = {
-            viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(it))
+        onChangeIndex = { index ->
+            viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(index))
         },
         onClickShow = navigateToShowDetail,
         onClickProfile = navigateToProfile,
@@ -281,7 +300,20 @@ private fun TabContainer(
         TabRow(
             selectedIndex = tabIndex,
             tabs = tabs.map { it.toLabel() },
-            onClickTab = onChangeIndex,
+            onClickTab = { index ->
+                // 0: All, 1: Show, 2: Artist
+                AppTracker.click(
+                    screen = Screen.SearchDetail,
+                    objectRole = Role.Tab,
+                    objectValue = when (index) {
+                        0 -> "All"
+                        1 -> "Show"
+                        2 -> "Artist"
+                        else -> "Unknown"
+                    }
+                )
+                onChangeIndex(index)
+            },
             modifier = Modifier.fillMaxWidth(),
         )
         HorizontalPager(
@@ -295,15 +327,59 @@ private fun TabContainer(
                         AllTab(
                             shows = shows.take(3),
                             profiles = profiles.take(3),
-                            onClickShow = onClickShow,
-                            onClickProfile = onClickProfile,
+                            onClickShow = { index, showId ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = showId,
+                                    properties = mapOf(
+                                        "tab" to "All",
+                                        "item_category" to "Show",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickShow(showId)
+                            },
+                            onClickProfile = { index, userCode ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = userCode,
+                                    properties = mapOf(
+                                        "tab" to "All",
+                                        "item_category" to "Artist",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickProfile(userCode)
+                            },
                             onClickAllShows = if (shows.size > 3) {
-                                { onChangeIndex(1) }
+                                {
+                                    AppTracker.click(
+                                        screen = Screen.SearchDetail,
+                                        objectRole = Role.Button,
+                                        objectValue = "ViewAll",
+                                        properties = mapOf(
+                                            "tab" to "Show",
+                                        ),
+                                    )
+                                    onChangeIndex(1)
+                                }
                             } else {
                                 null
                             },
                             onClickAllArtists = if (profiles.size > 3) {
-                                { onChangeIndex(2) }
+                                {
+                                    AppTracker.click(
+                                        screen = Screen.SearchDetail,
+                                        objectRole = Role.Button,
+                                        objectValue = "ViewAll",
+                                        properties = mapOf(
+                                            "tab" to "Artist",
+                                        ),
+                                    )
+                                    onChangeIndex(2)
+                                }
                             } else {
                                 null
                             },
@@ -319,7 +395,19 @@ private fun TabContainer(
                         ShowsTab(
                             shows = shows,
                             isLoading = showsLoading,
-                            onClickShow = onClickShow,
+                            onClickShow = { index, showId ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = showId,
+                                    properties = mapOf(
+                                        "tab" to "Show",
+                                        "item_category" to "Show",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickShow(showId)
+                            },
                             onBottomReached = onShowsPageReached,
                         )
                     }
@@ -333,7 +421,19 @@ private fun TabContainer(
                         ArtistTab(
                             profiles = profiles,
                             isLoading = profilesLoading,
-                            onClickProfile = onClickProfile,
+                            onClickProfile = { index, userCode ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = userCode,
+                                    properties = mapOf(
+                                        "tab" to "Artist",
+                                        "item_category" to "Artist",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickProfile(userCode)
+                            },
                             onBottomReached = onProfilesPageReached,
                         )
                     }
@@ -422,8 +522,8 @@ private fun TabRow(
 private fun AllTab(
     shows: List<Show>,
     profiles: List<User.Others>,
-    onClickShow: (String) -> Unit,
-    onClickProfile: (UserCode) -> Unit,
+    onClickShow: (Int, String) -> Unit,
+    onClickProfile: (Int, UserCode) -> Unit,
     onClickAllShows: (() -> Unit)?,
     onClickAllArtists: (() -> Unit)?,
     modifier: Modifier = Modifier,
@@ -451,7 +551,7 @@ private fun AllTab(
                         showDateStyle = MaterialTheme.typography.bodySmall.copy(color = Grey50),
                         backgroundColor = MaterialTheme.colorScheme.background,
                         contentPadding = PaddingValues(0.dp),
-                        onClick = { onClickShow(show.id) },
+                        onClick = { onClickShow(index, show.id) },
                     )
                 }
             }
@@ -477,7 +577,7 @@ private fun AllTab(
 
                     ProfileItem(
                         profile = profile,
-                        onClick = { onClickProfile(profile.userCode) },
+                        onClick = { onClickProfile(index, profile.userCode) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = marginHorizontal),
@@ -546,7 +646,7 @@ private fun AllTabSectionTitle(
 private fun ShowsTab(
     shows: List<Show>,
     isLoading: Boolean,
-    onClickShow: (id: String) -> Unit,
+    onClickShow: (index: Int, id: String) -> Unit,
     onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -557,7 +657,7 @@ private fun ShowsTab(
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        items(shows, key = { it.id }) { show ->
+        itemsIndexed(shows, key = { _, show -> show.id }) { index, show ->
             ShowItem(
                 show = show,
                 modifier = Modifier
@@ -566,7 +666,7 @@ private fun ShowsTab(
                 showNameStyle = MaterialTheme.typography.titleLarge,
                 backgroundColor = MaterialTheme.colorScheme.background,
                 contentPadding = PaddingValues(0.dp),
-                onClick = { onClickShow(show.id) },
+                onClick = { onClickShow(index, show.id) },
             )
         }
     }
@@ -576,7 +676,7 @@ private fun ShowsTab(
 private fun ArtistTab(
     profiles: List<User.Others>,
     isLoading: Boolean,
-    onClickProfile: (UserCode) -> Unit,
+    onClickProfile: (Int, UserCode) -> Unit,
     onBottomReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -587,10 +687,10 @@ private fun ArtistTab(
         contentPadding = PaddingValues(vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        items(profiles, key = { it.userCode }) { profile ->
+        itemsIndexed(profiles, key = { _, user -> user.userCode }) { index, profile ->
             ProfileItem(
                 profile = profile,
-                onClick = onClickProfile,
+                onClick = { userCode -> onClickProfile(index, userCode) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal),

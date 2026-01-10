@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.presentation.component.FloatingDebugLog
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
@@ -89,29 +91,34 @@ fun Main(
     val rootNavController = rememberNavControllerWithLog()
 
     BooltiTheme {
-        Scaffold(
-            snackbarHost = {
-                ToastSnackbarHost(
-                    modifier = Modifier
-                        .imePadding()
-                        .padding(bottom = 80.dp),
-                    hostState = snackbarHostState,
-                )
-            },
-        ) {
-            CompositionLocalProvider(
-                LocalSnackbarController provides SnackbarController(
-                    snackbarHostState,
-                    scope,
-                ),
-                LocalNavController provides rootNavController,
-                LocalUser provides user,
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                snackbarHost = {
+                    ToastSnackbarHost(
+                        modifier = Modifier
+                            .imePadding()
+                            .padding(bottom = 80.dp),
+                        hostState = snackbarHostState,
+                    )
+                },
             ) {
-                MainNavigation(
-                    modifier = modifier,
-                    onClickQrScan = onClickQrScan,
-                )
+                CompositionLocalProvider(
+                    LocalSnackbarController provides SnackbarController(
+                        snackbarHostState,
+                        scope,
+                    ),
+                    LocalNavController provides rootNavController,
+                    LocalUser provides user,
+                ) {
+                    MainNavigation(
+                        modifier = modifier,
+                        onClickQrScan = onClickQrScan,
+                    )
+                }
             }
+
+            // 전역 floating debug log
+            FloatingDebugLog()
         }
     }
 }

@@ -39,12 +39,43 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.create
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 internal object NetworkModule {
+    private fun createLoggingInterceptor(): HttpLoggingInterceptor {
+        // 각 스레드별로 로그 버퍼 관리
+        val logBuffer = ThreadLocal.withInitial { StringBuilder() }
+
+        return HttpLoggingInterceptor { message ->
+            val buffer = logBuffer.get() ?: StringBuilder()
+
+            // 로그를 버퍼에 추가
+            buffer.append(message).append("\n")
+
+            // 응답 끝이나 요청 실패 시 버퍼 출력
+            if (message.startsWith("<-- END HTTP") ||
+                message.startsWith("--> END ") ||
+                message.contains("IOException")) {
+
+                // 버퍼의 내용을 한 번에 출력
+                Timber.tag("OkHttp").d(buffer.toString().trim())
+                buffer.clear()
+            }
+
+            logBuffer.set(buffer)
+        }.apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+    }
+
     @Singleton
     @Provides
     @AuthRetrofit
@@ -186,18 +217,11 @@ internal object NetworkModule {
     @Provides
     @YouTubeOkHttpClient
     fun provideYouTubeOkHttpClient(customHeaderInterceptor: CustomHeaderInterceptor): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
-        }
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(customHeaderInterceptor)
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(createLoggingInterceptor())
             .build()
     }
 
@@ -214,20 +238,13 @@ internal object NetworkModule {
         customHeaderInterceptor: CustomHeaderInterceptor,
         authenticator: AuthAuthenticator
     ): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
-        }
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .authenticator(authenticator)
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(authInterceptor)
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(createLoggingInterceptor())
             .build()
     }
 
@@ -237,19 +254,12 @@ internal object NetworkModule {
         authInterceptor: AuthInterceptor,
         customHeaderInterceptor: CustomHeaderInterceptor,
     ): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
-        }
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(authInterceptor)
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(createLoggingInterceptor())
             .build()
     }
 
@@ -257,18 +267,11 @@ internal object NetworkModule {
     @Provides
     @NonAuthOkHttpClient
     fun provideNoneAuthOkHttpClient(customHeaderInterceptor: CustomHeaderInterceptor): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
-        }
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(customHeaderInterceptor)
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(createLoggingInterceptor())
             .build()
     }
 

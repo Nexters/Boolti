@@ -63,6 +63,16 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.clickLink
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.Profile
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.domain.extension.YN
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
@@ -107,6 +117,21 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
 
+    LaunchedEffect(uiState.user.userCode) {
+        if (uiState.user.userCode.isNotEmpty()) {
+            AppTracker.view(
+                screen = Screen.Profile,
+                properties = buildMap {
+                    put("artist_id", uiState.user.userCode)
+                    if (viewModel.source.isNotEmpty()) {
+                        put("source", viewModel.source)
+                    }
+                    put("is_own_profile", uiState.isMine.YN)
+                },
+            )
+        }
+    }
+
     ProfileScreen(
         modifier = modifier,
         user = uiState.user,
@@ -119,6 +144,11 @@ fun ProfileScreen(
             navigateToLinks(uiState.user.userCode)
         },
         navigateToVideos = {
+            AppTracker.click(
+                screen = Screen.Profile,
+                objectRole = Role.Button,
+                objectValue = "PlayVideo",
+            )
             navigateToVideos(uiState.user.userCode)
         },
         navigateToUpcomingShows = {
@@ -127,7 +157,14 @@ fun ProfileScreen(
         navigateToPerformedShows = {
             navigateToPerformedShows(uiState.user.userCode)
         },
-        navigateToShow = navigateToShow,
+        navigateToShow = { showId ->
+            AppTracker.click(
+                screen = Screen.Profile,
+                objectRole = Role.Item,
+                objectValue = showId,
+            )
+            navigateToShow(showId)
+        },
     )
 }
 
@@ -208,6 +245,11 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 user = user,
                 onClickSns = { sns ->
+                    AppTracker.clickLink(
+                        screen = Screen.Profile,
+                        url = sns.url,
+                        objectValue = sns.type.name.lowercase().replaceFirstChar(Char::uppercase),
+                    )
                     try {
                         uriHandler.openUri(sns.url.toValidUrlString())
                     } catch (e: ActivityNotFoundException) {
@@ -239,6 +281,14 @@ fun ProfileScreen(
                                             .padding(horizontal = marginHorizontal),
                                         link = link,
                                         onClick = {
+                                            AppTracker.clickLink(
+                                                screen = Screen.Profile,
+                                                url = link.url,
+                                                objectValue = link.name,
+                                                properties = mapOf(
+                                                    "rank" to i + 1,
+                                                ),
+                                            )
                                             try {
                                                 uriHandler.openUri(link.url.toValidUrlString())
                                             } catch (e: ActivityNotFoundException) {
@@ -320,6 +370,14 @@ fun ProfileScreen(
                                         onClick = {
                                             try {
                                                 uriHandler.openUri(video.url)
+                                                AppTracker.clickLink(
+                                                    screen = Screen.Profile,
+                                                    url = video.url,
+                                                    objectValue = "PlayVideo",
+                                                    properties = mapOf(
+                                                        "rank" to i + 1,
+                                                    ),
+                                                )
                                             } catch (e: ActivityNotFoundException) {
                                                 e.printStackTrace()
                                                 snackbarHostState.showMessage(invalidUrlMsg)

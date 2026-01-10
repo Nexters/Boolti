@@ -83,6 +83,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.Ticket
 import com.nexters.boolti.domain.model.TicketGroup
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
@@ -123,7 +125,7 @@ fun NavGraphBuilder.ticketDetailScreen(
             modifier = modifier,
             onBackClicked = navController::popBackStack,
             onClickQr = { navController.navigate(TicketRoute.Qr) },
-            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it)) },
+            navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it, source = Screen.Ticket.value)) },
             viewModel = getSharedViewModel(entry),
         )
     }

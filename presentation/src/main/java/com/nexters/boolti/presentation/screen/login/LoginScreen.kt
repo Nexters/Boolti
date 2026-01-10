@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +30,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.impression
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.BottomSheet
+import com.nexters.boolti.common.tracker.field.Login
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBottomSheet
@@ -54,6 +60,10 @@ fun LoginScreen(
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
     val loginFailedMessage = stringResource(id = R.string.login_failed)
     val signupFailedMessage = stringResource(id = R.string.signup_failed)
+
+    LaunchedEffect(Unit) {
+        AppTracker.view(Screen.Login)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.event.collect {
@@ -132,6 +142,14 @@ private fun SignUpBottomSheetContent(
     val term = stringResource(id = R.string.term_notice)
     val tag = stringResource(id = R.string.term_notice_tag)
     val spanOffset = Pair(term.indexOf(tag), tag.length)
+
+    LaunchedEffect(Unit) {
+        AppTracker.impression(
+            screen = Screen.Login,
+            objectRole = Role.BottomSheet,
+            objectValue = "TermsAgreement",
+        )
+    }
 
     Column(
         modifier = modifier

@@ -5,6 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.ShowDetail
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -49,7 +51,7 @@ fun NavGraphBuilder.showDetailScreen(
                 navController.navigate(ShowRoute.Report(showId))
             },
             navigateToProfile = { userCode ->
-                navController.navigate(MainRoute.Profile(userCode = userCode))
+                navController.navigate(MainRoute.Profile(userCode = userCode, source = Screen.ShowDetail.value))
             },
         )
     }

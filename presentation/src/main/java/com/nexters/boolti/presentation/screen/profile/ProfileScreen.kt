@@ -68,6 +68,7 @@ import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.emptyPreviewList
 import com.nexters.boolti.domain.model.url
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
@@ -369,6 +370,8 @@ fun ProfileScreen(
                     showShareBottomSheet = false
                 }
             ) {
+                val host = if (BuildConfig.DEBUG) "dev.profile.boolti.in" else "profile.boolti.in"
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -378,7 +381,7 @@ fun ProfileScreen(
                                 action = Intent.ACTION_SEND
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    "https://profile.boolti.in/${user.userCode}"
+                                    "https://${host}/${user.userCode}"
                                 )
                                 type = "text/plain"
                             }
@@ -400,7 +403,7 @@ fun ProfileScreen(
                     R.string.profile_share_detail,
                     user.nickname,
                     user.upcomingShow.totalSize + user.performedShow.totalSize,
-                    "https://profile.boolti.in/${user.userCode}"
+                    "https://${host}/${user.userCode}"
                 )
                 Box(
                     modifier = Modifier

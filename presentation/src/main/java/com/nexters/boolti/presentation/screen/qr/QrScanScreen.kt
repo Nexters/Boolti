@@ -80,6 +80,7 @@ fun QrScanScreen(
     val notTodayErrMessage = stringResource(R.string.error_show_not_today)
     val usedTicketErrMessage = stringResource(R.string.error_used_ticket)
     val notMatchedErrMessage = stringResource(R.string.error_ticket_not_matched)
+    val invalidTicketErrMessage = stringResource(R.string.error_invalid_ticket)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var bottomPadding by remember { mutableStateOf(0.dp) }
@@ -98,6 +99,12 @@ fun QrScanScreen(
             val (iconId, errMessage, color) = when (event) {
                 is QrScanEvent.ScanError -> {
                     when (event.errorType) {
+                        QrErrorType.InvalidTicket -> Triple(
+                            R.drawable.ic_error,
+                            invalidTicketErrMessage,
+                            Error
+                        )
+
                         QrErrorType.ShowNotToday -> Triple(
                             R.drawable.ic_warning,
                             notTodayErrMessage,

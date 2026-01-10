@@ -1,7 +1,6 @@
 package com.nexters.boolti.presentation
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.QrErrorType
 import com.nexters.boolti.domain.exception.QrScanException
@@ -57,6 +56,11 @@ class QrScanViewModel @Inject constructor(
      * 입장 확인
      */
     private fun requestEntrance(entryCode: String) {
+        if (!entryCode.startsWith(QR_PREFIX)) {
+            event(QrScanEvent.ScanError(QrErrorType.InvalidTicket))
+            return
+        }
+
         viewModelScope.launch(recordExceptionHandler) {
             hostRepository.requestEntrance(
                 QrScanRequest(showId = showId, entryCode = entryCode)
@@ -67,6 +71,7 @@ class QrScanViewModel @Inject constructor(
                             event(QrScanEvent.ScanError(type))
                         }
                     }
+
                     else -> throw e
                 }
             }.singleOrNull()?.let {
@@ -87,6 +92,10 @@ class QrScanViewModel @Inject constructor(
         viewModelScope.launch {
             _eventChannel.send(event)
         }
+    }
+
+    companion object {
+        private const val QR_PREFIX = "btec"
     }
 }
 

@@ -85,7 +85,7 @@ fun GiftScreen(
                 screen = Screen.Payment,
                 properties = mapOf(
                     "booking_type" to "Gift",
-                    "event_id" to viewModel.showId,
+                    "show_id" to viewModel.showId,
                     "ticket_type" to "Normal",
                     "ticket_quantity" to uiState.ticketCount,
                     "total_amount" to uiState.totalPrice,
@@ -106,8 +106,8 @@ fun GiftScreen(
                         target = "Purchase",
                         properties = mapOf(
                             "booking_type" to "Gift",
-                            "event_id" to viewModel.showId,
-                            "event_name" to uiState.showName,
+                            "show_id" to viewModel.showId,
+                            "show_name" to uiState.showName,
                             "ticket_quantity" to uiState.ticketCount,
                             "total_amount" to uiState.totalPrice,
                         ),
@@ -130,8 +130,8 @@ fun GiftScreen(
                             target = "Purchase",
                             properties = mapOf(
                                 "booking_type" to "Gift",
-                                "event_id" to viewModel.showId,
-                                "event_name" to uiState.showName,
+                                "show_id" to viewModel.showId,
+                                "show_name" to uiState.showName,
                                 "ticket_quantity" to uiState.ticketCount,
                                 "total_amount" to uiState.totalPrice,
                             ),

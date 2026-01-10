@@ -115,8 +115,8 @@ fun TicketingScreen(
                 screen = Screen.Payment,
                 properties = mapOf(
                     "booking_type" to "Direct",
-                    "event_id" to viewModel.showId,
-                    "ticket_type" to if (uiState.isInviteTicket) "INVITE" else "NORMAL",
+                    "show_id" to viewModel.showId,
+                    "ticket_type" to if (uiState.isInviteTicket) "Invite" else "Normal",
                     "ticket_quantity" to uiState.ticketCount,
                     "total_amount" to uiState.totalPrice,
                 ),
@@ -189,8 +189,8 @@ private fun TicketingScreen(
                         target = "Purchase",
                         properties = mapOf(
                             "booking_type" to "Direct",
-                            "event_id" to showId,
-                            "event_name" to uiState.showName,
+                            "show_id" to showId,
+                            "show_name" to uiState.showName,
                             "ticket_quantity" to uiState.ticketCount,
                             "total_amount" to uiState.totalPrice,
                         ),
@@ -212,8 +212,8 @@ private fun TicketingScreen(
                         target = "Purchase",
                         properties = mapOf(
                             "booking_type" to "Direct",
-                            "event_id" to showId,
-                            "event_name" to uiState.showName,
+                            "show_id" to showId,
+                            "show_name" to uiState.showName,
                             "ticket_quantity" to uiState.ticketCount,
                             "total_amount" to uiState.totalPrice,
                         ),

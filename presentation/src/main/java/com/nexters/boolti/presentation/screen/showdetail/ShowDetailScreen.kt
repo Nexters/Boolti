@@ -177,14 +177,18 @@ fun ShowDetailScreen(
         }
     }
 
-    LaunchedEffect(uiState.showDetail) {
+    LaunchedEffect(uiState.showDetail, uiState.castTeams) {
         uiState.showDetail?.let { showDetail ->
+            val artistNames = uiState.castTeams
+                .flatMap { it.members }
+                .joinToString(", ") { it.nickname }
+
             AppTracker.view(
                 screen = Screen.ShowDetail,
                 properties = buildMap {
                     put("show_id", showDetail.id)
                     put("show_name", showDetail.name)
-                    put("artist_name", showDetail.hostName)
+                    put("artist_name", artistNames)
                     if (viewModel.source.isNotEmpty()) {
                         put("source", viewModel.source)
                     }
@@ -349,6 +353,7 @@ fun ShowDetailScreen(
                         objectValue = "StartBooking",
                         properties = mapOf(
                             "booking_type" to "Direct",
+                            "show_id" to showDetail.id,
                         ),
                     )
                     onTicketClicked(TicketBottomSheetType.PURCHASE)
@@ -360,6 +365,7 @@ fun ShowDetailScreen(
                         objectValue = "StartBooking",
                         properties = mapOf(
                             "booking_type" to "Gift",
+                            "show_id" to showDetail.id,
                         ),
                     )
                     onTicketClicked(TicketBottomSheetType.GIFT)

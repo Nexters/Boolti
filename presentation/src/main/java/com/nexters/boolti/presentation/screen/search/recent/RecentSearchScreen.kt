@@ -41,10 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.search
-import com.nexters.boolti.common.tracker.field.Discovery
 import com.nexters.boolti.common.tracker.field.Item
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.Search
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtSearchBar
@@ -169,7 +169,7 @@ private fun RecentSearchScreen(
                 search = {
                     search(keyword)
                     AppTracker.search(
-                        screen = Screen.Discovery,
+                        screen = Screen.Search,
                         keyword = keyword,
                         properties = mapOf(
                             "search_source" to "Direct",
@@ -189,7 +189,7 @@ private fun RecentSearchScreen(
                     onClickKeyword = {
                         search(it)
                         AppTracker.search(
-                            screen = Screen.Discovery,
+                            screen = Screen.Search,
                             keyword = it,
                             properties = mapOf(
                                 "search_source" to "Recent",
@@ -205,7 +205,7 @@ private fun RecentSearchScreen(
                     recommendedKeywords = recommendedKeywords,
                     onClickKeyword = { keyword ->
                         AppTracker.click(
-                            screen = Screen.Discovery,
+                            screen = Screen.Search,
                             objectRole = Role.Item,
                             objectValue = "AutoComplete",
                             properties = mapOf(
@@ -213,7 +213,7 @@ private fun RecentSearchScreen(
                             ),
                         )
                         AppTracker.search(
-                            screen = Screen.Discovery,
+                            screen = Screen.Search,
                             keyword = keyword,
                             properties = mapOf(
                                 "search_source" to "AutoComplete",

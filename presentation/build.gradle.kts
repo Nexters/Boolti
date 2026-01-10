@@ -71,6 +71,7 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.tosspayments)
     implementation(projects.common.tracker)
+    implementation(projects.common.logger)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

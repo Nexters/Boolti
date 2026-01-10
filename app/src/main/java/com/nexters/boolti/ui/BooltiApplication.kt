@@ -2,6 +2,7 @@ package com.nexters.boolti.ui
 
 import android.app.Application
 import com.kakao.sdk.common.KakaoSdk
+import com.mangbaam.logger.CollectableDebugTree
 import com.nexters.boolti.BuildConfig
 import com.nexters.boolti.common.tracker.AppTracker
 import dagger.hilt.android.HiltAndroidApp
@@ -19,7 +20,7 @@ class BooltiApplication : Application() {
     }
 
     private fun initLogger() {
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        if (BuildConfig.DEBUG) Timber.plant(CollectableDebugTree())
     }
 
     private fun initKakaoSdk() {

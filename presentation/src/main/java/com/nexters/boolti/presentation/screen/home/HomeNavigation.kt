@@ -30,7 +30,7 @@ fun NavGraphBuilder.homeScreen(
                     )
                 )
             },
-            navigateToRecentSearch = { navController.navigate(SearchRoute.RecentSearch) },
+            navigateToRecentSearch = { navController.navigate(SearchRoute.RecentSearch()) },
             navigateToSearchDetail = { navController.navigate(SearchRoute.SearchDetail(keyword = it)) },
             navigateToTicketDetail = { navController.navigate(TicketRoute.TicketRoot(ticketId = it)) },
             navigateToQrScan = { navController.navigate(MainRoute.HostedShows) },

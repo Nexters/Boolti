@@ -78,7 +78,7 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
 fun SearchDetailScreen(
-    navigateToRecentSearch: () -> Unit,
+    navigateToRecentSearch: (keyword: String) -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     navigateToProfile: (userCode: UserCode) -> Unit,
     navigateUp: () -> Unit,
@@ -107,7 +107,7 @@ fun SearchDetailScreen(
 
     SearchDetailScreen(
         keyword = uiState.keyword,
-        navigateToRecentSearch = navigateToRecentSearch,
+        navigateToRecentSearch = { navigateToRecentSearch(uiState.keyword) },
         searchedKeyword = uiState.searchedKeyword,
         loading = uiState.loading,
         shows = uiState.shows,

@@ -19,7 +19,7 @@ fun NavGraphBuilder.searchDetailNavigation(
 
         val navigateUp: () -> Unit = {
             navController.popBackStack()
-            navController.navigate(SearchRoute.RecentSearch) {
+            navController.navigate(SearchRoute.RecentSearch()) {
                 popUpTo<SearchRoute.RecentSearch> {
                     inclusive = false
                 }
@@ -32,8 +32,8 @@ fun NavGraphBuilder.searchDetailNavigation(
         }
 
         SearchDetailScreen(
-            navigateToRecentSearch = {
-                navController.navigate(SearchRoute.RecentSearch)
+            navigateToRecentSearch = { keyword ->
+                navController.navigate(SearchRoute.RecentSearch(keyword))
             },
             navigateToShowDetail = { showId ->
                 navController.navigate(ShowRoute.ShowRoot(showId, source = Screen.SearchDetail.value))

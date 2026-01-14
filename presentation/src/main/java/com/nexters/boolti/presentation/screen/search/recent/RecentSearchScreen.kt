@@ -23,14 +23,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -142,9 +146,26 @@ private fun RecentSearchScreen(
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
+    var textFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = keyword,
+                selection = TextRange(keyword.length),
+            )
+        )
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+
+    LaunchedEffect(keyword) {
+        if (textFieldValue.text != keyword) {
+            textFieldValue = TextFieldValue(
+                text = keyword,
+                selection = TextRange(keyword.length),
+            )
+        }
     }
 
     Scaffold(
@@ -163,14 +184,17 @@ private fun RecentSearchScreen(
                 .padding(horizontal = marginHorizontal),
         ) {
             BtSearchBar(
-                keyword = keyword,
-                onKeywordChanged = onKeywordChanged,
+                value = textFieldValue,
+                onValueChange = { newValue ->
+                    textFieldValue = newValue
+                    onKeywordChanged(newValue.text)
+                },
                 hint = stringResource(R.string.search_search_hint),
                 search = {
-                    search(keyword)
+                    search(textFieldValue.text)
                     AppTracker.search(
                         screen = Screen.Search,
-                        keyword = keyword,
+                        keyword = textFieldValue.text,
                         properties = mapOf(
                             "search_source" to "Direct",
                         ),
@@ -182,7 +206,7 @@ private fun RecentSearchScreen(
                     .padding(vertical = 12.dp),
             )
 
-            if (keyword.isEmpty()) {
+            if (textFieldValue.text.isEmpty()) {
                 EmptyKeywordContent(
                     recentKeywords = recentKeywords,
                     showClearButton = showClearButton,

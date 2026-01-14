@@ -1,7 +1,10 @@
 package com.nexters.boolti.presentation.screen.search.recent
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.SearchHistory
+import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -23,10 +26,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecentSearchViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val searchRepository: SearchRepository,
 ) : BaseViewModel() {
-    private val _uiState = MutableStateFlow(RecentSearchUiState.Mock) // TODO Mock 제거
+    private val route = savedStateHandle.toRoute<SearchRoute.RecentSearch>()
+
+    private val _uiState = MutableStateFlow(
+        RecentSearchUiState.Default.copy(keyword = route.keyword)
+    )
     val uiState = _uiState.asStateFlow()
 
     private val _event = Channel<RecentSearchEvent>()

@@ -10,6 +10,7 @@ import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 
 fun NavGraphBuilder.paymentCompleteScreen() {
     composable<MainRoute.PaymentComplete> { entry ->
@@ -32,7 +33,7 @@ fun NavGraphBuilder.paymentCompleteScreen() {
                 )
             },
             navigateToTicketDetail = { reservation ->
-                navController.navigate("https://app.boolti.in/tickets/${reservation.id}".toUri())
+                navController.navigate(TicketRoute.TicketRoot(ticketId = reservation.id))
             },
         )
     }

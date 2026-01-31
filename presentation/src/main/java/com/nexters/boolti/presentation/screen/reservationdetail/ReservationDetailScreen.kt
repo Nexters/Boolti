@@ -7,10 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,7 +48,7 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
-import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.screen.giftcomplete.GiftPolicy
@@ -116,8 +116,11 @@ fun ReservationDetailScreen(
                     style = MaterialTheme.typography.bodySmall.copy(color = textColor)
                 )
             }
-            ShowItem(
-                modifier = Modifier.fillMaxWidth(),
+            ShowItemV2(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+                    .padding(horizontal = marginHorizontal),
                 poster = state.reservation.showImage,
                 title = state.reservation.showName,
                 description = stringResource(
@@ -125,8 +128,6 @@ fun ReservationDetailScreen(
                     state.reservation.ticketName,
                     state.reservation.ticketCount,
                 ),
-                backgroundColor = MaterialTheme.colorScheme.background,
-                contentPadding = PaddingValues(20.dp),
             )
             TicketHolderInfo(reservation = state.reservation)
             if (state.reservation.totalAmountPrice > 0 || state.reservation.isGift) {
@@ -276,7 +277,7 @@ private fun TicketHolderInfo(
     val isGift = reservation.isGift
 
     Section(
-        modifier = modifier.padding(top = 12.dp),
+        modifier = modifier.padding(top = 20.dp),
         title = stringResource(id = R.string.ticketing_ticket_holder_label),
         defaultExpanded = isGift,
     ) {
@@ -296,7 +297,7 @@ private fun TicketHolderInfo(
                 val day = reservation.salesEndDateTime.dayOfMonth
                 val senderText = stringResource(
                     id = R.string.gift_sender_description,
-                    reservation?.depositorName ?: ""
+                    reservation.depositorName,
                 )
                 val dateText = stringResource(id = R.string.gift_expiration_date, month, day)
                 val buttonText = stringResource(id = R.string.gift_check)
@@ -456,12 +457,13 @@ private fun Section(
             )
         }
         AnimatedVisibility(
-            modifier = Modifier
-                .padding(horizontal = marginHorizontal)
-                .padding(bottom = 20.dp),
+            modifier = Modifier.padding(horizontal = marginHorizontal),
             visible = expanded,
         ) {
-            content()
+            Column {
+                content()
+                Spacer(Modifier.height(20.dp))
+            }
         }
     }
 }

@@ -281,7 +281,6 @@ private fun TicketingScreen(
                 // 티켓 정보
                 Section(
                     title = stringResource(R.string.ticket_info_label),
-                    modifier = Modifier.padding(top = 12.dp),
                 ) {
                     ShowItemV2(
                         modifier = Modifier.fillMaxWidth(),

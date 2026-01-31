@@ -41,7 +41,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.SecondaryButton
-import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -160,7 +160,7 @@ private fun PaymentCompleteScreen(
                 ),
             )
 
-            ShowItem(
+            ShowItemV2(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp),

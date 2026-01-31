@@ -74,6 +74,7 @@ fun RefundInfoPage(
                 reservation.ticketName,
                 reservation.ticketCount
             ),
+            titleStyle = point2,
         )
         Section(
             modifier = Modifier.padding(top = 12.dp),

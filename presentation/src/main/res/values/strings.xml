@@ -212,7 +212,7 @@
     <string name="gift_sender">보내는 분</string>
     <string name="gift_message_length_unit">자</string>
     <string name="gift_receiver_note">결제 후 카카오톡 친구 목록에서 받는 분을 선택해주세요.</string>
-    <string name="gift_show_info">공연 및 티켓 정보</string>
+    <string name="gift_show_info">티켓 정보</string>
     <string name="gift_complete_note">결제를 완료했어요 \n카카오톡에서 받는 분을 \n선택해 주세요</string>
     <string name="gift_select_receiver">받는 분 선택하기</string>
     <string name="gift_selected_image">선택된 선물 이미지</string>

@@ -46,6 +46,8 @@ class PreQuestionEditViewModel @Inject constructor(
     private val _events = Channel<PreQuestionEditEvent>()
     val events: Flow<PreQuestionEditEvent> = _events.receiveAsFlow()
 
+    private var initialAnswers: ImmutableMap<Long, String>? = null
+
     init {
         fetchPreQuestionAnswers()
     }
@@ -69,11 +71,12 @@ class PreQuestionEditViewModel @Inject constructor(
                 _uiState.update { it.copy(loading = true) }
             }
             .onEach { answerList ->
+                val questions = answerList.toImmutableList()
+                val answers = answerList.associate { answer ->
+                    answer.preQuestionId to answer.answer
+                }.toImmutableMap()
+                initialAnswers = answers
                 _uiState.update {
-                    val questions = answerList.toImmutableList()
-                    val answers = answerList.associate { answer ->
-                        answer.preQuestionId to answer.answer
-                    }.toImmutableMap()
                     it.copy(
                         loading = false,
                         questions = questions,
@@ -148,8 +151,9 @@ class PreQuestionEditViewModel @Inject constructor(
                 _uiState.update { it.copy(loading = true) }
             }
             .onEach {
+                val hasChanges = initialAnswers != state.answers
                 _uiState.update { it.copy(loading = false) }
-                sendEvent(PreQuestionEditEvent.SaveSuccess)
+                sendEvent(PreQuestionEditEvent.SaveSuccess(hasChanges))
             }
             .catch { e ->
                 Timber.e(e, "Failed to submit pre-question answers")

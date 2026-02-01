@@ -33,6 +33,7 @@ import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.extension.unicodeLength
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import kotlinx.coroutines.flow.collectLatest
@@ -44,11 +45,18 @@ fun PreQuestionEditScreen(
     viewModel: PreQuestionEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarController = LocalSnackbarController.current
+    val saveCompleteMessage = stringResource(R.string.pre_question_save_complete)
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                is PreQuestionEditEvent.SaveSuccess -> onBackPressed()
+                is PreQuestionEditEvent.SaveSuccess -> {
+                    if (event.hasChanges) {
+                        snackbarController.showMessage(saveCompleteMessage)
+                    }
+                    onBackPressed()
+                }
                 is PreQuestionEditEvent.SaveError -> Unit
             }
         }

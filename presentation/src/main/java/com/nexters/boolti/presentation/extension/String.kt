@@ -72,6 +72,15 @@ fun String.takeForUnicode(n: Int): String {
     return substring(0, endIndex)
 }
 
+fun String.unicodeLength(): Int {
+    val iterator = BreakIterator.getCharacterInstance().apply { setText(this@unicodeLength) }
+    var count = 0
+    while (iterator.next() != BreakIterator.DONE) {
+        count++
+    }
+    return count
+}
+
 fun String.toValidUrlString(): String = runCatching {
     if (URL(this).protocol.isNullOrEmpty()) "https://$this" else this
 }.recoverCatching { e ->

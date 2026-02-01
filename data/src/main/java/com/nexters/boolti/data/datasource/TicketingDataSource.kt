@@ -3,6 +3,8 @@ package com.nexters.boolti.data.datasource
 import com.nexters.boolti.data.network.api.TicketingService
 import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
+import com.nexters.boolti.data.network.request.SubmitPreQuestionAnswersRequestDto
+import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.data.network.response.ApprovePaymentResponse
 import com.nexters.boolti.data.network.response.CheckInviteCodeResponse
 import com.nexters.boolti.data.network.response.ReservationDto
@@ -61,5 +63,13 @@ internal class TicketingDataSource @Inject constructor(
     suspend fun cancelPayment(request: PaymentCancelRequest): Boolean {
         val response = ticketingService.cancelPayment(request)
         return response.isSuccessful && response.body() ?: false
+    }
+
+    suspend fun getPreQuestions(showId: String): List<PreQuestion> {
+        return ticketingService.getPreQuestions(showId).map { it.toDomain() }
+    }
+
+    suspend fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequestDto): Response<Unit> {
+        return ticketingService.submitPreQuestionAnswers(request)
     }
 }

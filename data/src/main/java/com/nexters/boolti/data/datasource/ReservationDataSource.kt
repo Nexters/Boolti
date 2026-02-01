@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.datasource
 
 import com.nexters.boolti.data.network.api.ReservationService
+import com.nexters.boolti.data.network.response.PreQuestionAnswerDetailResponse
 import com.nexters.boolti.data.network.response.ReservationDetailResponse
 import com.nexters.boolti.data.network.response.ReservationResponse
 import com.nexters.boolti.domain.request.RefundRequest
@@ -15,4 +16,7 @@ internal class ReservationDataSource @Inject constructor(
         reservationService.findReservationById(id)
 
     suspend fun refund(request: RefundRequest) = reservationService.refund(request)
+
+    suspend fun getPreQuestionAnswers(reservationId: String): PreQuestionAnswerDetailResponse =
+        reservationService.getPreQuestionAnswers(reservationId)
 }

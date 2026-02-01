@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.response.PreQuestionAnswerDetailResponse
 import com.nexters.boolti.data.network.response.ReservationDetailResponse
 import com.nexters.boolti.data.network.response.ReservationResponse
 import com.nexters.boolti.domain.request.RefundRequest
@@ -17,4 +18,7 @@ internal interface ReservationService {
 
     @PATCH("/app/api/v1/reservation/refund")
     suspend fun refund(@Body request: RefundRequest): Boolean
+
+    @GET("/app/api/v1/pre-question-answers/{reservationId}")
+    suspend fun getPreQuestionAnswers(@Path("reservationId") reservationId: String): PreQuestionAnswerDetailResponse
 }

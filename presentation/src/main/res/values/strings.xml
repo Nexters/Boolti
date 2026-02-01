@@ -208,6 +208,10 @@
     <!-- 사전 질문 -->
     <string name="pre_questions_label">사전 질문</string>
     <string name="pre_question_placeholder">답변을 입력해주세요</string>
+    <string name="pre_question_edit_title">사전 질문 작성하기</string>
+    <string name="pre_question_create_button">작성하기</string>
+    <string name="pre_question_edit_button">수정하기</string>
+    <string name="pre_question_no_answer">작성한 내용이 없어요</string>
 
     <!-- 선물하기 -->
     <string name="gift_receiver_info">받는 분 정보</string>

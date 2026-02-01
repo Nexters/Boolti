@@ -22,8 +22,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -64,15 +68,30 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
     navigateToRefund: (id: String, isGift: Boolean) -> Unit,
+    navigateToPreQuestionEdit: (reservationId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
+    val preQuestionAnswers by viewModel.preQuestionAnswers.collectAsStateWithLifecycle()
     var showRefundDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchReservation()
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshPreQuestionAnswers()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Scaffold(
@@ -135,6 +154,12 @@ fun ReservationDetailScreen(
             }
             TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
+            PreQuestionAnswersSection(
+                modifier = Modifier.padding(top = 12.dp),
+                answers = preQuestionAnswers,
+                salesEndDateTime = state.reservation.salesEndDateTime,
+                onNavigateToEdit = { navigateToPreQuestionEdit(state.reservation.id) },
+            )
             if (state.reservation.reservationState in listOf(
                     ReservationState.REFUNDED,
                     ReservationState.CANCELED
@@ -414,7 +439,7 @@ private fun NormalRow(
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     title: String,
     modifier: Modifier = Modifier,
     defaultExpanded: Boolean = true,

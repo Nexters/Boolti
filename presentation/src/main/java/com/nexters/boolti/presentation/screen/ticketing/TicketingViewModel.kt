@@ -10,6 +10,8 @@ import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
+import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
+import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -29,6 +31,8 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -94,6 +98,7 @@ class TicketingViewModel @Inject constructor(
             .onCompletion { _uiState.update { it.copy(loading = false) } }
             .singleOrNull()?.let { reservationId ->
                 Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
+                submitPreQuestionAnswers(reservationId)
                 event(TicketingEvent.TicketingSuccess(reservationId, showId))
             }
     }
@@ -121,8 +126,9 @@ class TicketingViewModel @Inject constructor(
                 }
             }
             .singleOrNull()?.let { reservationId ->
-            event(TicketingEvent.TicketingSuccess(reservationId, showId))
-        }
+                submitPreQuestionAnswers(reservationId)
+                event(TicketingEvent.TicketingSuccess(reservationId, showId))
+            }
     }
 
     private fun load() {
@@ -150,6 +156,17 @@ class TicketingViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(refundPolicy = refundPolicy)
                     }
+                }
+                .launchIn(viewModelScope + recordExceptionHandler)
+
+            repository.getPreQuestions(showId)
+                .onEach { preQuestions ->
+                    _uiState.update {
+                        it.copy(preQuestions = preQuestions.toImmutableList())
+                    }
+                }
+                .catch { e ->
+                    Timber.e(e, "Failed to load pre-questions")
                 }
                 .launchIn(viewModelScope + recordExceptionHandler)
         }
@@ -204,6 +221,46 @@ class TicketingViewModel @Inject constructor(
 
     fun toggleAgreement() {
         _uiState.update { it.toggleAgreement() }
+    }
+
+    fun setPreQuestionAnswer(questionId: Long, answer: String) {
+        _uiState.update {
+            val newAnswers = it.preQuestionAnswers.toMutableMap()
+            newAnswers[questionId] = answer
+            it.copy(preQuestionAnswers = newAnswers.toImmutableMap())
+        }
+    }
+
+    private suspend fun submitPreQuestionAnswers(reservationId: String) {
+        if (state.preQuestions.isEmpty()) return
+
+        val answers = state.preQuestionAnswers
+            .filter { (_, answer) -> answer.isNotBlank() }
+            .map { (questionId, answer) ->
+                PreQuestionAnswerRequest(
+                    preQuestionId = questionId,
+                    answer = answer,
+                )
+            }
+
+        if (answers.isEmpty()) return
+
+        val request = SubmitPreQuestionAnswersRequest(
+            reservationId = reservationId,
+            answers = answers,
+        )
+
+        repository.submitPreQuestionAnswers(request)
+            .catch { e ->
+                Timber.e(e, "Failed to submit pre-question answers")
+            }
+            .firstOrNull()
+    }
+
+    fun submitPreQuestionAnswersForReservation(reservationId: String) {
+        viewModelScope.launch(recordExceptionHandler) {
+            submitPreQuestionAnswers(reservationId)
+        }
     }
 
     private fun requestOrderId(): Flow<String> {

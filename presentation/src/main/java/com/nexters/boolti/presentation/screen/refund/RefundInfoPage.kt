@@ -38,7 +38,7 @@ import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCheckBox
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -63,8 +63,10 @@ fun RefundInfoPage(
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        ShowItem(
-            modifier = Modifier.padding(top = 12.dp),
+        ShowItemV2(
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .padding(horizontal = marginHorizontal),
             poster = reservation.showImage,
             title = reservation.showName,
             description = stringResource(
@@ -73,8 +75,6 @@ fun RefundInfoPage(
                 reservation.ticketCount
             ),
             titleStyle = point2,
-            contentPadding = PaddingValues(20.dp),
-            backgroundColor = MaterialTheme.colorScheme.background,
         )
         Section(
             modifier = Modifier.padding(top = 12.dp),

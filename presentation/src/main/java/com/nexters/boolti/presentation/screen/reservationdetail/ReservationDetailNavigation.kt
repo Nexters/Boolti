@@ -13,6 +13,9 @@ fun NavGraphBuilder.reservationDetailScreen() {
             navigateToRefund = { id, isGift ->
                 navController.navigate(MainRoute.Refund(reservationId = id, isGift = isGift))
             },
+            navigateToPreQuestionEdit = { reservationId ->
+                navController.navigate(MainRoute.PreQuestionEdit(reservationId = reservationId))
+            },
         )
     }
 }

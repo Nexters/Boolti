@@ -143,6 +143,8 @@ fun TicketingScreen(
         onInviteCodeChanged = viewModel::setInviteCode,
         onToggleAgreement = viewModel::toggleAgreement,
         onClickReservation = viewModel::reservation,
+        onChangePreQuestionAnswer = viewModel::setPreQuestionAnswer,
+        onSubmitPreQuestionAnswers = viewModel::submitPreQuestionAnswersForReservation,
         modifier = modifier,
     )
 }
@@ -165,6 +167,8 @@ private fun TicketingScreen(
     onInviteCodeChanged: (String) -> Unit,
     onToggleAgreement: () -> Unit,
     onClickReservation: () -> Unit,
+    onChangePreQuestionAnswer: (Long, String) -> Unit,
+    onSubmitPreQuestionAnswers: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -198,6 +202,7 @@ private fun TicketingScreen(
                         ),
                     )
 
+                    onSubmitPreQuestionAnswers(reservationId)
                     onReserved(reservationId, showId)
                 }
 
@@ -326,6 +331,14 @@ private fun TicketingScreen(
                         onInviteCodeChanged = onInviteCodeChanged,
                     )
                 }
+
+                // 사전 질문
+                PreQuestionsSection(
+                    preQuestions = uiState.preQuestions,
+                    answers = uiState.preQuestionAnswers,
+                    onAnswerChanged = onChangePreQuestionAnswer,
+                    getAnswerError = uiState::getAnswerError,
+                )
 
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
@@ -889,6 +902,8 @@ private fun TicketingDetailScreenPreview() {
                 onClickCheckInviteCode = {},
                 onInviteCodeChanged = {},
                 onClickReservation = {},
+                onChangePreQuestionAnswer = { _, _ -> },
+                onSubmitPreQuestionAnswers = {},
             )
         }
     }

@@ -12,6 +12,8 @@ import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
+import com.nexters.boolti.domain.model.PreQuestion
+import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import kotlinx.coroutines.flow.Flow
 
 interface TicketingRepository {
@@ -23,4 +25,6 @@ interface TicketingRepository {
     fun requestOrderId(request: OrderIdRequest): Flow<String>
     fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse>
     fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean>
+    fun getPreQuestions(showId: String): Flow<List<PreQuestion>>
+    fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Flow<Unit>
 }

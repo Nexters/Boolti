@@ -49,6 +49,7 @@ import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.ShowItemV2
+import com.nexters.boolti.presentation.extension.OnResume
 import com.nexters.boolti.presentation.extension.getPaymentString
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.screen.giftcomplete.GiftPolicy
@@ -64,16 +65,20 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 fun ReservationDetailScreen(
     onBackPressed: () -> Unit,
     navigateToRefund: (id: String, isGift: Boolean) -> Unit,
+    navigateToPreQuestionEdit: (reservationId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReservationDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refundPolicy by viewModel.refundPolicy.collectAsStateWithLifecycle()
+    val preQuestionAnswers by viewModel.preQuestionAnswers.collectAsStateWithLifecycle()
     var showRefundDialog by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchReservation()
     }
+
+    OnResume { viewModel.refreshPreQuestionAnswers() }
 
     Scaffold(
         modifier = modifier.navigationBarsPadding(),
@@ -135,6 +140,12 @@ fun ReservationDetailScreen(
             }
             TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
+            PreQuestionAnswersSection(
+                modifier = Modifier.padding(top = 12.dp),
+                answers = preQuestionAnswers,
+                salesEndDateTime = state.reservation.salesEndDateTime,
+                onNavigateToEdit = { navigateToPreQuestionEdit(state.reservation.id) },
+            )
             if (state.reservation.reservationState in listOf(
                     ReservationState.REFUNDED,
                     ReservationState.CANCELED
@@ -414,7 +425,7 @@ private fun NormalRow(
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     title: String,
     modifier: Modifier = Modifier,
     defaultExpanded: Boolean = true,

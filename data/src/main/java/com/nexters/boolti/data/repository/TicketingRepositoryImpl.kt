@@ -8,6 +8,7 @@ import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.extension.errorType
 import com.nexters.boolti.domain.model.ApprovePaymentResponse
 import com.nexters.boolti.domain.model.InviteCodeStatus
+import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.domain.model.ReservationDetail
 import com.nexters.boolti.domain.model.TicketWithQuantity
 import com.nexters.boolti.domain.model.TicketingInfo
@@ -19,6 +20,7 @@ import com.nexters.boolti.domain.request.PaymentCancelRequest
 import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
+import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -83,5 +85,14 @@ internal class TicketingRepositoryImpl @Inject constructor(
 
     override fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean> = flow {
         emit(dataSource.cancelPayment(request))
+    }
+
+    override fun getPreQuestions(showId: String): Flow<List<PreQuestion>> = flow {
+        emit(dataSource.getPreQuestions(showId))
+    }
+
+    override fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Flow<Unit> = flow {
+        dataSource.submitPreQuestionAnswers(request.toData())
+        emit(Unit)
     }
 }

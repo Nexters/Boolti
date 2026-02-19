@@ -2,11 +2,14 @@ package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -74,7 +77,7 @@ import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BusinessInformation
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.PolicyBottomSheet
-import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
@@ -90,7 +93,6 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
@@ -141,6 +143,8 @@ fun TicketingScreen(
         onInviteCodeChanged = viewModel::setInviteCode,
         onToggleAgreement = viewModel::toggleAgreement,
         onClickReservation = viewModel::reservation,
+        onChangePreQuestionAnswer = viewModel::setPreQuestionAnswer,
+        onSubmitPreQuestionAnswers = viewModel::submitPreQuestionAnswersForReservation,
         modifier = modifier,
     )
 }
@@ -163,6 +167,8 @@ private fun TicketingScreen(
     onInviteCodeChanged: (String) -> Unit,
     onToggleAgreement: () -> Unit,
     onClickReservation: () -> Unit,
+    onChangePreQuestionAnswer: (Long, String) -> Unit,
+    onSubmitPreQuestionAnswers: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -196,6 +202,7 @@ private fun TicketingScreen(
                         ),
                     )
 
+                    onSubmitPreQuestionAnswers(reservationId)
                     onReserved(reservationId, showId)
                 }
 
@@ -272,18 +279,28 @@ private fun TicketingScreen(
     ) { innerPadding ->
         Box(modifier = modifier.padding(innerPadding)) {
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(scrollState),
             ) {
-                ShowItem(
-                    poster = uiState.poster,
-                    showName = uiState.showName,
-                    showDate = uiState.showDate,
-                    showNameStyle = point2,
-                    contentPadding = PaddingValues(20.dp),
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                )
+                // 티켓 정보
+                Section(
+                    title = stringResource(R.string.ticket_info_label),
+                ) {
+                    ShowItemV2(
+                        modifier = Modifier.fillMaxWidth(),
+                        poster = uiState.poster,
+                        showName = uiState.showName,
+                        showDate = uiState.showDate,
+                    )
+                    TicketInfoSection(
+                        modifier = Modifier.padding(top = 20.dp),
+                        ticketName = uiState.ticketName,
+                        ticketCount = uiState.ticketCount,
+                        totalPrice = uiState.totalPrice,
+                    )
+                }
+
                 // 예매자 정보
                 TicketHolderSection(
                     name = uiState.reservationName,
@@ -305,15 +322,6 @@ private fun TicketingScreen(
                     )
                 }
 
-                // 티켓 정보
-                Section(title = stringResource(R.string.ticket_info_label)) {
-                    TicketInfoSection(
-                        ticketName = uiState.ticketName,
-                        ticketCount = uiState.ticketCount,
-                        totalPrice = uiState.totalPrice,
-                    )
-                }
-
                 // 초청 코드
                 if (uiState.isInviteTicket) {
                     InviteCodeSection(
@@ -323,6 +331,14 @@ private fun TicketingScreen(
                         onInviteCodeChanged = onInviteCodeChanged,
                     )
                 }
+
+                // 사전 질문
+                PreQuestionsSection(
+                    preQuestions = uiState.preQuestions,
+                    answers = uiState.preQuestionAnswers,
+                    onAnswerChanged = onChangePreQuestionAnswer,
+                    getAnswerError = uiState::getAnswerError,
+                )
 
                 if (!uiState.isInviteTicket) RefundPolicySection(uiState.refundPolicy) // 취소/환불 규정
 
@@ -432,16 +448,12 @@ internal fun RefundPolicySection(refundPolicy: List<String>) {
         },
         contentVisible = expanded,
     ) {
-        Column(
-            Modifier
-                .animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioNoBouncy,
-                        stiffness = Spring.StiffnessMedium,
-                    )
-                )
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
         ) {
-            if (expanded) {
+            Column {
                 refundPolicy.forEach {
                     Row(modifier = Modifier.padding(top = 2.dp)) {
                         Text(
@@ -890,6 +902,8 @@ private fun TicketingDetailScreenPreview() {
                 onClickCheckInviteCode = {},
                 onInviteCodeChanged = {},
                 onClickReservation = {},
+                onChangePreQuestionAnswer = { _, _ -> },
+                onSubmitPreQuestionAnswers = {},
             )
         }
     }

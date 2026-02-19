@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,89 @@ import com.nexters.boolti.presentation.theme.point2
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@Composable
+fun ShowItemV2(
+    show: Show,
+    modifier: Modifier = Modifier,
+    showNameStyle: TextStyle = point1,
+    showDateStyle: TextStyle = MaterialTheme.typography.bodySmall,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceTint,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
+    shape: Shape = RoundedCornerShape(8.dp),
+    border: BorderStroke? = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+    onClick: (() -> Unit)? = null,
+) {
+    ShowItem(
+        show = show,
+        modifier = modifier,
+        showNameStyle = showNameStyle,
+        showDateStyle = showDateStyle,
+        backgroundColor = backgroundColor,
+        contentPadding = contentPadding,
+        shape = shape,
+        border = border,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun ShowItemV2(
+    poster: String,
+    showName: String,
+    showDate: LocalDateTime,
+    modifier: Modifier = Modifier,
+    showNameStyle: TextStyle = point1,
+    showDateStyle: TextStyle = MaterialTheme.typography.bodySmall,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceTint,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
+    shape: Shape = RoundedCornerShape(8.dp),
+    border: BorderStroke? = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+    onClick: (() -> Unit)? = null,
+) {
+    ShowItem(
+        poster = poster,
+        showName = showName,
+        showDate = showDate,
+        modifier = modifier,
+        showNameStyle = showNameStyle,
+        showDateStyle = showDateStyle,
+        backgroundColor = backgroundColor,
+        contentPadding = contentPadding,
+        shape = shape,
+        border = border,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun ShowItemV2(
+    poster: String,
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier,
+    titleStyle: TextStyle = point1,
+    descriptionStyle: TextStyle = MaterialTheme.typography.bodySmall,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceTint,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
+    shape: Shape = RoundedCornerShape(8.dp),
+    border: BorderStroke? = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+    onClick: (() -> Unit)? = null,
+) {
+    ShowItem(
+        poster = poster,
+        title = title,
+        description = description,
+        modifier = modifier,
+        titleStyle = titleStyle,
+        descriptionStyle = descriptionStyle,
+        backgroundColor = backgroundColor,
+        contentPadding = contentPadding,
+        shape = shape,
+        border = border,
+        onClick = onClick,
+    )
+}
+
 /**
  * ## 공연 정보를 나타내는 컴포넌트
  *
@@ -62,6 +146,7 @@ fun ShowItem(
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     shape: Shape = RoundedCornerShape(4.dp),
+    border: BorderStroke? = null,
     onClick: (() -> Unit)? = null,
 ) {
     ShowItem(
@@ -74,6 +159,7 @@ fun ShowItem(
         backgroundColor = backgroundColor,
         contentPadding = contentPadding,
         shape = shape,
+        border = border,
         onClick = onClick,
     )
 }
@@ -105,6 +191,7 @@ fun ShowItem(
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shape: Shape = RoundedCornerShape(4.dp),
+    border: BorderStroke? = null,
     onClick: (() -> Unit)? = null,
 ) {
     ShowItem(
@@ -117,6 +204,7 @@ fun ShowItem(
         contentPadding = contentPadding,
         backgroundColor = backgroundColor,
         shape = shape,
+        border = border,
         onClick = onClick,
     )
 }
@@ -148,6 +236,7 @@ fun ShowItem(
     contentPadding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = marginHorizontal),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shape: Shape = RoundedCornerShape(4.dp),
+    border: BorderStroke? = null,
     onClick: (() -> Unit)? = null,
 ) {
     Card(
@@ -157,6 +246,7 @@ fun ShowItem(
             disabledContainerColor = backgroundColor,
         ),
         shape = shape,
+        border = border,
         enabled = onClick != null,
         onClick = onClick ?: {},
     ) {
@@ -207,6 +297,22 @@ private fun ShowItemPreview() {
                     .padding(innerPadding)
                     .verticalScroll(scrollState),
             ) {
+                Text("ShowItemV2")
+                ShowItemV2(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = marginHorizontal),
+                    show = Show(
+                        id = "1",
+                        name = "2024 TOGETHER LUCKY CLUB",
+                        thumbnailImage = "",
+                        date = LocalDateTime.now(),
+                        salesStartDate = LocalDate.now(),
+                        salesEndDate = LocalDate.now().plusDays(10),
+                    ),
+                    onClick = {},
+                )
+
                 Text("ShowItem 을 받는 컴포넌트")
                 ShowItem(
                     modifier = Modifier.fillMaxWidth(),

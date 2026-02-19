@@ -2,6 +2,8 @@ package com.nexters.boolti.data.network.api
 
 import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
+import com.nexters.boolti.data.network.request.SubmitPreQuestionAnswersRequestDto
+import com.nexters.boolti.data.network.response.PreQuestionDto
 import com.nexters.boolti.data.network.response.ApprovePaymentResponse
 import com.nexters.boolti.data.network.response.CheckInviteCodeResponse
 import com.nexters.boolti.data.network.response.OrderIdDto
@@ -15,6 +17,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -62,4 +65,14 @@ internal interface TicketingService {
     suspend fun cancelPayment(
         @Body request: PaymentCancelRequest
     ): Response<Boolean>
+
+    @GET("/app/api/v1/shows/{showId}/pre-questions")
+    suspend fun getPreQuestions(
+        @Path("showId") showId: String,
+    ): List<PreQuestionDto>
+
+    @PUT("/app/api/v1/pre-question-answers")
+    suspend fun submitPreQuestionAnswers(
+        @Body request: SubmitPreQuestionAnswersRequestDto,
+    ): Response<Unit>
 }

@@ -42,6 +42,7 @@ import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
+import com.nexters.boolti.presentation.screen.prequestionedit.preQuestionEditScreen
 import com.nexters.boolti.presentation.screen.profile.profileScreen
 import com.nexters.boolti.presentation.screen.profileedit.introduce.profileIntroduceEditScreen
 import com.nexters.boolti.presentation.screen.profileedit.link.linkEditScreen
@@ -140,6 +141,7 @@ fun MainNavigation(
         signoutScreen()
         reservationsScreen()
         reservationDetailScreen()
+        preQuestionEditScreen()
         refundScreen()
 
         navigation<ShowRoute.ShowRoot>(

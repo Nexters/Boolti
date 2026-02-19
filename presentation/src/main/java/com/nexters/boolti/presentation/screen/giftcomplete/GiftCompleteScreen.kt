@@ -55,7 +55,7 @@ import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.SecondaryButton
-import com.nexters.boolti.presentation.component.ShowItem
+import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.component.dummyReservationDetail
 import com.nexters.boolti.presentation.extension.cardCodeToCompanyName
@@ -394,7 +394,7 @@ private fun ShowInformation(
                 )
             }",
         )
-        ShowItem(
+        ShowItemV2(
             modifier = Modifier.fillMaxWidth(),
             poster = reservation.showImage,
             showName = reservation.showName,

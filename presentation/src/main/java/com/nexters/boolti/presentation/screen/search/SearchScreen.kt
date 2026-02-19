@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -128,15 +130,11 @@ private fun SearchScreen(
     ) {
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .verticalScroll(scrollState)
-                .fillMaxSize(),
+                .padding(top = 72.dp),
         ) {
-            SearchBar(
-                modifier = Modifier.padding(horizontal = marginHorizontal),
-                onClick = onClickSearchBar,
-            )
-
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(48.dp))
 
             if (recentSearchKeywords.isNotEmpty()) {
                 SearchHistorySection(
@@ -193,6 +191,11 @@ private fun SearchScreen(
             )
         }
 
+        StickySearchBarWithGradient(
+            onClick = onClickSearchBar,
+            modifier = Modifier.align(Alignment.TopStart),
+        )
+
         if (loading) {
             BtCircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -227,6 +230,44 @@ private fun SearchBar(
         hint = stringResource(R.string.search_search_hint),
         search = {},
     )
+}
+
+@Composable
+private fun StickySearchBarWithGradient(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val backgroundColor = MaterialTheme.colorScheme.background
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(backgroundColor),
+        ) {
+            SearchBar(
+                modifier = Modifier.padding(
+                    vertical = 12.dp,
+                    horizontal = marginHorizontal
+                ),
+                onClick = onClick,
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            backgroundColor,
+                            backgroundColor.copy(alpha = 0f),
+                        ),
+                    ),
+                ),
+        )
+    }
 }
 
 @Composable

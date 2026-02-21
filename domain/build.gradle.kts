@@ -17,12 +17,12 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-tasks.getByName<Test>("test") {
+tasks.named<Test>("test") {
     useJUnitPlatform()
     reports {
         junitXml.required.set(false)
     }
-    systemProperty("gradle.build.dir", project.buildDir)
+    systemProperty("gradle.build.dir", project.layout.buildDirectory.get().asFile)
 }
 
 dependencies {

@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -11,7 +12,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
-    id("kotlin-kapt")
 }
 
 android {
@@ -44,11 +44,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = libs.versions.targetJvm.get()
-    }
     buildFeatures {
         buildConfig = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
     }
 }
 
@@ -67,7 +70,8 @@ dependencies {
     implementation(libs.bundles.coroutines)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.timber)
 

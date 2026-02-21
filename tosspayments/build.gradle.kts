@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -8,8 +9,8 @@ localProperties.load(FileInputStream(localPropertiesFile))
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    id("kotlin-kapt")
 }
 
 android {
@@ -43,12 +44,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = libs.versions.targetJvm.get()
-    }
     buildFeatures {
         buildConfig = true
         viewBinding = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
     }
 }
 
@@ -62,7 +66,8 @@ dependencies {
     implementation(libs.bundles.lifecycle)
     api(libs.payments.toss)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.mixpanel.android)
 

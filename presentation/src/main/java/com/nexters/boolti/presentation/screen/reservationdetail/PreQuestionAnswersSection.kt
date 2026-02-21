@@ -41,7 +41,7 @@ internal fun PreQuestionAnswersSection(
 ) {
     if (answers.isEmpty()) return
 
-    val hasAnswers = answers.any { it.answer.isNotBlank() }
+    val hasAnswers = answers.any { !it.answer.isNullOrBlank() }
     val canEdit = salesEndDateTime >= LocalDateTime.now()
 
     Section(
@@ -109,10 +109,10 @@ private fun PreQuestionAnswerItem(
             }
         }
 
-        if (answer.description.isNotBlank()) {
+        if (!answer.description.isNullOrBlank()) {
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = answer.description,
+                text = answer.description ?: "",
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey30,
             )
@@ -131,11 +131,9 @@ private fun PreQuestionAnswerItem(
                     .background(Grey60),
             )
             Text(
-                text = answer.answer.ifBlank {
-                    stringResource(R.string.pre_question_no_answer)
-                },
+                text = if (answer.answer.isNullOrBlank()) stringResource(R.string.pre_question_no_answer) else answer.answer!!,
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (answer.answer.isBlank()) Grey50 else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (answer.answer.isNullOrBlank()) Grey50 else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

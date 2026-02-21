@@ -14,9 +14,9 @@ internal data class PreQuestionAnswerDetailResponse(
 internal data class PreQuestionAnswerItemResponse(
     val preQuestionId: Long,
     val question: String,
-    val description: String,
+    val description: String?,
     val isRequired: Boolean,
-    val answer: String,
+    val answer: String?,
     val createdAt: String?,
     val modifiedAt: String?,
 )

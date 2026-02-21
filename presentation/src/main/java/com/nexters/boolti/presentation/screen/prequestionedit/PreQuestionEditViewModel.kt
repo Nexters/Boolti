@@ -73,7 +73,7 @@ class PreQuestionEditViewModel @Inject constructor(
             .onEach { answerList ->
                 val questions = answerList.toImmutableList()
                 val answers = answerList.associate { answer ->
-                    answer.preQuestionId to answer.answer
+                    answer.preQuestionId to (answer.answer ?: "")
                 }.toImmutableMap()
                 initialAnswers = answers
                 _uiState.update {

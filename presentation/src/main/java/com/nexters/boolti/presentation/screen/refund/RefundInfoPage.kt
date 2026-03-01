@@ -66,6 +66,7 @@ fun RefundInfoPage(
         ShowItemV2(
             modifier = Modifier
                 .padding(top = 12.dp)
+                .fillMaxWidth()
                 .padding(horizontal = marginHorizontal),
             poster = reservation.showImage,
             title = reservation.showName,

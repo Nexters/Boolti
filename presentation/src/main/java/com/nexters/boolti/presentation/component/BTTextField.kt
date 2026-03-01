@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,7 +45,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -55,7 +55,6 @@ import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
-import okio.utf8Size
 
 /**
  * 입력값이 있고, 포커즈를 받은 경우 Clear 버튼을 보여주는 텍스트 필드
@@ -75,12 +74,12 @@ fun BTClearableTextField(
     enabled: Boolean = true,
     isError: Boolean = false,
     readOnly: Boolean = false,
-    minHeight: Dp = 48.dp,
+    height: Dp = Dp.Unspecified,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    singleLine: Boolean = false,
+    singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
@@ -112,20 +111,19 @@ fun BTClearableTextField(
         modifier = modifier,
         placeholder = placeholder,
         supportingText = supportingText,
-        trailingIcon = {
-            when {
-                trailingIcon != null -> trailingIcon()
-                focused && text.isNotEmpty() -> {
-                    BTTextFieldDefaults.ClearButton(onClick = { onValueChanged("") })
-                }
-                else -> null
+        trailingIcon = when {
+            trailingIcon != null -> trailingIcon
+            focused && text.isNotEmpty() -> {
+                { BTTextFieldDefaults.ClearButton(onClick = { onValueChanged("") }) }
             }
+
+            else -> null
         },
         bottomEndText = bottomEndText,
         enabled = enabled,
         isError = isError,
         readOnly = readOnly,
-        minHeight = minHeight,
+        height = height,
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -151,12 +149,12 @@ fun BTTextField(
     enabled: Boolean = true,
     isError: Boolean = false,
     readOnly: Boolean = false,
-    minHeight: Dp = 48.dp,
+    height: Dp = Dp.Unspecified,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    singleLine: Boolean = false,
+    singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
@@ -181,6 +179,11 @@ fun BTTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val shape = RoundedCornerShape(4.dp)
+    val resolvedHeight = when {
+        height != Dp.Unspecified -> height
+        singleLine -> BTTextFieldDefaults.Height.SingleLine
+        else -> BTTextFieldDefaults.Height.MultiLine
+    }
 
     val textColor = textStyle.color.takeOrElse {
         colors.textColor(enabled, isError, interactionSource).value
@@ -194,9 +197,9 @@ fun BTTextField(
                 onValueChange = onValueChanged,
                 modifier = Modifier
                     .defaultMinSize(
-                        minHeight = minHeight.coerceAtLeast(48.dp),
                         minWidth = OutlinedTextFieldDefaults.MinWidth
                     )
+                    .height(resolvedHeight)
                     .constrainAs(textFieldRef) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
@@ -285,6 +288,11 @@ fun BTTextField(
 }
 
 object BTTextFieldDefaults {
+    object Height {
+        val SingleLine = 48.dp
+        val MultiLine = 160.dp
+    }
+
     @Composable
     fun ClearButton(
         onClick: () -> Unit,
@@ -342,9 +350,9 @@ private fun TextFieldColors.supportingTextColor(
     )
 }
 
-@Preview
+@Preview(name = "SingleLine")
 @Composable
-fun BTTextFieldPreview() {
+private fun BTTextFieldSingleLinePreview() {
     BooltiTheme {
         Surface {
             Column(
@@ -367,17 +375,51 @@ fun BTTextFieldPreview() {
                     supportingText = "에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!에러!!",
                     onValueChanged = { text = it },
                 )
+            }
+        }
+    }
+}
 
-                val maxLength = 3
+@Preview(name = "MultiLine")
+@Composable
+private fun BTTextFieldMultiLinePreview() {
+    BooltiTheme {
+        Surface {
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(12.dp),
+            ) {
+                var text by remember {
+                    mutableStateOf("높이가 160dp로 고정된 텍스트 필드입니다.\n줄이 늘어나도 높이가 변하지 않고 스크롤됩니다.\n세 번째 줄\n네 번째 줄\n다섯 번째 줄\n여섯 번째 줄\n일곱 번째 줄\n여덟 번째 줄")
+                }
+
                 BTTextField(
-                    text = text.takeForUnicode(maxLength),
-                    placeholder = "예) 재즈와 펑크락을 좋아해요",
-                    minHeight = 72.dp,
-                    bottomEndText = "${text.utf8Size()}/${maxLength}자",
-                    onValueChanged = {
-                        text = it.takeForUnicode(maxLength)
-                    },
+                    text = text,
+                    placeholder = "답변을 입력해 주세요",
+                    singleLine = false,
+                    bottomEndText = "${text.length}/300자",
+                    onValueChanged = { text = it },
                 )
+            }
+        }
+    }
+}
+
+@Preview(name = "Clearable")
+@Composable
+private fun BTClearableTextFieldPreview() {
+    BooltiTheme {
+        Surface {
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                var text by remember { mutableStateOf("") }
+                val maxLength = 3
+
                 BTTextField(
                     text = text.takeForUnicode(maxLength),
                     placeholder = "예) 재즈와 펑크락을 좋아해요",

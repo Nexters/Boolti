@@ -2,7 +2,6 @@ package com.nexters.boolti.presentation.screen.signout
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,10 +38,9 @@ fun SignoutReason(
         BTTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 300.dp)
                 .padding(horizontal = marginHorizontal),
             text = reason,
-            minHeight = 160.dp,
+            singleLine = false,
             placeholder = stringResource(R.string.signout_reason_placeholder),
             onValueChanged = viewModel::setReason,
         )

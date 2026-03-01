@@ -82,7 +82,6 @@ fun ManagerCodeDialog(
             keyboardActions = KeyboardActions(
                 onDone = { onClickConfirm(code) }
             ),
-            singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,

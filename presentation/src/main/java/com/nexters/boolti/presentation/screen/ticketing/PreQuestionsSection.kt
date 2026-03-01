@@ -92,7 +92,7 @@ private fun PreQuestionItem(
             text = answer,
             onValueChanged = onAnswerChanged,
             placeholder = stringResource(R.string.pre_question_placeholder),
-            minHeight = 160.dp,
+            singleLine = false,
             isError = isError,
             bottomEndText = stringResource(R.string.input_limit, answer.unicodeLength(), TicketingState.MAX_ANSWER_LENGTH),
             supportingText = if (isError) {

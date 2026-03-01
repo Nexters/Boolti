@@ -211,7 +211,6 @@ private fun SnsUsernameInput(
             isError = error != null,
             placeholder = stringResource(R.string.sns_username_placeholder),
             onValueChanged = onUsernameChanged,
-            singleLine = true,
         )
     }
 }

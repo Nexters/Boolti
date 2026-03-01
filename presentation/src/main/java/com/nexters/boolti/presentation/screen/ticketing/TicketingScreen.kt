@@ -488,7 +488,6 @@ private fun InviteCodeSection(
                     .weight(1F)
                     .padding(end = 6.dp),
                 text = inviteCode.uppercase(),
-                singleLine = true,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
                 isError = inviteCodeStatus in listOf(
                     InviteCodeStatus.Invalid,
@@ -833,7 +832,6 @@ fun InputRow(
             modifier = Modifier
                 .padding(start = 12.dp)
                 .weight(1F),
-            singleLine = true,
             keyboardOptions = if (isPhoneNumber) {
                 KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = imeAction)
             } else {

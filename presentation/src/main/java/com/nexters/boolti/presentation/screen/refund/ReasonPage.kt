@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.refund
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -35,11 +34,10 @@ fun ReasonPage(
         BTTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 300.dp)
                 .padding(horizontal = marginHorizontal)
                 .padding(top = 20.dp),
             text = reason,
-            minHeight = 160.dp,
+            singleLine = false,
             onValueChanged = onReasonChanged,
             placeholder = stringResource(id = R.string.refund_reason_hint),
         )

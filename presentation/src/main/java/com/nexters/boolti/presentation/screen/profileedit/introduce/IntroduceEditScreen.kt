@@ -123,7 +123,7 @@ private fun IntroduceEditScreen(
                     .padding(horizontal = marginHorizontal),
                 text = introduce.takeForUnicode(maxLength),
                 placeholder = stringResource(R.string.introduce_edit_placeholder),
-                minHeight = 160.dp,
+                singleLine = false,
                 bottomEndText = "${introduce.length}/${maxLength}자",
                 onValueChanged = {
                     onChangeIntroduce(it.takeForUnicode(maxLength))

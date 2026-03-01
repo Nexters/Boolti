@@ -5,6 +5,7 @@ import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
+import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.DeepLinkEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,7 @@ class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val giftRepository: GiftRepository,
     private val deepLinkEvent: DeepLinkEvent,
+    private val reservationRepository: ReservationRepository,
 ) : BaseViewModel() {
     val loggedIn = authRepository.loggedIn.stateIn(
         viewModelScope,
@@ -83,10 +85,18 @@ class HomeViewModel @Inject constructor(
 
     private fun processGiftWhenLoggedIn(giftUuid: String) {
         viewModelScope.launch(recordExceptionHandler) {
-            val senderId = giftRepository
+            val gift = giftRepository
                 .getGift(giftUuid)
                 .first()
-                .senderUserId
+            val senderId = gift.senderUserId
+
+            // 계획
+            // 1. 사전질문이 없는 공연은 응답이 어떻게 오는지 파악하기
+            // 2. 사전질문이 없을 경우 현행 유지
+            // 3. 사전질문이 있을 경우 등록하기 버튼은 다음 화면으로 가는 버튼이 된다.
+            // 4. 다음 화면에서 사전 질문을 작성한 뒤 완료하면 두 가지 api 호출
+            reservationRepository.getPreQuestionAnswers(gift.reservationId).first()
+            reservationRepository.findReservationById(gift.reservationId).first()
 
             val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
 

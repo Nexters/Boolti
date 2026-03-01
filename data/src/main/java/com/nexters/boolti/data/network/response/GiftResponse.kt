@@ -21,6 +21,11 @@ data class GiftResponse(
     val recipientPhoneNumber: String,
     val salesEndTime: String,
     val isDone: Boolean,
+    val showId: String,
+    val showImg: String,
+    val showDate: String,
+    val salesTicketName: String,
+    val ticketCount: Int,
 ) {
     fun toDomain(): Gift {
         return Gift(
@@ -38,6 +43,11 @@ data class GiftResponse(
             recipientPhoneNumber = recipientPhoneNumber,
             salesEndTime = salesEndTime.toLocalDate(),
             isDone = isDone,
+            showId = showId,
+            showImg = showImg,
+            showDate = showDate.toLocalDate(),
+            salesTicketName = salesTicketName,
+            ticketCount = ticketCount,
         )
     }
 }

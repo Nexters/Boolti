@@ -17,4 +17,9 @@ data class Gift(
     val recipientPhoneNumber: String,
     val salesEndTime: LocalDate,
     val isDone: Boolean,
+    val showId: String,
+    val showImg: String,
+    val showDate: LocalDate,
+    val salesTicketName: String,
+    val ticketCount: Int,
 )

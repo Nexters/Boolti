@@ -91,7 +91,7 @@ private fun PreQuestionAnswerItem(
                 shape = shape,
             )
             .background(Grey85)
-            .padding(16.dp),
+            .padding(20.dp),
     ) {
         Row {
             Text(

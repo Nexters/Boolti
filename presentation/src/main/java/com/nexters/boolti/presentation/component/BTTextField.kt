@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActionScope
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.OutputTransformation
@@ -61,7 +59,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,7 +74,6 @@ import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
-import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
@@ -101,8 +97,8 @@ fun BTClearableTextField(
     height: Dp = Dp.Unspecified,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
+    onKeyboardAction: KeyboardActionHandler? = null,
+    outputTransformation: OutputTransformation? = null,
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
@@ -151,8 +147,8 @@ fun BTClearableTextField(
         height = height,
         textStyle = textStyle,
         keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        visualTransformation = visualTransformation,
+        onKeyboardAction = onKeyboardAction,
+        outputTransformation = outputTransformation,
         singleLine = singleLine,
         maxLines = maxLines,
         minLines = minLines,
@@ -178,8 +174,8 @@ fun BTTextField(
     height: Dp = Dp.Unspecified,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
+    onKeyboardAction: KeyboardActionHandler? = null,
+    outputTransformation: OutputTransformation? = null,
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
@@ -245,49 +241,6 @@ fun BTTextField(
         TextFieldLineLimits.MultiLine(minHeightInLines = minLines, maxHeightInLines = maxLines)
     }
 
-    val outputTransformation: OutputTransformation? = when (visualTransformation) {
-        VisualTransformation.None -> null
-        is PhoneNumberVisualTransformation -> OutputTransformation {
-            if (length > 3) replace(3, 3, "-")
-            if (length > 8) replace(8, 8, "-")
-        }
-
-        else -> null
-    }
-
-    val adaptedKeyboardAction: KeyboardActionHandler? =
-        if (keyboardActions != KeyboardActions.Default) {
-            KeyboardActionHandler { performDefaultAction ->
-                val scope = object : KeyboardActionScope {
-                    override fun defaultKeyboardAction(imeAction: ImeAction) =
-                        performDefaultAction()
-                }
-                when (keyboardOptions.imeAction) {
-                    ImeAction.Done -> keyboardActions.onDone?.invoke(scope)
-                        ?: performDefaultAction()
-
-                    ImeAction.Go -> keyboardActions.onGo?.invoke(scope)
-                        ?: performDefaultAction()
-
-                    ImeAction.Next -> keyboardActions.onNext?.invoke(scope)
-                        ?: performDefaultAction()
-
-                    ImeAction.Previous -> keyboardActions.onPrevious?.invoke(scope)
-                        ?: performDefaultAction()
-
-                    ImeAction.Search -> keyboardActions.onSearch?.invoke(scope)
-                        ?: performDefaultAction()
-
-                    ImeAction.Send -> keyboardActions.onSend?.invoke(scope)
-                        ?: performDefaultAction()
-
-                    else -> performDefaultAction()
-                }
-            }
-        } else {
-            null
-        }
-
     val scrollState = rememberScrollState()
     val internalScrollState = rememberScrollState()
 
@@ -316,7 +269,7 @@ fun BTTextField(
                 textStyle = mergedTextStyle,
                 cursorBrush = SolidColor(if (isError) colors.errorCursorColor else colors.cursorColor),
                 keyboardOptions = keyboardOptions,
-                onKeyboardAction = adaptedKeyboardAction,
+                onKeyboardAction = onKeyboardAction,
                 lineLimits = lineLimits,
                 outputTransformation = outputTransformation,
                 interactionSource = interactionSource,
@@ -324,7 +277,7 @@ fun BTTextField(
                 decorator = TextFieldDecorator { innerTextField ->
                     OutlinedTextFieldDefaults.DecorationBox(
                         value = textFieldState.text.toString(),
-                        visualTransformation = visualTransformation,
+                        visualTransformation = VisualTransformation.None,
                         innerTextField = {
                             if (actualEnableEdgeFade) {
                                 Box {

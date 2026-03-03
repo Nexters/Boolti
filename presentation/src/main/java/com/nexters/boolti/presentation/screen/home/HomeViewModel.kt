@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -85,10 +86,14 @@ class HomeViewModel @Inject constructor(
     fun processGift(giftUuid: String) {
         pendingGift = PendingGift.Unprocessed(giftUuid)
 
-        when (loggedIn.value) {
-            true -> processGiftWhenLoggedIn(giftUuid)
-            false -> sendEvent(HomeEvent.GiftNotification(GiftStatus.NEED_LOGIN))
-            null -> sendEvent(HomeEvent.GiftNotification(GiftStatus.FAILED)) // 예기치 못한 오류... FIXME: cold start와 함께 선물을 받았을 때 이 경로를 탐. 아마 HomeScreen에 의해 Lazy를 바꾸면 해결될까?
+        viewModelScope.launch {
+            // 딥링크를 통해 cold start가 발생할 경우 loggedIn의 초기값인 null이 들어오는데, null 대신 로그인 정보를 가져오는 걸 기다리기 위함
+            val isLoggedIn = loggedIn.filterNotNull().first()
+            if (isLoggedIn) {
+                processGiftWhenLoggedIn(giftUuid)
+            } else {
+                sendEvent(HomeEvent.GiftNotification(GiftStatus.NEED_LOGIN))
+            }
         }
     }
 
@@ -102,7 +107,6 @@ class HomeViewModel @Inject constructor(
             val hasPreQuestion = ticketingRepository.getPreQuestions(gift.showId).first().isNotEmpty()
 
             // TODO: 계획
-            // 3. 사전질문이 있을 경우 등록하기 버튼은 다음 화면으로 가는 버튼이 된다.
             // 4. 다음 화면에서 사전 질문을 작성한 뒤 완료하면 두 가지 api 호출
             reservationRepository.getPreQuestionAnswers(gift.reservationId).first()
             reservationRepository.findReservationById(gift.reservationId).first()

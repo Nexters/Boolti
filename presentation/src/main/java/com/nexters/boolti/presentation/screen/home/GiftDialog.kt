@@ -35,7 +35,7 @@ fun GiftDialog(
     }
 
     val action: () -> Unit = when (status) {
-        GiftStatus.SELF -> {
+        GiftStatus.SELF, GiftStatus.CAN_REGISTER -> {
             {
                 receiveGift()
                 onDismiss()
@@ -43,12 +43,6 @@ fun GiftDialog(
         }
 
         GiftStatus.NEED_LOGIN -> requireLogin
-        GiftStatus.CAN_REGISTER -> {
-            {
-                receiveGift()
-                onDismiss()
-            }
-        }
 
         GiftStatus.FAILED -> onDismiss
     }

@@ -77,4 +77,10 @@ sealed interface MainRoute {
     data class PreQuestionEdit(
         val reservationId: String,
     ) : MainRoute
+
+    @Serializable
+    data class GiftPreQuestion(
+        val giftUuid: String,
+        val showId: String,
+    ) : MainRoute
 }

@@ -12,7 +12,6 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
-
 fun NavGraphBuilder.homeScreen(
     modifier: Modifier = Modifier,
 ) {
@@ -47,6 +46,9 @@ fun NavGraphBuilder.homeScreen(
                     navController.navigate(MainRoute.Login)
             },
             navigateToLogin = { navController.navigate(MainRoute.Login) },
+            navigateToGiftPreQuestion = { giftUuid, showId ->
+                navController.navigate(MainRoute.GiftPreQuestion(giftUuid = giftUuid, showId = showId))
+            },
         )
     }
 }

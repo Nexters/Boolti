@@ -10,4 +10,9 @@ sealed interface HomeEvent {
     ) : HomeEvent
 
     data object GiftRegistered : HomeEvent
+
+    data class NavigateToGiftPreQuestion(
+        val giftUuid: String,
+        val showId: String,
+    ) : HomeEvent
 }

@@ -30,6 +30,7 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
 import com.nexters.boolti.presentation.screen.gift.giftScreen
+import com.nexters.boolti.presentation.screen.giftprequestion.giftPreQuestionScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
@@ -185,6 +186,7 @@ fun MainNavigation(
         }
 
         giftScreen()
+        giftPreQuestionScreen()
 
         hostedShowScreen(
             onClickShow = onClickQrScan,

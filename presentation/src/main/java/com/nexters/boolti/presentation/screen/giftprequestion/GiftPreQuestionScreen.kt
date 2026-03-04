@@ -35,6 +35,7 @@ import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.screen.refund.InfoRow
 import com.nexters.boolti.presentation.screen.ticketing.PreQuestionsSection
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Grey95
@@ -62,9 +63,11 @@ fun GiftPreQuestionScreen(
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
             val state = uiState
 
             if (state is GiftPreQuestionUiState.Success) {
@@ -77,7 +80,7 @@ fun GiftPreQuestionScreen(
                 )
                 GiftPreQuestionCta(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    salesEndTime = state.gift.salesEndTime.format("yyyy년 M월 d일"),
+                    salesEndTime = state.gift.salesEndTime.format(stringResource(R.string.gift_pre_question_deadline_date_format)),
                 )
             }
         }
@@ -138,7 +141,7 @@ private fun GiftPreQuestionCta(
                 modifier = Modifier.padding(top = 8.dp),
                 text = buildAnnotatedString {
                     val dateEnd = salesEndTime.length
-                    append("${salesEndTime}까지 선물을 등록해 주세요")
+                    append(stringResource(R.string.gift_pre_question_deadline, salesEndTime))
                     addStyle(
                         SpanStyle(
                             color = MaterialTheme.colorScheme.primary,
@@ -157,7 +160,7 @@ private fun GiftPreQuestionCta(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .padding(vertical = 8.dp),
-                label = "선물 등록하기",
+                label = stringResource(R.string.gift_pre_question_register_cta),
                 onClick = {},
             )
         }
@@ -175,10 +178,11 @@ private fun TicketSection(
             .padding(vertical = 20.dp)
             .padding(horizontal = marginHorizontal),
     ) {
+        Text(text = stringResource(R.string.gift_show_info), color = Grey10, style = MaterialTheme.typography.titleLarge)
         ShowItemV2(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp),
+                .padding(top = 20.dp),
             poster = gift.showImage,
             title = gift.showName,
             description = gift.showDate.showDateString,
@@ -187,14 +191,14 @@ private fun TicketSection(
         InfoRow(
             modifier = Modifier
                 .padding(top = 20.dp, bottom = 8.dp),
-            type = "티켓 종류",
-            value = "${gift.ticketCount}매"
+            type = stringResource(R.string.ticket_type_label),
+            value = gift.salesTicketName
         )
         InfoRow(
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 10.dp),
-            type = "티켓 종류",
-            value = "${gift.ticketCount}매"
+            type = stringResource(R.string.ticket_count_label),
+            value = stringResource(R.string.reservation_ticket_count_format, gift.ticketCount)
         )
     }
 }

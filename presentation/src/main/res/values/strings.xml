@@ -216,6 +216,9 @@
 
     <!-- 선물하기 사전 질문 -->
     <string name="gift_pre_question_title">등록할 선물의 정보를 확인하고 사전 질문에 답변해 주세요</string>
+    <string name="gift_pre_question_deadline">%s까지 선물을 등록해 주세요</string>
+    <string name="gift_pre_question_deadline_date_format">yyyy년 M월 d일</string>
+    <string name="gift_pre_question_register_cta">선물 등록하기</string>
 
     <!-- 선물하기 -->
     <string name="gift_receiver_info">받는 분 정보</string>

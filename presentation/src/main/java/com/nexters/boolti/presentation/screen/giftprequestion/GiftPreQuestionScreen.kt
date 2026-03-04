@@ -104,6 +104,7 @@ fun GiftPreQuestionScreen(
                 GiftPreQuestionCta(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     salesEndTime = state.gift.salesEndTime.format(stringResource(R.string.gift_pre_question_deadline_date_format)),
+                    receiveGift = viewModel::receiveGift
                 )
             }
         }
@@ -150,6 +151,7 @@ fun GiftPreQuestionScreen(
 @Composable
 private fun GiftPreQuestionCta(
     salesEndTime: String,
+    receiveGift: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TopGradientBackground(
@@ -184,7 +186,7 @@ private fun GiftPreQuestionCta(
                     .padding(horizontal = 20.dp)
                     .padding(vertical = 8.dp),
                 label = stringResource(R.string.gift_pre_question_register_cta),
-                onClick = {},
+                onClick = receiveGift,
             )
         }
     }

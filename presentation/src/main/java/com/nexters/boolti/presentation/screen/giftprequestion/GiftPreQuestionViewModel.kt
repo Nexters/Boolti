@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -79,7 +80,7 @@ class GiftPreQuestionViewModel @Inject constructor(
     }
 
     fun receiveGift() {
-        val state = _uiState.value as? GiftPreQuestionUiState.Success ?: return
+        val state = uiState.value as? GiftPreQuestionUiState.Success ?: return
 
         viewModelScope.launch(recordExceptionHandler) {
             val request = SubmitPreQuestionAnswersRequest(
@@ -93,7 +94,12 @@ class GiftPreQuestionViewModel @Inject constructor(
                         )
                     },
             )
-            ticketingRepository.submitPreQuestionAnswers(request).first() // TODO: 성공 여부 확인 후 다음 API 호출하기
+
+            ticketingRepository.submitPreQuestionAnswers(request)
+                .catch {
+                    _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
+                }
+                .first()
 
             val isSuccessful = giftRepository.receiveGift(giftUuid).first()
             if (isSuccessful) {

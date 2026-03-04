@@ -7,6 +7,7 @@ import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +55,16 @@ class GiftPreQuestionViewModel @Inject constructor(
                     preQuestions = preQuestions.await().toImmutableList(),
                 )
             }
+        }
+    }
+
+    fun putPreQuestionAnswer(questionId: Long, answer: String) {
+        _uiState.update {
+            val state = it as GiftPreQuestionUiState.Success
+
+            val newAnswers = state.preQuestionAnswers.toMutableMap()
+            newAnswers[questionId] = answer
+            state.copy(preQuestionAnswers = newAnswers.toImmutableMap())
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.data.util.toLocalDate
+import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.Gift
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -47,7 +48,7 @@ data class GiftResponse(
             showId = showId,
             showName = showName,
             showImage = showImg,
-            showDate = showDate.toLocalDate(),
+            showDate = showDate.toLocalDateTime(),
             salesTicketName = salesTicketName,
             ticketCount = ticketCount,
         )

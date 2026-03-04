@@ -9,11 +9,8 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 fun NavGraphBuilder.giftPreQuestionScreen() {
     composable<MainRoute.GiftPreQuestion> { backStackEntry ->
         val navController = LocalNavController.current
-        val route: MainRoute.GiftPreQuestion = backStackEntry.toRoute()
 
         GiftPreQuestionScreen(
-            giftUuid = route.giftUuid,
-            showId = route.showId,
             onBackPressed = navController::navigateUp,
         )
     }

@@ -214,6 +214,9 @@
     <string name="pre_question_no_answer">작성한 내용이 없어요</string>
     <string name="pre_question_save_complete">사전 질문 작성을 완료했어요</string>
 
+    <!-- 선물하기 사전 질문 -->
+    <string name="gift_pre_question_title">등록할 선물의 정보를 확인하고 사전 질문에 답변해 주세요</string>
+
     <!-- 선물하기 -->
     <string name="gift_receiver_info">받는 분 정보</string>
     <string name="gift_sender_info">보내는 분 정보</string>

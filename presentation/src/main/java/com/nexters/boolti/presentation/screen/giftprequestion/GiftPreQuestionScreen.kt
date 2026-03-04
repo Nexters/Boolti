@@ -3,17 +3,23 @@ package com.nexters.boolti.presentation.screen.giftprequestion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,11 +27,15 @@ import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCloseableAppBar
+import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ShowItemV2
+import com.nexters.boolti.presentation.component.TopGradientBackground
+import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.showDateString
 import com.nexters.boolti.presentation.screen.refund.InfoRow
 import com.nexters.boolti.presentation.screen.ticketing.PreQuestionsSection
 import com.nexters.boolti.presentation.theme.Grey05
+import com.nexters.boolti.presentation.theme.Grey20
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -52,7 +62,9 @@ fun GiftPreQuestionScreen(
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()) {
             val state = uiState
 
             if (state is GiftPreQuestionUiState.Success) {
@@ -62,6 +74,10 @@ fun GiftPreQuestionScreen(
                     preQuestionAnswers = state.preQuestionAnswers,
                     onAnswerChanged = viewModel::putPreQuestionAnswer,
                     getAnswerError = state::getAnswerError,
+                )
+                GiftPreQuestionCta(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    salesEndTime = state.gift.salesEndTime.format("yyyy년 M월 d일"),
                 )
             }
         }
@@ -102,6 +118,49 @@ fun GiftPreQuestionScreen(
             onAnswerChanged = onAnswerChanged,
             getAnswerError = getAnswerError,
         )
+    }
+}
+
+@Composable
+private fun GiftPreQuestionCta(
+    salesEndTime: String,
+    modifier: Modifier = Modifier,
+) {
+    TopGradientBackground(
+        modifier = modifier,
+        bgColor = Grey95,
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = buildAnnotatedString {
+                    val dateEnd = salesEndTime.length
+                    append("${salesEndTime}까지 선물을 등록해 주세요")
+                    addStyle(
+                        SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        start = 0,
+                        end = dateEnd,
+                    )
+                },
+                color = Grey20,
+                style = MaterialTheme.typography.bodySmall,
+            )
+
+            MainButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(vertical = 8.dp),
+                label = "선물 등록하기",
+                onClick = {},
+            )
+        }
     }
 }
 

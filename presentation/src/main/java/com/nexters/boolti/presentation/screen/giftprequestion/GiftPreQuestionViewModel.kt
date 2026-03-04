@@ -2,17 +2,24 @@ package com.nexters.boolti.presentation.screen.giftprequestion
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
+import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
+import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,6 +40,9 @@ class GiftPreQuestionViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<GiftPreQuestionUiState>(GiftPreQuestionUiState.Loading)
     val uiState: StateFlow<GiftPreQuestionUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<GiftPreQuestionEvent>()
+    val events: Flow<GiftPreQuestionEvent> = _events.receiveAsFlow()
 
     init {
         fetchGiftAndPreQuestions()
@@ -65,6 +75,36 @@ class GiftPreQuestionViewModel @Inject constructor(
             val newAnswers = state.preQuestionAnswers.toMutableMap()
             newAnswers[questionId] = answer
             state.copy(preQuestionAnswers = newAnswers.toImmutableMap())
+        }
+    }
+
+    fun receiveGift() {
+        val state = _uiState.value as? GiftPreQuestionUiState.Success ?: return
+
+        viewModelScope.launch(recordExceptionHandler) {
+            val request = SubmitPreQuestionAnswersRequest(
+                reservationId = state.gift.reservationId,
+                answers = state.preQuestionAnswers
+                    .filter { (_, answer) -> answer.isNotBlank() }
+                    .map { (questionId, answer) ->
+                        PreQuestionAnswerRequest(
+                            preQuestionId = questionId,
+                            answer = answer,
+                        )
+                    },
+            )
+            ticketingRepository.submitPreQuestionAnswers(request).first() // TODO: 성공 여부 확인 후 다음 API 호출하기
+
+            val isSuccessful = giftRepository.receiveGift(giftUuid).first()
+            if (isSuccessful) {
+                AppTracker.complete(
+                    target = "GiftRegistration",
+                    properties = mapOf("gift_id" to giftUuid),
+                )
+                _events.send(GiftPreQuestionEvent.GiftRegistered)
+            } else {
+                _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
+            }
         }
     }
 }

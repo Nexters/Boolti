@@ -103,14 +103,7 @@ class HomeViewModel @Inject constructor(
                 .getGift(giftUuid)
                 .first()
             val senderId = gift.senderUserId
-
             val hasPreQuestion = ticketingRepository.getPreQuestions(gift.showId).first().isNotEmpty()
-
-            // TODO: 계획
-            // 4. 다음 화면에서 사전 질문을 작성한 뒤 완료하면 두 가지 api 호출
-            reservationRepository.getPreQuestionAnswers(gift.reservationId).first()
-            reservationRepository.findReservationById(gift.reservationId).first()
-
             val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
 
             pendingGift = PendingGift.Ready(

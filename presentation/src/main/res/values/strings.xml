@@ -219,6 +219,8 @@
     <string name="gift_pre_question_deadline">%s까지 선물을 등록해 주세요</string>
     <string name="gift_pre_question_deadline_date_format">yyyy년 M월 d일</string>
     <string name="gift_pre_question_register_cta">선물 등록하기</string>
+    <string name="gift_pre_question_exit_dialog_title">답변을 완료하지 않고 이 페이지를 나가면 선물이 등록되지 않습니다. 답변을 종료할까요?</string>
+    <string name="gift_pre_question_exit_label">종료하기</string>
 
     <!-- 선물하기 -->
     <string name="gift_receiver_info">받는 분 정보</string>

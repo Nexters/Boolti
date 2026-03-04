@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.giftprequestion
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +15,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtCloseableAppBar
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.ShowItemV2
@@ -50,16 +56,33 @@ fun GiftPreQuestionScreen(
     viewModel: GiftPreQuestionViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showExitDialog by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler { showExitDialog = true }
+
+    if (showExitDialog) {
+        BTDialog(
+            onDismiss = { showExitDialog = false },
+            negativeButtonLabel = stringResource(R.string.cancel),
+            onClickNegativeButton = { showExitDialog = false },
+            positiveButtonLabel = stringResource(R.string.gift_pre_question_exit_label),
+            onClickPositiveButton = onBackPressed,
+        ) {
+            Text(
+                text = stringResource(R.string.gift_pre_question_exit_dialog_title),
+                color = Grey05,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
 
     Scaffold(
         modifier = Modifier.navigationBarsPadding(),
         containerColor = Grey95,
         topBar = {
             BtCloseableAppBar(
-                onClickClose = {
-                    TODO()
-                    onBackPressed()
-                }
+                onClickClose = { showExitDialog = true }
             )
         }
     ) { innerPadding ->

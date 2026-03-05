@@ -83,6 +83,13 @@ class GiftPreQuestionViewModel @Inject constructor(
         val state = uiState.value as? GiftPreQuestionUiState.Success ?: return
 
         viewModelScope.launch(recordExceptionHandler) {
+            val isSuccessful = giftRepository.receiveGift(giftUuid).first()
+
+            if (!isSuccessful) {
+                _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
+                return@launch
+            }
+
             val request = SubmitPreQuestionAnswersRequest(
                 reservationId = state.gift.reservationId,
                 answers = state.preQuestionAnswers
@@ -99,18 +106,14 @@ class GiftPreQuestionViewModel @Inject constructor(
                 .catch {
                     _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
                 }
-                .first()
+                .collect {
+                    _events.send(GiftPreQuestionEvent.GiftRegistered)
 
-            val isSuccessful = giftRepository.receiveGift(giftUuid).first()
-            if (isSuccessful) {
-                AppTracker.complete(
-                    target = "GiftRegistration",
-                    properties = mapOf("gift_id" to giftUuid),
-                )
-                _events.send(GiftPreQuestionEvent.GiftRegistered)
-            } else {
-                _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
-            }
+                    AppTracker.complete(
+                        target = "GiftRegistration",
+                        properties = mapOf("gift_id" to giftUuid),
+                    )
+                }
         }
     }
 }

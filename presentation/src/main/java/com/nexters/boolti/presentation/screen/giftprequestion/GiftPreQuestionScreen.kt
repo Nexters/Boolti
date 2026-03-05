@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +39,7 @@ import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.component.TopGradientBackground
 import com.nexters.boolti.presentation.extension.format
 import com.nexters.boolti.presentation.extension.showDateString
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.refund.InfoRow
 import com.nexters.boolti.presentation.screen.ticketing.PreQuestionsSection
 import com.nexters.boolti.presentation.theme.Grey05
@@ -57,8 +59,27 @@ fun GiftPreQuestionScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showExitDialog by rememberSaveable { mutableStateOf(false) }
+    val snackbarController = LocalSnackbarController.current
 
     BackHandler { showExitDialog = true }
+
+    val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
+    val giftRegistrationFailureMessage = stringResource(id = R.string.gift_registration_failed)
+
+    LaunchedEffect(viewModel.events) {
+        viewModel.events.collect { event ->
+            when (event) {
+                GiftPreQuestionEvent.GiftRegistered -> {
+                    snackbarController.showMessage(giftRegistrationMessage)
+                    onBackPressed()
+                }
+
+                GiftPreQuestionEvent.GiftRegistrationFailed -> {
+                    snackbarController.showMessage(giftRegistrationFailureMessage)
+                }
+            }
+        }
+    }
 
     if (showExitDialog) {
         BTDialog(

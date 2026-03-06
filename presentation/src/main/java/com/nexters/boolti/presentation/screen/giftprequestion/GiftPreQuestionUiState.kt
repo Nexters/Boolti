@@ -6,10 +6,8 @@ import com.nexters.boolti.presentation.extension.unicodeLength
 import com.nexters.boolti.presentation.screen.ticketing.TicketingState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.persistentSetOf
 
 sealed class GiftPreQuestionUiState {
     data object Loading : GiftPreQuestionUiState()
@@ -18,10 +16,20 @@ sealed class GiftPreQuestionUiState {
         val gift: Gift,
         val preQuestions: ImmutableList<PreQuestion> = persistentListOf(),
         val preQuestionAnswers: ImmutableMap<Long, String> = persistentMapOf(),
-    ) : GiftPreQuestionUiState()
+    ) : GiftPreQuestionUiState() {
+        private val isRequiredQuestionsAnswered: Boolean
+            get() = preQuestions
+                .filter { it.isRequired }
+                .all { question ->
+                    val answer = preQuestionAnswers[question.id]
+                    !answer.isNullOrBlank() && answer.unicodeLength() <= TicketingState.Companion.MAX_ANSWER_LENGTH
+                }
 
-    companion object {
-        const val MAX_ANSWER_LENGTH = 100
+        private val hasInvalidAnswers: Boolean
+            get() = preQuestionAnswers.values.any { it.unicodeLength() > TicketingState.Companion.MAX_ANSWER_LENGTH }
+
+        val isPreQuestionsValid: Boolean
+            get() = isRequiredQuestionsAnswered && !hasInvalidAnswers
     }
 
     fun getAnswerError(questionId: Long): Boolean {
@@ -29,5 +37,9 @@ sealed class GiftPreQuestionUiState {
 
         val answer = preQuestionAnswers[questionId] ?: return false
         return answer.unicodeLength() > TicketingState.Companion.MAX_ANSWER_LENGTH
+    }
+
+    companion object {
+        const val MAX_ANSWER_LENGTH = 100
     }
 }

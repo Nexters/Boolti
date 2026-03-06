@@ -18,9 +18,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -103,7 +105,9 @@ class GiftPreQuestionViewModel @Inject constructor(
             )
 
             ticketingRepository.submitPreQuestionAnswers(request)
-                .catch {
+                .retry(2)
+                .catch { throwable ->
+                    FirebaseCrashlytics.getInstance().recordException(throwable)
                     _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
                 }
                 .collect {

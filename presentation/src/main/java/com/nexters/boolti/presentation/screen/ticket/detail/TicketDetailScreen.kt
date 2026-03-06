@@ -1,10 +1,8 @@
 package com.nexters.boolti.presentation.screen.ticket.detail
 
 import android.os.Build
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -70,7 +67,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -85,6 +81,7 @@ import androidx.navigation.compose.composable
 import coil.compose.AsyncImage
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.Ticket
+import com.nexters.boolti.domain.model.PreQuestionAnswer
 import com.nexters.boolti.domain.model.TicketGroup
 import com.nexters.boolti.domain.model.TicketState
 import com.nexters.boolti.presentation.R
@@ -92,11 +89,16 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.DottedDivider
 import com.nexters.boolti.presentation.component.InstagramIndicator
+import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.component.PreQuestionAnswerItem
 import com.nexters.boolti.presentation.component.ShowInquiry
+import com.nexters.boolti.presentation.extension.OnResume
 import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
 import com.nexters.boolti.presentation.screen.qr.QrCoverView
@@ -114,6 +116,7 @@ import com.nexters.boolti.presentation.util.TicketShape
 import com.nexters.boolti.presentation.util.UrlParser
 import com.nexters.boolti.presentation.util.asyncImageBlurModel
 import com.nexters.boolti.presentation.util.rememberQrBitmapPainter
+import kotlinx.collections.immutable.ImmutableList
 
 fun NavGraphBuilder.ticketDetailScreen(
     getSharedViewModel: @Composable (NavBackStackEntry) -> TicketDetailViewModel,
@@ -126,6 +129,9 @@ fun NavGraphBuilder.ticketDetailScreen(
             onBackClicked = navController::popBackStack,
             onClickQr = { navController.navigate(TicketRoute.Qr) },
             navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it, source = Screen.Ticket.value)) },
+            navigateToPreQuestionEdit = { reservationId ->
+                navController.navigate(MainRoute.PreQuestionEdit(reservationId = reservationId))
+            },
             viewModel = getSharedViewModel(entry),
         )
     }
@@ -139,6 +145,7 @@ private fun TicketDetailScreen(
     onBackClicked: () -> Unit,
     onClickQr: () -> Unit,
     navigateToShowDetail: (showId: String) -> Unit,
+    navigateToPreQuestionEdit: (reservationId: String) -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
     var showEnterCodeDialog by remember { mutableStateOf(false) }
@@ -193,6 +200,8 @@ private fun TicketDetailScreen(
         snapshotFlow { pagerState.currentPage }
             .collect(viewModel::syncCurrentPage)
     }
+
+    OnResume { viewModel.refreshPreQuestionAnswers() }
 
     Scaffold(
         modifier = modifier.navigationBarsPadding(),
@@ -350,6 +359,14 @@ private fun TicketDetailScreen(
                             ),
                     )
                 }
+
+                PreQuestionSection(
+                    answers = uiState.preQuestionAnswers,
+                    canEdit = uiState.canEditPreQuestion,
+                    onNavigateToEdit = {
+                        navigateToPreQuestionEdit(ticketGroup.reservationId)
+                    },
+                )
 
                 RefundPolicySection(uiState.refundPolicy)
 
@@ -652,55 +669,65 @@ private fun Inquiry(
 }
 
 @Composable
+private fun PreQuestionSection(
+    answers: ImmutableList<PreQuestionAnswer>,
+    canEdit: Boolean,
+    onNavigateToEdit: () -> Unit,
+) {
+    if (answers.isEmpty()) return
+
+    val hasAnswers = answers.any { it.answer.isNotBlank() }
+
+    Section(
+        title = stringResource(R.string.pre_questions_label),
+        defaultExpanded = false,
+    ) {
+        answers.forEachIndexed { index, answer ->
+            if (index > 0) {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            PreQuestionAnswerItem(answer = answer)
+        }
+
+        if (canEdit) {
+            MainButton(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .fillMaxWidth(),
+                label = stringResource(
+                    if (hasAnswers) R.string.pre_question_edit_button
+                    else R.string.pre_question_create_button,
+                ),
+                colors = MainButtonDefaults.buttonColors(
+                    containerColor = if (hasAnswers) Grey70 else MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
+                onClick = onNavigateToEdit,
+            )
+        }
+    }
+}
+
+@Composable
 private fun RefundPolicySection(refundPolicy: List<String>) {
-    var expanded by remember { mutableStateOf(false) }
-    val rotation by animateFloatAsState(
-        targetValue = if (expanded) 0F else 180F,
-        animationSpec = tween(),
-        label = "expandIconRotation"
-    )
     Section(
         title = stringResource(R.string.refund_policy_label),
-        titleRowOption = {
-            Icon(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .rotate(rotation)
-                    .clickable(role = Role.Image) { expanded = !expanded },
-                painter = painterResource(R.drawable.ic_expand_24),
-                tint = Grey50,
-                contentDescription = null,
-            )
-        },
-        contentVisible = expanded,
+        defaultExpanded = false,
     ) {
-        Column(
-            Modifier
-                .animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioNoBouncy,
-                        stiffness = Spring.StiffnessMedium,
-                    )
-                ),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            if (expanded) {
-                refundPolicy.forEachIndexed { index, policy ->
-                    if (index > 0) Spacer(modifier = Modifier.size(6.dp))
-                    Row {
-                        Text(
-                            text = stringResource(R.string.bullet),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Grey50,
-                        )
-                        Text(
-                            text = policy,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Grey50,
-                            lineHeight = 22.sp,
-                        )
-                    }
-                }
+        refundPolicy.forEachIndexed { index, policy ->
+            if (index > 0) Spacer(modifier = Modifier.size(6.dp))
+            Row {
+                Text(
+                    text = stringResource(R.string.bullet),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                )
+                Text(
+                    text = policy,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                    lineHeight = 22.sp,
+                )
             }
         }
     }
@@ -710,26 +737,43 @@ private fun RefundPolicySection(refundPolicy: List<String>) {
 private fun Section(
     modifier: Modifier = Modifier,
     title: String,
-    titleRowOption: (@Composable () -> Unit)? = null,
-    contentVisible: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit,
+    defaultExpanded: Boolean = true,
+    content: @Composable () -> Unit,
 ) {
+    var expanded by remember { mutableStateOf(defaultExpanded) }
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 0F else 180F,
+        animationSpec = tween(),
+        label = "expandIconRotation"
+    )
+
     Column(
         modifier
             .fillMaxWidth()
             .border(1.dp, color = White.copy(alpha = .15f), shape = RoundedCornerShape(8.dp))
-            .padding(start = 20.dp, end = 20.dp, bottom = if (contentVisible) 20.dp else 0.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp),
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 20.dp, vertical = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             SectionTitle(title)
-            titleRowOption?.let { it() }
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .rotate(rotation),
+                painter = painterResource(R.drawable.ic_expand_24),
+                tint = Grey50,
+                contentDescription = null,
+            )
         }
-        content()
+        AnimatedVisibility(visible = expanded) {
+            Column(Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)) {
+                content()
+            }
+        }
     }
 }
 

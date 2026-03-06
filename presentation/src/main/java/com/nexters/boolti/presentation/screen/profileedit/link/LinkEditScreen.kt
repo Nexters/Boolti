@@ -137,7 +137,6 @@ fun LinkEditScreen(
                             .fillMaxWidth(),
                         text = linkName,
                         placeholder = stringResource(R.string.link_name_placeholder),
-                        singleLine = true,
                         onValueChanged = onChangeLinkName,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
@@ -160,7 +159,6 @@ fun LinkEditScreen(
                             .fillMaxWidth(),
                         text = linkUrl,
                         placeholder = stringResource(R.string.link_url_placeholder),
-                        singleLine = true,
                         onValueChanged = onChangeLinkUrl,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,

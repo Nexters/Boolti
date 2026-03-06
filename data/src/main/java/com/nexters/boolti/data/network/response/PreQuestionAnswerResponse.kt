@@ -24,9 +24,9 @@ internal data class PreQuestionAnswerItemResponse(
 internal fun PreQuestionAnswerItemResponse.toDomain() = PreQuestionAnswer(
     preQuestionId = preQuestionId,
     question = question,
-    description = description,
+    description = description.orEmpty(),
     isRequired = isRequired,
-    answer = answer,
+    answer = answer.orEmpty(),
 )
 
 internal fun List<PreQuestionAnswerItemResponse>.toDomains() = map { it.toDomain() }

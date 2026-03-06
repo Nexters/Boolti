@@ -6,7 +6,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -74,10 +73,10 @@ fun ReportScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
-                    .height(160.dp)
                     .padding(top = 20.dp),
                 text = uiState.reason,
                 placeholder = stringResource(id = R.string.report_reason_hint),
+                singleLine = false,
                 onValueChanged = viewModel::updateReason,
             )
             Spacer(modifier = Modifier.weight(1.0f))

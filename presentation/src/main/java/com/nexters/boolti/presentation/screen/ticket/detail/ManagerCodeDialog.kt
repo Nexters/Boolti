@@ -2,8 +2,8 @@ package com.nexters.boolti.presentation.screen.ticket.detail
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -75,14 +75,11 @@ fun ManagerCodeDialog(
                 .fillMaxWidth()
                 .padding(top = 24.dp),
             keyboardOptions = KeyboardOptions(
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done,
             ),
-            keyboardActions = KeyboardActions(
-                onDone = { onClickConfirm(code) }
-            ),
-            singleLine = true,
+            onKeyboardAction = KeyboardActionHandler { onClickConfirm(code) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,

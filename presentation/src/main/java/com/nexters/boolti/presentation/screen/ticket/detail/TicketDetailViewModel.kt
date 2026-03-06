@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.exception.ManagerCodeException
 import com.nexters.boolti.domain.exception.TicketException
 import com.nexters.boolti.domain.repository.GiftRepository
+import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,8 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,6 +33,7 @@ class TicketDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketRepository,
     private val giftRepository: GiftRepository,
+    private val reservationRepository: ReservationRepository,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
     // 실제로는 reservationId가 들어온다. api 변경에 따른 수정
@@ -65,10 +70,41 @@ class TicketDetailViewModel @Inject constructor(
             getRefundPolicyUsecase().onEach { refundPolicy ->
                 _uiState.update { it.copy(refundPolicy = refundPolicy) }
             }.launchIn(viewModelScope + recordExceptionHandler)
+
+            fetchReservationDetail()
+            fetchPreQuestionAnswers()
         }
     }
 
     fun refresh() = load()
+
+    fun refreshPreQuestionAnswers() {
+        fetchPreQuestionAnswers()
+    }
+
+    private fun fetchReservationDetail() {
+        reservationRepository.findReservationById(ticketId)
+            .onEach { detail ->
+                _uiState.update {
+                    it.copy(canEditPreQuestion = detail.salesEndDateTime >= LocalDateTime.now())
+                }
+            }
+            .catch { e ->
+                Timber.e(e, "Failed to fetch reservation detail for salesEndDateTime")
+            }
+            .launchIn(viewModelScope + recordExceptionHandler)
+    }
+
+    private fun fetchPreQuestionAnswers() {
+        reservationRepository.getPreQuestionAnswers(ticketId)
+            .onEach { answers ->
+                _uiState.update { it.copy(preQuestionAnswers = answers.toImmutableList()) }
+            }
+            .catch { e ->
+                Timber.e(e, "Failed to fetch pre-question answers")
+            }
+            .launchIn(viewModelScope + recordExceptionHandler)
+    }
 
     fun requestEntrance(managerCode: String) {
         val ticket = uiState.value.legacyTicket

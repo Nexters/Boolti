@@ -23,12 +23,17 @@ import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 internal class TicketingRepositoryImpl @Inject constructor(
     private val dataSource: TicketingDataSource,
     private val reservationDataSource: ReservationDataSource,
 ) : TicketingRepository {
+    private data class CacheEntry<T>(val value: T, val cachedAt: Long)
+
+    private val preQuestionsCache = ConcurrentHashMap<String, CacheEntry<List<PreQuestion>>>()
+    private val cacheTtlMs = 60_000L
     override fun getSalesTickets(request: SalesTicketRequest): Flow<List<TicketWithQuantity>> = flow {
         emit(dataSource.getSalesTickets(request))
     }
@@ -88,7 +93,14 @@ internal class TicketingRepositoryImpl @Inject constructor(
     }
 
     override fun getPreQuestions(showId: String): Flow<List<PreQuestion>> = flow {
-        emit(dataSource.getPreQuestions(showId))
+        val cached = preQuestionsCache[showId]
+        if (cached != null && System.currentTimeMillis() - cached.cachedAt < cacheTtlMs) {
+            emit(cached.value)
+            return@flow
+        }
+        val preQuestions = dataSource.getPreQuestions(showId)
+        preQuestionsCache[showId] = CacheEntry(preQuestions, System.currentTimeMillis())
+        emit(preQuestions)
     }
 
     override fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Flow<Unit> = flow {

@@ -28,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GiftPreQuestionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val giftRepository: GiftRepository, // TODO: 캐시
+    private val giftRepository: GiftRepository,
     private val ticketingRepository: TicketingRepository,
 ) : BaseViewModel() {
 

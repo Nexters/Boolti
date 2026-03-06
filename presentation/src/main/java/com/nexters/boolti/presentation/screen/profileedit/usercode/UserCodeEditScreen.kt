@@ -147,7 +147,6 @@ private fun UserCodeEditScreen(
                     }
                 },
                 placeholder = stringResource(R.string.nickname_edit_placeholder),
-                singleLine = true,
             )
             Spacer(Modifier.height(20.dp))
             Text(

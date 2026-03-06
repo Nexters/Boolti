@@ -136,7 +136,6 @@ fun VideoEditScreen(
                             .fillMaxWidth(),
                         text = videoUrl,
                         placeholder = stringResource(R.string.video_edit_placeholer),
-                        singleLine = true,
                         onValueChanged = onChangeVideoUrl,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,

@@ -56,7 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
+import com.nexters.boolti.presentation.util.PhoneNumberOutputTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -93,7 +93,6 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.util.PhoneNumberVisualTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
@@ -488,7 +487,6 @@ private fun InviteCodeSection(
                     .weight(1F)
                     .padding(end = 6.dp),
                 text = inviteCode.uppercase(),
-                singleLine = true,
                 enabled = inviteCodeStatus !is InviteCodeStatus.Valid,
                 isError = inviteCodeStatus in listOf(
                     InviteCodeStatus.Invalid,
@@ -833,16 +831,15 @@ fun InputRow(
             modifier = Modifier
                 .padding(start = 12.dp)
                 .weight(1F),
-            singleLine = true,
             keyboardOptions = if (isPhoneNumber) {
                 KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = imeAction)
             } else {
                 KeyboardOptions.Default.copy(imeAction = imeAction)
             },
-            visualTransformation = if (isPhoneNumber) {
-                PhoneNumberVisualTransformation('-')
+            outputTransformation = if (isPhoneNumber) {
+                PhoneNumberOutputTransformation('-')
             } else {
-                VisualTransformation.None
+                null
             },
             onValueChanged = {
                 onValueChanged(

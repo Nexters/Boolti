@@ -119,7 +119,6 @@ private fun NicknameEditScreen(
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            BTTextField(
             BTClearableTextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -146,12 +145,6 @@ private fun NicknameEditScreen(
                     }
                 },
                 placeholder = stringResource(R.string.nickname_edit_placeholder),
-                singleLine = true,
-                /*trailingIcon = {
-                    if (nickname.isNotEmpty()) {
-                        BTTextFieldDefaults.ClearButton(onClick = { onChangeNickname("") })
-                    }
-                },*/
             )
             Spacer(Modifier.height(20.dp))
             Text(

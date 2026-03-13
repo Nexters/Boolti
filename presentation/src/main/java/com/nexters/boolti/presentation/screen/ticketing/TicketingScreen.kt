@@ -28,6 +28,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.then
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -56,7 +59,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import com.nexters.boolti.presentation.util.PhoneNumberOutputTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -80,7 +82,6 @@ import com.nexters.boolti.presentation.component.PolicyBottomSheet
 import com.nexters.boolti.presentation.component.ShowItemV2
 import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.component.TopGradientBackground
-import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Error
 import com.nexters.boolti.presentation.theme.Grey05
@@ -93,6 +94,8 @@ import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Success
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.DigitOnlyInputTransformation
+import com.nexters.boolti.presentation.util.PhoneNumberOutputTransformation
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
@@ -826,7 +829,7 @@ fun InputRow(
             style = MaterialTheme.typography.bodySmall,
         )
         BTTextField(
-            text = if (isPhoneNumber) text.filterToPhoneNumber() else text,
+            text = text,
             placeholder = placeholder,
             modifier = Modifier
                 .padding(start = 12.dp)
@@ -836,16 +839,19 @@ fun InputRow(
             } else {
                 KeyboardOptions.Default.copy(imeAction = imeAction)
             },
-            outputTransformation = if (isPhoneNumber) {
-                PhoneNumberOutputTransformation('-')
+            inputTransformation = if (isPhoneNumber) {
+                InputTransformation.maxLength(11).then(
+                    DigitOnlyInputTransformation()
+                )
             } else {
                 null
             },
-            onValueChanged = {
-                onValueChanged(
-                    if (isPhoneNumber) it.filterToPhoneNumber() else it,
-                )
+            outputTransformation = if (isPhoneNumber) {
+                PhoneNumberOutputTransformation("-")
+            } else {
+                null
             },
+            onValueChanged = onValueChanged,
         )
     }
 }

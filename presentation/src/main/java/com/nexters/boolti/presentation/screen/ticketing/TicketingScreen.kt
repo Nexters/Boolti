@@ -830,7 +830,7 @@ fun InputRow(
             style = MaterialTheme.typography.bodySmall,
         )
         BTTextField(
-            text = if (isPhoneNumber) text.filterToPhoneNumber() else text,
+            text = text,
             placeholder = placeholder,
             modifier = Modifier
                 .padding(start = 12.dp)
@@ -840,10 +840,6 @@ fun InputRow(
             } else {
                 KeyboardOptions.Default.copy(imeAction = imeAction)
             },
-            // TODO: 체크리스트
-            // 3. 기존 api를 대체하면서 불필요해진 코드를 제거했는가?
-            // 4. 모든 BtTextField에 대해 적용했는가?
-            // 5. BtTextField에서 setAnd... api 호출 방식을 그대로 두어도 되는지에 대한 고민
             inputTransformation = if (isPhoneNumber) {
                 InputTransformation.maxLength(11).then(
                     DigitOnlyInputTransformation()

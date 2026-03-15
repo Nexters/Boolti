@@ -126,6 +126,7 @@ private fun PreQuestionEditItem(
     Column(modifier = modifier) {
         Row {
             Text(
+                modifier = Modifier.weight(1f, fill = false),
                 text = question.question,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

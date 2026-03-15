@@ -12,16 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.presentation.R
+import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.extension.unicodeLength
+import com.nexters.boolti.presentation.theme.Grey50
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import com.nexters.boolti.presentation.component.BTTextField
-import com.nexters.boolti.presentation.theme.Grey50
 
 @Composable
 internal fun PreQuestionsSection(
@@ -62,6 +61,7 @@ private fun PreQuestionItem(
     Column(modifier = modifier) {
         Row {
             Text(
+                modifier = Modifier.weight(1f, fill = false),
                 text = question.question,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -94,7 +94,11 @@ private fun PreQuestionItem(
             placeholder = stringResource(R.string.pre_question_placeholder),
             singleLine = false,
             isError = isError,
-            bottomEndText = stringResource(R.string.input_limit, answer.unicodeLength(), TicketingState.MAX_ANSWER_LENGTH),
+            bottomEndText = stringResource(
+                R.string.input_limit,
+                answer.unicodeLength(),
+                TicketingState.MAX_ANSWER_LENGTH
+            ),
             supportingText = if (isError) {
                 stringResource(R.string.input_upper_limit_text, TicketingState.MAX_ANSWER_LENGTH)
             } else null,

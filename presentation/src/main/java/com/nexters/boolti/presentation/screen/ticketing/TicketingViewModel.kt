@@ -235,15 +235,12 @@ class TicketingViewModel @Inject constructor(
         if (state.preQuestions.isEmpty()) return
 
         val answers = state.preQuestionAnswers
-            .filter { (_, answer) -> answer.isNotBlank() }
             .map { (questionId, answer) ->
                 PreQuestionAnswerRequest(
                     preQuestionId = questionId,
                     answer = answer,
                 )
             }
-
-        if (answers.isEmpty()) return
 
         val request = SubmitPreQuestionAnswersRequest(
             reservationId = reservationId,

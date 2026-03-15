@@ -133,7 +133,6 @@ class PreQuestionEditViewModel @Inject constructor(
     private fun submitAnswers() {
         val state = uiState.value
         val answerRequests = state.answers
-            .filter { (_, answer) -> answer.isNotBlank() }
             .map { (questionId, answer) ->
                 PreQuestionAnswerRequest(
                     preQuestionId = questionId,

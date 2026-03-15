@@ -33,6 +33,7 @@ data class TicketGroup(
     val tickets: List<Ticket> = emptyList(),
     val giftUuid: String? = null,
     val isGift: Boolean = false,
+    val salesEndTime: LocalDateTime? = null,
 ) {
     data class Ticket(
         val ticketId: String = "",

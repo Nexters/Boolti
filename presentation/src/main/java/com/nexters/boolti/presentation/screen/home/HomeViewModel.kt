@@ -5,7 +5,6 @@ import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
-import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.DeepLinkEvent
@@ -30,7 +29,6 @@ class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val giftRepository: GiftRepository,
     private val deepLinkEvent: DeepLinkEvent,
-    private val reservationRepository: ReservationRepository,
     private val ticketingRepository: TicketingRepository,
 ) : BaseViewModel() {
     val loggedIn = authRepository.loggedIn.stateIn(
@@ -109,8 +107,13 @@ class HomeViewModel @Inject constructor(
             pendingGift = PendingGift.Ready(
                 giftUuid = gift.uuid,
                 showId = gift.showId,
-                hasPreQuestion = hasPreQuestion,
             )
+
+            if (hasPreQuestion) {
+                sendEvent(HomeEvent.NavigateToGiftPreQuestion(gift.uuid, gift.showId))
+                return@launch
+            }
+
             if (senderId == myUserId) {
                 sendEvent(HomeEvent.GiftNotification(GiftStatus.SELF))
             } else {
@@ -128,11 +131,6 @@ class HomeViewModel @Inject constructor(
     fun receiveGift() {
         val ready = pendingGift as? PendingGift.Ready ?: return
         val giftUuid = ready.giftUuid
-
-        if (ready.hasPreQuestion) {
-            sendEvent(HomeEvent.NavigateToGiftPreQuestion(giftUuid, ready.showId))
-            return
-        }
 
         pendingGift = null
 

@@ -6,6 +6,5 @@ sealed interface PendingGift {
     data class Ready(
         val giftUuid: String,
         val showId: String,
-        val hasPreQuestion: Boolean,
     ) : PendingGift
 }

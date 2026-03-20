@@ -15,7 +15,10 @@ import javax.inject.Inject
 internal class GiftDataSource @Inject constructor(
     private val service: GiftService
 ) {
-    suspend fun receiveGift(request: GiftReceiveRequest): Boolean = service.receiveGift(request)
+    suspend fun receiveGift(request: GiftReceiveRequest): Boolean {
+        val response = service.receiveGift(request)
+        return response.isSuccessful
+    }
 
     suspend fun approveGiftPayment(request: GiftApproveRequest): ApproveGiftPaymentResponse =
         service.approveGiftPayment(request)

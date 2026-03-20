@@ -63,7 +63,14 @@ class TicketDetailViewModel @Inject constructor(
                     }
                 }
                 .onEach { ticketGroup ->
-                    _uiState.update { it.copy(ticketGroup = ticketGroup) }
+                    _uiState.update {
+                        it.copy(
+                            ticketGroup = ticketGroup,
+                            canEditPreQuestion = ticketGroup.salesEndTime?.let { salesEnd ->
+                                salesEnd >= LocalDateTime.now()
+                            } ?: false,
+                        )
+                    }
                 }
                 .launchIn(viewModelScope + recordExceptionHandler)
 
@@ -71,7 +78,6 @@ class TicketDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(refundPolicy = refundPolicy) }
             }.launchIn(viewModelScope + recordExceptionHandler)
 
-            fetchReservationDetail()
             fetchPreQuestionAnswers()
         }
     }
@@ -80,19 +86,6 @@ class TicketDetailViewModel @Inject constructor(
 
     fun refreshPreQuestionAnswers() {
         fetchPreQuestionAnswers()
-    }
-
-    private fun fetchReservationDetail() {
-        reservationRepository.findReservationById(ticketId)
-            .onEach { detail ->
-                _uiState.update {
-                    it.copy(canEditPreQuestion = detail.salesEndDateTime >= LocalDateTime.now())
-                }
-            }
-            .catch { e ->
-                Timber.e(e, "Failed to fetch reservation detail for salesEndDateTime")
-            }
-            .launchIn(viewModelScope + recordExceptionHandler)
     }
 
     private fun fetchPreQuestionAnswers() {

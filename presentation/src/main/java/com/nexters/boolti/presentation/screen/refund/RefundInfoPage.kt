@@ -78,7 +78,7 @@ fun RefundInfoPage(
             titleStyle = point2,
         )
         Section(
-            modifier = Modifier.padding(top = 12.dp),
+            modifier = Modifier.padding(top = 20.dp),
             title = stringResource(id = R.string.refund_information),
             expandable = false,
         ) {

@@ -14,9 +14,9 @@ internal data class PreQuestionAnswerDetailResponse(
 internal data class PreQuestionAnswerItemResponse(
     val preQuestionId: Long,
     val question: String,
-    val description: String?,
+    val description: String,
     val isRequired: Boolean,
-    val answer: String?,
+    val answer: String,
     val createdAt: String?,
     val modifiedAt: String?,
 )
@@ -24,9 +24,9 @@ internal data class PreQuestionAnswerItemResponse(
 internal fun PreQuestionAnswerItemResponse.toDomain() = PreQuestionAnswer(
     preQuestionId = preQuestionId,
     question = question,
-    description = description.orEmpty(),
+    description = description,
     isRequired = isRequired,
-    answer = answer.orEmpty(),
+    answer = answer,
 )
 
 internal fun List<PreQuestionAnswerItemResponse>.toDomains() = map { it.toDomain() }

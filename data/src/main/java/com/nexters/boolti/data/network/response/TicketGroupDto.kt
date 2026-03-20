@@ -97,6 +97,8 @@ internal data class TicketGroupDto(
     val userId: String? = null,
     @SerialName("giftUuid")
     val giftUuid: String? = null,
+    @SerialName("salesEndTime")
+    val salesEndTime: String? = null,
 ) {
     fun toDomain(): TicketGroup = TicketGroup(
         userId = userId ?: "",
@@ -119,6 +121,7 @@ internal data class TicketGroupDto(
         } ?: emptyList(),
         isGift = giftUuid != null,
         giftUuid = giftUuid,
+        salesEndTime = salesEndTime?.toLocalDateTime(),
     )
 
     @Serializable

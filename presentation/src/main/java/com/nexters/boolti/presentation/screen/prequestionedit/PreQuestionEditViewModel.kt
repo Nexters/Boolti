@@ -116,6 +116,8 @@ class PreQuestionEditViewModel @Inject constructor(
         questions: ImmutableList<PreQuestionAnswer>,
         answers: ImmutableMap<Long, String>,
     ): Boolean {
+        val hasChanges = initialAnswers != null && initialAnswers != answers
+
         val requiredAnswered = questions
             .filter { it.isRequired }
             .all { question ->
@@ -127,7 +129,7 @@ class PreQuestionEditViewModel @Inject constructor(
             it.unicodeLength() > PreQuestionEditUiState.MAX_ANSWER_LENGTH
         }
 
-        return requiredAnswered && noInvalidAnswers
+        return hasChanges && requiredAnswered && noInvalidAnswers
     }
 
     private fun submitAnswers() {

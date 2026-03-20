@@ -52,6 +52,7 @@ fun GiftDialog(
     BTDialog(
         onDismiss = onDismiss,
         onClickPositiveButton = action,
+        showCloseButton = false,
         positiveButtonLabel = stringResource(id = buttonTextRes),
         onClickNegativeButton = if(hasNegativeButton) onCanceled else null
     ) {

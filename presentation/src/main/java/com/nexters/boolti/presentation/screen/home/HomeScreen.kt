@@ -187,7 +187,10 @@ fun HomeScreen(
                 giftStatus = null
                 viewModel.cancelGift()
             },
-            receiveGift = viewModel::receiveGift,
+            receiveGift = {
+                viewModel.receiveGift()
+                navController.navigate(HomeRoute.Ticket)
+            },
             requireLogin = {
                 giftStatus = null
                 navigateToLogin()

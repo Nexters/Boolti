@@ -38,6 +38,11 @@ import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 
+/**
+ * BTDialog는 불티에서 공통적으로 사용하는 다이얼로그 컴포저블입니다.
+ *
+ * @param onClickNegativeButton null일 경우 positive button만 표시됩니다.
+ */
 @Composable
 fun BTDialog(
     modifier: Modifier = Modifier,

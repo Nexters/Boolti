@@ -84,6 +84,7 @@ fun HomeScreen(
 
                 is HomeEvent.GiftRegistered -> {
                     snackbarController.showMessage(giftRegistrationMessage)
+                    navController.navigate(HomeRoute.Ticket)
                 }
 
                 is HomeEvent.NavigateToGiftPreQuestion -> {
@@ -187,10 +188,7 @@ fun HomeScreen(
                 giftStatus = null
                 viewModel.cancelGift()
             },
-            receiveGift = {
-                viewModel.receiveGift()
-                navController.navigate(HomeRoute.Ticket)
-            },
+            receiveGift = viewModel::receiveGift,
             requireLogin = {
                 giftStatus = null
                 navigateToLogin()

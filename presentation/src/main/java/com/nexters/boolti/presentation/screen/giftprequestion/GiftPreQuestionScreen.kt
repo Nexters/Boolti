@@ -124,6 +124,7 @@ fun GiftPreQuestionScreen(
             onClickNegativeButton = { showExitDialog = false },
             positiveButtonLabel = stringResource(R.string.gift_pre_question_exit_label),
             onClickPositiveButton = onBackPressed,
+            showCloseButton = false,
         ) {
             Text(
                 text = stringResource(R.string.gift_pre_question_exit_dialog_title),

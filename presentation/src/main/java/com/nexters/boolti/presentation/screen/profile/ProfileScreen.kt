@@ -645,7 +645,9 @@ private fun ProfileHeader(
                     Text(
                         modifier = Modifier.clickable(onClick = onClickUserCode),
                         text = user.userCode,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            textDecoration = TextDecoration.Underline,
+                        ),
                         fontWeight = FontWeight.Normal,
                         color = Grey50,
                         maxLines = 1,

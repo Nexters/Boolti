@@ -18,10 +18,10 @@ plugins {
     alias(libs.plugins.ksp) apply false
 }
 
-task("clean", Delete::class) {
-    delete = setOf(rootProject.buildDir)
+tasks.register<Delete>("clean") {
+    delete = setOf(rootProject.layout.buildDirectory)
 }
 
-task("btTest") {
+tasks.register("btTest") {
     dependsOn(":domain:test", ":data:testDebugUnitTest", ":presentation:testDebugUnitTest")
 }

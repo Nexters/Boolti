@@ -23,9 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -140,7 +140,10 @@ fun GiftPreQuestionScreen(
     if (showFailureDialog) {
         BTDialog(
             onDismiss = { showFailureDialog = false },
-            onClickPositiveButton = { showFailureDialog = false },
+            onClickPositiveButton = {
+                showFailureDialog = false
+                onBackPressed()
+            },
         ) {
             Text(
                 text = stringResource(id = R.string.gift_registration_failed),
@@ -255,7 +258,11 @@ private fun TicketSection(
             .padding(vertical = 20.dp)
             .padding(horizontal = marginHorizontal),
     ) {
-        Text(text = stringResource(R.string.gift_show_info), color = Grey10, style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.gift_show_info),
+            color = Grey10,
+            style = MaterialTheme.typography.titleLarge
+        )
         ShowItemV2(
             modifier = Modifier
                 .fillMaxWidth()

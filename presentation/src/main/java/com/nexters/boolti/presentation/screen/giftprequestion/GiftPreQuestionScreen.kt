@@ -69,7 +69,7 @@ fun GiftPreQuestionScreen(
 
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
-    LaunchedEffect(viewModel.events) {
+    LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 GiftPreQuestionEvent.GiftRegistered -> {

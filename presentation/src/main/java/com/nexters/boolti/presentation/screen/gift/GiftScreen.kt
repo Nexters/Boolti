@@ -120,7 +120,7 @@ fun GiftScreen(
             }
         }
 
-    LaunchedEffect(viewModel.events) {
+    LaunchedEffect(Unit) {
         viewModel.events
             .collect { event ->
                 when (event) {

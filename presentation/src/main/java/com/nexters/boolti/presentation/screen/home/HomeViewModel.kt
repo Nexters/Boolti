@@ -82,14 +82,13 @@ class HomeViewModel @Inject constructor(
     }
 
     fun processGift(giftUuid: String) {
-        pendingGift = PendingGift.Unprocessed(giftUuid)
-
         viewModelScope.launch {
             // 딥링크를 통해 cold start가 발생할 경우 loggedIn의 초기값인 null이 들어오는데, null 대신 로그인 정보를 가져오는 걸 기다리기 위함
             val isLoggedIn = loggedIn.filterNotNull().first()
             if (isLoggedIn) {
                 processGiftWhenLoggedIn(giftUuid)
             } else {
+                pendingGift = PendingGift.Unprocessed(giftUuid)
                 sendEvent(HomeEvent.GiftNotification(GiftStatus.NEED_LOGIN))
             }
         }

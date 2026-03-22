@@ -58,6 +58,7 @@ import kotlinx.collections.immutable.ImmutableMap
 fun GiftPreQuestionScreen(
     onBackPressed: () -> Unit,
     viewModel: GiftPreQuestionViewModel = hiltViewModel(),
+    reserveNavigatingToTicketTab: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showExitDialog by rememberSaveable { mutableStateOf(false) }
@@ -73,6 +74,7 @@ fun GiftPreQuestionScreen(
             when (event) {
                 GiftPreQuestionEvent.GiftRegistered -> {
                     snackbarController.showMessage(giftRegistrationMessage)
+                    reserveNavigatingToTicketTab()
                     onBackPressed()
                 }
 

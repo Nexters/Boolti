@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,6 +47,7 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreen(
@@ -61,6 +63,7 @@ fun HomeScreen(
     navigateToShowRegistration: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToGiftPreQuestion: (giftUuid: String, showId: String) -> Unit,
+    navigateToTicketTabEvent: Flow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -105,6 +108,12 @@ fun HomeScreen(
                 val giftUuid = deepLink.split("/").last()
                 viewModel.processGift(giftUuid)
             }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        navigateToTicketTabEvent.collect {
+            navController.navigate(HomeRoute.Ticket)
         }
     }
 

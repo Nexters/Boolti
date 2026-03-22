@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profile
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -50,11 +51,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,6 +92,7 @@ import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.toValidUrlString
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.video.VideoItem
+import com.nexters.boolti.presentation.util.copyMessage
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey15
@@ -187,8 +191,10 @@ fun ProfileScreen(
 ) {
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     val snackbarHostState = LocalSnackbarController.current
     val invalidUrlMsg = stringResource(R.string.invalid_link)
+    val userCodeCopiedMessage = stringResource(R.string.profile_user_code_copied)
 
     val scrollState = rememberScrollState()
     val appBarTitleAlpha by animateFloatAsState(
@@ -245,6 +251,12 @@ fun ProfileScreen(
             ProfileHeader(
                 modifier = Modifier.fillMaxWidth(),
                 user = user,
+                onClickUserCode = {
+                    clipboardManager.setText(AnnotatedString(user.userCode))
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                        snackbarHostState.showMessage(userCodeCopiedMessage)
+                    }
+                },
                 onClickSns = { sns ->
                     AppTracker.clickLink(
                         screen = Screen.Profile,
@@ -576,6 +588,7 @@ private fun ProfileAppBar(
 private fun ProfileHeader(
     user: User,
     modifier: Modifier = Modifier,
+    onClickUserCode: () -> Unit,
     onClickSns: (Sns) -> Unit,
 ) {
     val shape = RoundedCornerShape(
@@ -629,7 +642,8 @@ private fun ProfileHeader(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        text = "@${user.userCode}",
+                        modifier = Modifier.clickable(onClick = onClickUserCode),
+                        text = user.userCode,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
                         color = Grey50,

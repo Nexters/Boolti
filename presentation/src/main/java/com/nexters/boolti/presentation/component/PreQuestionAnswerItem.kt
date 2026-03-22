@@ -46,6 +46,7 @@ fun PreQuestionAnswerItem(
     ) {
         Row {
             Text(
+                modifier = Modifier.weight(1f, fill = false),
                 text = answer.question,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

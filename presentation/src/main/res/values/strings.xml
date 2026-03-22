@@ -74,6 +74,7 @@
     <string name="login">로그인</string>
     <string name="message_unknown_error">일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</string>
     <string name="copy">복사</string>
+    <string name="profile_user_code_copied">ID를 복사했어요</string>
     <string name="next">다음</string>
     <string name="show">보기</string>
     <string name="show_all">전체보기</string>

@@ -10,28 +10,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nexters.boolti.domain.model.PreQuestionAnswer
-import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.PreQuestionAnswerItem
 import com.nexters.boolti.presentation.theme.Grey70
 import kotlinx.collections.immutable.ImmutableList
-import java.time.LocalDateTime
 
 @Composable
 internal fun PreQuestionAnswersSection(
     answers: ImmutableList<PreQuestionAnswer>,
-    salesEndDateTime: LocalDateTime,
-    reservationState: ReservationState,
+    canEdit: Boolean,
     onNavigateToEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (answers.isEmpty()) return
 
     val hasAnswers = answers.any { it.answer.isNotBlank() }
-    val canEdit = salesEndDateTime >= LocalDateTime.now() &&
-        reservationState !in listOf(ReservationState.CANCELED, ReservationState.REFUNDED)
 
     Section(
         modifier = modifier,

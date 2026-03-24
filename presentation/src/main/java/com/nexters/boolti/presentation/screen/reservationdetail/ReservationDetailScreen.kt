@@ -143,8 +143,7 @@ fun ReservationDetailScreen(
             PreQuestionAnswersSection(
                 modifier = Modifier.padding(top = 12.dp),
                 answers = preQuestionAnswers,
-                salesEndDateTime = state.reservation.salesEndDateTime,
-                reservationState = state.reservation.reservationState,
+                canEdit = state.canEditPreQuestions,
                 onNavigateToEdit = { navigateToPreQuestionEdit(state.reservation.id) },
             )
             if (state.reservation.reservationState in listOf(

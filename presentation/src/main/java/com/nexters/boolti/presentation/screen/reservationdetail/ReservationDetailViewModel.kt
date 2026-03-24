@@ -62,7 +62,12 @@ class ReservationDetailViewModel @Inject constructor(
                 _uiState.update { ReservationDetailUiState.Loading }
             }
             .onEach { reservation ->
-                _uiState.update { ReservationDetailUiState.Success(reservation) }
+                _uiState.update {
+                    ReservationDetailUiState.Success(
+                        reservation = reservation,
+                        canEditPreQuestions = reservation.canEditPreQuestions(),
+                    )
+                }
                 fetchPreQuestionAnswers()
             }
             .catch {

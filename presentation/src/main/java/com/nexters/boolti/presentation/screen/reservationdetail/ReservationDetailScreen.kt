@@ -140,12 +140,14 @@ fun ReservationDetailScreen(
             }
             TicketInfo(reservation = state.reservation)
             PaymentInfo(reservation = state.reservation)
-            PreQuestionAnswersSection(
-                modifier = Modifier.padding(top = 12.dp),
-                answers = preQuestionAnswers,
-                canEdit = state.canEditPreQuestions,
-                onNavigateToEdit = { navigateToPreQuestionEdit(state.reservation.id) },
-            )
+            if (state.canShowPreQuestions) {
+                PreQuestionAnswersSection(
+                    modifier = Modifier.padding(top = 12.dp),
+                    answers = preQuestionAnswers,
+                    canEdit = state.canEditPreQuestions,
+                    onNavigateToEdit = { navigateToPreQuestionEdit(state.reservation.id) },
+                )
+            }
             if (state.reservation.reservationState in listOf(
                     ReservationState.REFUNDED,
                     ReservationState.CANCELED

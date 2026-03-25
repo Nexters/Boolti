@@ -62,13 +62,19 @@ class ReservationDetailViewModel @Inject constructor(
                 _uiState.update { ReservationDetailUiState.Loading }
             }
             .onEach { reservation ->
+                val canShowPreQuestions = reservation.canShowPreQuestions()
                 _uiState.update {
                     ReservationDetailUiState.Success(
                         reservation = reservation,
+                        canShowPreQuestions = canShowPreQuestions,
                         canEditPreQuestions = reservation.canEditPreQuestions(),
                     )
                 }
-                fetchPreQuestionAnswers()
+                if (canShowPreQuestions) {
+                    fetchPreQuestionAnswers()
+                } else {
+                    _preQuestionAnswers.value = persistentListOf()
+                }
             }
             .catch {
                 _uiState.update { ReservationDetailUiState.Error() }
@@ -78,6 +84,11 @@ class ReservationDetailViewModel @Inject constructor(
     }
 
     fun refreshPreQuestionAnswers() {
+        val state = _uiState.value as? ReservationDetailUiState.Success ?: return
+        if (!state.canShowPreQuestions) {
+            _preQuestionAnswers.value = persistentListOf()
+            return
+        }
         fetchPreQuestionAnswers()
     }
 

@@ -9,6 +9,7 @@ sealed interface ReservationDetailUiState {
 
     data class Success(
         val reservation: ReservationDetail,
+        val canShowPreQuestions: Boolean,
         val canEditPreQuestions: Boolean,
     ) : ReservationDetailUiState
 
@@ -17,9 +18,13 @@ sealed interface ReservationDetailUiState {
     ) : ReservationDetailUiState
 }
 
-internal fun ReservationDetail.canEditPreQuestions(now: LocalDateTime = LocalDateTime.now()): Boolean {
-    return salesEndDateTime >= now && reservationState !in listOf(
+internal fun ReservationDetail.canShowPreQuestions(): Boolean {
+    return reservationState !in listOf(
         ReservationState.CANCELED,
         ReservationState.REFUNDED,
     )
+}
+
+internal fun ReservationDetail.canEditPreQuestions(now: LocalDateTime = LocalDateTime.now()): Boolean {
+    return canShowPreQuestions() && salesEndDateTime >= now
 }

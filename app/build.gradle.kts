@@ -95,7 +95,7 @@ androidComponents {
             isIgnoreExitValue = true
         }.standardOutput.asText.map { it.trim().ifEmpty { "nogit" } }
 
-        tasks.register("rename${capitalizedName}Apk") {
+        tasks.register("copy${capitalizedName}Apk") {
             doLast {
                 val dir = apkDir.get().asFile
                 if (!dir.exists()) return@doLast
@@ -105,14 +105,14 @@ androidComponents {
                 val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
                 dir.listFiles()?.filter { it.extension == "apk" }?.forEach { apk ->
                     val newName = "app-$buildType-$versionName-$hash-$date.apk"
-                    apk.renameTo(File(apk.parentFile, newName))
+                    apk.copyTo(File(apk.parentFile, newName))
                 }
             }
         }
 
         tasks.configureEach {
             if (name == "assemble$capitalizedName") {
-                finalizedBy("rename${capitalizedName}Apk")
+                finalizedBy("copy${capitalizedName}Apk")
             }
         }
     }

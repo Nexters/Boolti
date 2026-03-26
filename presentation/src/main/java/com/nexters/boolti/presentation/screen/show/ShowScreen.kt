@@ -86,7 +86,7 @@ fun ShowScreen(
                 .fillMaxSize()
                 .padding(horizontal = marginHorizontal),
             state = lazyGridState,
-            columns = GridCells.Adaptive(minSize = 150.dp),
+            columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalArrangement = Arrangement.spacedBy(28.dp),
         ) {
@@ -106,43 +106,40 @@ fun ShowScreen(
             }
 
             items(
-                count = uiState.shows.size.coerceAtMost(4),
-                contentType = { "Show" },
-                key = { index -> uiState.shows[index].id }) { index ->
-                ShowFeed(
-                    show = uiState.shows[index],
-                    modifier = Modifier
-                        .clickable { onClickShowItem(uiState.shows[index].id) },
-                )
-            }
+                count = uiState.shows.size,
+                span = { index ->
+                    when (uiState.shows[index]) {
+                        is ShowListItem.ShowItem -> GridItemSpan(1)
+                        is ShowListItem.BannerItem -> GridItemSpan(2)
+                    }
+                },
+                contentType = { index -> uiState.shows[index]::class },
+                key = { index ->
+                    when (val item = uiState.shows[index]) {
+                        is ShowListItem.ShowItem -> item.show.id
+                        is ShowListItem.BannerItem -> "Banner"
+                    }
+                }
+            ) { index ->
+                when (val item = uiState.shows[index]) {
+                    is ShowListItem.ShowItem -> ShowFeed(
+                        show = item.show,
+                        modifier = Modifier
+                            .clickable { onClickShowItem(item.show.id) },
+                    )
 
-            // 4개의 공연 뒤 보이는 배너
-            if (uiState.shows.isNotEmpty()) item(
-                span = { GridItemSpan(2) },
-            ) {
-                Banner(
-                    modifier = Modifier.fillMaxWidth(),
-                    navigateToShowRegistration = {
-                        AppTracker.click(
-                            screen = screenField,
-                            objectRole = Role.Banner,
-                            objectValue = "RegisterShow",
-                        )
-                        navigateToShowRegistration()
-                    },
-                )
-            }
-
-            // 나머지 공연 목록
-            items(
-                count = (uiState.shows.size - 4).coerceAtLeast(0),
-                contentType = { "Show" },
-                key = { index -> uiState.shows[index + 4].id }) { index ->
-                ShowFeed(
-                    show = uiState.shows[index + 4],
-                    modifier = Modifier
-                        .clickable { onClickShowItem(uiState.shows[index + 4].id) },
-                )
+                    is ShowListItem.BannerItem -> Banner(
+                        modifier = Modifier.fillMaxWidth(),
+                        navigateToShowRegistration = {
+                            AppTracker.click(
+                                screen = screenField,
+                                objectRole = Role.Banner,
+                                objectValue = "RegisterShow",
+                            )
+                            navigateToShowRegistration()
+                        },
+                    )
+                }
             }
 
             item(

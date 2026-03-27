@@ -1,16 +1,18 @@
+import com.android.build.api.artifact.SingleArtifact
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
-    id("kotlin-kapt")
     id("kotlin-parcelize")
 }
 
@@ -67,37 +69,51 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = libs.versions.targetJvm.get()
-    }
     buildFeatures {
         buildConfig = true
-    }
-
-    applicationVariants.all {
-        outputs.all {
-            val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            val versionName = libs.versions.versionName.get()
-            val buildType = name.substringAfterLast('-')
-            val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-
-            // 현재 git 커밋 해시 앞 7자리
-            val gitHash = try {
-                Runtime.getRuntime().exec("git rev-parse --short=7 HEAD")
-                    .inputStream.bufferedReader().readText().trim()
-            } catch (e: Exception) {
-                "nogit"
-            }
-
-            // apk 파일 이름 설정
-            val apkName = "app-$buildType-$versionName-$gitHash-$date.apk"
-            outputImpl.outputFileName = apkName
-        }
     }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val capitalizedName = variant.name.replaceFirstChar { it.uppercase() }
+        val apkDir = variant.artifacts.get(SingleArtifact.APK)
+        val gitHash = providers.exec {
+            commandLine("git", "rev-parse", "--short=7", "HEAD")
+            isIgnoreExitValue = true
+        }.standardOutput.asText.map { it.trim().ifEmpty { "nogit" } }
+
+        tasks.register("copy${capitalizedName}Apk") {
+            doLast {
+                val dir = apkDir.get().asFile
+                if (!dir.exists()) return@doLast
+                val versionName = libs.versions.versionName.get()
+                val buildType = variant.buildType ?: "unknown"
+                val hash = gitHash.get()
+                val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+                dir.listFiles()?.filter { it.extension == "apk" }?.forEach { apk ->
+                    val newName = "app-$buildType-$versionName-$hash-$date.apk"
+                    apk.copyTo(File(apk.parentFile, newName))
+                }
+            }
+        }
+
+        tasks.configureEach {
+            if (name == "assemble$capitalizedName") {
+                finalizedBy("copy${capitalizedName}Apk")
+            }
         }
     }
 }
@@ -117,7 +133,8 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)

@@ -2,6 +2,8 @@ package com.nexters.boolti.presentation.screen
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -10,12 +12,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.util.Consumer
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -91,6 +96,37 @@ fun Main(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val rootNavController = rememberNavControllerWithLog()
+    val activity = LocalActivity.current as ComponentActivity
+    val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
+    val giftDeepLinkRegex = "^boolti://gift/([\\w-])+$".toRegex()
+
+    LaunchedEffect(Unit) {
+        val deepLink = activity.intent?.data?.toString() ?: return@LaunchedEffect
+        if (giftDeepLinkRegex.matches(deepLink)) {
+            activity.intent.data = null
+            giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
+            rootNavController.navigate(MainRoute.Home) {
+                popUpTo<MainRoute.Home> { inclusive = false }
+                launchSingleTop = true
+            }
+        }
+    }
+
+    DisposableEffect(activity) {
+        val listener = Consumer<Intent> { intent ->
+            val deepLink = intent.data?.toString() ?: return@Consumer
+            if (giftDeepLinkRegex.matches(deepLink)) {
+                intent.data = null
+                giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
+                rootNavController.navigate(MainRoute.Home) {
+                    popUpTo<MainRoute.Home> { inclusive = false }
+                    launchSingleTop = true
+                }
+            }
+        }
+        activity.addOnNewIntentListener(listener)
+        onDispose { activity.removeOnNewIntentListener(listener) }
+    }
 
     BooltiTheme {
         Box(modifier = Modifier.fillMaxSize()) {

@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldDecorator
@@ -175,6 +176,7 @@ fun BTTextField(
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onKeyboardAction: KeyboardActionHandler? = null,
+    inputTransformation: InputTransformation? = null,
     outputTransformation: OutputTransformation? = null,
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
@@ -271,6 +273,7 @@ fun BTTextField(
                 keyboardOptions = keyboardOptions,
                 onKeyboardAction = onKeyboardAction,
                 lineLimits = lineLimits,
+                inputTransformation = inputTransformation,
                 outputTransformation = outputTransformation,
                 interactionSource = interactionSource,
                 scrollState = if (actualEnableEdgeFade) internalScrollState else scrollState,

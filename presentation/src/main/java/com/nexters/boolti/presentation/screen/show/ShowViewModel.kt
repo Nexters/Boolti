@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.PopupRepository
@@ -57,10 +58,20 @@ class ShowViewModel @Inject constructor(
     private fun loadShows() {
         viewModelScope.launch {
             showRepository.search("").onSuccess { shows ->
-                _uiState.update { it.copy(shows = shows) }
+                _uiState.update {
+                    it.copy(shows = getInsertedBannerShows(shows))
+                }
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun getInsertedBannerShows(shows: List<Show>): List<ShowListItem> {
+        return buildList {
+            addAll(shows.take(4).map { it.toUI() })
+            if (shows.isNotEmpty()) add(ShowListItem.BannerItem)
+            addAll(shows.drop(4).map { it.toUI() })
         }
     }
 

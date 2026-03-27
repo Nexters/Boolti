@@ -9,6 +9,7 @@ import com.nexters.boolti.data.network.response.GiftResponse
 import com.nexters.boolti.data.network.response.ImageResponse
 import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.GiftApproveRequest
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -16,7 +17,7 @@ import retrofit2.http.Path
 
 internal interface GiftService {
     @POST("/app/api/v1/order/receive-gift")
-    suspend fun receiveGift(@Body request: GiftReceiveRequest): Boolean
+    suspend fun receiveGift(@Body request: GiftReceiveRequest): Response<Boolean>
 
     @POST("/app/api/v1/order/gift-approve-payment")
     suspend fun approveGiftPayment(@Body request: GiftApproveRequest): ApproveGiftPaymentResponse

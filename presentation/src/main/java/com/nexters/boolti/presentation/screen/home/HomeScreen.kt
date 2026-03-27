@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.home
 
-import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
@@ -15,19 +14,16 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.core.util.Consumer
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
@@ -36,7 +32,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.screen.GiftDeepLinkViewModel
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.myScreen
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
@@ -48,6 +44,7 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreen(
@@ -63,6 +60,7 @@ fun HomeScreen(
     navigateToShowRegistration: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToGiftPreQuestion: (giftUuid: String, showId: String) -> Unit,
+    navigateToTicketTabEvent: Flow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -71,7 +69,8 @@ fun HomeScreen(
     val currentBackStack by navController.currentBackStackEntryAsState()
 
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
-    val activity = LocalActivity.current as? ComponentActivity
+    val activity = LocalActivity.current as ComponentActivity
+    val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
     var giftStatus: GiftStatus? by rememberSaveable { mutableStateOf(null) }
@@ -86,6 +85,7 @@ fun HomeScreen(
 
                 is HomeEvent.GiftRegistered -> {
                     snackbarController.showMessage(giftRegistrationMessage)
+                    navController.navigate(HomeRoute.Ticket)
                 }
 
                 is HomeEvent.NavigateToGiftPreQuestion -> {
@@ -97,33 +97,14 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        val intent = activity?.intent ?: return@LaunchedEffect
-        intent.action?.let { _ ->
-            val deepLink = intent.data.toString()
-            intent.data = null
-            val regex = "^boolti://gift/([\\w-])+$".toRegex()
-            if (regex.matches(deepLink)) {
-                val giftUuid = deepLink.split("/").last()
-                viewModel.processGift(giftUuid)
-            }
+        navigateToTicketTabEvent.collect {
+            navController.navigate(HomeRoute.Ticket)
         }
     }
 
-    DisposableEffect(activity) {
-        val listener = Consumer<Intent> { intent ->
-            val deepLink = intent.data.toString()
-            intent.data = null
-            val regex = "^boolti://gift/([\\w-])+$".toRegex()
-            if (regex.matches(deepLink)) {
-                val giftUuid = deepLink.split("/").last()
-                viewModel.processGift(giftUuid)
-            }
-        }
-
-        activity?.addOnNewIntentListener(listener)
-
-        onDispose {
-            activity?.removeOnNewIntentListener(listener)
+    LaunchedEffect(Unit) {
+        giftDeepLinkViewModel.pendingGiftEvents.collect { giftUuid ->
+            viewModel.processGift(giftUuid)
         }
     }
 
@@ -194,8 +175,8 @@ fun HomeScreen(
                 giftStatus = null
                 navigateToLogin()
             },
-            onFailed = {
-                giftStatus = GiftStatus.FAILED
+            onCanceled = {
+                giftStatus = null
                 viewModel.cancelGift()
             }
         )

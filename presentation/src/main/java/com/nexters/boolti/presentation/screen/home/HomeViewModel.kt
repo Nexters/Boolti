@@ -5,21 +5,20 @@ import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
-import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.DeepLinkEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -30,7 +29,6 @@ class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val giftRepository: GiftRepository,
     private val deepLinkEvent: DeepLinkEvent,
-    private val reservationRepository: ReservationRepository,
     private val ticketingRepository: TicketingRepository,
 ) : BaseViewModel() {
     val loggedIn = authRepository.loggedIn.stateIn(
@@ -39,8 +37,8 @@ class HomeViewModel @Inject constructor(
         null,
     )
 
-    private val _events = MutableSharedFlow<HomeEvent>()
-    val events: SharedFlow<HomeEvent> = _events.asSharedFlow()
+    private val _events = Channel<HomeEvent>(Channel.BUFFERED)
+    val events: Flow<HomeEvent> = _events.receiveAsFlow()
 
     /**
      * 1. 딥 링크를 통해 앱이 실행되면 아래 메서드를 호출하여 [pendingGift]를 초기화한다. (오버로딩에 유의)
@@ -84,14 +82,13 @@ class HomeViewModel @Inject constructor(
     }
 
     fun processGift(giftUuid: String) {
-        pendingGift = PendingGift.Unprocessed(giftUuid)
-
         viewModelScope.launch {
             // 딥링크를 통해 cold start가 발생할 경우 loggedIn의 초기값인 null이 들어오는데, null 대신 로그인 정보를 가져오는 걸 기다리기 위함
             val isLoggedIn = loggedIn.filterNotNull().first()
             if (isLoggedIn) {
                 processGiftWhenLoggedIn(giftUuid)
             } else {
+                pendingGift = PendingGift.Unprocessed(giftUuid)
                 sendEvent(HomeEvent.GiftNotification(GiftStatus.NEED_LOGIN))
             }
         }
@@ -103,14 +100,20 @@ class HomeViewModel @Inject constructor(
                 .getGift(giftUuid)
                 .first()
             val senderId = gift.senderUserId
-            val hasPreQuestion = ticketingRepository.getPreQuestions(gift.showId).first().isNotEmpty()
+            val hasPreQuestion =
+                ticketingRepository.getPreQuestions(gift.showId).first().isNotEmpty()
             val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
 
             pendingGift = PendingGift.Ready(
                 giftUuid = gift.uuid,
                 showId = gift.showId,
-                hasPreQuestion = hasPreQuestion,
             )
+
+            if (hasPreQuestion) {
+                sendEvent(HomeEvent.NavigateToGiftPreQuestion(gift.uuid, gift.showId))
+                return@launch
+            }
+
             if (senderId == myUserId) {
                 sendEvent(HomeEvent.GiftNotification(GiftStatus.SELF))
             } else {
@@ -121,18 +124,13 @@ class HomeViewModel @Inject constructor(
 
     private fun sendEvent(event: HomeEvent) {
         viewModelScope.launch {
-            _events.emit(event)
+            _events.trySend(event)
         }
     }
 
     fun receiveGift() {
         val ready = pendingGift as? PendingGift.Ready ?: return
         val giftUuid = ready.giftUuid
-
-        if (ready.hasPreQuestion) {
-            sendEvent(HomeEvent.NavigateToGiftPreQuestion(giftUuid, ready.showId))
-            return
-        }
 
         pendingGift = null
 

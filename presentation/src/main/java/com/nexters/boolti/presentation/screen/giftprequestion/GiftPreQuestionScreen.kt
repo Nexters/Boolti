@@ -23,9 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,7 +44,9 @@ import com.nexters.boolti.presentation.screen.refund.InfoRow
 import com.nexters.boolti.presentation.screen.ticketing.PreQuestionsSection
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey20
+import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Grey95
 import com.nexters.boolti.presentation.theme.marginHorizontal
@@ -56,45 +58,30 @@ import kotlinx.collections.immutable.ImmutableMap
 fun GiftPreQuestionScreen(
     onBackPressed: () -> Unit,
     viewModel: GiftPreQuestionViewModel = hiltViewModel(),
+    reserveNavigatingToTicketTab: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showExitDialog by rememberSaveable { mutableStateOf(false) }
+    var showFailureDialog by rememberSaveable { mutableStateOf(false) }
     val snackbarController = LocalSnackbarController.current
 
     BackHandler { showExitDialog = true }
 
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
-    val giftRegistrationFailureMessage = stringResource(id = R.string.gift_registration_failed)
 
-    LaunchedEffect(viewModel.events) {
+    LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 GiftPreQuestionEvent.GiftRegistered -> {
                     snackbarController.showMessage(giftRegistrationMessage)
+                    reserveNavigatingToTicketTab()
                     onBackPressed()
                 }
 
                 GiftPreQuestionEvent.GiftRegistrationFailed -> {
-                    snackbarController.showMessage(giftRegistrationFailureMessage)
+                    showFailureDialog = true
                 }
             }
-        }
-    }
-
-    if (showExitDialog) {
-        BTDialog(
-            onDismiss = { showExitDialog = false },
-            negativeButtonLabel = stringResource(R.string.cancel),
-            onClickNegativeButton = { showExitDialog = false },
-            positiveButtonLabel = stringResource(R.string.gift_pre_question_exit_label),
-            onClickPositiveButton = onBackPressed,
-        ) {
-            Text(
-                text = stringResource(R.string.gift_pre_question_exit_dialog_title),
-                color = Grey05,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-            )
         }
     }
 
@@ -129,6 +116,50 @@ fun GiftPreQuestionScreen(
                     enabled = state.isPreQuestionsValid
                 )
             }
+        }
+    }
+
+    if (showExitDialog) {
+        BTDialog(
+            onDismiss = { showExitDialog = false },
+            negativeButtonLabel = stringResource(R.string.cancel),
+            onClickNegativeButton = { showExitDialog = false },
+            positiveButtonLabel = stringResource(R.string.gift_pre_question_exit_label),
+            onClickPositiveButton = onBackPressed,
+            showCloseButton = false,
+        ) {
+            Text(
+                text = stringResource(R.string.gift_pre_question_exit_dialog_title),
+                color = Grey15,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+
+    if (showFailureDialog) {
+        BTDialog(
+            onDismiss = { showFailureDialog = false },
+            onClickPositiveButton = {
+                showFailureDialog = false
+                onBackPressed()
+            },
+        ) {
+            Text(
+                text = stringResource(id = R.string.gift_registration_failed),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = Grey15,
+                    textAlign = TextAlign.Center
+                ),
+            )
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = stringResource(id = R.string.gift_registration_failed_dialog),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = Grey50,
+                    textAlign = TextAlign.Center
+                ),
+            )
         }
     }
 }
@@ -227,7 +258,11 @@ private fun TicketSection(
             .padding(vertical = 20.dp)
             .padding(horizontal = marginHorizontal),
     ) {
-        Text(text = stringResource(R.string.gift_show_info), color = Grey10, style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.gift_show_info),
+            color = Grey10,
+            style = MaterialTheme.typography.titleLarge
+        )
         ShowItemV2(
             modifier = Modifier
                 .fillMaxWidth()

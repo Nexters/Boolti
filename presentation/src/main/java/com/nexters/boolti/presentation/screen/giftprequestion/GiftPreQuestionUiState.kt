@@ -22,21 +22,21 @@ sealed class GiftPreQuestionUiState {
                 .filter { it.isRequired }
                 .all { question ->
                     val answer = preQuestionAnswers[question.id]
-                    !answer.isNullOrBlank() && answer.unicodeLength() <= TicketingState.Companion.MAX_ANSWER_LENGTH
+                    !answer.isNullOrBlank() && answer.unicodeLength() <= MAX_ANSWER_LENGTH
                 }
 
         private val hasInvalidAnswers: Boolean
-            get() = preQuestionAnswers.values.any { it.unicodeLength() > TicketingState.Companion.MAX_ANSWER_LENGTH }
+            get() = preQuestionAnswers.values.any { it.unicodeLength() > MAX_ANSWER_LENGTH }
 
         val isPreQuestionsValid: Boolean
             get() = isRequiredQuestionsAnswered && !hasInvalidAnswers
     }
 
     fun getAnswerError(questionId: Long): Boolean {
-        if (this !is GiftPreQuestionUiState.Success) return false
+        if (this !is Success) return false
 
         val answer = preQuestionAnswers[questionId] ?: return false
-        return answer.unicodeLength() > TicketingState.Companion.MAX_ANSWER_LENGTH
+        return answer.unicodeLength() > MAX_ANSWER_LENGTH
     }
 
     companion object {

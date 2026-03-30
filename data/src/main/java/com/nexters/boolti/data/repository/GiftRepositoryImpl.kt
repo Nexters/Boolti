@@ -15,11 +15,16 @@ import com.nexters.boolti.domain.request.GiftApproveRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 internal class GiftRepositoryImpl @Inject constructor(
     private val dataSource: GiftDataSource,
 ) : GiftRepository {
+    private data class CacheEntry<T>(val value: T, val cachedAt: Long)
+
+    private val giftCache = ConcurrentHashMap<String, CacheEntry<Gift>>()
+    private val cacheTtlMs = 60_000L
     override fun receiveGift(giftUuid: String): Flow<Boolean> = flow {
         emit(dataSource.receiveGift(GiftReceiveRequest(giftUuid)))
     }
@@ -33,7 +38,14 @@ internal class GiftRepositoryImpl @Inject constructor(
     }
 
     override fun getGift(giftUuid: String): Flow<Gift> = flow {
-        emit(dataSource.getGift(giftUuid).toDomain())
+        val cached = giftCache[giftUuid]
+        if (cached != null && System.currentTimeMillis() - cached.cachedAt < cacheTtlMs) {
+            emit(cached.value)
+            return@flow
+        }
+        val gift = dataSource.getGift(giftUuid).toDomain()
+        giftCache[giftUuid] = CacheEntry(gift, System.currentTimeMillis())
+        emit(gift)
     }
 
     override fun getGiftImages(): Flow<List<ImagePair>> = flow {

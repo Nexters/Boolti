@@ -141,10 +141,10 @@ private fun PreQuestionEditItem(
             }
         }
 
-        if (question.description.isNotBlank()) {
+        if (!question.description.isNullOrBlank()) {
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = question.description,
+                text = question.description ?: "",
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
             )

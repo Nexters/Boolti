@@ -19,7 +19,7 @@ fun GiftDialog(
     onDismiss: () -> Unit,
     receiveGift: () -> Unit,
     requireLogin: () -> Unit,
-    onFailed: () -> Unit,
+    onCanceled: () -> Unit,
 ) {
     val buttonTextRes = when (status) {
         GiftStatus.SELF, GiftStatus.CAN_REGISTER -> R.string.gift_register
@@ -35,7 +35,7 @@ fun GiftDialog(
     }
 
     val action: () -> Unit = when (status) {
-        GiftStatus.SELF -> {
+        GiftStatus.SELF, GiftStatus.CAN_REGISTER -> {
             {
                 receiveGift()
                 onDismiss()
@@ -43,12 +43,6 @@ fun GiftDialog(
         }
 
         GiftStatus.NEED_LOGIN -> requireLogin
-        GiftStatus.CAN_REGISTER -> {
-            {
-                receiveGift()
-                onDismiss()
-            }
-        }
 
         GiftStatus.FAILED -> onDismiss
     }
@@ -58,8 +52,9 @@ fun GiftDialog(
     BTDialog(
         onDismiss = onDismiss,
         onClickPositiveButton = action,
+        showCloseButton = false,
         positiveButtonLabel = stringResource(id = buttonTextRes),
-        onClickNegativeButton = if(hasNegativeButton) onFailed else null
+        onClickNegativeButton = if(hasNegativeButton) onCanceled else null
     ) {
         Text(
             text = stringResource(id = textRes),

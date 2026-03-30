@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.home
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,7 +32,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.extension.requireActivity
+import com.nexters.boolti.presentation.screen.GiftDeepLinkViewModel
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.myScreen
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
@@ -43,6 +44,7 @@ import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.util.rememberNavControllerWithLog
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreen(
@@ -57,6 +59,8 @@ fun HomeScreen(
     navigateToBusiness: () -> Unit,
     navigateToShowRegistration: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToGiftPreQuestion: (giftUuid: String, showId: String) -> Unit,
+    navigateToTicketTabEvent: Flow<Unit>,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -65,36 +69,42 @@ fun HomeScreen(
     val currentBackStack by navController.currentBackStackEntryAsState()
 
     val isLoggedIn by viewModel.loggedIn.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val activity = LocalActivity.current as ComponentActivity
+    val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
     val giftRegistrationMessage = stringResource(id = R.string.gift_successfully_registered)
 
-    var dialog: GiftStatus? by rememberSaveable { mutableStateOf(null) }
+    var giftStatus: GiftStatus? by rememberSaveable { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is HomeEvent.DeepLinkEvent -> navController.navigate(event.deepLink.toUri())
                 is HomeEvent.GiftNotification -> {
-                    dialog = event.status
+                    giftStatus = event.status
                 }
 
                 is HomeEvent.GiftRegistered -> {
                     snackbarController.showMessage(giftRegistrationMessage)
+                    navController.navigate(HomeRoute.Ticket)
+                }
+
+                is HomeEvent.NavigateToGiftPreQuestion -> {
+                    giftStatus = null
+                    navigateToGiftPreQuestion(event.giftUuid, event.showId)
                 }
             }
         }
     }
 
     LaunchedEffect(Unit) {
-        val intent = context.requireActivity().intent
-        intent.action?.let { _ ->
-            val deepLink = intent.data.toString()
-            intent.data = null
-            val regex = "^boolti://gift/([\\w-])+$".toRegex()
-            if (regex.matches(deepLink)) {
-                val giftUuid = deepLink.split("/").last()
-                viewModel.processGift(giftUuid)
-            }
+        navigateToTicketTabEvent.collect {
+            navController.navigate(HomeRoute.Ticket)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        giftDeepLinkViewModel.pendingGiftEvents.collect { giftUuid ->
+            viewModel.processGift(giftUuid)
         }
     }
 
@@ -153,20 +163,20 @@ fun HomeScreen(
         }
     }
 
-    if (dialog != null) {
+    if (giftStatus != null) {
         GiftDialog(
-            status = dialog!!,
+            status = giftStatus!!,
             onDismiss = {
-                dialog = null
+                giftStatus = null
                 viewModel.cancelGift()
             },
             receiveGift = viewModel::receiveGift,
             requireLogin = {
-                dialog = null
+                giftStatus = null
                 navigateToLogin()
             },
-            onFailed = {
-                dialog = GiftStatus.FAILED
+            onCanceled = {
+                giftStatus = null
                 viewModel.cancelGift()
             }
         )

@@ -16,19 +16,17 @@ import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.PreQuestionAnswerItem
 import com.nexters.boolti.presentation.theme.Grey70
 import kotlinx.collections.immutable.ImmutableList
-import java.time.LocalDateTime
 
 @Composable
 internal fun PreQuestionAnswersSection(
     answers: ImmutableList<PreQuestionAnswer>,
-    salesEndDateTime: LocalDateTime,
+    canEdit: Boolean,
     onNavigateToEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (answers.isEmpty()) return
 
     val hasAnswers = answers.any { it.answer.isNotBlank() }
-    val canEdit = salesEndDateTime >= LocalDateTime.now()
 
     Section(
         modifier = modifier,

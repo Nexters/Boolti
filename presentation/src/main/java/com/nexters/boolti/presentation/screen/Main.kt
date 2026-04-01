@@ -98,7 +98,7 @@ fun Main(
     val rootNavController = rememberNavControllerWithLog()
     val activity = LocalActivity.current as ComponentActivity
     val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
-    val giftDeepLinkRegex = "^boolti://gift/([\\w-]+)$".toRegex()
+    val giftDeepLinkRegex = remember { "^boolti://gift/([\\w-]+)$".toRegex() }
 
     LaunchedEffect(Unit) {
         val deepLink = activity.intent?.data?.toString() ?: return@LaunchedEffect

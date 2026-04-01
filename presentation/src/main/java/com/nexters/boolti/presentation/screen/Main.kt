@@ -37,8 +37,8 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
 import com.nexters.boolti.presentation.screen.gift.giftScreen
-import com.nexters.boolti.presentation.screen.giftprequestion.giftPreQuestionScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
+import com.nexters.boolti.presentation.screen.giftprequestion.giftPreQuestionScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
@@ -101,27 +101,28 @@ fun Main(
     val rootNavController = rememberNavControllerWithLog()
     val activity = LocalActivity.current as ComponentActivity
     val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
-    val handleGiftDeeplink: (intent: Intent) -> Unit by rememberUpdatedState { intent ->
-        val deepLink = intent.data.toString()
+    val handleGiftDeepLink: (intent: Intent) -> Unit by rememberUpdatedState { intent ->
+        val deepLink = intent.data?.toString() ?: return@rememberUpdatedState
+        val matchResult = giftDeepLinkRegex.matchEntire(deepLink) ?: return@rememberUpdatedState
+        val giftUuid = matchResult.groupValues[1]
 
-        if (giftDeepLinkRegex.matches(deepLink)) {
-            intent.data = null
-            giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
-            rootNavController.navigate(MainRoute.Home) {
-                popUpTo<MainRoute.Home> { inclusive = false }
-                launchSingleTop = true
-            }
+        intent.data = null
+
+        giftDeepLinkViewModel.pendGift(giftUuid)
+        rootNavController.navigate(MainRoute.Home) {
+            popUpTo<MainRoute.Home> { inclusive = false }
+            launchSingleTop = true
         }
     }
 
     LaunchedEffect(Unit) {
         val intent = activity.intent ?: return@LaunchedEffect
-        handleGiftDeeplink(intent)
+        handleGiftDeepLink(intent)
     }
 
     DisposableEffect(activity) {
         val listener = Consumer<Intent> { intent ->
-            handleGiftDeeplink(intent)
+            handleGiftDeepLink(intent)
         }
         activity.addOnNewIntentListener(listener)
         onDispose { activity.removeOnNewIntentListener(listener) }

@@ -15,8 +15,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -99,11 +101,11 @@ fun Main(
     val rootNavController = rememberNavControllerWithLog()
     val activity = LocalActivity.current as ComponentActivity
     val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
+    val handleGiftDeeplink: (intent: Intent) -> Unit by rememberUpdatedState { intent ->
+        val deepLink = intent.data.toString()
 
-    LaunchedEffect(Unit) {
-        val deepLink = activity.intent?.data?.toString() ?: return@LaunchedEffect
         if (giftDeepLinkRegex.matches(deepLink)) {
-            activity.intent.data = null
+            intent.data = null
             giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
             rootNavController.navigate(MainRoute.Home) {
                 popUpTo<MainRoute.Home> { inclusive = false }
@@ -112,17 +114,14 @@ fun Main(
         }
     }
 
+    LaunchedEffect(Unit) {
+        val intent = activity.intent ?: return@LaunchedEffect
+        handleGiftDeeplink(intent)
+    }
+
     DisposableEffect(activity) {
         val listener = Consumer<Intent> { intent ->
-            val deepLink = intent.data?.toString() ?: return@Consumer
-            if (giftDeepLinkRegex.matches(deepLink)) {
-                intent.data = null
-                giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
-                rootNavController.navigate(MainRoute.Home) {
-                    popUpTo<MainRoute.Home> { inclusive = false }
-                    launchSingleTop = true
-                }
-            }
+            handleGiftDeeplink(intent)
         }
         activity.addOnNewIntentListener(listener)
         onDispose { activity.removeOnNewIntentListener(listener) }

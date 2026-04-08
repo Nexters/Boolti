@@ -131,7 +131,7 @@ fun GiftPreQuestionScreen(
             Text(
                 text = stringResource(R.string.gift_pre_question_exit_dialog_title),
                 color = Grey15,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
             )
         }

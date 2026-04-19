@@ -3,9 +3,9 @@ package com.nexters.boolti.presentation.screen.search.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
-import com.nexters.boolti.domain.model.Venue
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -31,11 +31,11 @@ class SearchDetailViewModel @Inject constructor(
     private var searchJob: Job? = null
     private var searchShowsJob: Job? = null
     private var searchProfilesJob: Job? = null
-    private var searchVenuesJob: Job? = null
+    private var searchPlacesJob: Job? = null
 
     private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel.default())
     private val profiles = MutableStateFlow<PagingDataUiModel<User.Others>>(PagingDataUiModel.default())
-    private val venues = MutableStateFlow<PagingDataUiModel<Venue>>(PagingDataUiModel.default())
+    private val places = MutableStateFlow<PagingDataUiModel<Place>>(PagingDataUiModel.default())
 
     private val _uiState = MutableStateFlow(
         SearchDetailUiState.Default.copy(
@@ -47,15 +47,15 @@ class SearchDetailViewModel @Inject constructor(
         _uiState,
         shows,
         profiles,
-        venues,
-    ) { uiState, shows, profiles, venues ->
+        places,
+    ) { uiState, shows, profiles, places ->
         uiState.copy(
             shows = shows.items,
             showsTotalCount = shows.totalCount,
             profiles = profiles.items,
             profilesTotalCount = profiles.totalCount,
-            venues = venues.items,
-            venuesTotalCount = venues.totalCount,
+            places = places.items,
+            placesTotalCount = places.totalCount,
         )
     }.stateInUi(viewModelScope, SearchDetailUiState.Default.copy(keyword = route.keyword))
 
@@ -68,7 +68,7 @@ class SearchDetailViewModel @Inject constructor(
             is SearchDetailIntent.ChangeTabIndex -> changeTabIndex(intent.index)
             is SearchDetailIntent.OnProfilesPageReached -> loadNextProfilesPage()
             is SearchDetailIntent.OnShowsPageReached -> loadNextShowsPage()
-            is SearchDetailIntent.OnVenuesPageReached -> loadNextVenuesPage()
+            is SearchDetailIntent.OnPlacesPageReached -> loadNextPlacesPage()
         }
     }
 
@@ -107,8 +107,8 @@ class SearchDetailViewModel @Inject constructor(
                     }
                 },
                 async {
-                    searchRepository.searchVenues(keyword, 0).onSuccess { response ->
-                        venues.update {
+                    searchRepository.searchPlaces(keyword, 0).onSuccess { response ->
+                        places.update {
                             PagingDataUiModel(
                                 items = response.items,
                                 totalCount = response.totalElements,
@@ -188,19 +188,19 @@ class SearchDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadNextVenuesPage() {
-        if (searchVenuesJob?.isActive == true || !venues.value.hasNext) return
-        _uiState.update { it.copy(venuesLoading = true) }
+    private fun loadNextPlacesPage() {
+        if (searchPlacesJob?.isActive == true || !places.value.hasNext) return
+        _uiState.update { it.copy(placesLoading = true) }
 
-        searchVenuesJob = viewModelScope.launch {
-            val currentPage = venues.value.currentPage
+        searchPlacesJob = viewModelScope.launch {
+            val currentPage = places.value.currentPage
             val nextPage = currentPage + 1
-            val currentItems = venues.value.items
+            val currentItems = places.value.items
 
-            searchRepository.searchVenues(uiState.value.searchedKeyword, nextPage).onSuccess { searchResult ->
+            searchRepository.searchPlaces(uiState.value.searchedKeyword, nextPage).onSuccess { searchResult ->
                 if (searchResult.items.isNotEmpty()) {
                     val appendedItems = (currentItems + searchResult.items).distinctBy { it.id }
-                    venues.update {
+                    places.update {
                         it.copy(
                             items = appendedItems,
                             totalCount = searchResult.totalElements,
@@ -211,7 +211,7 @@ class SearchDetailViewModel @Inject constructor(
                     }
                 }
             }
-            _uiState.update { it.copy(venuesLoading = false) }
+            _uiState.update { it.copy(placesLoading = false) }
         }
     }
 }

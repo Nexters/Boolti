@@ -20,20 +20,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.Venue
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 
 @Composable
-fun VenueItem(
-    venue: Venue,
-    onClick: (venueId: String) -> Unit,
+fun PlaceItem(
+    place: Place,
+    onClick: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.clickable(onClick = { onClick(venue.id) }),
+        modifier = modifier.clickable(onClick = { onClick(place.id) }),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -46,21 +46,21 @@ fun VenueItem(
                     color = Grey80,
                     shape = RoundedCornerShape(4.dp),
                 ),
-            model = venue.thumbnailImage,
-            contentDescription = venue.name,
+            model = place.thumbnailImage,
+            contentDescription = place.name,
             contentScale = ContentScale.Crop,
         )
 
         Column {
             Text(
-                text = venue.name,
+                text = place.name,
                 style = MaterialTheme.typography.titleMedium,
                 color = Grey05,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = venue.address,
+                text = place.address,
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
                 maxLines = 1,
@@ -72,13 +72,13 @@ fun VenueItem(
 
 @Preview
 @Composable
-private fun VenueItemPreview() {
+private fun PlaceItemPreview() {
     BooltiTheme {
-        VenueItem(
+        PlaceItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp),
-            venue = Venue(
+            place = Place(
                 id = "1",
                 name = "그레이존 라이브바",
                 address = "서울 영등포구 도신로 38 지하1층",

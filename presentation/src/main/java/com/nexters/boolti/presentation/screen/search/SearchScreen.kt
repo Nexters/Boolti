@@ -94,7 +94,7 @@ fun SearchScreen(
         onClickSearchBar = navigateToRecentSearch,
         onSearch = navigateToSearchDetail,
         onClickShow = navigateToShowDetail,
-        onClickVenueFinder = {
+        onClickPlaceFinder = {
             // TODO: 공연장 찾기 화면 네비게이션 연결
         },
         recentSearchKeywords = uiState.searchHistory,
@@ -124,7 +124,7 @@ private fun SearchScreen(
     onClickSearchBar: () -> Unit,
     onSearch: (String) -> Unit,
     onClickShow: (id: String) -> Unit,
-    onClickVenueFinder: () -> Unit,
+    onClickPlaceFinder: () -> Unit,
     recentSearchKeywords: List<String>,
     deleteSearchHistory: (String) -> Unit,
     onClickClearButton: () -> Unit,
@@ -144,8 +144,8 @@ private fun SearchScreen(
                 .verticalScroll(scrollState)
                 .padding(top = 72.dp),
         ) {
-            VenueFinderBanner(
-                onClick = onClickVenueFinder,
+            PlaceFinderBanner(
+                onClick = onClickPlaceFinder,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
@@ -228,7 +228,7 @@ private fun SearchScreen(
 }
 
 @Composable
-private fun VenueFinderBanner(
+private fun PlaceFinderBanner(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -242,7 +242,7 @@ private fun VenueFinderBanner(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(R.string.search_venue_finder_subtitle),
+                text = stringResource(R.string.search_place_finder_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.75f),
             )
@@ -252,7 +252,7 @@ private fun VenueFinderBanner(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.search_venue_finder_title),
+                    text = stringResource(R.string.search_place_finder_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -279,7 +279,7 @@ private fun BetaBadge(
             .background(Color.White)
             .padding(horizontal = 6.dp)
             .padding(bottom = 1.dp),
-        text = stringResource(R.string.search_venue_finder_beta),
+        text = stringResource(R.string.search_place_finder_beta),
         style = MaterialTheme.typography.labelMedium.copy(
             fontSize = 10.sp,
             lineHeight = 18.sp,
@@ -538,7 +538,7 @@ private fun SearchScreenPreview() {
             onClickSearchBar = {},
             onSearch = {},
             onClickShow = {},
-            onClickVenueFinder = {},
+            onClickPlaceFinder = {},
             recentSearchKeywords = listOf("최근검색어1", "최근검색어2"),
             deleteSearchHistory = {},
             onClickClearButton = {},
@@ -561,7 +561,7 @@ private fun SearchScreenEmptyPreview() {
             onClickSearchBar = {},
             onSearch = {},
             onClickShow = {},
-            onClickVenueFinder = {},
+            onClickPlaceFinder = {},
             recentSearchKeywords = emptyList(),
             deleteSearchHistory = {},
             onClickClearButton = {},

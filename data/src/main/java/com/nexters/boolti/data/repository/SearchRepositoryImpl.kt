@@ -3,9 +3,9 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.datasource.SearchDataSource
 import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
 import com.nexters.boolti.domain.model.PagingData
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
-import com.nexters.boolti.domain.model.Venue
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.domain.util.suspendRunCatching
 import javax.inject.Inject
@@ -35,11 +35,11 @@ internal class SearchRepositoryImpl @Inject constructor(
         searchDataSource.getProfiles(keyword, page, 10)
     }
 
-    // TODO: API 연동 시 searchDataSource.getVenues(keyword, page, 10) 로 교체
-    override suspend fun searchVenues(
+    // TODO: API 연동 시 searchDataSource.getPlaces(keyword, page, 10) 로 교체
+    override suspend fun searchPlaces(
         keyword: String,
         page: Int,
-    ): Result<PagingData<Venue>> = suspendRunCatching {
+    ): Result<PagingData<Place>> = suspendRunCatching {
         PagingData(
             items = emptyList(),
             currentPage = page,

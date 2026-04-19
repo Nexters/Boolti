@@ -5,5 +5,5 @@ sealed interface SearchDetailIntent {
 
     data object OnShowsPageReached : SearchDetailIntent
     data object OnProfilesPageReached : SearchDetailIntent
-    data object OnVenuesPageReached : SearchDetailIntent
+    data object OnPlacesPageReached : SearchDetailIntent
 }

@@ -301,12 +301,18 @@
     <string name="search_no_result">와 관련된 결과가 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_no_show_result">와 관련된 공연이 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_no_artist_result">와 관련된 아티스트가 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_no_venue_result">와 관련된 공연장이 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_reset_searched_keyword_button">검색어 초기화</string>
     <string name="search_tab_all">전체</string>
     <string name="search_tab_show_section">공연</string>
     <string name="search_tab_artist_section">아티스트</string>
+    <string name="search_tab_venue_section">공연장</string>
     <string name="search_tab_show">공연(%d)</string>
     <string name="search_tab_artist">아티스트(%d)</string>
+    <string name="search_tab_venue">공연장(%d)</string>
+    <string name="search_venue_finder_subtitle">조건에 맞는 공연장을 찾고 있나요?</string>
+    <string name="search_venue_finder_title">공연장 찾기</string>
+    <string name="search_venue_finder_beta">Beta</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>

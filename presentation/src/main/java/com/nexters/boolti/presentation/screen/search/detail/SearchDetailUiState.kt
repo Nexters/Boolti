@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.search.detail
 import androidx.compose.runtime.Stable
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.model.Venue
 
 @Stable
 data class SearchDetailUiState(
@@ -15,6 +16,9 @@ data class SearchDetailUiState(
     val profiles: List<User.Others>,
     val profilesTotalCount: Long,
     val profilesLoading: Boolean,
+    val venues: List<Venue>,
+    val venuesTotalCount: Long,
+    val venuesLoading: Boolean,
     val tabIndex: Int,
 ) {
     companion object {
@@ -28,6 +32,9 @@ data class SearchDetailUiState(
             profiles = emptyList(),
             profilesTotalCount = 0L,
             profilesLoading = false,
+            venues = emptyList(),
+            venuesTotalCount = 0L,
+            venuesLoading = false,
             tabIndex = 0,
         )
     }

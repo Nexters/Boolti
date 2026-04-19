@@ -141,6 +141,7 @@ class HomeViewModel @Inject constructor(
                         target = "GiftRegistration",
                         properties = mapOf(
                             "gift_id" to giftUuid,
+                            "show_id" to ready.showId,
                         ),
                     )
                     sendEvent(HomeEvent.GiftRegistered)

@@ -166,5 +166,6 @@ common/tracker/   - Common analytics tracking
 - **Remote Config**: Feature flags and dynamic configuration
 - **App Distribution**: 테스터 배포
   - Project ID: `boolti-9a521`
-  - Debug App ID: `1:965765235527:android:fd491b0a5869fc69d30262`
+  - Debug App ID: `1:965765235527:android:fd491b0a5869fc69d30262` (package: `com.nexters.boolti.debug`)
+  - Release App ID: `1:965765235527:android:6ed43e2462526efbd30262` (package: `com.nexters.boolti`)
   - 테스터 그룹: `안드폰-사용자들`

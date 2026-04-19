@@ -149,7 +149,3 @@ common/tracker/   - Common analytics tracking
   - Project ID: `boolti-9a521`
   - Debug App ID: `1:965765235527:android:fd491b0a5869fc69d30262`
   - 테스터 그룹: `안드폰-사용자들`
-
-## Project-local Skills
-
-프로젝트 전용 스킬과 슬래시 커맨드는 `.claude/skills/`, `.claude/commands/`에 위치한다. 자동 로드되므로 별도 설정 불필요.

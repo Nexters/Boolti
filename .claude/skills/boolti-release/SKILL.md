@@ -111,24 +111,15 @@ git log <base>..HEAD --pretty=format:'%s' --no-merges
 
 ## Step 4. 릴리즈 빌드
 
-App Distribution 대상 앱(variant)을 먼저 결정한다. 불티는 **debug·release 두 Firebase 앱이 분리**되어 있고 패키지명도 다르므로 잘못 매칭하면 배포가 실제 테스터 기기에 설치되지 않는다.
-
-| Variant | 패키지 | 언제 쓰나 |
-|---------|--------|----------|
-| **debug** | `com.nexters.boolti.debug` | 기능·버그 확인용 빠른 배포 (기본) |
-| **release** | `com.nexters.boolti` | 스토어 제출 전 실제 빌드 검증, 프로덕션과 동일 조건 필요 |
-
-사용자에게 명시적으로 묻지 않았다면 **debug를 기본값**으로 제안하되, 스토어 직전 QA처럼 release가 필요한 맥락이면 확인한다. Release 선택 시 `keystore.properties`가 반드시 존재해야 한다(Step 1 재확인).
+빌드 variant(`debug`/`release`)를 먼저 정한다. 각 variant는 전용 Firebase 앱에 매핑되며 sub-skill이 artifact 경로로 자동 구분한다. 기본은 **debug**(빠른 테스터 배포), 스토어 직전 QA처럼 release가 필요한 맥락이면 사용자에게 확인한다.
 
 ```bash
 ./gradlew clean
-
-# Variant 선택에 따라 하나
 ./gradlew assembleDebug      # → app/build/outputs/apk/debug/app-debug.apk
-./gradlew assembleRelease    # → app/build/outputs/apk/release/app-release.apk
+./gradlew assembleRelease    # → app/build/outputs/apk/release/app-release.apk  (keystore.properties 필요)
 ```
 
-빌드 산출물의 실제 경로를 Step 5로 넘긴다. **경로에 `debug` 또는 `release` 가 포함**되어 있어야 sub-skill이 App ID를 자동 추론한다.
+빌드 산출물의 실제 경로를 Step 5로 넘긴다.
 
 ## Step 5. 배포 sub-skill 위임
 
@@ -140,7 +131,7 @@ App Distribution 대상 앱(variant)을 먼저 결정한다. 불티는 **debug·
 | `release_notes` | Step 3에서 승인된 인라인 텍스트 |
 | `groups` | sub-skill 기본값 사용 (사용자가 변경 요청하면 override) |
 
-**App ID는 sub-skill이 `artifact` 경로로 자동 결정**한다 (`apk/debug/` → Debug 앱, `apk/release/` → Release 앱). 오케스트레이터는 명시적으로 `app_id` 를 전달하지 않는다. 단, Step 4에서 variant 선택과 실제 빌드 경로가 일치하는지 한 번 더 확인해 전달한다.
+App ID는 sub-skill이 `artifact` 경로로 자동 결정한다. 오케스트레이터는 Step 4 variant와 빌드 경로가 일치하는지만 위임 직전에 재확인.
 
 CLI 실행·검증·결과 보고는 sub-skill 책임. 본 스킬은 결과만 사용자에게 전달.
 

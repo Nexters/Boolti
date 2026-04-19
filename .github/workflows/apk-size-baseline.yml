@@ -42,12 +42,12 @@ jobs:
 
       - name: Build debug APK
         env:
-          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+          KEYSTORE: ${{ secrets.KEYSTORE }}
           KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
         run: |
-          echo "$DEBUG_KEYSTORE" | base64 -d > ./app/boolti-keystore.keystore
+          echo "$KEYSTORE" | base64 -d > ./app/boolti-keystore.keystore
           echo "$KEYSTORE_PROPERTIES" > keystore.properties
           echo "$LOCAL_PROPERTIES" > local.properties
           echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json

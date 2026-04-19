@@ -42,7 +42,7 @@ jobs:
 
       - name: Run unit tests
         env:
-          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+          KEYSTORE: ${{ secrets.KEYSTORE }}
           KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}

@@ -1,6 +1,6 @@
 # Boolti-472 GitHub Actions 개선 머지 체크리스트
 
-`feature/Boolti-472` 우산 브랜치에 쌓인 6개 서브 PR을 추적하고, 모두 머지된 뒤 수동으로 수행할 후속 작업을 정리한다.
+`feature/Boolti-472` 통합 브랜치에 쌓인 6개 서브 PR을 추적하고, 모두 머지된 뒤 수동으로 수행할 후속 작업을 정리한다.
 
 ## 6개 서브 PR
 
@@ -38,7 +38,7 @@ Settings → Branches → Add rule (`main`):
 - [ ] Require status checks:
   - [ ] `check` — `release-version-check.yml` (release/* PR에서만 실행)
 
-### 3. Umbrella PR 생성·머지
+### 3. 통합 PR 생성·머지
 
 - [ ] 본 체크리스트 md 파일 제거 커밋
 - [ ] `feature/Boolti-472` → `develop` PR 생성

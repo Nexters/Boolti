@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # 와일드카드 import 검출 (Kotlin)
+# 테스트 소스 세트(src/test, src/androidTest 및 그 변형)는 제외한다.
 # Usage: check-imports.sh [target_path]
 
 set -euo pipefail
@@ -7,6 +8,11 @@ set -euo pipefail
 TARGET="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 
 violations=$(git -C "$TARGET" ls-files -z '*.kt' '*.kts' \
+    ':!:*/src/test/*' \
+    ':!:*/src/androidTest/*' \
+    ':!:*/src/testDebug/*' \
+    ':!:*/src/testRelease/*' \
+    ':!:*/src/androidTestDebug/*' \
   | xargs -0 grep -En '^import [^[:space:]]+\.\*[[:space:]]*$' 2>/dev/null \
   || true)
 

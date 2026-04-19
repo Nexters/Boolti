@@ -55,12 +55,12 @@ jobs:
           echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
           ./gradlew assembleDebug --stacktrace
 
-      - name: Download baseline APK
+      - name: Download baseline APK size
         uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
         continue-on-error: true
         with:
           workflow: apk-size-baseline.yml
-          name: baseline-debug-apk
+          name: baseline-apk-size
           path: baseline
           workflow_conclusion: success
 
@@ -71,7 +71,7 @@ jobs:
             const fs = require('fs');
 
             const currentPath = 'app/build/outputs/apk/debug/app-debug.apk';
-            const baselinePath = 'baseline/app-debug.apk';
+            const baselineSizePath = 'baseline/baseline-apk-size.txt';
 
             if (!fs.existsSync(currentPath)) {
               core.setFailed('Current APK not found: ' + currentPath);
@@ -79,8 +79,8 @@ jobs:
             }
 
             const currentSize = fs.statSync(currentPath).size;
-            const baselineSize = fs.existsSync(baselinePath)
-              ? fs.statSync(baselinePath).size
+            const baselineSize = fs.existsSync(baselineSizePath)
+              ? parseInt(fs.readFileSync(baselineSizePath, 'utf8').trim(), 10)
               : null;
 
             const toMB = (bytes) => (bytes / 1024 / 1024).toFixed(2) + ' MB';

@@ -53,10 +53,13 @@ jobs:
           echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
           ./gradlew assembleDebug --stacktrace
 
-      - name: Upload baseline APK
+      - name: Record APK size
+        run: stat --printf='%s' app/build/outputs/apk/debug/app-debug.apk > baseline-apk-size.txt
+
+      - name: Upload baseline APK size
         uses: actions/upload-artifact@v4
         with:
-          name: baseline-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: baseline-apk-size
+          path: baseline-apk-size.txt
           retention-days: 30
           overwrite: true

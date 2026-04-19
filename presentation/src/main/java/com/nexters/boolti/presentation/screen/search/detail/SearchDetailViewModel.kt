@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
+import com.nexters.boolti.domain.model.Venue
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -12,6 +13,8 @@ import com.nexters.boolti.presentation.extension.stateInUi
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -28,9 +31,11 @@ class SearchDetailViewModel @Inject constructor(
     private var searchJob: Job? = null
     private var searchShowsJob: Job? = null
     private var searchProfilesJob: Job? = null
+    private var searchVenuesJob: Job? = null
 
     private val shows = MutableStateFlow<PagingDataUiModel<Show>>(PagingDataUiModel.default())
     private val profiles = MutableStateFlow<PagingDataUiModel<User.Others>>(PagingDataUiModel.default())
+    private val venues = MutableStateFlow<PagingDataUiModel<Venue>>(PagingDataUiModel.default())
 
     private val _uiState = MutableStateFlow(
         SearchDetailUiState.Default.copy(
@@ -42,12 +47,15 @@ class SearchDetailViewModel @Inject constructor(
         _uiState,
         shows,
         profiles,
-    ) { uiState, shows, profiles ->
+        venues,
+    ) { uiState, shows, profiles, venues ->
         uiState.copy(
             shows = shows.items,
             showsTotalCount = shows.totalCount,
             profiles = profiles.items,
             profilesTotalCount = profiles.totalCount,
+            venues = venues.items,
+            venuesTotalCount = venues.totalCount,
         )
     }.stateInUi(viewModelScope, SearchDetailUiState.Default.copy(keyword = route.keyword))
 
@@ -60,6 +68,7 @@ class SearchDetailViewModel @Inject constructor(
             is SearchDetailIntent.ChangeTabIndex -> changeTabIndex(intent.index)
             is SearchDetailIntent.OnProfilesPageReached -> loadNextProfilesPage()
             is SearchDetailIntent.OnShowsPageReached -> loadNextShowsPage()
+            is SearchDetailIntent.OnVenuesPageReached -> loadNextVenuesPage()
         }
     }
 
@@ -70,29 +79,47 @@ class SearchDetailViewModel @Inject constructor(
 
             searchHistoryRepository.saveSearchHistory(keyword)
 
-            searchRepository.searchShows(keyword, 0).onSuccess { showsResponse ->
-                shows.update {
-                    PagingDataUiModel(
-                        items = showsResponse.items,
-                        totalCount = showsResponse.totalElements,
-                        currentPage = 0,
-                        totalPages = showsResponse.totalPages,
-                        hasNext = showsResponse.hasNext,
-                    )
-                }
-            }
-
-            searchRepository.searchProfiles(keyword, 0).onSuccess { profilesResponse ->
-                profiles.update {
-                    PagingDataUiModel(
-                        items = profilesResponse.items,
-                        totalCount = profilesResponse.totalElements,
-                        currentPage = 0,
-                        totalPages = profilesResponse.totalPages,
-                        hasNext = profilesResponse.hasNext,
-                    )
-                }
-            }
+            listOf(
+                async {
+                    searchRepository.searchShows(keyword, 0).onSuccess { response ->
+                        shows.update {
+                            PagingDataUiModel(
+                                items = response.items,
+                                totalCount = response.totalElements,
+                                currentPage = 0,
+                                totalPages = response.totalPages,
+                                hasNext = response.hasNext,
+                            )
+                        }
+                    }
+                },
+                async {
+                    searchRepository.searchProfiles(keyword, 0).onSuccess { response ->
+                        profiles.update {
+                            PagingDataUiModel(
+                                items = response.items,
+                                totalCount = response.totalElements,
+                                currentPage = 0,
+                                totalPages = response.totalPages,
+                                hasNext = response.hasNext,
+                            )
+                        }
+                    }
+                },
+                async {
+                    searchRepository.searchVenues(keyword, 0).onSuccess { response ->
+                        venues.update {
+                            PagingDataUiModel(
+                                items = response.items,
+                                totalCount = response.totalElements,
+                                currentPage = 0,
+                                totalPages = response.totalPages,
+                                hasNext = response.hasNext,
+                            )
+                        }
+                    }
+                },
+            ).awaitAll()
 
             _uiState.update {
                 it.copy(
@@ -104,7 +131,7 @@ class SearchDetailViewModel @Inject constructor(
     }
 
     private fun changeTabIndex(index: Int) {
-        _uiState.update { it.copy(tabIndex = index.takeIf { i -> i < 3 } ?: 0) }
+        _uiState.update { it.copy(tabIndex = index.takeIf { i -> i < 4 } ?: 0) }
     }
 
     private fun loadNextShowsPage() {
@@ -158,6 +185,33 @@ class SearchDetailViewModel @Inject constructor(
                 }
             }
             _uiState.update { it.copy(profilesLoading = false) }
+        }
+    }
+
+    private fun loadNextVenuesPage() {
+        if (searchVenuesJob?.isActive == true || !venues.value.hasNext) return
+        _uiState.update { it.copy(venuesLoading = true) }
+
+        searchVenuesJob = viewModelScope.launch {
+            val currentPage = venues.value.currentPage
+            val nextPage = currentPage + 1
+            val currentItems = venues.value.items
+
+            searchRepository.searchVenues(uiState.value.searchedKeyword, nextPage).onSuccess { searchResult ->
+                if (searchResult.items.isNotEmpty()) {
+                    val appendedItems = (currentItems + searchResult.items).distinctBy { it.id }
+                    venues.update {
+                        it.copy(
+                            items = appendedItems,
+                            totalCount = searchResult.totalElements,
+                            currentPage = nextPage,
+                            totalPages = searchResult.totalPages,
+                            hasNext = searchResult.hasNext,
+                        )
+                    }
+                }
+            }
+            _uiState.update { it.copy(venuesLoading = false) }
         }
     }
 }

@@ -84,13 +84,32 @@ common/tracker/   - Common analytics tracking
 ## Development Setup Requirements
 
 ### Required Files (Not in Git)
-- `local.properties` - Contains API keys and environment configs:
+- `local.properties` - Contains API keys and environment configs. 실제 값은 팀 비공개 채널에서 받는다.
   ```
-  KAKAO_APP_KEY="your_key"
-  DEV_BASE_URL="dev_api_url"
-  PROD_BASE_URL="prod_api_url"
-  DEV_TOSS_CLIENT_KEY="dev_toss_key"
-  PROD_TOSS_CLIENT_KEY="prod_toss_key"
+  # 인증
+  KAKAO_APP_KEY="<카카오 앱 키>"
+
+  # API 엔드포인트
+  DEV_BASE_URL="<개발 API base URL>"
+  PROD_BASE_URL="<운영 API base URL>"
+  DEV_DOMAIN="<개발 도메인>"
+  PROD_DOMAIN="<운영 도메인>"
+
+  # 토스페이먼츠
+  DEV_TOSS_CLIENT_KEY="<개발 토스 클라이언트 키>"
+  DEV_TOSS_SECRET_KEY="<개발 토스 시크릿 키>"
+  PROD_TOSS_CLIENT_KEY="<운영 토스 클라이언트 키>"
+  PROD_TOSS_SECRET_KEY="<운영 토스 시크릿 키>"
+
+  # 분석
+  DEV_MIXPANEL_TOKEN="<개발 Mixpanel 토큰>"
+  PROD_MIXPANEL_TOKEN="<운영 Mixpanel 토큰>"
+
+  # 외부 서비스
+  YOUTUBE_API_KEY="<YouTube Data API 키>"
+
+  # 디자인 도구 (Figma REST API용, 로컬 스킬에서 사용)
+  FIGMA_TOKEN="<Figma personal access token>"
   ```
 - `keystore.properties` - Release signing configuration
 

@@ -33,7 +33,9 @@ jobs:
           set -euo pipefail
 
           violations=$(git diff "$BASE_SHA"..."$HEAD_SHA" -- 'data/src/main/**/*.kt' \
-            | grep -E '^\+[^+].*\brunCatching\b' \
+            | grep -E '^\+[^+]' \
+            | grep -v -E '^\+[[:space:]]*(//|\*|/\*)' \
+            | grep -E '\brunCatching\b' \
             | grep -v 'suspendRunCatching' \
             || true)
 

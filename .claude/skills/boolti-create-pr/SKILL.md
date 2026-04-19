@@ -29,8 +29,34 @@ Pre-flight 검증 → 티켓 추출 → 변경 요약 → 제목/바디 생성 �
 | 워킹 트리가 clean | `git status --porcelain` | 사용자에게 알리고 커밋/스태시 여부 확인 (임의 커밋 금지) |
 | 동일 브랜치로 열린 PR이 없음 | `gh pr list --head <branch> --state open --json number` | 이미 있으면 URL 안내 후 중단. 업데이트는 `git push`만 하면 된다고 안내 |
 | Quality Gate 통과 | `bash .claude/skills/boolti-feature-planner/scripts/quality-gate.sh --no-test` | 실패 항목 보고 후 중단. 사용자가 fix 요청하면 먼저 해결 |
+| AppTracker 변경 검증 | 아래 "AppTracker 검증" 절 참고 | 스킬 실행 → 지적 사항 반영 → 재시도 |
 
 Quality Gate 스크립트가 없거나 실행이 어려운 환경이면 최소한 `./gradlew assembleDebug --quiet`는 통과해야 한다.
+
+#### AppTracker 검증
+
+이번 PR의 커밋(`develop..HEAD`)에 **Mixpanel/AppTracker 관련 변경**이 있으면 `boolti-mixpanel-validator` 스킬을 먼저 실행해 컨벤션을 검증한다.
+
+검사 방법:
+
+```bash
+# 1) 트래커 모듈 변경 여부
+git diff develop...HEAD --name-only | grep -E '^common/tracker/'
+
+# 2) AppTracker 호출 추가/수정 여부 (.kt/.kts)
+git diff develop...HEAD -U0 -- '*.kt' '*.kts' \
+  | grep -E '^\+[^+]' \
+  | grep -E 'AppTracker\.|\btrackEvent\('
+```
+
+둘 중 하나라도 매치되면:
+1. `Skill` 도구로 `boolti-mixpanel-validator` 호출, 해당 변경 파일을 검토.
+2. 지적 사항이 있으면 수정 → 재커밋 후 PR 단계로 복귀.
+3. 지적 사항이 없거나 이미 해소됐으면 "검증 완료" 메모와 함께 다음 단계로.
+
+매치가 없으면 이 단계는 통과 처리.
+
+> 커밋 시점에도 `PreToolUse` 훅(`.claude/hooks/check-apptracker-before-commit.sh`)이 같은 검사를 수행한다. PR 단계의 이 절차는 커밋이 훅 밖에서 이뤄졌을 가능성을 커버하는 **2차 방어선**이다.
 
 ### Step 2. 브랜치·티켓·타입 추출
 

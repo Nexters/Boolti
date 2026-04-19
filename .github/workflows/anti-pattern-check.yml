@@ -1,0 +1,49 @@
+name: Anti-Pattern Check
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'data/src/main/**/*.kt'
+      - '.github/workflows/anti-pattern-check.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: anti-pattern-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  run-catching:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect runCatching additions in data layer
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          violations=$(git diff "$BASE_SHA"..."$HEAD_SHA" -- 'data/src/main/**/*.kt' \
+            | grep -E '^\+[^+].*\brunCatching\b' \
+            | grep -v 'suspendRunCatching' \
+            || true)
+
+          if [ -z "$violations" ]; then
+            echo "✅ data 레이어에 추가된 runCatching이 없습니다."
+            exit 0
+          fi
+
+          echo "::error::data 레이어에 runCatching이 추가되었습니다. suspend 함수 내부에서는 suspendRunCatching (domain/util/Kotlin.kt)을 사용하세요."
+          echo ""
+          echo "위반 라인:"
+          echo "$violations"
+          exit 1

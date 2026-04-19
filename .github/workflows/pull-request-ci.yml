@@ -3,6 +3,22 @@ name: Android Pull Request CI
 on:
   pull_request:
     branches: [ develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.idea/**'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+  actions: read
+
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   unit_test:
@@ -26,7 +42,7 @@ jobs:
 
       - name: Run unit tests
         env:
-          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+          KEYSTORE: ${{ secrets.KEYSTORE }}
           KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
@@ -36,6 +52,27 @@ jobs:
           echo "$LOCAL_PROPERTIES" > local.properties
           echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
           ./gradlew test --stacktrace
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Download baseline APK size
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
+        continue-on-error: true
+        with:
+          workflow: apk-size-baseline.yml
+          name: baseline-apk-size
+          path: baseline
+          workflow_conclusion: success
+
+      - name: APK size diff comment
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentApkSize = require('./.github/scripts/apk-size-comment.js');
+            await commentApkSize({ github, context, core });
 
       - name: Publish Test Results
         if: always()

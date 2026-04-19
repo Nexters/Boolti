@@ -3,6 +3,22 @@ name: Android Pull Request CI
 on:
   pull_request:
     branches: [ develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.idea/**'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  checks: write
+  actions: read
+
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   unit_test:
@@ -36,6 +52,119 @@ jobs:
           echo "$LOCAL_PROPERTIES" > local.properties
           echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
           ./gradlew test --stacktrace
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Download baseline APK size
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
+        continue-on-error: true
+        with:
+          workflow: apk-size-baseline.yml
+          name: baseline-apk-size
+          path: baseline
+          workflow_conclusion: success
+
+      - name: APK size diff comment
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const currentPath = 'app/build/outputs/apk/debug/app-debug.apk';
+            const baselineSizePath = 'baseline/baseline-apk-size.txt';
+
+            if (!fs.existsSync(currentPath)) {
+              core.setFailed('Current APK not found: ' + currentPath);
+              return;
+            }
+
+            const currentSize = fs.statSync(currentPath).size;
+            const baselineSize = fs.existsSync(baselineSizePath)
+              ? parseInt(fs.readFileSync(baselineSizePath, 'utf8').trim(), 10)
+              : null;
+
+            const toMB = (bytes) => (bytes / 1024 / 1024).toFixed(2) + ' MB';
+            const KB = 1024;
+            const MB = 1024 * 1024;
+
+            const marker = '<!-- apk-size-diff -->';
+            let body;
+            if (baselineSize === null) {
+              body = `${marker}\n📦 APK size: **${toMB(currentSize)}** (baseline 없음 — develop push 후 재실행하면 비교 가능)`;
+            } else {
+              const diff = currentSize - baselineSize;
+              const absDiff = Math.abs(diff);
+              const pct = baselineSize > 0
+                ? ((diff / baselineSize) * 100).toFixed(2)
+                : '0.00';
+              const sign = diff > 0 ? '+' : '';
+              const header = `APK size: **${toMB(currentSize)}** (${sign}${toMB(diff)}, ${sign}${pct}%) vs \`develop\``;
+
+              let icon, note;
+              if (absDiff < KB) {
+                icon = '🟢';
+                note = '거의 변화 없음';
+              } else if (diff < 0) {
+                if (absDiff >= MB) {
+                  icon = '🎉';
+                  note = `무려 ${toMB(absDiff)} 감량! 사이즈 다이어트 성공 🚀`;
+                } else if (absDiff >= 100 * KB) {
+                  icon = '🔻';
+                  note = '감량 고생하셨어요 👏';
+                } else {
+                  icon = '🔻';
+                  note = '살짝 슬림해졌어요 🙂';
+                }
+              } else {
+                if (absDiff >= 5 * MB) {
+                  icon = '🚨';
+                  note = '상당히 커졌어요! 리소스·의존성 점검 필요';
+                } else if (absDiff >= MB) {
+                  icon = '⚠️';
+                  note = '꽤 무거워졌어요. 꼭 필요한 변경인지 확인 부탁';
+                } else if (absDiff >= 100 * KB) {
+                  icon = '🔺';
+                  note = '사이즈가 살짝 늘었네요';
+                } else {
+                  icon = '🔺';
+                  note = '작은 증가';
+                }
+              }
+
+              body = `${marker}\n${icon} ${header} — ${note}`;
+            }
+
+            const pr = context.payload.pull_request;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+            });
+            const existing = comments.find(c =>
+              c.body &&
+              c.body.includes(marker) &&
+              c.user &&
+              c.user.login === 'github-actions[bot]'
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body,
+              });
+            }
 
       - name: Publish Test Results
         if: always()

@@ -1,11 +1,11 @@
 ---
 name: boolti-release
-description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 선택 → Pre-release 검증 → 버전 번프 → QA 친화 릴리즈 노트 초안 생성까지 수행한 뒤, 사용자 승인을 받으면 배포 경로별 sub-skill(`boolti-app-distribution`, 추후 `boolti-play-console`)에 위임한다. "릴리즈 준비해줘", "테스터 배포해줘", "릴리즈 노트 써줘", "버전 올려줘", "릴리즈 빌드" 등 릴리즈 전체 흐름을 요청할 때 트리거.
+description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 선택 → Pre-release 검증 → 버전 상향 → QA 친화 릴리즈 노트 초안 생성까지 수행한 뒤, 사용자 승인을 받으면 배포 경로별 sub-skill(`boolti-app-distribution`, 추후 `boolti-play-console`)에 위임한다. "릴리즈 준비해줘", "테스터 배포해줘", "릴리즈 노트 써줘", "버전 올려줘", "릴리즈 빌드" 등 릴리즈 전체 흐름을 요청할 때 트리거.
 ---
 
 # 불티 릴리즈 오케스트레이터
 
-불티 Android 앱 릴리즈의 **공통 전처리**(경로 선택, 검증, 버전 번프, 릴리즈 노트 생성)를 담당한다. 빌드·업로드 같은 경로별 작업은 sub-skill로 위임한다.
+불티 Android 앱 릴리즈의 **공통 전처리**(경로 선택, 검증, 버전 상향, 릴리즈 노트 생성)를 담당한다. 빌드·업로드 같은 경로별 작업은 sub-skill로 위임한다.
 
 ## 스킬 분리 구조
 
@@ -45,7 +45,7 @@ description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 �
 | `keystore.properties` 존재 | `test -f keystore.properties` | release APK 빌드 시에만 필수 (debug 배포면 skip) |
 | 버전 확인 | `grep -E 'versionCode\|versionName' gradle/libs.versions.toml` | 값 보고 후 Step 2 |
 
-## Step 2. 버전 번프
+## Step 2. 버전 상향
 
 `gradle/libs.versions.toml`의 `[versions]`에서 `versionCode`(+1), `versionName`(SemVer)을 갱신.
 

@@ -1,0 +1,30 @@
+name: PR Milestone Required
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - milestoned
+      - demilestoned
+      - ready_for_review
+
+jobs:
+  check-milestone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify milestone is set
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const milestone = context.payload.pull_request.milestone;
+            if (!milestone) {
+              core.setFailed(
+                "이 PR에는 마일스톤이 지정되지 않았습니다. " +
+                "현재 앱 버전 마일스톤 또는 Tools 마일스톤을 지정한 뒤 다시 확인하세요."
+              );
+            } else {
+              core.info(`Milestone: ${milestone.title}`);
+            }

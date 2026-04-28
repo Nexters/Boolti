@@ -275,6 +275,16 @@
     <string name="show_naver_map_dialog_content">이 안내는 한 번만 표시됩니다.</string>
     <string name="show_navigate_to_nmap">앱으로 이동하기</string>
 
+    <!-- 공연장 -->
+    <string name="place_tab_home">홈</string>
+    <string name="place_tab_rental">대관 정보</string>
+    <string name="place_rental_fee">대관료</string>
+    <string name="place_capacity">수용인원</string>
+    <string name="place_location">위치</string>
+    <string name="place_subway">지하철역</string>
+    <string name="place_contact">문의처</string>
+    <string name="place_capacity_format">%d명</string>
+
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
     <string name="input_enter_code_button">입장 코드 입력하기</string>

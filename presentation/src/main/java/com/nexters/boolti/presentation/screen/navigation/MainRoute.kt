@@ -83,4 +83,9 @@ sealed interface MainRoute {
         val giftUuid: String,
         val showId: String,
     ) : MainRoute
+
+    @Serializable
+    data class Place(
+        val placeId: String,
+    ) : MainRoute
 }

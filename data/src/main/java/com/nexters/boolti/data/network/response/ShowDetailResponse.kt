@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 internal data class ShowDetailResponse(
     val id: String,
     val name: String,
+    val placeId: String? = null,
     val placeName: String,
     val date: String,
     val runningTime: Int,
@@ -28,6 +29,7 @@ internal data class ShowDetailResponse(
         return ShowDetail(
             id = id,
             name = name,
+            placeId = placeId,
             placeName = placeName,
             date = date.toLocalDateTime(),
             runningTime = runningTime,

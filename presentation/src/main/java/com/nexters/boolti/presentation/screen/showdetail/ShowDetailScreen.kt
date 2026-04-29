@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.text.TextUtils
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -273,6 +274,37 @@ fun ShowDetailScreen(
 
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
+    val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
+    val url = "https://${host}/show/${showDetail.id}/info"
+    // ex. tel:010-1010-1101
+    val telSchemes = listOf("tel", "telprompt")
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+    var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
+    var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
+    val webView by remember {
+        mutableStateOf(BtWebView(preUriLoading = { url ->
+            preUriLoading(
+                url = url,
+                context = context,
+                uriHandler = uriHandler,
+                navigateWithUrl = { url -> redirectedInquiryUrl = url },
+                navigateWithIntent = { intent -> intentToNavigateTo = intent })
+        }, context = context).apply {
+            loadUrl(url)
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        })
+    }
+
+    LaunchedEffect(intentToNavigateTo) {
+        if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
+            if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
+                trackNaverMap()
+            }
+            context.startActivity(intentToNavigateTo)
+            intentToNavigateTo = null
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -314,9 +346,7 @@ fun ShowDetailScreen(
 
             when (selectedTab) {
                 0 -> ShowInfoTab(
-                    showId = showDetail.id,
-                    shouldShowNaverMapDialog = shouldShowNaverMapDialog,
-                    doNotShowNaverMapDialog = doNotShowNaverMapDialog
+                    infoContentWebView = webView,
                 )
 
                 1 -> CastTab(
@@ -379,6 +409,17 @@ fun ShowDetailScreen(
                 deadlineDateTime = showDetail.salesEndDateTime!!,
             )
         }
+
+        redirectedInquiryUrl?.let { url ->
+            val contact = url.filterToPhoneNumber()
+            val isPhone = URI(url).scheme in telSchemes
+
+            InquiryBottomSheet(
+                isTelephone = isPhone,
+                onDismissRequest = { redirectedInquiryUrl = null },
+                contact = contact
+            )
+        }
     }
 
     showBottomSheet?.let { type ->
@@ -406,6 +447,43 @@ fun ShowDetailScreen(
                 showBottomSheet = null
             }
         )
+    }
+
+    if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
+        BTDialog(
+            onDismiss = {
+                intentToNavigateTo = null
+            },
+            positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+            onClickPositiveButton = {
+                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
+                    trackNaverMap()
+                }
+                context.startActivity(intentToNavigateTo)
+                doNotShowNaverMapDialog()
+                intentToNavigateTo = null
+            }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.show_naver_map_dialog_title),
+                    color = Grey15,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    modifier = Modifier.padding(
+                        top = 4.dp
+                    ),
+                    text = stringResource(R.string.show_naver_map_dialog_content),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
     }
 }
 
@@ -671,43 +749,9 @@ private fun ContentTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
-    showId: String,
-    shouldShowNaverMapDialog: Boolean,
-    doNotShowNaverMapDialog: () -> Unit,
+    infoContentWebView: WebView,
 ) {
     item {
-        var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
-        val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
-        val url = "https://${host}/show/${showId}/info"
-        val context = LocalContext.current
-        val uriHandler = LocalUriHandler.current
-        var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
-
-        LaunchedEffect(intentToNavigateTo) {
-            if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
-                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                    trackNaverMap()
-                }
-                context.startActivity(intentToNavigateTo)
-                intentToNavigateTo = null
-            }
-        }
-
-        // ex. tel:010-1010-1101
-        val telSchemes = listOf("tel", "telprompt")
-        val webView by remember {
-            mutableStateOf(BtWebView(preUriLoading = { url ->
-                preUriLoading(
-                    url = url,
-                    context = context,
-                    uriHandler = uriHandler,
-                    navigateWithUrl = { url -> redirectedInquiryUrl = url },
-                    navigateWithIntent = { intent -> intentToNavigateTo = intent })
-            }, context = context).apply {
-                loadUrl(url)
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            })
-        }
 
         Box(
             modifier = Modifier
@@ -720,7 +764,7 @@ private fun LazyListScope.ShowInfoTab(
             AndroidView(
                 modifier = Modifier.fillMaxWidth(),
                 factory = { context ->
-                    webView.apply {
+                    infoContentWebView.apply {
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -729,54 +773,6 @@ private fun LazyListScope.ShowInfoTab(
                     }
                 },
             )
-        }
-
-        redirectedInquiryUrl?.let { url ->
-            val contact = url.filterToPhoneNumber()
-            val isPhone = URI(url).scheme in telSchemes
-
-            InquiryBottomSheet(
-                isTelephone = isPhone,
-                onDismissRequest = { redirectedInquiryUrl = null },
-                contact = contact
-            )
-        }
-
-        if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
-            BTDialog(
-                onDismiss = {
-                    intentToNavigateTo = null
-                },
-                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
-                onClickPositiveButton = {
-                    if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                        trackNaverMap()
-                    }
-                    context.startActivity(intentToNavigateTo)
-                    doNotShowNaverMapDialog()
-                    intentToNavigateTo = null
-                }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(R.string.show_naver_map_dialog_title),
-                        color = Grey15,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        modifier = Modifier.padding(
-                            top = 4.dp
-                        ),
-                        text = stringResource(R.string.show_naver_map_dialog_content),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Grey50,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
         }
     }
 

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.text.TextUtils
 import android.view.ViewGroup
-import android.webkit.WebView
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -124,6 +123,8 @@ import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
@@ -749,18 +750,22 @@ private fun ContentTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
-    infoContentWebView: WebView,
+    infoContentWebView: BtWebView,
 ) {
     item {
+        var isLoading by remember { mutableStateOf(true) }
+        val scope = rememberCoroutineScope()
 
         Box(
             modifier = Modifier
                 .heightIn(min = 96.dp)
                 .fillMaxWidth()
         ) {
-            BtCircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
+            if (isLoading) {
+                BtCircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
             AndroidView(
                 modifier = Modifier.fillMaxWidth(),
                 factory = { context ->
@@ -770,6 +775,9 @@ private fun LazyListScope.ShowInfoTab(
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                         )
                         setOnLongClickListener { true }
+                        progress.onEach {
+                            isLoading = it < 100
+                        }.launchIn(scope)
                     }
                 },
             )

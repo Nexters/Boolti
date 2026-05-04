@@ -142,10 +142,9 @@ class BtWebChromeClient(
         filePathCallback: ValueCallback<Array<Uri>>?,
         fileChooserParams: FileChooserParams
     ): Boolean {
-        if (filePathCallback == null) return false
-        setFilePathCallback?.invoke(filePathCallback)
-
-        launchActivity?.invoke()
+        if (filePathCallback == null || setFilePathCallback == null || launchActivity == null) return false
+        setFilePathCallback.invoke(filePathCallback)
+        launchActivity.invoke()
 
         return true
     }

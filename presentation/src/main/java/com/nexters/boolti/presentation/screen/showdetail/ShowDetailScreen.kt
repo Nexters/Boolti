@@ -753,7 +753,7 @@ private fun LazyListScope.ShowInfoTab(
     infoContentWebView: BtWebView,
 ) {
     item {
-        var isLoading by remember { mutableStateOf(true) }
+        var isLoading by remember { mutableStateOf(infoContentWebView.progress.value < 100) }
         val scope = rememberCoroutineScope()
 
         Box(

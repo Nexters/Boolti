@@ -778,6 +778,7 @@ private fun LazyListScope.ShowInfoTab(
                         progress.onEach {
                             isLoading = it < 100
                         }.launchIn(scope)
+                        setWebChromeClient()
                     }
                 },
             )

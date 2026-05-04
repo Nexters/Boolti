@@ -56,8 +56,8 @@ class BtWebView @JvmOverloads constructor(
     }
 
     fun setWebChromeClient(
-        launchActivity: () -> Unit,
-        setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
+        launchActivity: (() -> Unit)? = null,
+        setFilePathCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null,
     ) {
         webChromeClient = BtWebChromeClient(
             launchActivity = launchActivity,
@@ -128,8 +128,8 @@ class BtWebViewClient(
 }
 
 class BtWebChromeClient(
-    private val launchActivity: () -> Unit,
-    private val setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
+    private val launchActivity: (() -> Unit)?,
+    private val setFilePathCallback: ((ValueCallback<Array<Uri>>) -> Unit)?,
     private val onProgressChanged: (Int) -> Unit = {},
 ) : WebChromeClient() {
     override fun onProgressChanged(view: WebView?, newProgress: Int) {
@@ -143,9 +143,9 @@ class BtWebChromeClient(
         fileChooserParams: FileChooserParams
     ): Boolean {
         if (filePathCallback == null) return false
-        setFilePathCallback(filePathCallback)
+        setFilePathCallback?.invoke(filePathCallback)
 
-        launchActivity()
+        launchActivity?.invoke()
 
         return true
     }

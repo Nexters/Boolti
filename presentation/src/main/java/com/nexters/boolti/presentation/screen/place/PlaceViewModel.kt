@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.place
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -21,7 +22,7 @@ class PlaceViewModel @Inject constructor(
     private val route = savedStateHandle.toRoute<MainRoute.Place>()
     val placeId: String = route.placeId
 
-    private val _uiState = MutableStateFlow(PlaceUiState())
+    private val _uiState = MutableStateFlow(PlaceUiState(Place("", "", null, null, null, null, null, null)))
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -33,14 +34,21 @@ class PlaceViewModel @Inject constructor(
     }
 
     private fun fetchPlace() {
-        viewModelScope.launch(recordExceptionHandler) {
-            placeRepository.getPlace(placeId)
-                .onSuccess { place ->
-                    _uiState.update { it.copy(place = place, isLoading = false) }
-                }
-                .onFailure {
-                    _uiState.update { it.copy(isLoading = false) }
-                }
+        // TODO: 더미 데이터 제거 후 실제 API 연동
+        _uiState.update {
+            it.copy(
+                place = com.nexters.boolti.domain.model.Place(
+                    id = placeId,
+                    name = "벨로드롬",
+                    imageUrl = null,
+                    rentalFee = "평일 30만원 / 주말 50만원",
+                    capacity = 300,
+                    streetAddress = "서울시 마포구 와우산로 94",
+                    subwayStation = "홍대입구역 2번 출구",
+                    contact = "02-1234-5678",
+                ),
+                isLoading = false,
+            )
         }
     }
 }

@@ -7,11 +7,13 @@ import kotlinx.serialization.Serializable
 internal data class ConcertHallProfileResponse(
     val id: Long,
     val name: String,
+    val representativeImageUrl: String? = null,
     val head: ConcertHallHeadResponse? = null,
 ) {
     fun toDomain(): Place = Place(
         id = id.toString(),
         name = name,
+        imageUrl = representativeImageUrl,
         rentalFee = head?.rentalFeeSummary,
         capacity = head?.capacity?.let { (it.seatedCapacity + it.standingCapacity).takeIf { total -> total > 0 } },
         streetAddress = head?.location?.streetAddress,

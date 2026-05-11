@@ -4,23 +4,27 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -52,11 +56,14 @@ import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.theme.Grey10
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.theme.point3
 
 @Composable
 fun PlaceScreen(
@@ -66,38 +73,36 @@ fun PlaceScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            BtAppBar(
-                navigateButtons = {
-                    BtAppBarDefaults.AppBarIconButton(
-                        iconRes = R.drawable.ic_arrow_back,
-                        description = stringResource(R.string.description_navigate_back),
-                        onClick = onBack,
-                    )
-                },
-            )
-        },
-    ) { innerPadding ->
+    Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                BtCircularProgressIndicator()
-            }
+            BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
             PlaceContent(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.fillMaxSize(),
                 place = uiState.place,
                 placeId = viewModel.placeId,
                 selectedTab = uiState.selectedTab,
                 onSelectTab = viewModel::selectTab,
             )
         }
+
+        BtAppBar(
+            colors = BtAppBarDefaults.appBarColors(containerColor = Color.Transparent),
+            navigateButtons = {
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_arrow_back,
+                    description = stringResource(R.string.description_navigate_back),
+                    onClick = onBack,
+                )
+            },
+            actionButtons = {
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_share,
+                    description = stringResource(R.string.ticketing_share),
+                    onClick = { TODO("공유하기") },
+                )
+            },
+        )
     }
 }
 
@@ -108,10 +113,48 @@ private fun PlaceContent(
     selectedTab: Int,
     onSelectTab: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    place: Place? = null,
+    place: Place,
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        place?.let {
+    LazyColumn(modifier = modifier) {
+        item {
+            Box(
+                contentAlignment = Alignment.BottomStart
+            ) {
+                AsyncImage(
+                    model = place.imageUrl,
+                    contentDescription = place.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .background(MaterialTheme.colorScheme.surface),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Grey90.copy(alpha = 0.2f),
+                                )
+                            )
+                        )
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = marginHorizontal)
+                        .padding(top = 20.dp, bottom = 4.dp),
+                    text = place.name,
+                    style = point3,
+                    color = Grey10,
+                )
+            }
+        }
+
+        place.let {
             item {
                 PlaceInfoSection(place = it)
             }
@@ -128,7 +171,13 @@ private fun PlaceContent(
             PlaceWebView(placeId = placeId, tabIndex = selectedTab)
         }
 
-        item { Spacer(Modifier.size(16.dp)) }
+        item {
+            Spacer(
+                Modifier
+                    .navigationBarsPadding()
+                    .height(16.dp)
+            )
+        }
     }
 }
 
@@ -344,6 +393,7 @@ private fun PlaceInfoSectionPreview() {
             place = Place(
                 id = "1",
                 name = "예시 공연장",
+                imageUrl = null,
                 rentalFee = "50만원/일",
                 capacity = 300,
                 streetAddress = "서울시 강남구 테헤란로 123",
@@ -362,6 +412,7 @@ private fun PlaceInfoSectionEmptyPreview() {
             place = Place(
                 id = "1",
                 name = "예시 공연장",
+                imageUrl = null,
                 rentalFee = null,
                 capacity = null,
                 streetAddress = null,

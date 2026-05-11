@@ -1,10 +1,10 @@
 package com.nexters.boolti.data.network.api
 
-import com.nexters.boolti.data.network.response.PlaceResponse
+import com.nexters.boolti.data.network.response.ConcertHallProfileResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 
 internal interface PlaceService {
-    @GET("/app/papi/v1/places/{placeId}")
-    suspend fun getPlace(@Path("placeId") placeId: String): PlaceResponse
+    @GET("/app/papi/v1/concert-halls/{id}")
+    suspend fun getPlace(@Path("id") placeId: String): ConcertHallProfileResponse
 }

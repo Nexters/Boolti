@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -148,39 +150,36 @@ private fun PlaceInfoSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = marginHorizontal, vertical = 20.dp),
+            .padding(top = 16.dp, bottom = 24.dp)
+            .padding(horizontal = marginHorizontal),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         place.rentalFee?.let { fee ->
             PlaceInfoRow(
-                iconRes = R.drawable.ic_info_20,
                 label = stringResource(R.string.place_rental_fee),
                 value = fee,
             )
         }
         place.capacity?.let { cap ->
             PlaceInfoRow(
-                iconRes = R.drawable.ic_person,
                 label = stringResource(R.string.place_capacity),
                 value = stringResource(R.string.place_capacity_format, cap),
             )
         }
         place.streetAddress?.let { address ->
             PlaceInfoRow(
-                iconRes = R.drawable.ic_place,
                 label = stringResource(R.string.place_location),
                 value = address,
             )
         }
         place.subwayStation?.let { subway ->
             PlaceInfoRow(
-                iconRes = R.drawable.ic_place,
                 label = stringResource(R.string.place_subway),
                 value = subway,
             )
         }
         place.contact?.let { contact ->
             PlaceInfoRow(
-                iconRes = R.drawable.ic_telephone,
                 label = stringResource(R.string.place_contact),
                 value = contact,
             )
@@ -190,36 +189,27 @@ private fun PlaceInfoSection(
 
 @Composable
 private fun PlaceInfoRow(
-    iconRes: Int,
     label: String,
     value: String,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top,
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Icon(
-            modifier = Modifier.size(20.dp),
-            imageVector = ImageVector.vectorResource(iconRes),
-            tint = Grey30,
-            contentDescription = label,
+        Text(
+            modifier = Modifier.width(88.dp),
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Grey50,
         )
-        Column(modifier = Modifier.padding(start = 12.dp)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodySmall,
-                color = Grey50,
-            )
-            Text(
-                modifier = Modifier.padding(top = 2.dp),
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Text(
+            modifier = Modifier.weight(1f),
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Grey30,
+        )
     }
 }
 

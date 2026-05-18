@@ -122,56 +122,60 @@ private fun PlaceContent(
 ) {
     LazyColumn(modifier = modifier) {
         item {
-            Box(
-                contentAlignment = Alignment.BottomStart
+            Column(
+                modifier = Modifier
+                    .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                    .background(color = Grey90)
             ) {
-                AsyncImage(
-                    model = place.imageUrl,
-                    contentDescription = place.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .background(MaterialTheme.colorScheme.surface),
-                )
-
                 Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Grey90.copy(alpha = 0.2f),
+                    contentAlignment = Alignment.BottomStart
+                ) {
+                    AsyncImage(
+                        model = place.imageUrl,
+                        contentDescription = place.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(MaterialTheme.colorScheme.surface),
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Grey90.copy(alpha = 0.2f),
+                                        Grey90,
+                                    )
                                 )
                             )
-                        )
-                )
+                    )
 
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = marginHorizontal)
-                        .padding(top = 20.dp, bottom = 4.dp),
-                    text = place.name,
-                    style = point3,
-                    color = Grey10,
-                )
-            }
-        }
-
-        item {
-            PlaceInfoSection(place = place)
-        }
-
-        place.contact?.let { contact ->
-            if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
-                item {
-                    PlaceContactSection(
-                        url = contact.websiteUrl,
-                        phoneNumber = contact.phoneNumber,
-                        email = contact.email,
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = marginHorizontal)
+                            .padding(top = 20.dp, bottom = 4.dp),
+                        text = place.name,
+                        style = point3,
+                        color = Grey10,
                     )
                 }
+
+                PlaceInfoSection(place = place)
+
+                place.contact?.let { contact ->
+                    if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
+                        PlaceContactSection(
+                            url = contact.websiteUrl,
+                            phoneNumber = contact.phoneNumber,
+                            email = contact.email,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
 
@@ -374,6 +378,7 @@ private fun PlaceTabRow(
 ) {
     Box(
         modifier = modifier
+            .padding(top = 20.dp)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background),
     ) {
@@ -444,8 +449,9 @@ private fun PlaceWebView(
 ) {
     val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
     val url = when (tabIndex) {
-        0 -> "https://$host/place/$placeId/home"
-        else -> "https://$host/place/$placeId/rental"
+        // TODO: 하드 코드 제거
+        0 -> "https://dev.preview.boolti.in/show/298/info" // "https://$host/place/$placeId/home"
+        else -> "https://dev.preview.boolti.in/show/296/info" // "https://$host/place/$placeId/rental"
     }
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current

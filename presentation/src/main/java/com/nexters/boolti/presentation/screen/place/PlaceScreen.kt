@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.place
 import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +43,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -130,15 +132,26 @@ private fun PlaceContent(
                 Box(
                     contentAlignment = Alignment.BottomStart
                 ) {
-                    AsyncImage(
-                        model = place.imageUrl,
-                        contentDescription = place.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .background(MaterialTheme.colorScheme.surface),
-                    )
+                    val imageUrl = place.imageUrl
+                    if (imageUrl != null) {
+                        AsyncImage(
+                            model = place.imageUrl,
+                            contentDescription = place.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.surface),
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f),
+                            painter = painterResource(id = R.drawable.place_default_image),
+                            contentDescription = null,
+                        )
+                    }
 
                     Box(
                         modifier = Modifier

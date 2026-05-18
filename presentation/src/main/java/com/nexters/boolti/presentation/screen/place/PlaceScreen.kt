@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.screen.place
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -52,6 +53,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.ShowDetail
 import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.presentation.BuildConfig
@@ -79,6 +86,8 @@ fun PlaceScreen(
     viewModel: PlaceViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val webUrl = "https://dev.preview.boolti.in/show/259" // TODO: 임시 url임. FE와 협의 후 url 변경
 
     Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isLoading) {
@@ -106,7 +115,26 @@ fun PlaceScreen(
                 BtAppBarDefaults.AppBarIconButton(
                     iconRes = R.drawable.ic_share,
                     description = stringResource(R.string.ticketing_share),
-                    onClick = { TODO("공유하기") },
+                    onClick = {
+                        // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
+//                        AppTracker.click(
+//                            screen = Screen.ShowDetail,
+//                            objectRole = Role.Button,
+//                            objectValue = "Share",
+//                            properties = mapOf(
+//                                "share_method" to "LinkCopy"
+//                            ),
+//                        )
+
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, webUrl)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+
+                        context.startActivity(shareIntent)
+                    },
                 )
             },
         )

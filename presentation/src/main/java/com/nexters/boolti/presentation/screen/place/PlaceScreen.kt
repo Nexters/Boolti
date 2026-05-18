@@ -2,7 +2,9 @@ package com.nexters.boolti.presentation.screen.place
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,9 +17,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -30,12 +35,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -50,6 +58,7 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
@@ -154,8 +163,16 @@ private fun PlaceContent(
             PlaceInfoSection(place = place)
         }
 
-        item {
-
+        place.contact?.let { contact ->
+            if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
+                item {
+                    PlaceContactSection(
+                        url = contact.websiteUrl,
+                        phoneNumber = contact.phoneNumber,
+                        email = contact.email,
+                    )
+                }
+            }
         }
 
         item {
@@ -225,18 +242,102 @@ private fun PlaceInfoSection(
                 value = subway,
             )
         }
-        place.contact?.let { contact ->
-            PlaceInfoRow(
-                label = stringResource(R.string.place_contact),
-                value = contact,
-            )
-        }
     }
 }
 
 @Composable
-private fun PlaceContactSection(contact: PlaceContact) {
+private fun PlaceContactSection(
+    url: String?,
+    phoneNumber: String?,
+    email: String?,
+) {
+    val uriHandler = LocalUriHandler.current
+    val snackbarController = LocalSnackbarController.current
 
+    Row(
+        modifier = Modifier
+            .padding(horizontal = marginHorizontal)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        val noWebsiteMessage = stringResource(R.string.place_no_website)
+        PlaceContactButton(
+            modifier = Modifier.weight(1f),
+            icon = R.drawable.ic_website,
+            label = stringResource(R.string.place_website),
+            enabled = url != null,
+            onClick = {
+                if (url != null) {
+                    uriHandler.openUri(url)
+                } else {
+                    snackbarController.showMessage(noWebsiteMessage)
+                }
+            },
+        )
+
+        val noPhoneNumberMessage = stringResource(R.string.place_no_phone)
+        PlaceContactButton(
+            modifier = Modifier.weight(1f),
+            icon = R.drawable.ic_phone,
+            label = stringResource(R.string.place_phone),
+            enabled = phoneNumber != null,
+            onClick = {
+                if (phoneNumber != null) {
+                    uriHandler.openUri("tel:$phoneNumber")
+                } else {
+                    snackbarController.showMessage(noPhoneNumberMessage)
+                }
+            },
+        )
+
+        val noEmailMessage = stringResource(R.string.place_no_email)
+        PlaceContactButton(
+            modifier = Modifier.weight(1f),
+            icon = R.drawable.ic_email,
+            label = stringResource(R.string.place_email),
+            enabled = email != null,
+            onClick = {
+                if (email != null) {
+                    uriHandler.openUri("mailto:$email")
+                } else {
+                    snackbarController.showMessage(noEmailMessage)
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun PlaceContactButton(
+    @DrawableRes icon: Int,
+    label: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Grey85)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        val contentColor = if (enabled) Grey30 else Grey70
+        Icon(
+            modifier = Modifier.size(16.dp),
+            imageVector = ImageVector.vectorResource(icon),
+            contentDescription = label,
+            tint = contentColor,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = contentColor,
+        )
+    }
 }
 
 @Composable
@@ -402,7 +503,11 @@ private fun PlaceInfoSectionPreview() {
                 capacity = 300,
                 streetAddress = "서울시 강남구 테헤란로 123",
                 subwayStation = "강남역 2번 출구",
-                contact = "010-1234-5678",
+                contact = PlaceContact(
+                    websiteUrl = "https://boolti.in",
+                    phoneNumber = "010-1234-5678",
+                    email = "boolti@example.com",
+                ),
             ),
         )
     }
@@ -410,19 +515,12 @@ private fun PlaceInfoSectionPreview() {
 
 @Preview
 @Composable
-private fun PlaceInfoSectionEmptyPreview() {
+fun PlaceContactSectionPreview() {
     BooltiTheme {
-        PlaceInfoSection(
-            place = Place(
-                id = "1",
-                name = "예시 공연장",
-                imageUrl = null,
-                rentalFee = null,
-                capacity = null,
-                streetAddress = null,
-                subwayStation = null,
-                contact = null,
-            ),
+        PlaceContactSection(
+            url = "https://boolti.in",
+            phoneNumber = "010-1234-5678",
+            email = "boolti@example.com",
         )
     }
 }

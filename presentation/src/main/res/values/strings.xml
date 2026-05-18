@@ -284,6 +284,12 @@
     <string name="place_subway">지하철역</string>
     <string name="place_contact">문의처</string>
     <string name="place_capacity_format">%d명</string>
+    <string name="place_website">웹사이트</string>
+    <string name="place_phone">전화</string>
+    <string name="place_email">메일</string>
+    <string name="place_no_website">웹사이트를 준비 중이에요</string>
+    <string name="place_no_phone">전화 정보를 준비 중이에요</string>
+    <string name="place_no_email">메일 정보를 준비 중이에요</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>

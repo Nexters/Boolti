@@ -1,10 +1,8 @@
 package com.nexters.boolti.presentation.screen.place
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.view.ViewGroup
 import androidx.compose.foundation.background
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,15 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -36,18 +30,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.platform.LocalUriHandler
+import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.Place
+import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
@@ -57,11 +53,11 @@ import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
-import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
 
@@ -154,10 +150,12 @@ private fun PlaceContent(
             }
         }
 
-        place.let {
-            item {
-                PlaceInfoSection(place = it)
-            }
+        item {
+            PlaceInfoSection(place = place)
+        }
+
+        item {
+
         }
 
         item {
@@ -234,6 +232,11 @@ private fun PlaceInfoSection(
             )
         }
     }
+}
+
+@Composable
+private fun PlaceContactSection(contact: PlaceContact) {
+
 }
 
 @Composable
@@ -347,21 +350,22 @@ private fun PlaceWebView(
     val uriHandler = LocalUriHandler.current
 
     val webView by remember(tabIndex) {
-        mutableStateOf(BtWebView(
-            preUriLoading = { loadUrl ->
-                preUriLoading(
-                    url = loadUrl,
-                    context = context,
-                    uriHandler = uriHandler,
-                    navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
-                    navigateWithUrl = {},
-                )
-            },
-            context = context,
-        ).apply {
-            loadUrl(url)
-            setBackgroundColor(android.graphics.Color.TRANSPARENT)
-        })
+        mutableStateOf(
+            BtWebView(
+                preUriLoading = { loadUrl ->
+                    preUriLoading(
+                        url = loadUrl,
+                        context = context,
+                        uriHandler = uriHandler,
+                        navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
+                        navigateWithUrl = {},
+                    )
+                },
+                context = context,
+            ).apply {
+                loadUrl(url)
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            })
     }
 
     Box(

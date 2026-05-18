@@ -1,6 +1,7 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.Place
+import com.nexters.boolti.domain.model.PlaceContact
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +19,7 @@ internal data class ConcertHallProfileResponse(
         capacity = head?.capacity?.let { (it.seatedCapacity + it.standingCapacity).takeIf { total -> total > 0 } },
         streetAddress = head?.location?.streetAddress,
         subwayStation = head?.subwayStations?.firstOrNull()?.stationName,
-        contact = head?.contact?.phoneNumber,
+        contact = head?.contact?.toDomain(),
     )
 }
 
@@ -66,4 +67,12 @@ internal data class ConcertHallContactResponse(
     val websiteUrl: String? = null,
     val phoneNumber: String? = null,
     val email: String? = null,
-)
+) {
+    fun toDomain(): PlaceContact {
+        return PlaceContact(
+            websiteUrl = websiteUrl,
+            phoneNumber = phoneNumber,
+            email = email,
+        )
+    }
+}

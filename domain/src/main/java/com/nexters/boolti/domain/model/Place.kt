@@ -8,5 +8,5 @@ data class Place(
     val capacity: Int?,
     val streetAddress: String?,
     val subwayStation: String?,
-    val contact: String?,
+    val contact: PlaceContact?,
 )

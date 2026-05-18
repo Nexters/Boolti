@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class PlaceDataSource @Inject constructor(
     private val placeService: PlaceService,
 ) {
-    suspend fun getPlace(placeId: String): Result<ConcertHallProfileResponse> = runCatching {
-        placeService.getPlace(placeId)
+    suspend fun getPlace(placeId: String): ConcertHallProfileResponse {
+        return placeService.getPlace(placeId)
     }
 }

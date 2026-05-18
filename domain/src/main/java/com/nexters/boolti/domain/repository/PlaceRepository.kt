@@ -1,7 +1,8 @@
 package com.nexters.boolti.domain.repository
 
 import com.nexters.boolti.domain.model.Place
+import kotlinx.coroutines.flow.Flow
 
 interface PlaceRepository {
-    suspend fun getPlace(placeId: String): Result<Place>
+    fun getPlace(placeId: String): Flow<Place>
 }

@@ -986,7 +986,7 @@ private fun Poster(
                 .padding(top = 4.dp)
                 .then(
                     if (placeClickable) {
-                        Modifier.clickable { navigateToPlace(showDetail.placeId ?: "") } // TODO: 테스트 끝나면 엘비스 지우기
+                        Modifier.clickable { navigateToPlace(showDetail.placeId ?: "1") } // TODO: 테스트 끝나면 엘비스 지우기
                     } else {
                         Modifier
                     }

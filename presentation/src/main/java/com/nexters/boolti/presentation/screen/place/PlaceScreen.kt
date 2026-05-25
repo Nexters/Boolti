@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -49,18 +51,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.nexters.boolti.common.tracker.AppTracker
-import com.nexters.boolti.common.tracker.event.click
-import com.nexters.boolti.common.tracker.field.Button
-import com.nexters.boolti.common.tracker.field.Role
-import com.nexters.boolti.common.tracker.field.Screen
-import com.nexters.boolti.common.tracker.field.ShowDetail
 import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.PlaceContact
+import com.nexters.boolti.domain.model.SubwayLine
+import com.nexters.boolti.domain.model.SubwayStation
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
@@ -250,9 +249,8 @@ private fun PlaceInfoSection(
         place.rentalFee,
         place.capacity?.toString(),
         place.streetAddress,
-        place.subwayStation,
         place.contact,
-    ).any { it != null }
+    ).any { it != null } || place.subwayStations.isNotEmpty()
 
     if (!hasAnyInfo) return
 
@@ -281,10 +279,10 @@ private fun PlaceInfoSection(
                 value = address,
             )
         }
-        place.subwayStation?.let { subway ->
-            PlaceInfoRow(
+        if (place.subwayStations.isNotEmpty()) {
+            PlaceStationsRow(
                 label = stringResource(R.string.place_subway),
-                value = subway,
+                stations = place.subwayStations,
             )
         }
     }
@@ -408,6 +406,59 @@ private fun PlaceInfoRow(
             style = MaterialTheme.typography.bodyMedium,
             color = Grey30,
         )
+    }
+}
+
+@Composable
+private fun PlaceStationsRow(
+    label: String,
+    stations: List<SubwayStation>,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            modifier = Modifier.width(88.dp),
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Grey50,
+        )
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            stations.forEach { station ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    station.lines.forEach { line ->
+                        Box(
+                            modifier = Modifier
+                                .sizeIn(minWidth = 20.dp)
+                                .clip(CircleShape)
+                                .background(color = line.colorHex.toComposeColor()),
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 6.dp),
+                                text = line.name.take(2),
+                                style = MaterialTheme.typography.titleSmall.copy(lineHeight = 20.sp),
+                                color = Color.White, // TODO: 특정 케이스는 검정 글씨
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = station.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Grey30,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -537,6 +588,18 @@ private fun PlaceWebView(
     }
 }
 
+private fun String.toComposeColor(): Color {
+    val normalized = removePrefix("#")
+
+    val argb = when (normalized.length) {
+        6 -> "FF$normalized"
+        8 -> normalized
+        else -> return Grey50
+    }
+
+    return Color(argb.toLong(16))
+}
+
 @Preview
 @Composable
 private fun PlaceInfoSectionPreview() {
@@ -549,7 +612,29 @@ private fun PlaceInfoSectionPreview() {
                 rentalFee = "50만원/일",
                 capacity = 300,
                 streetAddress = "서울시 강남구 테헤란로 123",
-                subwayStation = "강남역 2번 출구",
+                subwayStations = listOf(
+                    SubwayStation(
+                        id = "1",
+                        name = "왕십리",
+                        lines = listOf(
+                            SubwayLine(
+                                id = "1",
+                                name = "2",
+                                colorHex = "#0CA34A",
+                            ),
+                            SubwayLine(
+                                id = "2",
+                                name = "경의",
+                                colorHex = "#79C0A0",
+                            ),
+                            SubwayLine(
+                                id = "3",
+                                name = "분당",
+                                colorHex = "#FCD205",
+                            ),
+                        )
+                    )
+                ),
                 contact = PlaceContact(
                     websiteUrl = "https://boolti.in",
                     phoneNumber = "010-1234-5678",

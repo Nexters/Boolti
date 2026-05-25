@@ -25,7 +25,7 @@ class PlaceViewModel @Inject constructor(
     val placeId: String = route.placeId
 
     private val _uiState =
-        MutableStateFlow(PlaceUiState(Place("", "", null, null, null, null, null, null)))
+        MutableStateFlow(PlaceUiState(Place("", "", null, null, null, null, emptyList(), null)))
     val uiState = _uiState.asStateFlow()
 
     init {

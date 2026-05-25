@@ -2,6 +2,8 @@ package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.PlaceContact
+import com.nexters.boolti.domain.model.SubwayLine
+import com.nexters.boolti.domain.model.SubwayStation
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +20,7 @@ internal data class ConcertHallProfileResponse(
         rentalFee = head?.rentalFeeSummary,
         capacity = head?.capacity?.let { (it.seatedCapacity + it.standingCapacity).takeIf { total -> total > 0 } },
         streetAddress = head?.location?.streetAddress,
-        subwayStation = head?.subwayStations?.firstOrNull()?.stationName,
+        subwayStations = head?.subwayStations?.map { it.toDomain() } ?: emptyList(),
         contact = head?.contact?.toDomain(),
     )
 }
@@ -48,19 +50,35 @@ internal data class ConcertHallLocationResponse(
 
 @Serializable
 internal data class ConcertHallSubwayStationResponse(
-    val id: Long,
+    val id: String,
     val stationName: String,
     val region: String? = null,
     val lines: List<ConcertHallSubwayLineResponse> = emptyList(),
-)
+) {
+    fun toDomain(): SubwayStation {
+        return SubwayStation(
+            id = id,
+            name = stationName,
+            lines = lines.map { it.toDomain() },
+        )
+    }
+}
 
 @Serializable
 internal data class ConcertHallSubwayLineResponse(
-    val id: Long,
+    val id: String,
     val lineKey: String,
     val lineName: String,
     val colorHex: String? = null,
-)
+) {
+    fun toDomain(): SubwayLine {
+        return SubwayLine(
+            id = id,
+            name = lineName,
+            colorHex = colorHex ?: "0x00000000",
+        )
+    }
+}
 
 @Serializable
 internal data class ConcertHallContactResponse(

@@ -7,6 +7,6 @@ data class Place(
     val rentalFee: String?,
     val capacity: Int?,
     val streetAddress: String?,
-    val subwayStation: String?,
+    val subwayStations: List<SubwayStation>,
     val contact: PlaceContact?,
 )

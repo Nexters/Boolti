@@ -704,6 +704,8 @@ private fun LazyListScope.ShowInfoTab(
                     navigateWithUrl = { url -> redirectedInquiryUrl = url },
                     navigateWithIntent = { intent -> intentToNavigateTo = intent })
             }, context = context).apply {
+                isFocusable = false
+                isFocusableInTouchMode = false
                 loadUrl(url)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
             })

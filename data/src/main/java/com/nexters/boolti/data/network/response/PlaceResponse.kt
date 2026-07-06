@@ -14,8 +14,8 @@ internal data class PlaceResponse(
     fun toPlace(): Place = Place(
         id = id,
         name = name,
-        streetAddress = streetAddress,
-        detailAddress = detailAddress,
+        streetAddress = streetAddress.trim(),
+        detailAddress = detailAddress.trim(),
         thumbnailImage = representativeImageUrl,
     )
 }

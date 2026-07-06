@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.response.ConcertHallResponse
 import com.nexters.boolti.data.network.response.MemberResponse
 import com.nexters.boolti.data.network.response.PagingResponse
 import com.nexters.boolti.data.network.response.SearchOverviewResponse
@@ -30,6 +31,16 @@ internal interface SearchService {
         @Query("size")
         size: Int,
     ): PagingResponse<MemberResponse>
+
+    @GET("/app/papi/v1/concert-halls/search")
+    suspend fun requestConcertHalls(
+        @Query("keyword")
+        keyword: String,
+        @Query("page")
+        page: Int,
+        @Query("size")
+        size: Int,
+    ): PagingResponse<ConcertHallResponse>
 
     @GET("/app/papi/v1/shows/autocomplete")
     suspend fun requestAutoCompleteKeywords(

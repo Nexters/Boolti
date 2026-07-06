@@ -60,7 +60,7 @@ fun PlaceItem(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = place.address,
+                text = "${place.streetAddress} ${place.detailAddress}".trim(),
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
                 maxLines = 1,
@@ -81,7 +81,8 @@ private fun PlaceItemPreview() {
             place = Place(
                 id = "1",
                 name = "그레이존 라이브바",
-                address = "서울 영등포구 도신로 38 지하1층",
+                streetAddress = "서울 영등포구 도신로 38",
+                detailAddress = "지하1층",
                 thumbnailImage = "",
             ),
             onClick = {},

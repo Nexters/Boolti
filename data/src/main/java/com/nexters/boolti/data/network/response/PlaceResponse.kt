@@ -5,14 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class PlaceResponse(
-    val id: Long = 0L,
-    val name: String = "",
-    val representativeImageUrl: String = "",
-    val streetAddress: String = "",
-    val detailAddress: String = "",
+    val id: String,
+    val name: String,
+    val representativeImageUrl: String,
+    val streetAddress: String,
+    val detailAddress: String,
 ) {
     fun toPlace(): Place = Place(
-        id = id.toString(),
+        id = id,
         name = name,
         streetAddress = streetAddress,
         detailAddress = detailAddress,

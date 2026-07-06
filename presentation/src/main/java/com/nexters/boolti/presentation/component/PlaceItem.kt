@@ -60,7 +60,7 @@ fun PlaceItem(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = "${place.streetAddress} ${place.detailAddress}".trim(),
+                text = "${place.streetAddress.trim()} ${place.detailAddress.trim()}",
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
                 maxLines = 1,

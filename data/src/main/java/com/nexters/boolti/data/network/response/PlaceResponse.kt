@@ -4,7 +4,7 @@ import com.nexters.boolti.domain.model.Place
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ConcertHallResponse(
+internal data class PlaceResponse(
     val id: Long = 0L,
     val name: String = "",
     val representativeImageUrl: String = "",

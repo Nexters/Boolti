@@ -283,7 +283,7 @@ fun ShowDetailScreen(
     val uriHandler = LocalUriHandler.current
     var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
     var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
-    val webView = remember(context, url) {
+    val webView = remember(context) {
         BtWebView(preUriLoading = { url ->
             preUriLoading(
                 url = url,
@@ -292,9 +292,12 @@ fun ShowDetailScreen(
                 navigateWithUrl = { url -> redirectedInquiryUrl = url },
                 navigateWithIntent = { intent -> intentToNavigateTo = intent })
         }, context = context).apply {
-            loadUrl(url)
             setBackgroundColor(android.graphics.Color.TRANSPARENT)
         }
+    }
+
+    LaunchedEffect(webView, url) {
+        webView.loadUrl(url)
     }
 
     LaunchedEffect(intentToNavigateTo) {

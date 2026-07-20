@@ -283,7 +283,7 @@ fun ShowDetailScreen(
     val uriHandler = LocalUriHandler.current
     var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
     var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
-    val webView = remember {
+    val webView = remember(context, url) {
         BtWebView(preUriLoading = { url ->
             preUriLoading(
                 url = url,

@@ -35,18 +35,10 @@ internal class SearchRepositoryImpl @Inject constructor(
         searchDataSource.getProfiles(keyword, page, 10)
     }
 
-    // TODO: API 연동 시 searchDataSource.getPlaces(keyword, page, 10) 로 교체
     override suspend fun searchPlaces(
         keyword: String,
         page: Int,
     ): Result<PagingData<Place>> = suspendRunCatching {
-        PagingData(
-            items = emptyList(),
-            currentPage = page,
-            pageSize = 10,
-            totalElements = 0L,
-            totalPages = 0,
-            hasNext = false,
-        )
+        searchDataSource.getPlaces(keyword, page, 10)
     }
 }

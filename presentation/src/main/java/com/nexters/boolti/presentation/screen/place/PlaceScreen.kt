@@ -86,7 +86,8 @@ fun PlaceScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val webUrl = "https://dev.preview.boolti.in/show/259" // TODO: 임시 url임. FE와 협의 후 url 변경
+    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
+    val shareUrl = "https://$subDomain.boolti.in/${viewModel.placeId}"
 
     Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isLoading) {
@@ -127,7 +128,7 @@ fun PlaceScreen(
 
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, webUrl)
+                            putExtra(Intent.EXTRA_TEXT, shareUrl)
                             type = "text/plain"
                         }
                         val shareIntent = Intent.createChooser(sendIntent, null)
@@ -539,11 +540,10 @@ private fun PlaceWebView(
     placeId: String,
     tabIndex: Int,
 ) {
-    val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
+    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
     val url = when (tabIndex) {
-        // TODO: 하드 코드 제거
-        0 -> "https://dev.preview.boolti.in/show/298/info" // "https://$host/place/$placeId/home"
-        else -> "https://dev.preview.boolti.in/show/296/info" // "https://$host/place/$placeId/rental"
+        0 -> "https://$subDomain.boolti.in/$placeId/home"
+        else -> "https://$subDomain.boolti.in/$placeId/rental"
     }
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current

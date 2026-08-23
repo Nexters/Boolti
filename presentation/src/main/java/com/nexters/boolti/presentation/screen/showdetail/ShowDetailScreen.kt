@@ -980,7 +980,7 @@ private fun Poster(
                 )
             }
         }
-        val placeClickable = showDetail.placeId != null || true // TODO: 테스트 끝나면 true 조건 지우기
+        val placeClickable = showDetail.placeId != null
         Row(
             modifier = Modifier
                 .padding(top = 4.dp)

@@ -14,15 +14,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.nexters.boolti.domain.model.PlaceImage
+import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtCloseableAppBar
-import com.nexters.boolti.presentation.screen.showdetail.Indicator
+import com.nexters.boolti.presentation.component.Indicator
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
@@ -102,7 +104,7 @@ private fun PlaceImagePager(
                     .fillMaxSize()
                     .zoomable(rememberZoomState()),
                 model = images[page].imageUrl,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.description_place_photo, page + 1),
                 contentScale = ContentScale.Fit,
             )
         }

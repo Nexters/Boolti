@@ -93,6 +93,7 @@ private fun PlaceImagesScreen(
                     ) { index, image ->
                         PlaceImageThumbnail(
                             image = image,
+                            position = index + 1,
                             onClick = { onClickImage(index) },
                         )
                     }
@@ -105,6 +106,7 @@ private fun PlaceImagesScreen(
 @Composable
 private fun PlaceImageThumbnail(
     image: PlaceImage,
+    position: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -115,7 +117,7 @@ private fun PlaceImageThumbnail(
             .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick),
         model = image.thumbnailUrl,
-        contentDescription = null,
+        contentDescription = stringResource(R.string.description_place_photo, position),
         contentScale = ContentScale.Crop,
     )
 }

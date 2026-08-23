@@ -291,6 +291,7 @@
     <string name="place_no_phone">전화 정보를 준비 중이에요</string>
     <string name="place_no_email">메일 정보를 준비 중이에요</string>
     <string name="place_photos">사진</string>
+    <string name="description_place_photo">공연장 사진 %1$d번째</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>

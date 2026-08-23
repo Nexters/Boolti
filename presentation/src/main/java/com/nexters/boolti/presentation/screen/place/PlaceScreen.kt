@@ -28,15 +28,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,6 +71,10 @@ import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
+import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
+import com.nexters.boolti.presentation.util.bridge.BridgeManager
+import com.nexters.boolti.presentation.util.bridge.NavigateOption
+import com.nexters.boolti.presentation.util.bridge.TokenDto
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
@@ -81,6 +88,8 @@ import com.nexters.boolti.presentation.theme.point3
 @Composable
 fun PlaceScreen(
     onBack: () -> Unit,
+    navigateTo: (route: Any) -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlaceViewModel = hiltViewModel(),
 ) {
@@ -88,6 +97,33 @@ fun PlaceScreen(
     val context = LocalContext.current
     val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
     val shareUrl = "https://$subDomain.boolti.in/${viewModel.placeId}"
+
+    val scope = rememberCoroutineScope()
+    val snackbarController = LocalSnackbarController.current
+    val bridgeManager = remember(scope) {
+        BridgeManager(
+            callbackHandler = object : BridgeCallbackHandler {
+                override suspend fun fetchToken(): TokenDto =
+                    TokenDto(token = viewModel.refreshAndGetToken())
+
+                override fun <T : Any> navigate(route: T, navigateOption: NavigateOption) {
+                    when (navigateOption) {
+                        NavigateOption.PUSH -> navigateTo(route)
+                        NavigateOption.HOME -> navigateToHome()
+                        NavigateOption.CLOSE_AND_OPEN -> {
+                            onBack()
+                            navigateTo(route)
+                        }
+                    }
+                }
+
+                override fun showSnackbar(message: String, duration: SnackbarDuration) {
+                    snackbarController.showMessage(message = message, duration = duration)
+                }
+            },
+            scope = scope,
+        )
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (uiState.isLoading) {
@@ -99,6 +135,7 @@ fun PlaceScreen(
                 placeId = viewModel.placeId,
                 selectedTab = uiState.selectedTab,
                 onSelectTab = viewModel::selectTab,
+                bridgeManager = bridgeManager,
             )
         }
 
@@ -147,6 +184,7 @@ private fun PlaceContent(
     placeId: String,
     selectedTab: Int,
     onSelectTab: (Int) -> Unit,
+    bridgeManager: BridgeManager,
     modifier: Modifier = Modifier,
     place: Place,
 ) {
@@ -228,7 +266,11 @@ private fun PlaceContent(
         }
 
         item {
-            PlaceWebView(placeId = placeId, tabIndex = selectedTab)
+            PlaceWebView(
+                placeId = placeId,
+                tabIndex = selectedTab,
+                bridgeManager = bridgeManager,
+            )
         }
 
         item {
@@ -539,6 +581,7 @@ private fun PlaceTab(
 private fun PlaceWebView(
     placeId: String,
     tabIndex: Int,
+    bridgeManager: BridgeManager,
 ) {
     val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
     val url = when (tabIndex) {
@@ -562,9 +605,16 @@ private fun PlaceWebView(
                 },
                 context = context,
             ).apply {
+                // 웹의 초기 스크립트가 브릿지를 인식하도록 loadUrl 이전에 등록한다.
+                bindBridge(bridgeManager)
                 loadUrl(url)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
             })
+    }
+
+    // 탭 전환으로 WebView 가 새로 만들어지면 앱 → 웹 메시지 구독도 다시 시작한다.
+    LaunchedEffect(webView) {
+        webView.collectBridgeMessages(bridgeManager)
     }
 
     Box(

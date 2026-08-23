@@ -72,6 +72,7 @@ import com.nexters.boolti.presentation.screen.showregistration.addShowRegistrati
 import com.nexters.boolti.presentation.screen.signout.signoutScreen
 import com.nexters.boolti.presentation.screen.ticket.detail.ticketDetailScreen
 import com.nexters.boolti.presentation.screen.ticketing.ticketingScreen
+import com.nexters.boolti.presentation.screen.place.images.placeImagesScreen
 import com.nexters.boolti.presentation.screen.place.placeScreen
 import com.nexters.boolti.presentation.screen.video.videoEditScreen
 import com.nexters.boolti.presentation.screen.video.videoListScreen
@@ -268,6 +269,7 @@ fun MainNavigation(
 
         performedShowsScreen()
         placeScreen()
+        placeImagesScreen()
 
         addShowRegistration()
     }

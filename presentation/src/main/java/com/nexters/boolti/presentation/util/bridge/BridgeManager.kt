@@ -5,6 +5,7 @@ import android.os.Looper
 import androidx.compose.material3.SnackbarDuration
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.WebBridge
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -15,8 +16,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 import timber.log.Timber
 
 class BridgeManager(
@@ -77,6 +80,27 @@ class BridgeManager(
                     } ?: SnackbarDuration.Short
 
                     callbackHandler.showSnackbar(message, duration)
+                }
+                callbackToWeb(data)
+            }
+
+            CommandType.VIEW_PLACE_PHOTO_DETAIL -> {
+                val payload = data.data?.jsonObject
+                val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull
+                val imageIds = payload?.get("imageIds")?.runCatching {
+                    jsonArray.mapNotNull { it.jsonPrimitive.longOrNull }
+                }?.getOrNull()
+
+                if (placeId != null && imageIds != null) {
+                    Handler(Looper.getMainLooper()).post {
+                        Timber.tag("bridge").d("공연장 사진 목록으로 이동 $placeId, $imageIds")
+                        callbackHandler.navigate(
+                            route = MainRoute.PlaceImages(placeId = placeId, imageIds = imageIds),
+                            navigateOption = NavigateOption.PUSH,
+                        )
+                    }
+                } else {
+                    Timber.tag("bridge").d("공연장 사진 목록으로 이동 실패: ${data.data}")
                 }
                 callbackToWeb(data)
             }

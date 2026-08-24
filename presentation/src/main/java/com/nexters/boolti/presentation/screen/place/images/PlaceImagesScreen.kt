@@ -132,7 +132,7 @@ private fun PlaceImagesScreenPreview() {
         PlaceImagesScreen(
             images = List(7) { index ->
                 PlaceImage(
-                    id = index.toLong(),
+                    id = index.toString(),
                     imageUrl = "",
                     thumbnailUrl = "",
                     sequence = index,

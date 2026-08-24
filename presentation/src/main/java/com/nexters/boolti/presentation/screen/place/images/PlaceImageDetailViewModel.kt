@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.place.images
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.nexters.boolti.domain.model.orderedBy
 import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -40,7 +39,7 @@ class PlaceImageDetailViewModel @Inject constructor(
             .onEach { images ->
                 _uiState.update {
                     it.copy(
-                        images = images.orderedBy(route.imageIds),
+                        images = images,
                         isLoading = false,
                     )
                 }

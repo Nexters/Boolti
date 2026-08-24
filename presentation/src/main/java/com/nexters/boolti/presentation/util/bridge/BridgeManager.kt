@@ -88,7 +88,7 @@ class BridgeManager(
                 val payload = data.data?.jsonObject
                 val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull
                 val imageIds = payload?.get("imageIds")?.runCatching {
-                    jsonArray.mapNotNull { it.jsonPrimitive.longOrNull }
+                    jsonArray.mapNotNull { it.jsonPrimitive.toString() }
                 }?.getOrNull()
 
                 if (placeId != null && imageIds != null) {

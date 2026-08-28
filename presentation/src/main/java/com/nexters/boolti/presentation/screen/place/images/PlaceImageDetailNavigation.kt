@@ -1,23 +1,20 @@
-package com.nexters.boolti.presentation.screen.place
+package com.nexters.boolti.presentation.screen.place.images
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.nexters.boolti.presentation.extension.navigateOnce
-import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.placeScreen(
+fun NavGraphBuilder.placeImageDetailScreen(
     modifier: Modifier = Modifier,
 ) {
-    composable<MainRoute.Place> {
+    composable<MainRoute.PlaceImageDetail> {
         val navController = LocalNavController.current
-        PlaceScreen(
+
+        PlaceImageDetailScreen(
             modifier = modifier,
             onBack = navController::popBackStack,
-            navigateTo = { route -> navController.navigateOnce(route) },
-            navigateToHome = navController::navigateToHome,
         )
     }
 }

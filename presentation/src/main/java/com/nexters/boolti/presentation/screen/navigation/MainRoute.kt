@@ -88,4 +88,17 @@ sealed interface MainRoute {
     data class Place(
         val placeId: String,
     ) : MainRoute
+
+    @Serializable
+    data class PlaceImages(
+        val placeId: String,
+        val imageIds: List<String>,
+    ) : MainRoute
+
+    @Serializable
+    data class PlaceImageDetail(
+        val placeId: String,
+        val imageIds: List<String>,
+        val initialIndex: Int,
+    ) : MainRoute
 }

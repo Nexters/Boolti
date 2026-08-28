@@ -8,6 +8,7 @@ enum class CommandType {
     NAVIGATE_BACK,
     REQUEST_TOKEN,
     SHOW_TOAST,
+    VIEW_PLACE_PHOTO_DETAIL,
     UNKNOWN;
 
     companion object {

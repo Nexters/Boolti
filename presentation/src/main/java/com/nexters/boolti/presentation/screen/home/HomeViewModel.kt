@@ -7,7 +7,7 @@ import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
-import com.nexters.boolti.presentation.screen.DeepLinkEvent
+import com.nexters.boolti.presentation.screen.HomeNavigationEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val giftRepository: GiftRepository,
-    private val deepLinkEvent: DeepLinkEvent,
+    private val homeNavigationEvent: HomeNavigationEvent,
     private val ticketingRepository: TicketingRepository,
 ) : BaseViewModel() {
     val loggedIn = authRepository.loggedIn.stateIn(
@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(
     init {
         fetchUserInfo()
         sendFcmToken()
-        collectDeepLinkEvent()
+        collectHomeNavigationEvent()
     }
 
     private fun fetchUserInfo() {
@@ -67,10 +67,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun collectDeepLinkEvent() {
-        deepLinkEvent.events
-            .filter { it.startsWith("https://app.boolti.in/home") }
-            .onEach { sendEvent(HomeEvent.DeepLinkEvent(it)) }
+    private fun collectHomeNavigationEvent() {
+        homeNavigationEvent.events
+            .onEach { sendEvent(HomeEvent.NavigateToHomeRoute(it)) }
             .launchIn(viewModelScope)
     }
 

@@ -1,9 +1,11 @@
 package com.nexters.boolti.presentation.service
 
-enum class BtNotification(val id: Int, val type: String, val deepLink: String?) {
-    RESERVATION_COMPLETED(id = 0, type = "RESERVATION_COMPLETED", deepLink = "https://app.boolti.in/home/tickets"),
-    ENTER_NOTIFICATION(id = 3, type = "ENTER_NOTIFICATION", deepLink = "https://app.boolti.in/home/tickets"),
-    UNDEFINED(id = -1, type = "UNDEFINED", deepLink = null),
+import com.nexters.boolti.presentation.screen.navigation.HomeRoute
+
+enum class BtNotification(val id: Int, val type: String, val homeRoute: HomeRoute?) {
+    RESERVATION_COMPLETED(id = 0, type = "RESERVATION_COMPLETED", homeRoute = HomeRoute.Ticket),
+    ENTER_NOTIFICATION(id = 3, type = "ENTER_NOTIFICATION", homeRoute = HomeRoute.Ticket),
+    UNDEFINED(id = -1, type = "UNDEFINED", homeRoute = null),
 }
 
 fun BtNotification(type: String?): BtNotification {

@@ -15,8 +15,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,8 +37,8 @@ import com.nexters.boolti.presentation.component.ToastSnackbarHost
 import com.nexters.boolti.presentation.screen.accountsetting.accountSettingScreen
 import com.nexters.boolti.presentation.screen.business.businessScreen
 import com.nexters.boolti.presentation.screen.gift.giftScreen
-import com.nexters.boolti.presentation.screen.giftprequestion.giftPreQuestionScreen
 import com.nexters.boolti.presentation.screen.giftcomplete.giftCompleteScreen
+import com.nexters.boolti.presentation.screen.giftprequestion.giftPreQuestionScreen
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
@@ -85,6 +87,7 @@ val LocalNavController = compositionLocalOf<NavHostController> {
 }
 
 val LocalUser = compositionLocalOf<User?> { null }
+private val giftDeepLinkRegex = "^boolti://gift/([\\w-]+)$".toRegex()
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -98,31 +101,28 @@ fun Main(
     val rootNavController = rememberNavControllerWithLog()
     val activity = LocalActivity.current as ComponentActivity
     val giftDeepLinkViewModel: GiftDeepLinkViewModel = hiltViewModel(activity)
-    val giftDeepLinkRegex = "^boolti://gift/([\\w-])+$".toRegex()
+    val handleGiftDeepLink: (intent: Intent) -> Unit by rememberUpdatedState { intent ->
+        val deepLink = intent.data?.toString() ?: return@rememberUpdatedState
+        val matchResult = giftDeepLinkRegex.matchEntire(deepLink) ?: return@rememberUpdatedState
+        val giftUuid = matchResult.groupValues[1]
+
+        intent.data = null
+
+        giftDeepLinkViewModel.pendGift(giftUuid)
+        rootNavController.navigate(MainRoute.Home) {
+            popUpTo<MainRoute.Home> { inclusive = false }
+            launchSingleTop = true
+        }
+    }
 
     LaunchedEffect(Unit) {
-        val deepLink = activity.intent?.data?.toString() ?: return@LaunchedEffect
-        if (giftDeepLinkRegex.matches(deepLink)) {
-            activity.intent.data = null
-            giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
-            rootNavController.navigate(MainRoute.Home) {
-                popUpTo<MainRoute.Home> { inclusive = false }
-                launchSingleTop = true
-            }
-        }
+        val intent = activity.intent ?: return@LaunchedEffect
+        handleGiftDeepLink(intent)
     }
 
     DisposableEffect(activity) {
         val listener = Consumer<Intent> { intent ->
-            val deepLink = intent.data?.toString() ?: return@Consumer
-            if (giftDeepLinkRegex.matches(deepLink)) {
-                intent.data = null
-                giftDeepLinkViewModel.pendGift(deepLink.split("/").last())
-                rootNavController.navigate(MainRoute.Home) {
-                    popUpTo<MainRoute.Home> { inclusive = false }
-                    launchSingleTop = true
-                }
-            }
+            handleGiftDeepLink(intent)
         }
         activity.addOnNewIntentListener(listener)
         onDispose { activity.removeOnNewIntentListener(listener) }

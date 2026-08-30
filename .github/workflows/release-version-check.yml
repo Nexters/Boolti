@@ -1,0 +1,88 @@
+name: Release Version Check
+
+on:
+  pull_request:
+    branches: [main]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-version-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: >
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify versionCode and versionName
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+
+          extract() {
+            local source="$1"
+            local key="$2"
+            local content
+            if [ "$source" = "HEAD" ]; then
+              content=$(cat gradle/libs.versions.toml)
+            else
+              content=$(git show "$source":gradle/libs.versions.toml)
+            fi
+            awk -F '"' -v k="$key" '$0 ~ "^"k" = \"" { print $2; exit }' <<< "$content"
+          }
+
+          current_code=$(extract HEAD versionCode)
+          current_name=$(extract HEAD versionName)
+          main_code=$(extract origin/main versionCode)
+          main_name=$(extract origin/main versionName)
+
+          branch_version="${HEAD_REF#release/}"
+
+          echo "Branch: $HEAD_REF (version: $branch_version)"
+          echo "versionCode: $current_code (main: $main_code)"
+          echo "versionName: $current_name (main: $main_name)"
+
+          errors=0
+
+          if ! [ "$current_code" -gt "$main_code" ] 2>/dev/null; then
+            echo "::error::versionCode($current_code) must be greater than main($main_code)."
+            errors=$((errors + 1))
+          fi
+
+          if [ "$current_name" != "$branch_version" ]; then
+            echo "::error::versionName($current_name) must equal branch suffix ($branch_version)."
+            errors=$((errors + 1))
+          fi
+
+          if [ "$current_name" = "$main_name" ]; then
+            echo "::error::versionName($current_name) must differ from main($main_name)."
+            errors=$((errors + 1))
+          else
+            highest=$(printf '%s\n%s\n' "$current_name" "$main_name" | sort -V | tail -1)
+            if [ "$highest" != "$current_name" ]; then
+              echo "::error::versionName($current_name) must be greater than main($main_name) per semver."
+              errors=$((errors + 1))
+            fi
+          fi
+
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
+
+          echo "✅ release 버전 검증 통과"

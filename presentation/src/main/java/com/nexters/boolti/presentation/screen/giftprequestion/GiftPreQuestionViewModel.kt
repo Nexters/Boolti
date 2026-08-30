@@ -115,7 +115,7 @@ class GiftPreQuestionViewModel @Inject constructor(
 
                     AppTracker.complete(
                         target = "GiftRegistration",
-                        properties = mapOf("gift_id" to giftUuid),
+                        properties = mapOf("gift_id" to giftUuid, "show_id" to showId),
                     )
                 }
         }

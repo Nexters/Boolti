@@ -51,8 +51,8 @@ class SplashActivity : ComponentActivity() {
                         intent.extras?.getString("type")?.let { type ->
                             val notification = BtNotification(type)
 
-                            notification.deepLink?.let {
-                                viewModel.sendDeepLinkEvent(it)
+                            notification.homeRoute?.let {
+                                viewModel.navigateToHome(it)
                             }
 
                             NotificationManagerCompat.from(this).cancel(notification.id)

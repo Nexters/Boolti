@@ -3,7 +3,8 @@ package com.nexters.boolti.presentation.screen.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.ConfigRepository
-import com.nexters.boolti.presentation.screen.DeepLinkEvent
+import com.nexters.boolti.presentation.screen.HomeNavigationEvent
+import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -11,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     configRepository: ConfigRepository,
-    private val deepLinkEvent: DeepLinkEvent,
+    private val homeNavigationEvent: HomeNavigationEvent,
 ) : ViewModel() {
     init {
         viewModelScope.launch {
@@ -21,10 +22,9 @@ class SplashViewModel @Inject constructor(
 
     val shouldUpdate = configRepository.shouldUpdate()
 
-    fun sendDeepLinkEvent(deeplink: String) {
+    fun navigateToHome(route: HomeRoute) {
         viewModelScope.launch {
-            deepLinkEvent.sendEvent(deeplink)
+            homeNavigationEvent.sendEvent(route)
         }
     }
 }
-

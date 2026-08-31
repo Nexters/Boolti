@@ -38,6 +38,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,6 +80,8 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun PlaceScreen(
@@ -151,6 +155,37 @@ private fun PlaceContent(
     modifier: Modifier = Modifier,
     place: PlaceDetail,
 ) {
+    val scope = rememberCoroutineScope()
+    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
+    val url by remember(selectedTab) {
+        mutableStateOf(
+            when (selectedTab) {
+                0 -> "https://$subDomain.boolti.in/$placeId/home"
+                else -> "https://$subDomain.boolti.in/$placeId/rental"
+            }
+        )
+    }
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+
+    val webView by remember(context) {
+        mutableStateOf(
+            BtWebView(
+                preUriLoading = { loadUrl ->
+                    preUriLoading(
+                        url = loadUrl,
+                        context = context,
+                        uriHandler = uriHandler,
+                        navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
+                        navigateWithUrl = {},
+                    )
+                },
+                context = context,
+            ).apply {
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            })
+    }
+
     LazyColumn(modifier = modifier) {
         item {
             Column(
@@ -229,41 +264,37 @@ private fun PlaceContent(
         }
 
         item {
-            val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-            val url by remember(selectedTab) {
-                mutableStateOf(
-                    when (selectedTab) {
-                        0 -> "https://$subDomain.boolti.in/$placeId/home"
-                        else -> "https://$subDomain.boolti.in/$placeId/rental"
-                    }
-                )
-            }
-            val context = LocalContext.current
-            val uriHandler = LocalUriHandler.current
-
-            val webView by remember(context) {
-                mutableStateOf(
-                    BtWebView(
-                        preUriLoading = { loadUrl ->
-                            preUriLoading(
-                                url = loadUrl,
-                                context = context,
-                                uriHandler = uriHandler,
-                                navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
-                                navigateWithUrl = {},
-                            )
-                        },
-                        context = context,
-                    ).apply {
-                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                    })
-            }
+            var isLoading by remember { mutableStateOf(webView.progress.value < 100)}
 
             LaunchedEffect(webView, url) {
                 webView.loadUrl(url)
             }
 
-            PlaceWebView(contentWebview = webView)
+            Box(
+                modifier = Modifier
+                    .heightIn(min = 200.dp)
+                    .fillMaxWidth(),
+            ) {
+                if (isLoading) {
+                    BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = {
+                        webView.apply {
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                            )
+                            setOnLongClickListener { true }
+                            progress.onEach {
+                                isLoading = it < 100
+                            }.launchIn(scope)
+                            setWebChromeClient()
+                        }
+                    },
+                )
+            }
         }
 
         item {
@@ -570,32 +601,6 @@ private fun PlaceTab(
         },
         onClick = onSelect,
     )
-}
-
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-private fun PlaceWebView(
-    contentWebview: BtWebView,
-) {
-    Box(
-        modifier = Modifier
-            .heightIn(min = 200.dp)
-            .fillMaxWidth(),
-    ) {
-        BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = {
-                contentWebview.apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                    )
-                    setOnLongClickListener { true }
-                }
-            },
-        )
-    }
 }
 
 private fun String.toComposeColor(): Color {

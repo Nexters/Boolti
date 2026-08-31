@@ -1,8 +1,10 @@
 package com.nexters.boolti.presentation.screen.home
 
+import com.nexters.boolti.presentation.screen.navigation.HomeRoute
+
 sealed interface HomeEvent {
-    data class DeepLinkEvent(
-        val deepLink: String,
+    data class NavigateToHomeRoute(
+        val route: HomeRoute,
     ) : HomeEvent
 
     data class GiftNotification(

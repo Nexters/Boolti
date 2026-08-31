@@ -448,7 +448,7 @@ private fun PlaceStationsRow(
                         ) {
                             Text(
                                 modifier = Modifier.padding(horizontal = 6.dp),
-                                text = line.name,
+                                text = line.displayName,
                                 style = MaterialTheme.typography.titleSmall.copy(lineHeight = 20.sp),
                                 color = Color.White,
                             )

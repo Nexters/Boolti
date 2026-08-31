@@ -33,8 +33,6 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 
 /**
  * 공연장 사진 목록 화면.
- *
- * 웹 브릿지(`VIEW_PLACE_PHOTO_DETAIL`)로 전달받은 순서대로 썸네일을 3열 그리드로 보여준다.
  */
 @Composable
 fun PlaceImagesScreen(

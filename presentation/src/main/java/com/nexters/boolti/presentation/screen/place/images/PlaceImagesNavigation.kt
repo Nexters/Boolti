@@ -21,7 +21,6 @@ fun NavGraphBuilder.placeImagesScreen(
                 navController.navigate(
                     MainRoute.PlaceImageDetail(
                         placeId = route.placeId,
-                        imageIds = route.imageIds,
                         initialIndex = index,
                     ),
                 )

@@ -16,10 +16,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.longOrNull
 import timber.log.Timber
 
 class BridgeManager(
@@ -87,15 +85,12 @@ class BridgeManager(
             CommandType.VIEW_PLACE_PHOTO_DETAIL -> {
                 val payload = data.data?.jsonObject
                 val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull
-                val imageIds = payload?.get("imageIds")?.runCatching {
-                    jsonArray.mapNotNull { it.jsonPrimitive.toString() }
-                }?.getOrNull()
 
-                if (placeId != null && imageIds != null) {
+                if (placeId != null) {
                     Handler(Looper.getMainLooper()).post {
-                        Timber.tag("bridge").d("공연장 사진 목록으로 이동 $placeId, $imageIds")
+                        Timber.tag("bridge").d("공연장 사진 목록으로 이동 $placeId")
                         callbackHandler.navigate(
-                            route = MainRoute.PlaceImages(placeId = placeId, imageIds = imageIds),
+                            route = MainRoute.PlaceImages(placeId = placeId),
                             navigateOption = NavigateOption.PUSH,
                         )
                     }

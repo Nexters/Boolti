@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.place.images
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.nexters.boolti.domain.model.orderedBy
 import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -37,8 +36,7 @@ class PlaceImagesViewModel @Inject constructor(
             .onEach { images ->
                 _uiState.update {
                     it.copy(
-                        // 웹 브릿지로 전달받은 순서를 따른다.
-                        images = images.orderedBy(route.imageIds),
+                        images = images,
                         isLoading = false,
                     )
                 }

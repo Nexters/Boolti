@@ -1,19 +1,19 @@
 package com.nexters.boolti.data.network.response
 
-import com.nexters.boolti.domain.model.Place
+import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class PlaceResponse(
+internal data class PlaceDetailResponse(
     val id: Long,
     val name: String,
     val representativeImageUrl: String? = null,
     val head: ConcertHallHeadResponse? = null,
 ) {
-    fun toDomain(): Place = Place(
+    fun toDomain(): PlaceDetail = PlaceDetail(
         id = id.toString(),
         name = name,
         imageUrl = representativeImageUrl,

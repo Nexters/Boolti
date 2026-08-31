@@ -3,7 +3,7 @@ package com.nexters.boolti.presentation.screen.place
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.nexters.boolti.domain.model.Place
+import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -25,7 +25,7 @@ class PlaceViewModel @Inject constructor(
     val placeId: String = route.placeId
 
     private val _uiState =
-        MutableStateFlow(PlaceUiState(Place("", "", null, null, null, null, emptyList(), null)))
+        MutableStateFlow(PlaceUiState(PlaceDetail("", "", null, null, null, null, emptyList(), null)))
     val uiState = _uiState.asStateFlow()
 
     init {

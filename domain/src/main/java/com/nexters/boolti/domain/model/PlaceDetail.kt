@@ -1,6 +1,6 @@
 package com.nexters.boolti.domain.model
 
-data class Place(
+data class PlaceDetail(
     val id: String,
     val name: String,
     val imageUrl: String?,

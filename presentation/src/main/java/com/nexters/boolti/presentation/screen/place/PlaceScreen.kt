@@ -57,7 +57,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.Place
+import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
@@ -149,7 +149,7 @@ private fun PlaceContent(
     selectedTab: Int,
     onSelectTab: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    place: Place,
+    place: PlaceDetail,
 ) {
     LazyColumn(modifier = modifier) {
         item {
@@ -278,7 +278,7 @@ private fun PlaceContent(
 
 @Composable
 private fun PlaceInfoSection(
-    place: Place,
+    place: PlaceDetail,
     modifier: Modifier = Modifier,
 ) {
     val hasAnyInfo = listOf(
@@ -615,7 +615,7 @@ private fun String.toComposeColor(): Color {
 private fun PlaceInfoSectionPreview() {
     BooltiTheme {
         PlaceInfoSection(
-            place = Place(
+            place = PlaceDetail(
                 id = "1",
                 name = "예시 공연장",
                 imageUrl = null,

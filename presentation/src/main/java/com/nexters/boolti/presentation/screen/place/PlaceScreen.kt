@@ -437,6 +437,9 @@ private fun PlaceStationsRow(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     station.lines.forEach { line ->
+                        /**
+                         * 글씨색깔은 디자인 시안과 다르지만, 모두 흰색으로 지정. (서버 응답과 디자인 불일치)
+                         */
                         Box(
                             modifier = Modifier
                                 .sizeIn(minWidth = 20.dp)
@@ -445,9 +448,9 @@ private fun PlaceStationsRow(
                         ) {
                             Text(
                                 modifier = Modifier.padding(horizontal = 6.dp),
-                                text = line.name.take(2),
+                                text = line.name,
                                 style = MaterialTheme.typography.titleSmall.copy(lineHeight = 20.sp),
-                                color = Color.White, // TODO: 특정 케이스는 검정 글씨
+                                color = Color.White,
                             )
                         }
                     }

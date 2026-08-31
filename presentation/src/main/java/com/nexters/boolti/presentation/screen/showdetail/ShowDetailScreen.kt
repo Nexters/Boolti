@@ -63,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -774,7 +775,9 @@ private fun LazyListScope.ShowInfoTab(
                 )
             }
             AndroidView(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clipToBounds(),
                 factory = { context ->
                     infoContentWebView.apply {
                         layoutParams = ViewGroup.LayoutParams(
@@ -994,7 +997,11 @@ private fun Poster(
                 .padding(top = 4.dp)
                 .then(
                     if (placeClickable) {
-                        Modifier.clickable { navigateToPlace(showDetail.placeId ?: "1") } // TODO: 테스트 끝나면 엘비스 지우기
+                        Modifier.clickable {
+                            navigateToPlace(
+                                showDetail.placeId ?: "1"
+                            )
+                        } // TODO: 테스트 끝나면 엘비스 지우기
                     } else {
                         Modifier
                     }

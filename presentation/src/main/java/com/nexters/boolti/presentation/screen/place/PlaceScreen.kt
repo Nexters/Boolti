@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -94,78 +95,14 @@ fun PlaceScreen(
     val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
     val shareUrl = "https://$subDomain.boolti.in/${viewModel.placeId}"
 
-    Box(modifier = modifier.fillMaxSize()) {
-        if (uiState.isLoading) {
-            BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        } else {
-            PlaceContent(
-                modifier = Modifier.fillMaxSize(),
-                place = uiState.place,
-                placeId = viewModel.placeId,
-                selectedTab = uiState.selectedTab,
-                onSelectTab = viewModel::selectTab,
-            )
-        }
-
-        BtAppBar(
-            colors = BtAppBarDefaults.appBarColors(containerColor = Color.Transparent),
-            navigateButtons = {
-                BtAppBarDefaults.AppBarIconButton(
-                    iconRes = R.drawable.ic_arrow_back,
-                    description = stringResource(R.string.description_navigate_back),
-                    onClick = onBack,
-                )
-            },
-            actionButtons = {
-                BtAppBarDefaults.AppBarIconButton(
-                    iconRes = R.drawable.ic_share,
-                    description = stringResource(R.string.ticketing_share),
-                    onClick = {
-                        // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
-//                        AppTracker.click(
-//                            screen = Screen.ShowDetail,
-//                            objectRole = Role.Button,
-//                            objectValue = "Share",
-//                            properties = mapOf(
-//                                "share_method" to "LinkCopy"
-//                            ),
-//                        )
-
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, shareUrl)
-                            type = "text/plain"
-                        }
-                        val shareIntent = Intent.createChooser(sendIntent, null)
-
-                        context.startActivity(shareIntent)
-                    },
-                )
-            },
-        )
-    }
-}
-
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-private fun PlaceContent(
-    placeId: String,
-    selectedTab: Int,
-    onSelectTab: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    place: PlaceDetail,
-) {
-    val scope = rememberCoroutineScope()
-    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-    val url by remember(selectedTab) {
+    val url by remember(uiState.selectedTab) {
         mutableStateOf(
-            when (selectedTab) {
-                0 -> "https://$subDomain.boolti.in/$placeId/home"
-                else -> "https://$subDomain.boolti.in/$placeId/rental"
+            when (uiState.selectedTab) {
+                0 -> "https://$subDomain.boolti.in/${viewModel.placeId}/home"
+                else -> "https://$subDomain.boolti.in/${viewModel.placeId}/rental"
             }
         )
     }
-    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
 
     val webView by remember(context) {
@@ -186,6 +123,80 @@ private fun PlaceContent(
             })
     }
 
+    LaunchedEffect(webView, url) {
+        webView.loadUrl(url)
+    }
+
+    Scaffold(
+        modifier = modifier.navigationBarsPadding(),
+    ) { innerPadding ->
+        Box(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            if (uiState.isLoading) {
+                BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                PlaceContent(
+                    modifier = Modifier.fillMaxSize(),
+                    place = uiState.place,
+                    selectedTab = uiState.selectedTab,
+                    onSelectTab = viewModel::selectTab,
+                    contentWebView = webView
+                )
+            }
+
+            // 배경이 app bar 뒤에도 보여야 해서 topbar에 넣지 않음
+            BtAppBar(
+                colors = BtAppBarDefaults.appBarColors(containerColor = Color.Transparent),
+                navigateButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        iconRes = R.drawable.ic_arrow_back,
+                        description = stringResource(R.string.description_navigate_back),
+                        onClick = onBack,
+                    )
+                },
+                actionButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        iconRes = R.drawable.ic_share,
+                        description = stringResource(R.string.ticketing_share),
+                        onClick = {
+                            // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
+//                        AppTracker.click(
+//                            screen = Screen.ShowDetail,
+//                            objectRole = Role.Button,
+//                            objectValue = "Share",
+//                            properties = mapOf(
+//                                "share_method" to "LinkCopy"
+//                            ),
+//                        )
+
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shareUrl)
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+
+                            context.startActivity(shareIntent)
+                        },
+                    )
+                },
+            )
+        }
+    }
+}
+
+@SuppressLint("SetJavaScriptEnabled")
+@Composable
+private fun PlaceContent(
+    selectedTab: Int,
+    onSelectTab: (Int) -> Unit,
+    place: PlaceDetail,
+    contentWebView: BtWebView,
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(modifier = modifier) {
         item {
             Column(
@@ -264,11 +275,8 @@ private fun PlaceContent(
         }
 
         item {
-            var isLoading by remember { mutableStateOf(webView.progress.value < 100)}
-
-            LaunchedEffect(webView, url) {
-                webView.loadUrl(url)
-            }
+            var isLoading by remember { mutableStateOf(contentWebView.progress.value < 100)}
+            val scope = rememberCoroutineScope()
 
             Box(
                 modifier = Modifier
@@ -281,7 +289,7 @@ private fun PlaceContent(
                 AndroidView(
                     modifier = Modifier.fillMaxWidth(),
                     factory = {
-                        webView.apply {
+                        contentWebView.apply {
                             layoutParams = ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT,

@@ -34,6 +34,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -228,7 +229,41 @@ private fun PlaceContent(
         }
 
         item {
-            PlaceWebView(placeId = placeId, tabIndex = selectedTab)
+            val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
+            val url by remember(selectedTab) {
+                mutableStateOf(
+                    when (selectedTab) {
+                        0 -> "https://$subDomain.boolti.in/$placeId/home"
+                        else -> "https://$subDomain.boolti.in/$placeId/rental"
+                    }
+                )
+            }
+            val context = LocalContext.current
+            val uriHandler = LocalUriHandler.current
+
+            val webView by remember(context) {
+                mutableStateOf(
+                    BtWebView(
+                        preUriLoading = { loadUrl ->
+                            preUriLoading(
+                                url = loadUrl,
+                                context = context,
+                                uriHandler = uriHandler,
+                                navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
+                                navigateWithUrl = {},
+                            )
+                        },
+                        context = context,
+                    ).apply {
+                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                    })
+            }
+
+            LaunchedEffect(webView, url) {
+                webView.loadUrl(url)
+            }
+
+            PlaceWebView(contentWebview = webView)
         }
 
         item {
@@ -540,36 +575,8 @@ private fun PlaceTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun PlaceWebView(
-    placeId: String,
-    tabIndex: Int,
+    contentWebview: BtWebView,
 ) {
-    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-    val url = when (tabIndex) {
-        0 -> "https://$subDomain.boolti.in/$placeId/home"
-        else -> "https://$subDomain.boolti.in/$placeId/rental"
-    }
-    val context = LocalContext.current
-    val uriHandler = LocalUriHandler.current
-
-    val webView by remember(tabIndex) {
-        mutableStateOf(
-            BtWebView(
-                preUriLoading = { loadUrl ->
-                    preUriLoading(
-                        url = loadUrl,
-                        context = context,
-                        uriHandler = uriHandler,
-                        navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
-                        navigateWithUrl = {},
-                    )
-                },
-                context = context,
-            ).apply {
-                loadUrl(url)
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            })
-    }
-
     Box(
         modifier = Modifier
             .heightIn(min = 200.dp)
@@ -579,7 +586,7 @@ private fun PlaceWebView(
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
             factory = {
-                webView.apply {
+                contentWebview.apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT,

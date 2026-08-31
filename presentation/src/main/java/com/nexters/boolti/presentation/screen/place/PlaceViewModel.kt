@@ -37,9 +37,7 @@ class PlaceViewModel @Inject constructor(
     }
 
     /**
-     * 웹 브릿지의 토큰 요청에 응답한다.
-     *
-     * 공연장 화면은 비로그인 사용자도 진입할 수 있으므로, 토큰 갱신에 실패하면 빈 문자열을 반환한다.
+     * 공연장 화면은 비로그인 사용자도 진입할 수 있지만, [BridgeCallbackHandler]인터페이스를 구현하기 위해 구현
      */
     suspend fun refreshAndGetToken(): String = runCatching {
         authRepository.refreshToken().first().token

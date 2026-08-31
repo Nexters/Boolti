@@ -63,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -154,6 +155,7 @@ fun ShowDetailScreen(
     ) -> Unit,
     navigateToReport: () -> Unit,
     navigateToProfile: (userCode: String) -> Unit,
+    navigateToPlace: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
@@ -231,6 +233,7 @@ fun ShowDetailScreen(
                     onTicketSelected = onTicketSelected,
                     onGiftTicketSelected = onGiftTicketSelected,
                     navigateToProfile = navigateToProfile,
+                    navigateToPlace = navigateToPlace,
                     isLoggedIn = isLoggedIn == true,
                     onSelectTab = viewModel::selectTab,
                     shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
@@ -260,6 +263,7 @@ fun ShowDetailScreen(
         ticketCount: Int,
     ) -> Unit,
     navigateToProfile: (userCode: String) -> Unit,
+    navigateToPlace: (placeId: String) -> Unit,
     isLoggedIn: Boolean,
     onSelectTab: (index: Int) -> Unit,
     shouldShowNaverMapDialog: Boolean,
@@ -336,6 +340,7 @@ fun ShowDetailScreen(
                         .background(color = MaterialTheme.colorScheme.surface)
                         .padding(top = paddingTop),
                     navigateToImages = navigateToImages,
+                    navigateToPlace = navigateToPlace,
                     showDetail = showDetail,
                 )
             }
@@ -770,7 +775,9 @@ private fun LazyListScope.ShowInfoTab(
                 )
             }
             AndroidView(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clipToBounds(),
                 factory = { context ->
                     infoContentWebView.apply {
                         layoutParams = ViewGroup.LayoutParams(
@@ -931,6 +938,7 @@ fun LazyListScope.CastTab(
 private fun Poster(
     showDetail: ShowDetail,
     navigateToImages: (index: Int) -> Unit,
+    navigateToPlace: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val images by remember { derivedStateOf { showDetail.images.map { it.originImage } } }
@@ -983,8 +991,21 @@ private fun Poster(
                 )
             }
         }
+        val placeClickable = showDetail.placeId != null
         Row(
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .then(
+                    if (placeClickable) {
+                        Modifier.clickable {
+                            navigateToPlace(
+                                showDetail.placeId ?: "1"
+                            )
+                        } // TODO: 테스트 끝나면 엘비스 지우기
+                    } else {
+                        Modifier
+                    }
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -998,6 +1019,14 @@ private fun Poster(
                 text = showDetail.placeName,
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
+            if (placeClickable) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
+                    tint = Grey50,
+                    contentDescription = null,
+                )
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -1116,6 +1145,7 @@ private fun ShowDetailScreenPreview() {
             onTicketSelected = { _, _, _, _ -> },
             onGiftTicketSelected = { _, _, _ -> },
             navigateToProfile = {},
+            navigateToPlace = {},
             isLoggedIn = true,
             onSelectTab = {},
             shouldShowNaverMapDialog = false,

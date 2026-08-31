@@ -3,12 +3,15 @@ package com.nexters.boolti.data.network.response
 import com.nexters.boolti.data.util.toLocalDate
 import com.nexters.boolti.data.util.toLocalDateTime
 import com.nexters.boolti.domain.model.ShowDetail
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class ShowDetailResponse(
     val id: String,
     val name: String,
+    @SerialName("concertHallId")
+    val placeId: String? = null,
     val placeName: String,
     val date: String,
     val runningTime: Int,
@@ -28,6 +31,7 @@ internal data class ShowDetailResponse(
         return ShowDetail(
             id = id,
             name = name,
+            placeId = placeId,
             placeName = placeName,
             date = date.toLocalDateTime(),
             runningTime = runningTime,

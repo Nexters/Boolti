@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 data class ShowDetail(
     val id: String = "0",
     val name: String = "",
+    val placeId: String? = null,
     val placeName: String = "",
     val date: LocalDateTime = LocalDateTime.now(),
     val runningTime: Int = 0,

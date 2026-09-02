@@ -82,7 +82,7 @@ class BridgeManager(
                 callbackToWeb(data)
             }
 
-            CommandType.VIEW_PLACE_PHOTO_DETAIL -> {
+            CommandType.VIEW_PLACE_PHOTO_LIST -> {
                 val payload = data.data?.jsonObject
                 val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull
 
@@ -96,6 +96,25 @@ class BridgeManager(
                     }
                 } else {
                     Timber.tag("bridge").d("공연장 사진 목록으로 이동 실패: ${data.data}")
+                }
+                callbackToWeb(data)
+            }
+
+            CommandType.VIEW_PLACE_PHOTO_DETAIL -> {
+                val payload = data.data?.jsonObject
+                val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull
+                val imageId = payload?.get("imageId")?.jsonPrimitive?.contentOrNull
+
+                if (placeId != null) {
+                    Handler(Looper.getMainLooper()).post {
+                        Timber.tag("bridge").d("공연장 사진 상세로 이동 $placeId -> $imageId")
+                        callbackHandler.navigate(
+                            route = MainRoute.PlaceImages(placeId = placeId, imageId = imageId),
+                            navigateOption = NavigateOption.PUSH,
+                        )
+                    }
+                } else {
+                    Timber.tag("bridge").d("공연장 사진 상세로 이동 실패: ${data.data}")
                 }
                 callbackToWeb(data)
             }

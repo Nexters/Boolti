@@ -9,6 +9,7 @@ enum class CommandType {
     REQUEST_TOKEN,
     SHOW_TOAST,
     VIEW_PLACE_PHOTO_DETAIL,
+    VIEW_PLACE_PHOTO_LIST,
     UNKNOWN;
 
     companion object {

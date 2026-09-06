@@ -533,9 +533,6 @@ private fun PlaceStationsRow(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     station.lines.forEach { line ->
-                        /**
-                         * 글씨색깔은 디자인 시안과 다르지만, 모두 흰색으로 지정. (서버 응답과 디자인 불일치)
-                         */
                         Box(
                             modifier = Modifier
                                 .sizeIn(minWidth = 20.dp)
@@ -546,7 +543,7 @@ private fun PlaceStationsRow(
                                 modifier = Modifier.padding(horizontal = 6.dp),
                                 text = line.displayName,
                                 style = MaterialTheme.typography.titleSmall.copy(lineHeight = 20.sp),
-                                color = Color.White,
+                                color = line.textColorHex.toComposeColor(),
                             )
                         }
                     }
@@ -666,16 +663,19 @@ private fun PlaceInfoSectionPreview() {
                                 id = "1",
                                 name = "2",
                                 colorHex = "#0CA34A",
+                                textColorHex = "#FFFFFF",
                             ),
                             SubwayLine(
                                 id = "2",
                                 name = "경의",
                                 colorHex = "#79C0A0",
+                                textColorHex = "#FFFFFF",
                             ),
                             SubwayLine(
                                 id = "3",
                                 name = "분당",
                                 colorHex = "#FCD205",
+                                textColorHex = "#000000",
                             ),
                         )
                     )

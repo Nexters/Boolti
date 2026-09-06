@@ -69,13 +69,15 @@ internal data class ConcertHallSubwayLineResponse(
     val id: String,
     val lineKey: String,
     val lineName: String,
-    val colorHex: String? = null,
+    val textColorHex: String,
+    val colorHex: String,
 ) {
     fun toDomain(): SubwayLine {
         return SubwayLine(
             id = id,
             name = lineName,
-            colorHex = colorHex ?: "0x00000000",
+            textColorHex = textColorHex,
+            colorHex = colorHex,
         )
     }
 }

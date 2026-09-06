@@ -661,19 +661,22 @@ private fun PlaceInfoSectionPreview() {
                         lines = listOf(
                             SubwayLine(
                                 id = "1",
-                                name = "2",
+                                key = "SEOUL_LINE_2",
+                                name = "수도권 2호선",
                                 colorHex = "#0CA34A",
                                 textColorHex = "#FFFFFF",
                             ),
                             SubwayLine(
                                 id = "2",
-                                name = "경의",
+                                key = "SEOUL_GYEONGUI_JUNGANG",
+                                name = "경의중앙선",
                                 colorHex = "#79C0A0",
                                 textColorHex = "#FFFFFF",
                             ),
                             SubwayLine(
                                 id = "3",
-                                name = "분당",
+                                key = "SEOUL_SUIN_BUNDANG",
+                                name = "수인분당선",
                                 colorHex = "#FCD205",
                                 textColorHex = "#000000",
                             ),

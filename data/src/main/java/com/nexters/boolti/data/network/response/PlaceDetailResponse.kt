@@ -75,6 +75,7 @@ internal data class ConcertHallSubwayLineResponse(
     fun toDomain(): SubwayLine {
         return SubwayLine(
             id = id,
+            key = lineKey,
             name = lineName,
             textColorHex = textColorHex,
             colorHex = colorHex,

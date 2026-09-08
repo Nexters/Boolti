@@ -68,7 +68,6 @@ import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
-import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
@@ -97,17 +96,6 @@ fun PlaceScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-    val shareUrl = "https://$subDomain.boolti.in/${viewModel.placeId}"
-
-    val url by remember(uiState.selectedTab) {
-        mutableStateOf(
-            when (uiState.selectedTab) {
-                0 -> "https://$subDomain.boolti.in/${viewModel.placeId}/home"
-                else -> "https://$subDomain.boolti.in/${viewModel.placeId}/rental"
-            }
-        )
-    }
     val uriHandler = LocalUriHandler.current
 
     val webView by remember(context) {
@@ -128,8 +116,8 @@ fun PlaceScreen(
             })
     }
 
-    LaunchedEffect(webView, url) {
-        webView.loadUrl(url)
+    LaunchedEffect(webView, uiState) {
+        webView.loadUrl(uiState.webViewUrl)
     }
 
     val listState = rememberLazyListState()
@@ -193,7 +181,7 @@ fun PlaceScreen(
 
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, shareUrl)
+                            putExtra(Intent.EXTRA_TEXT, uiState.shareUrl)
                             type = "text/plain"
                         }
                         val shareIntent = Intent.createChooser(sendIntent, null)

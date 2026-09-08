@@ -264,7 +264,15 @@ private fun PlaceContent(
                     )
                 }
 
-                PlaceInfoSection(place = place)
+                val hasAnyInfo = listOf(
+                    place.rentalFee,
+                    place.capacity,
+                    place.streetAddress,
+                ).any { it != null } || place.subwayStations.isNotEmpty()
+
+                if (hasAnyInfo) {
+                    PlaceInfoSection(place = place)
+                }
 
                 place.contact?.let { contact ->
                     if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
@@ -333,15 +341,6 @@ private fun PlaceInfoSection(
     place: PlaceDetail,
     modifier: Modifier = Modifier,
 ) {
-    val hasAnyInfo = listOf(
-        place.rentalFee,
-        place.capacity?.toString(),
-        place.streetAddress,
-        place.contact,
-    ).any { it != null } || place.subwayStations.isNotEmpty()
-
-    if (!hasAnyInfo) return
-
     Column(
         modifier = modifier
             .fillMaxWidth()

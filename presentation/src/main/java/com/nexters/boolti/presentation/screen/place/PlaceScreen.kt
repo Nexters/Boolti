@@ -45,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -116,8 +117,9 @@ fun PlaceScreen(
             })
     }
 
-    LaunchedEffect(webView, uiState) {
-        webView.loadUrl(uiState.webViewUrl)
+    val webViewUrl = uiState.webViewUrl
+    LaunchedEffect(webView, webViewUrl) {
+        webView.loadUrl(webViewUrl)
     }
 
     val listState = rememberLazyListState()

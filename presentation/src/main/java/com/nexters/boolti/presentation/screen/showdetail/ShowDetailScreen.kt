@@ -991,17 +991,17 @@ private fun Poster(
                 )
             }
         }
-        val placeClickable = showDetail.placeId != null
+        val placeId = showDetail.placeId
         Row(
             modifier = Modifier
                 .padding(top = 4.dp)
                 .then(
-                    if (placeClickable) {
+                    if (placeId != null) {
                         Modifier.clickable {
                             navigateToPlace(
-                                showDetail.placeId ?: "1"
+                                placeId
                             )
-                        } // TODO: 테스트 끝나면 엘비스 지우기
+                        }
                     } else {
                         Modifier
                     }
@@ -1019,7 +1019,7 @@ private fun Poster(
                 text = showDetail.placeName,
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
-            if (placeClickable) {
+            if (placeId != null) {
                 Icon(
                     modifier = Modifier.size(20.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),

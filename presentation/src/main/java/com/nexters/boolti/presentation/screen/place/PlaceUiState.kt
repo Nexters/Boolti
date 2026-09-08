@@ -19,8 +19,8 @@ data class PlaceUiState(
     val shareUrl = baseUrl
 
     companion object {
-        val DEFAULT = PlaceUiState(
-            place = PlaceDetail("", "", null, null, null, null, emptyList(), null),
+        fun getDefault(id: String) = PlaceUiState(
+            place = PlaceDetail(id, "", null, null, null, null, emptyList(), null),
             selectedTab = 0,
             isLoading = true,
         )

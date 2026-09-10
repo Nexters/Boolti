@@ -28,6 +28,7 @@ import com.nexters.boolti.data.network.api.SignUpService
 import com.nexters.boolti.data.network.api.TicketService
 import com.nexters.boolti.data.network.api.TicketingService
 import com.nexters.boolti.data.network.api.UserService
+import com.nexters.boolti.data.network.api.PlaceService
 import com.nexters.boolti.data.network.api.YouTubeService
 import dagger.Module
 import dagger.Provides
@@ -195,6 +196,10 @@ internal object NetworkModule {
     @Singleton
     @Provides
     fun provideSearchService(@NonAuthRetrofit retrofit: Retrofit): SearchService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun providePlaceService(@NonAuthRetrofit retrofit: Retrofit): PlaceService = retrofit.create()
 
     @Singleton
     @Provides

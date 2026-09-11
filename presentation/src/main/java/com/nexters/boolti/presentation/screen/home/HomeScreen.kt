@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
@@ -78,7 +77,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                is HomeEvent.DeepLinkEvent -> navController.navigate(event.deepLink.toUri())
+                is HomeEvent.NavigateToHomeRoute -> navController.navigate(event.route)
                 is HomeEvent.GiftNotification -> {
                     giftStatus = event.status
                 }

@@ -5,6 +5,7 @@ import com.nexters.boolti.data.network.response.toNewShowsAndRisingKeywords
 import com.nexters.boolti.data.network.response.toPagingData
 import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
 import com.nexters.boolti.domain.model.PagingData
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.map
@@ -32,6 +33,14 @@ internal class SearchDataSource @Inject constructor(
     ): PagingData<User.Others> = searchService.requestProfiles(keyword, page, size)
         .toPagingData()
         .map { it.toDomain() }
+
+    suspend fun getPlaces(
+        keyword: String,
+        page: Int,
+        size: Int,
+    ): PagingData<Place> = searchService.requestConcertHalls(keyword, page, size)
+        .toPagingData()
+        .map { it.toPlace() }
 
     suspend fun getAutoCompleteKeywords(
         keyword: String,

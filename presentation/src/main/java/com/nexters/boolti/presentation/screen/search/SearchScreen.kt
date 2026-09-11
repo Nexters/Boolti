@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
@@ -56,6 +61,7 @@ import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey85
+import com.nexters.boolti.presentation.theme.Orange01
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -88,6 +94,9 @@ fun SearchScreen(
         onClickSearchBar = navigateToRecentSearch,
         onSearch = navigateToSearchDetail,
         onClickShow = navigateToShowDetail,
+        onClickPlaceFinder = {
+            // TODO: 공연장 찾기 화면 네비게이션 연결
+        },
         recentSearchKeywords = uiState.searchHistory,
         deleteSearchHistory = { keyword ->
             viewModel.onIntent(SearchIntent.DeleteSearchHistory(keyword))
@@ -115,6 +124,7 @@ private fun SearchScreen(
     onClickSearchBar: () -> Unit,
     onSearch: (String) -> Unit,
     onClickShow: (id: String) -> Unit,
+    onClickPlaceFinder: () -> Unit,
     recentSearchKeywords: List<String>,
     deleteSearchHistory: (String) -> Unit,
     onClickClearButton: () -> Unit,
@@ -134,7 +144,13 @@ private fun SearchScreen(
                 .verticalScroll(scrollState)
                 .padding(top = 72.dp),
         ) {
-            Spacer(Modifier.height(48.dp))
+            PlaceFinderBanner(
+                onClick = onClickPlaceFinder,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal)
+                    .padding(top = 48.dp, bottom = 24.dp),
+            )
 
             if (recentSearchKeywords.isNotEmpty()) {
                 SearchHistorySection(
@@ -209,6 +225,68 @@ private fun SearchScreen(
             )
         }
     }
+}
+
+@Composable
+private fun PlaceFinderBanner(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Orange01)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.search_place_finder_subtitle),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.75f),
+            )
+            Row(
+                modifier = Modifier.padding(top = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.search_place_finder_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+                BetaBadge()
+            }
+        }
+        Icon(
+            modifier = Modifier.size(24.dp),
+            painter = painterResource(R.drawable.ic_arrow_right),
+            contentDescription = null,
+            tint = Color.White,
+        )
+    }
+}
+
+@Composable
+private fun BetaBadge(
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        modifier = modifier
+            .clip(RoundedCornerShape(100.dp))
+            .background(Color.White)
+            .padding(horizontal = 6.dp)
+            .padding(bottom = 1.dp),
+        text = stringResource(R.string.search_place_finder_beta),
+        style = MaterialTheme.typography.labelMedium.copy(
+            fontSize = 10.sp,
+            lineHeight = 18.sp,
+        ),
+        fontWeight = FontWeight.Bold,
+        color = Orange01,
+    )
 }
 
 @Composable
@@ -460,6 +538,7 @@ private fun SearchScreenPreview() {
             onClickSearchBar = {},
             onSearch = {},
             onClickShow = {},
+            onClickPlaceFinder = {},
             recentSearchKeywords = listOf("최근검색어1", "최근검색어2"),
             deleteSearchHistory = {},
             onClickClearButton = {},
@@ -482,6 +561,7 @@ private fun SearchScreenEmptyPreview() {
             onClickSearchBar = {},
             onSearch = {},
             onClickShow = {},
+            onClickPlaceFinder = {},
             recentSearchKeywords = emptyList(),
             deleteSearchHistory = {},
             onClickClearButton = {},

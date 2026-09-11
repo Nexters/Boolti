@@ -56,6 +56,7 @@ import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.SearchDetail
 import com.nexters.boolti.common.tracker.field.Tab
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.model.UserCode
@@ -66,6 +67,7 @@ import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.component.InfiniteScrollLazyColumn
 import com.nexters.boolti.presentation.component.MainButton
 import com.nexters.boolti.presentation.component.MainButtonDefaults
+import com.nexters.boolti.presentation.component.PlaceItem
 import com.nexters.boolti.presentation.component.ProfileItem
 import com.nexters.boolti.presentation.component.ShowItem
 import com.nexters.boolti.presentation.extension.ellipsis
@@ -81,6 +83,7 @@ fun SearchDetailScreen(
     navigateToRecentSearch: (keyword: String) -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     navigateToProfile: (userCode: UserCode) -> Unit,
+    navigateToPlaceDetail: (placeId: String) -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchDetailViewModel = hiltViewModel(),
@@ -116,17 +119,24 @@ fun SearchDetailScreen(
         profiles = uiState.profiles,
         profilesTotalCount = uiState.profilesTotalCount,
         profilesLoading = uiState.profilesLoading,
+        places = uiState.places,
+        placesTotalCount = uiState.placesTotalCount,
+        placesLoading = uiState.placesLoading,
         tabIndex = uiState.tabIndex,
         onChangeIndex = { index ->
             viewModel.onIntent(SearchDetailIntent.ChangeTabIndex(index))
         },
         onClickShow = navigateToShowDetail,
         onClickProfile = navigateToProfile,
+        onClickPlace = navigateToPlaceDetail,
         onShowsPageReached = {
             viewModel.onIntent(SearchDetailIntent.OnShowsPageReached)
         },
         onProfilesPageReached = {
             viewModel.onIntent(SearchDetailIntent.OnProfilesPageReached)
+        },
+        onPlacesPageReached = {
+            viewModel.onIntent(SearchDetailIntent.OnPlacesPageReached)
         },
         navigateUp = navigateUp,
         modifier = modifier,
@@ -145,12 +155,17 @@ private fun SearchDetailScreen(
     profiles: List<User.Others>,
     profilesTotalCount: Long,
     profilesLoading: Boolean,
+    places: List<Place>,
+    placesTotalCount: Long,
+    placesLoading: Boolean,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
+    onClickPlace: (placeId: String) -> Unit,
     onShowsPageReached: () -> Unit,
     onProfilesPageReached: () -> Unit,
+    onPlacesPageReached: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -184,7 +199,7 @@ private fun SearchDetailScreen(
                 search = {},
             )
 
-            if (!loading && shows.isEmpty() && profiles.isEmpty()) {
+            if (!loading && shows.isEmpty() && profiles.isEmpty() && places.isEmpty()) {
                 EmptyContents(
                     keyword = searchedKeyword,
                     onClickResetKeyword = navigateToRecentSearch,
@@ -198,13 +213,18 @@ private fun SearchDetailScreen(
                     profiles = profiles,
                     profilesTotalCount = profilesTotalCount,
                     profilesLoading = profilesLoading,
+                    places = places,
+                    placesTotalCount = placesTotalCount,
+                    placesLoading = placesLoading,
                     keyword = keyword,
                     onClickShow = onClickShow,
                     onClickProfile = onClickProfile,
+                    onClickPlace = onClickPlace,
                     tabIndex = tabIndex,
                     onChangeIndex = onChangeIndex,
                     onShowsPageReached = onShowsPageReached,
                     onProfilesPageReached = onProfilesPageReached,
+                    onPlacesPageReached = onPlacesPageReached,
                 )
             }
         }
@@ -268,23 +288,29 @@ private fun TabContainer(
     profiles: List<User.Others>,
     profilesTotalCount: Long,
     profilesLoading: Boolean,
+    places: List<Place>,
+    placesTotalCount: Long,
+    placesLoading: Boolean,
     keyword: String,
     onClickShow: (id: String) -> Unit,
     onClickProfile: (userCode: UserCode) -> Unit,
+    onClickPlace: (placeId: String) -> Unit,
     tabIndex: Int,
     onChangeIndex: (Int) -> Unit,
     onShowsPageReached: () -> Unit,
     onProfilesPageReached: () -> Unit,
+    onPlacesPageReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val tabs = remember(shows.size, profiles.size) {
+    val tabs = remember(shows.size, profiles.size, places.size) {
         listOf(
             SearchDetailTab.All,
             SearchDetailTab.Show(showsTotalCount),
             SearchDetailTab.Artist(profilesTotalCount),
+            SearchDetailTab.Place(placesTotalCount),
         )
     }
-    val pagerState = rememberPagerState { 3 }
+    val pagerState = rememberPagerState { tabs.size }
 
     LaunchedEffect(tabIndex) {
         pagerState.animateScrollToPage(tabIndex)
@@ -301,16 +327,10 @@ private fun TabContainer(
             selectedIndex = tabIndex,
             tabs = tabs.map { it.toLabel() },
             onClickTab = { index ->
-                // 0: All, 1: Show, 2: Artist
                 AppTracker.click(
                     screen = Screen.SearchDetail,
                     objectRole = Role.Tab,
-                    objectValue = when (index) {
-                        0 -> "All"
-                        1 -> "Show"
-                        2 -> "Artist"
-                        else -> "Unknown"
-                    }
+                    objectValue = tabs.getOrNull(index)?.trackerValue ?: "Unknown",
                 )
                 onChangeIndex(index)
             },
@@ -327,6 +347,7 @@ private fun TabContainer(
                         AllTab(
                             shows = shows.take(3),
                             profiles = profiles.take(3),
+                            places = places.take(3),
                             onClickShow = { index, showId ->
                                 AppTracker.click(
                                     screen = Screen.SearchDetail,
@@ -352,6 +373,19 @@ private fun TabContainer(
                                     ),
                                 )
                                 onClickProfile(userCode)
+                            },
+                            onClickPlace = { index, placeId ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = placeId,
+                                    properties = mapOf(
+                                        "tab" to "All",
+                                        "item_category" to "Place",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickPlace(placeId)
                             },
                             onClickAllShows = if (shows.size > 3) {
                                 {
@@ -379,6 +413,21 @@ private fun TabContainer(
                                         ),
                                     )
                                     onChangeIndex(2)
+                                }
+                            } else {
+                                null
+                            },
+                            onClickAllPlaces = if (places.size > 3) {
+                                {
+                                    AppTracker.click(
+                                        screen = Screen.SearchDetail,
+                                        objectRole = Role.Button,
+                                        objectValue = "ViewAll",
+                                        properties = mapOf(
+                                            "tab" to "Place",
+                                        ),
+                                    )
+                                    onChangeIndex(3)
                                 }
                             } else {
                                 null
@@ -435,6 +484,32 @@ private fun TabContainer(
                                 onClickProfile(userCode)
                             },
                             onBottomReached = onProfilesPageReached,
+                        )
+                    }
+
+                    is SearchDetailTab.Place -> if (places.isEmpty()) {
+                        EmptyContents(
+                            keyword = keyword,
+                            content = stringResource(R.string.search_no_place_result),
+                        )
+                    } else {
+                        PlacesTab(
+                            places = places,
+                            isLoading = placesLoading,
+                            onClickPlace = { index, placeId ->
+                                AppTracker.click(
+                                    screen = Screen.SearchDetail,
+                                    objectRole = Role.Item,
+                                    objectValue = placeId,
+                                    properties = mapOf(
+                                        "tab" to "Place",
+                                        "item_category" to "Place",
+                                        "item_rank" to index + 1,
+                                    ),
+                                )
+                                onClickPlace(placeId)
+                            },
+                            onBottomReached = onPlacesPageReached,
                         )
                     }
                 }
@@ -522,10 +597,13 @@ private fun TabRow(
 private fun AllTab(
     shows: List<Show>,
     profiles: List<User.Others>,
+    places: List<Place>,
     onClickShow: (Int, String) -> Unit,
     onClickProfile: (Int, UserCode) -> Unit,
+    onClickPlace: (Int, String) -> Unit,
     onClickAllShows: (() -> Unit)?,
     onClickAllArtists: (() -> Unit)?,
+    onClickAllPlaces: (() -> Unit)?,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
 ) {
@@ -578,6 +656,35 @@ private fun AllTab(
                     ProfileItem(
                         profile = profile,
                         onClick = { onClickProfile(index, profile.userCode) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = marginHorizontal),
+                    )
+                }
+            }
+        }
+
+        if ((shows.isNotEmpty() || profiles.isNotEmpty()) && places.isNotEmpty()) {
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal),
+                thickness = 1.dp,
+                color = Grey85
+            )
+        }
+
+        if (places.isNotEmpty()) {
+            AllTabSection(
+                title = stringResource(R.string.search_tab_place_section),
+                onClickAll = onClickAllPlaces,
+            ) {
+                places.forEachIndexed { index, place ->
+                    if (index > 0) Spacer(Modifier.height(16.dp))
+
+                    PlaceItem(
+                        place = place,
+                        onClick = { placeId -> onClickPlace(index, placeId) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = marginHorizontal),
@@ -699,10 +806,51 @@ private fun ArtistTab(
     }
 }
 
+@Composable
+private fun PlacesTab(
+    places: List<Place>,
+    isLoading: Boolean,
+    onClickPlace: (Int, String) -> Unit,
+    onBottomReached: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    InfiniteScrollLazyColumn(
+        isLoading = isLoading,
+        onBottomReached = onBottomReached,
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        itemsIndexed(places, key = { _, place -> place.id }) { index, place ->
+            PlaceItem(
+                place = place,
+                onClick = { placeId -> onClickPlace(index, placeId) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = marginHorizontal),
+            )
+        }
+    }
+}
+
 private sealed interface SearchDetailTab {
-    data object All : SearchDetailTab
-    data class Show(val count: Long) : SearchDetailTab
-    data class Artist(val count: Long) : SearchDetailTab
+    val trackerValue: String
+
+    data object All : SearchDetailTab {
+        override val trackerValue: String = "All"
+    }
+
+    data class Show(val count: Long) : SearchDetailTab {
+        override val trackerValue: String = "Show"
+    }
+
+    data class Artist(val count: Long) : SearchDetailTab {
+        override val trackerValue: String = "Artist"
+    }
+
+    data class Place(val count: Long) : SearchDetailTab {
+        override val trackerValue: String = "Place"
+    }
 }
 
 @Composable
@@ -710,4 +858,5 @@ private fun SearchDetailTab.toLabel(): String = when (this) {
     is SearchDetailTab.All -> stringResource(R.string.search_tab_all)
     is SearchDetailTab.Show -> stringResource(R.string.search_tab_show, count)
     is SearchDetailTab.Artist -> stringResource(R.string.search_tab_artist, count)
+    is SearchDetailTab.Place -> stringResource(R.string.search_tab_place, count)
 }

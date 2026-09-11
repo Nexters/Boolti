@@ -10,7 +10,6 @@ import com.google.firebase.messaging.RemoteMessage
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.extension.checkGrantedPermission
-import com.nexters.boolti.presentation.screen.DeepLinkEvent
 import com.nexters.boolti.presentation.screen.splash.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +26,6 @@ class BtFirebaseMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var authRepository: AuthRepository
-
-    @Inject
-    lateinit var deepLinkEvent: DeepLinkEvent
 
     override fun onNewToken(token: String) {
         scope.launch {

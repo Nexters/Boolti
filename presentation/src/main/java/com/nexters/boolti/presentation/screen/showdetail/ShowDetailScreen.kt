@@ -63,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -123,6 +124,8 @@ import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
@@ -276,6 +279,40 @@ fun ShowDetailScreen(
 
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
+    val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
+    val url = "https://${host}/show/${showDetail.id}/info"
+    // ex. tel:010-1010-1101
+    val telSchemes = listOf("tel", "telprompt")
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+    var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
+    var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
+    val webView = remember(context) {
+        BtWebView(preUriLoading = { url ->
+            preUriLoading(
+                url = url,
+                context = context,
+                uriHandler = uriHandler,
+                navigateWithUrl = { url -> redirectedInquiryUrl = url },
+                navigateWithIntent = { intent -> intentToNavigateTo = intent })
+        }, context = context).apply {
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
+    }
+
+    LaunchedEffect(webView, url) {
+        webView.loadUrl(url)
+    }
+
+    LaunchedEffect(intentToNavigateTo) {
+        if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
+            if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
+                trackNaverMap()
+            }
+            context.startActivity(intentToNavigateTo)
+            intentToNavigateTo = null
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -318,9 +355,7 @@ fun ShowDetailScreen(
 
             when (selectedTab) {
                 0 -> ShowInfoTab(
-                    showId = showDetail.id,
-                    shouldShowNaverMapDialog = shouldShowNaverMapDialog,
-                    doNotShowNaverMapDialog = doNotShowNaverMapDialog
+                    infoContentWebView = webView,
                 )
 
                 1 -> CastTab(
@@ -383,6 +418,17 @@ fun ShowDetailScreen(
                 deadlineDateTime = showDetail.salesEndDateTime!!,
             )
         }
+
+        redirectedInquiryUrl?.let { url ->
+            val contact = url.filterToPhoneNumber()
+            val isPhone = URI(url).scheme in telSchemes
+
+            InquiryBottomSheet(
+                isTelephone = isPhone,
+                onDismissRequest = { redirectedInquiryUrl = null },
+                contact = contact
+            )
+        }
     }
 
     showBottomSheet?.let { type ->
@@ -410,6 +456,43 @@ fun ShowDetailScreen(
                 showBottomSheet = null
             }
         )
+    }
+
+    if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
+        BTDialog(
+            onDismiss = {
+                intentToNavigateTo = null
+            },
+            positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+            onClickPositiveButton = {
+                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
+                    trackNaverMap()
+                }
+                context.startActivity(intentToNavigateTo)
+                doNotShowNaverMapDialog()
+                intentToNavigateTo = null
+            }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.show_naver_map_dialog_title),
+                    color = Grey15,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    modifier = Modifier.padding(
+                        top = 4.dp
+                    ),
+                    text = stringResource(R.string.show_naver_map_dialog_content),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
     }
 }
 
@@ -675,112 +758,40 @@ private fun ContentTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
-    showId: String,
-    shouldShowNaverMapDialog: Boolean,
-    doNotShowNaverMapDialog: () -> Unit,
+    infoContentWebView: BtWebView,
 ) {
     item {
-        var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
-        val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
-        val url = "https://${host}/show/${showId}/info"
-        val context = LocalContext.current
-        val uriHandler = LocalUriHandler.current
-        var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
-
-        LaunchedEffect(intentToNavigateTo) {
-            if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
-                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                    trackNaverMap()
-                }
-                context.startActivity(intentToNavigateTo)
-                intentToNavigateTo = null
-            }
-        }
-
-        // ex. tel:010-1010-1101
-        val telSchemes = listOf("tel", "telprompt")
-        val webView by remember {
-            mutableStateOf(BtWebView(preUriLoading = { url ->
-                preUriLoading(
-                    url = url,
-                    context = context,
-                    uriHandler = uriHandler,
-                    navigateWithUrl = { url -> redirectedInquiryUrl = url },
-                    navigateWithIntent = { intent -> intentToNavigateTo = intent })
-            }, context = context).apply {
-                loadUrl(url)
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            })
-        }
+        var isLoading by remember { mutableStateOf(infoContentWebView.progress.value < 100) }
+        val scope = rememberCoroutineScope()
 
         Box(
             modifier = Modifier
                 .heightIn(min = 96.dp)
                 .fillMaxWidth()
         ) {
-            BtCircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
+            if (isLoading) {
+                BtCircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
             AndroidView(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clipToBounds(),
                 factory = { context ->
-                    webView.apply {
+                    infoContentWebView.apply {
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                         )
                         setOnLongClickListener { true }
+                        progress.onEach {
+                            isLoading = it < 100
+                        }.launchIn(scope)
+                        setWebChromeClient()
                     }
                 },
             )
-        }
-
-        redirectedInquiryUrl?.let { url ->
-            val contact = url.filterToPhoneNumber()
-            val isPhone = URI(url).scheme in telSchemes
-
-            InquiryBottomSheet(
-                isTelephone = isPhone,
-                onDismissRequest = { redirectedInquiryUrl = null },
-                contact = contact
-            )
-        }
-
-        if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
-            BTDialog(
-                onDismiss = {
-                    intentToNavigateTo = null
-                },
-                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
-                onClickPositiveButton = {
-                    if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                        trackNaverMap()
-                    }
-                    context.startActivity(intentToNavigateTo)
-                    doNotShowNaverMapDialog()
-                    intentToNavigateTo = null
-                }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(R.string.show_naver_map_dialog_title),
-                        color = Grey15,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        modifier = Modifier.padding(
-                            top = 4.dp
-                        ),
-                        text = stringResource(R.string.show_naver_map_dialog_content),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Grey50,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
         }
     }
 
@@ -980,13 +991,17 @@ private fun Poster(
                 )
             }
         }
-        val placeClickable = showDetail.placeId != null
+        val placeId = showDetail.placeId
         Row(
             modifier = Modifier
                 .padding(top = 4.dp)
                 .then(
-                    if (placeClickable) {
-                        Modifier.clickable { navigateToPlace(showDetail.placeId ?: "1") } // TODO: 테스트 끝나면 엘비스 지우기
+                    if (placeId != null) {
+                        Modifier.clickable {
+                            navigateToPlace(
+                                placeId
+                            )
+                        }
                     } else {
                         Modifier
                     }
@@ -1004,7 +1019,7 @@ private fun Poster(
                 text = showDetail.placeName,
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
-            if (placeClickable) {
+            if (placeId != null) {
                 Icon(
                     modifier = Modifier.size(20.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),

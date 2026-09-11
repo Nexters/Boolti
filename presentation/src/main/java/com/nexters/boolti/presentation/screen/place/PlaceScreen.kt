@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -36,9 +40,14 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,16 +68,16 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.PlaceContact
+import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
-import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.extension.displayName
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
 import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
@@ -84,6 +93,8 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun PlaceScreen(
@@ -95,9 +106,48 @@ fun PlaceScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-    val shareUrl = "https://$subDomain.boolti.in/${viewModel.placeId}"
+    val uriHandler = LocalUriHandler.current
 
+    val webView by remember(context) {
+        mutableStateOf(
+            BtWebView(
+                preUriLoading = { loadUrl ->
+                    preUriLoading(
+                        url = loadUrl,
+                        context = context,
+                        uriHandler = uriHandler,
+                        navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
+                        navigateWithUrl = {},
+                    )
+                },
+                context = context,
+            ).apply {
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            })
+    }
+
+    val webViewUrl = uiState.webViewUrl
+    LaunchedEffect(webView, webViewUrl) {
+        webView.loadUrl(webViewUrl)
+    }
+
+    val listState = rememberLazyListState()
+    // 스크롤이 시작되면 앱바가 불투명해지며 공연장 이름이 나타난다.
+    val appBarScrolled by remember {
+        derivedStateOf {
+            listState.firstVisibleItemScrollOffset > 0
+        }
+    }
+    val appBarContainerColor by animateColorAsState(
+        targetValue = if (appBarScrolled) Grey90 else Color.Transparent
+    )
+    val appBarTitleAlpha by animateFloatAsState(
+        targetValue = if (appBarScrolled) 1f else 0f
+    )
+
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
     val scope = rememberCoroutineScope()
     val snackbarController = LocalSnackbarController.current
     val bridgeManager = remember(scope) {
@@ -132,15 +182,20 @@ fun PlaceScreen(
             PlaceContent(
                 modifier = Modifier.fillMaxSize(),
                 place = uiState.place,
-                placeId = viewModel.placeId,
                 selectedTab = uiState.selectedTab,
                 onSelectTab = viewModel::selectTab,
-                bridgeManager = bridgeManager,
+                contentWebView = webView,
+                listState = listState,
             )
         }
 
+        // 배경이 app bar 뒤에도 보여야 해서 topbar에 넣지 않음
         BtAppBar(
-            colors = BtAppBarDefaults.appBarColors(containerColor = Color.Transparent),
+            title = uiState.place.name,
+            colors = BtAppBarDefaults.appBarColors(
+                containerColor = appBarContainerColor,
+                titleColor = MaterialTheme.colorScheme.onBackground.copy(alpha = appBarTitleAlpha),
+            ),
             navigateButtons = {
                 BtAppBarDefaults.AppBarIconButton(
                     iconRes = R.drawable.ic_arrow_back,
@@ -165,7 +220,7 @@ fun PlaceScreen(
 
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, shareUrl)
+                            putExtra(Intent.EXTRA_TEXT, uiState.shareUrl)
                             type = "text/plain"
                         }
                         val shareIntent = Intent.createChooser(sendIntent, null)
@@ -181,14 +236,17 @@ fun PlaceScreen(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun PlaceContent(
-    placeId: String,
     selectedTab: Int,
     onSelectTab: (Int) -> Unit,
-    bridgeManager: BridgeManager,
+    place: PlaceDetail,
+    contentWebView: BtWebView,
+    listState: LazyListState,
     modifier: Modifier = Modifier,
-    place: Place,
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+    ) {
         item {
             Column(
                 modifier = Modifier
@@ -242,7 +300,15 @@ private fun PlaceContent(
                     )
                 }
 
-                PlaceInfoSection(place = place)
+                val hasAnyInfo = listOf(
+                    place.rentalFee,
+                    place.capacity,
+                    place.streetAddress,
+                ).any { it != null } || place.subwayStations.isNotEmpty()
+
+                if (hasAnyInfo) {
+                    PlaceInfoSection(place = place)
+                }
 
                 place.contact?.let { contact ->
                     if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
@@ -266,11 +332,34 @@ private fun PlaceContent(
         }
 
         item {
-            PlaceWebView(
-                placeId = placeId,
-                tabIndex = selectedTab,
-                bridgeManager = bridgeManager,
-            )
+            var isLoading by remember { mutableStateOf(contentWebView.progress.value < 100) }
+            val scope = rememberCoroutineScope()
+
+            Box(
+                modifier = Modifier
+                    .heightIn(min = 200.dp)
+                    .fillMaxWidth(),
+            ) {
+                if (isLoading) {
+                    BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = {
+                        contentWebView.apply {
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                            )
+                            setOnLongClickListener { true }
+                            progress.onEach {
+                                isLoading = it < 100
+                            }.launchIn(scope)
+                            setWebChromeClient()
+                        }
+                    },
+                )
+            }
         }
 
         item {
@@ -285,18 +374,9 @@ private fun PlaceContent(
 
 @Composable
 private fun PlaceInfoSection(
-    place: Place,
+    place: PlaceDetail,
     modifier: Modifier = Modifier,
 ) {
-    val hasAnyInfo = listOf(
-        place.rentalFee,
-        place.capacity?.toString(),
-        place.streetAddress,
-        place.contact,
-    ).any { it != null } || place.subwayStations.isNotEmpty()
-
-    if (!hasAnyInfo) return
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -487,9 +567,9 @@ private fun PlaceStationsRow(
                         ) {
                             Text(
                                 modifier = Modifier.padding(horizontal = 6.dp),
-                                text = line.name.take(2),
+                                text = line.displayName,
                                 style = MaterialTheme.typography.titleSmall.copy(lineHeight = 20.sp),
-                                color = Color.White, // TODO: 특정 케이스는 검정 글씨
+                                color = line.textColorHex.toComposeColor(),
                             )
                         }
                     }
@@ -576,68 +656,6 @@ private fun PlaceTab(
     )
 }
 
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-private fun PlaceWebView(
-    placeId: String,
-    tabIndex: Int,
-    bridgeManager: BridgeManager,
-) {
-    val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-    val url = when (tabIndex) {
-        0 -> "https://$subDomain.boolti.in/$placeId/home"
-        else -> "https://$subDomain.boolti.in/$placeId/rental"
-    }
-    val context = LocalContext.current
-    val uriHandler = LocalUriHandler.current
-
-    val webView by remember(tabIndex) {
-        mutableStateOf(
-            BtWebView(
-                preUriLoading = { loadUrl ->
-                    preUriLoading(
-                        url = loadUrl,
-                        context = context,
-                        uriHandler = uriHandler,
-                        navigateWithIntent = { intent -> intent?.let { context.startActivity(it) } },
-                        navigateWithUrl = {},
-                    )
-                },
-                context = context,
-            ).apply {
-                // 웹의 초기 스크립트가 브릿지를 인식하도록 loadUrl 이전에 등록한다.
-                bindBridge(bridgeManager)
-                loadUrl(url)
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            })
-    }
-
-    // 탭 전환으로 WebView 가 새로 만들어지면 앱 → 웹 메시지 구독도 다시 시작한다.
-    LaunchedEffect(webView) {
-        webView.collectBridgeMessages(bridgeManager)
-    }
-
-    Box(
-        modifier = Modifier
-            .heightIn(min = 200.dp)
-            .fillMaxWidth(),
-    ) {
-        BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = {
-                webView.apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                    )
-                    setOnLongClickListener { true }
-                }
-            },
-        )
-    }
-}
-
 private fun String.toComposeColor(): Color {
     val normalized = removePrefix("#")
 
@@ -655,7 +673,7 @@ private fun String.toComposeColor(): Color {
 private fun PlaceInfoSectionPreview() {
     BooltiTheme {
         PlaceInfoSection(
-            place = Place(
+            place = PlaceDetail(
                 id = "1",
                 name = "예시 공연장",
                 imageUrl = null,
@@ -669,18 +687,24 @@ private fun PlaceInfoSectionPreview() {
                         lines = listOf(
                             SubwayLine(
                                 id = "1",
-                                name = "2",
+                                key = "SEOUL_LINE_2",
+                                name = "수도권 2호선",
                                 colorHex = "#0CA34A",
+                                textColorHex = "#FFFFFF",
                             ),
                             SubwayLine(
                                 id = "2",
-                                name = "경의",
+                                key = "SEOUL_GYEONGUI_JUNGANG",
+                                name = "경의중앙선",
                                 colorHex = "#79C0A0",
+                                textColorHex = "#FFFFFF",
                             ),
                             SubwayLine(
                                 id = "3",
-                                name = "분당",
+                                key = "SEOUL_SUIN_BUNDANG",
+                                name = "수인분당선",
                                 colorHex = "#FCD205",
+                                textColorHex = "#000000",
                             ),
                         )
                     )

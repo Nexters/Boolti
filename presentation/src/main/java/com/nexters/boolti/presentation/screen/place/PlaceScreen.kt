@@ -107,6 +107,8 @@ fun PlaceScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
+    val scope = rememberCoroutineScope()
+    val snackbarController = LocalSnackbarController.current
 
     val webView by remember(context) {
         mutableStateOf(
@@ -126,30 +128,6 @@ fun PlaceScreen(
             })
     }
 
-    val webViewUrl = uiState.webViewUrl
-    LaunchedEffect(webView, webViewUrl) {
-        webView.loadUrl(webViewUrl)
-    }
-
-    val listState = rememberLazyListState()
-    // 스크롤이 시작되면 앱바가 불투명해지며 공연장 이름이 나타난다.
-    val appBarScrolled by remember {
-        derivedStateOf {
-            listState.firstVisibleItemScrollOffset > 0
-        }
-    }
-    val appBarContainerColor by animateColorAsState(
-        targetValue = if (appBarScrolled) Grey90 else Color.Transparent
-    )
-    val appBarTitleAlpha by animateFloatAsState(
-        targetValue = if (appBarScrolled) 1f else 0f
-    )
-
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-    val scope = rememberCoroutineScope()
-    val snackbarController = LocalSnackbarController.current
     val bridgeManager = remember(scope) {
         BridgeManager(
             callbackHandler = object : BridgeCallbackHandler {
@@ -175,40 +153,63 @@ fun PlaceScreen(
         )
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        if (uiState.isLoading) {
-            BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        } else {
-            PlaceContent(
-                modifier = Modifier.fillMaxSize(),
-                place = uiState.place,
-                selectedTab = uiState.selectedTab,
-                onSelectTab = viewModel::selectTab,
-                contentWebView = webView,
-                listState = listState,
-            )
-        }
+    val webViewUrl = uiState.webViewUrl
+    LaunchedEffect(webView, webViewUrl) {
+        webView.loadUrl(webViewUrl)
+    }
 
-        // 배경이 app bar 뒤에도 보여야 해서 topbar에 넣지 않음
-        BtAppBar(
-            title = uiState.place.name,
-            colors = BtAppBarDefaults.appBarColors(
-                containerColor = appBarContainerColor,
-                titleColor = MaterialTheme.colorScheme.onBackground.copy(alpha = appBarTitleAlpha),
-            ),
-            navigateButtons = {
-                BtAppBarDefaults.AppBarIconButton(
-                    iconRes = R.drawable.ic_arrow_back,
-                    description = stringResource(R.string.description_navigate_back),
-                    onClick = onBack,
+    val listState = rememberLazyListState()
+    // 스크롤이 시작되면 앱바가 불투명해지며 공연장 이름이 나타난다.
+    val appBarScrolled by remember {
+        derivedStateOf {
+            listState.firstVisibleItemScrollOffset > 0
+        }
+    }
+    val appBarContainerColor by animateColorAsState(
+        targetValue = if (appBarScrolled) Grey90 else Color.Transparent
+    )
+    val appBarTitleAlpha by animateFloatAsState(
+        targetValue = if (appBarScrolled) 1f else 0f
+    )
+
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        Box(modifier = modifier.fillMaxSize()) {
+            if (uiState.isLoading) {
+                BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                PlaceContent(
+                    modifier = Modifier.fillMaxSize(),
+                    place = uiState.place,
+                    selectedTab = uiState.selectedTab,
+                    onSelectTab = viewModel::selectTab,
+                    contentWebView = webView,
+                    listState = listState,
+                    bridgeManager = bridgeManager,
                 )
-            },
-            actionButtons = {
-                BtAppBarDefaults.AppBarIconButton(
-                    iconRes = R.drawable.ic_share,
-                    description = stringResource(R.string.ticketing_share),
-                    onClick = {
-                        // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
+            }
+
+            // 배경이 app bar 뒤에도 보여야 해서 topbar에 넣지 않음
+            BtAppBar(
+                title = uiState.place.name,
+                colors = BtAppBarDefaults.appBarColors(
+                    containerColor = appBarContainerColor,
+                    titleColor = MaterialTheme.colorScheme.onBackground.copy(alpha = appBarTitleAlpha),
+                ),
+                navigateButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        iconRes = R.drawable.ic_arrow_back,
+                        description = stringResource(R.string.description_navigate_back),
+                        onClick = onBack,
+                    )
+                },
+                actionButtons = {
+                    BtAppBarDefaults.AppBarIconButton(
+                        iconRes = R.drawable.ic_share,
+                        description = stringResource(R.string.ticketing_share),
+                        onClick = {
+                            // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
 //                        AppTracker.click(
 //                            screen = Screen.ShowDetail,
 //                            objectRole = Role.Button,
@@ -218,18 +219,19 @@ fun PlaceScreen(
 //                            ),
 //                        )
 
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, uiState.shareUrl)
-                            type = "text/plain"
-                        }
-                        val shareIntent = Intent.createChooser(sendIntent, null)
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, uiState.shareUrl)
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
 
-                        context.startActivity(shareIntent)
-                    },
-                )
-            },
-        )
+                            context.startActivity(shareIntent)
+                        },
+                    )
+                },
+            )
+        }
     }
 }
 
@@ -240,6 +242,7 @@ private fun PlaceContent(
     onSelectTab: (Int) -> Unit,
     place: PlaceDetail,
     contentWebView: BtWebView,
+    bridgeManager: BridgeManager,
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
@@ -347,6 +350,7 @@ private fun PlaceContent(
                     modifier = Modifier.fillMaxWidth(),
                     factory = {
                         contentWebView.apply {
+                            bindBridge(bridgeManager = bridgeManager)
                             layoutParams = ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT,

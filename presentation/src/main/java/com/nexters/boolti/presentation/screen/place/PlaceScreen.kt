@@ -149,6 +149,10 @@ fun PlaceScreen(
         )
     }
 
+    LaunchedEffect(webView) {
+        webView.setBridgeManager(bridgeManager)
+    }
+
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
         webView.loadUrl(webViewUrl)
@@ -182,7 +186,6 @@ fun PlaceScreen(
                     onSelectTab = viewModel::selectTab,
                     contentWebView = webView,
                     listState = listState,
-                    bridgeManager = bridgeManager,
                 )
             }
 
@@ -238,7 +241,6 @@ private fun PlaceContent(
     onSelectTab: (Int) -> Unit,
     place: PlaceDetail,
     contentWebView: BtWebView,
-    bridgeManager: BridgeManager,
     listState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
@@ -337,10 +339,6 @@ private fun PlaceContent(
                 contentWebView.progress.collect {
                     isLoading = it < 100
                 }
-            }
-
-            LaunchedEffect(contentWebView) {
-                contentWebView.setBridgeManager(bridgeManager)
             }
 
             Box(

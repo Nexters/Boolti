@@ -49,7 +49,9 @@ class PlaceImagesViewModel @Inject constructor(
 
                 val receivedImageId = route.imageId ?: return@onEach
                 val imageIndex = images.map { it.id }.indexOf(receivedImageId)
-                sendEvent(PlaceImagesEvent.NavigateToDetail(index = imageIndex))
+                if (imageIndex != -1) {
+                    sendEvent(PlaceImagesEvent.NavigateToDetail(index = imageIndex))
+                }
             }
             .catch { e ->
                 Timber.e(e, "공연장 사진 목록 조회 실패")

@@ -24,7 +24,6 @@ class PlaceImageDetailViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<MainRoute.PlaceImageDetail>()
 
-    /** 목록에서 선택한 사진의 위치. 이미지 개수보다 크면 첫 장부터 보여준다. */
     val initialIndex: Int = route.initialIndex.coerceAtLeast(0)
 
     private val _uiState = MutableStateFlow(PlaceImagesUiState())

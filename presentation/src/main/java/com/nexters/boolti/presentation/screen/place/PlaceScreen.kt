@@ -175,40 +175,39 @@ fun PlaceScreen(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        Box(modifier = modifier.fillMaxSize()) {
-            if (uiState.isLoading) {
-                BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else {
-                PlaceContent(
-                    modifier = Modifier.fillMaxSize(),
-                    place = uiState.place,
-                    selectedTab = uiState.selectedTab,
-                    onSelectTab = viewModel::selectTab,
-                    contentWebView = webView,
-                    listState = listState,
-                )
-            }
+        if (uiState.isLoading) {
+            BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        } else {
+            PlaceContent(
+                modifier = Modifier.fillMaxSize(),
+                place = uiState.place,
+                selectedTab = uiState.selectedTab,
+                onSelectTab = viewModel::selectTab,
+                contentWebView = webView,
+                listState = listState,
+            )
+        }
 
-            // 배경이 app bar 뒤에도 보여야 해서 topbar에 넣지 않음
-            BtAppBar(
-                title = uiState.place.name,
-                colors = BtAppBarDefaults.appBarColors(
-                    containerColor = appBarContainerColor,
-                    titleColor = MaterialTheme.colorScheme.onBackground.copy(alpha = appBarTitleAlpha),
-                ),
-                navigateButtons = {
-                    BtAppBarDefaults.AppBarIconButton(
-                        iconRes = R.drawable.ic_arrow_back,
-                        description = stringResource(R.string.description_navigate_back),
-                        onClick = onBack,
-                    )
-                },
-                actionButtons = {
-                    BtAppBarDefaults.AppBarIconButton(
-                        iconRes = R.drawable.ic_share,
-                        description = stringResource(R.string.ticketing_share),
-                        onClick = {
-                            // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
+        // 배경이 app bar 뒤에도 보여야 해서 topbar에 넣지 않음
+        BtAppBar(
+            title = uiState.place.name,
+            colors = BtAppBarDefaults.appBarColors(
+                containerColor = appBarContainerColor,
+                titleColor = MaterialTheme.colorScheme.onBackground.copy(alpha = appBarTitleAlpha),
+            ),
+            navigateButtons = {
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_arrow_back,
+                    description = stringResource(R.string.description_navigate_back),
+                    onClick = onBack,
+                )
+            },
+            actionButtons = {
+                BtAppBarDefaults.AppBarIconButton(
+                    iconRes = R.drawable.ic_share,
+                    description = stringResource(R.string.ticketing_share),
+                    onClick = {
+                        // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
 //                        AppTracker.click(
 //                            screen = Screen.ShowDetail,
 //                            objectRole = Role.Button,
@@ -218,19 +217,18 @@ fun PlaceScreen(
 //                            ),
 //                        )
 
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, uiState.shareUrl)
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, null)
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, uiState.shareUrl)
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, null)
 
-                            context.startActivity(shareIntent)
-                        },
-                    )
-                },
-            )
-        }
+                        context.startActivity(shareIntent)
+                    },
+                )
+            },
+        )
     }
 }
 

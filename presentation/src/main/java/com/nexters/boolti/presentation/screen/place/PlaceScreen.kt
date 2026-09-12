@@ -339,6 +339,10 @@ private fun PlaceContent(
                 }
             }
 
+            LaunchedEffect(contentWebView) {
+                contentWebView.setBridgeManager(bridgeManager)
+            }
+
             Box(
                 modifier = Modifier
                     .heightIn(min = 200.dp)
@@ -351,7 +355,6 @@ private fun PlaceContent(
                     modifier = Modifier.fillMaxWidth(),
                     factory = {
                         contentWebView.apply {
-                            bindBridge(bridgeManager = bridgeManager)
                             layoutParams = ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT,

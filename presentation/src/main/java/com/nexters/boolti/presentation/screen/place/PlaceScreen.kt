@@ -41,14 +41,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.isInvisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -80,10 +78,6 @@ import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.extension.displayName
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
-import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
-import com.nexters.boolti.presentation.util.bridge.BridgeManager
-import com.nexters.boolti.presentation.util.bridge.NavigateOption
-import com.nexters.boolti.presentation.util.bridge.TokenDto
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
 import com.nexters.boolti.presentation.theme.Grey30
@@ -93,8 +87,10 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
+import com.nexters.boolti.presentation.util.bridge.BridgeManager
+import com.nexters.boolti.presentation.util.bridge.NavigateOption
+import com.nexters.boolti.presentation.util.bridge.TokenDto
 
 @Composable
 fun PlaceScreen(
@@ -336,7 +332,12 @@ private fun PlaceContent(
 
         item {
             var isLoading by remember { mutableStateOf(contentWebView.progress.value < 100) }
-            val scope = rememberCoroutineScope()
+
+            LaunchedEffect(contentWebView) {
+                contentWebView.progress.collect {
+                    isLoading = it < 100
+                }
+            }
 
             Box(
                 modifier = Modifier
@@ -356,11 +357,11 @@ private fun PlaceContent(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                             )
                             setOnLongClickListener { true }
-                            progress.onEach {
-                                isLoading = it < 100
-                            }.launchIn(scope)
                             setWebChromeClient()
                         }
+                    },
+                    update = { webView ->
+                        contentWebView.isInvisible = isLoading
                     },
                 )
             }

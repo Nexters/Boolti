@@ -12,6 +12,7 @@ internal data class PlaceDetailResponse(
     val name: String,
     val representativeImageUrl: String? = null,
     val head: ConcertHallHeadResponse? = null,
+    val shareCode: String,
 ) {
     fun toDomain(): PlaceDetail = PlaceDetail(
         id = id.toString(),
@@ -22,6 +23,7 @@ internal data class PlaceDetailResponse(
         streetAddress = head?.location?.streetAddress,
         subwayStations = head?.subwayStations?.map { it.toDomain() } ?: emptyList(),
         contact = head?.contact?.toDomain(),
+        shareCode = shareCode,
     )
 }
 

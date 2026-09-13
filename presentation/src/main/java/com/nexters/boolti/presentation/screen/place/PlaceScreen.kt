@@ -155,7 +155,9 @@ fun PlaceScreen(
 
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
-        webView.loadUrl(webViewUrl)
+        if (webViewUrl != null) {
+            webView.loadUrl(webViewUrl)
+        }
     }
 
     val listState = rememberLazyListState()
@@ -718,6 +720,7 @@ private fun PlaceInfoSectionPreview() {
                     phoneNumber = "010-1234-5678",
                     email = "boolti@example.com",
                 ),
+                shareCode = ""
             ),
         )
     }

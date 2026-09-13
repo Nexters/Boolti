@@ -12,6 +12,8 @@ data class PlaceUiState(
 ) {
     private val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
     private val baseUrl = place.shareCode?.let { "https://$subDomain.boolti.in/$it" }
+
+    // ex. "https://dev.place.boolti.in/1234/home"
     val webViewUrl = baseUrl?.let { if (selectedTab == 0) "$it/home" else "$it/rental" }
     val shareUrl = baseUrl
 

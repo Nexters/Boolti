@@ -3,27 +3,22 @@ package com.nexters.boolti.presentation.screen.place
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
-import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.plus
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class PlaceViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val placeRepository: PlaceRepository,
-    private val authRepository: AuthRepository,
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<MainRoute.Place>()
     val placeId: String = route.placeId
@@ -33,16 +28,6 @@ class PlaceViewModel @Inject constructor(
 
     init {
         fetchPlace()
-    }
-
-    /**
-     * 공연장 화면은 비로그인 사용자도 진입할 수 있지만, [BridgeCallbackHandler]인터페이스를 구현하기 위해 구현
-     */
-    suspend fun refreshAndGetToken(): String = runCatching {
-        authRepository.refreshToken().first().token
-    }.getOrElse { e ->
-        Timber.tag("bridge").w(e, "토큰 갱신 실패 (비로그인 상태일 수 있음)")
-        ""
     }
 
     fun selectTab(index: Int) {

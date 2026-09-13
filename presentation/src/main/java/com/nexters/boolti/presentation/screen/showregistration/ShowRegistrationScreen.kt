@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,18 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
-import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
-import com.nexters.boolti.presentation.util.bridge.BridgeManager
-import com.nexters.boolti.presentation.util.bridge.NavigateOption
-import com.nexters.boolti.presentation.util.bridge.TokenDto
+import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -51,9 +45,6 @@ import timber.log.Timber
 fun ShowRegistrationScreen(
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit,
-    navigateTo: (route: Any) -> Unit,
-    navigateToHome: () -> Unit,
-    viewModel: ShowRegistrationViewModel = hiltViewModel(),
 ) {
     var filePathCallback: ValueCallback<Array<Uri>>? by remember { mutableStateOf(null) }
     val launcher =
@@ -71,35 +62,10 @@ fun ShowRegistrationScreen(
     var webviewProgress by remember { mutableIntStateOf(0) }
     val loading by remember { derivedStateOf { webviewProgress < 100 } }
 
-    val snackbarHostState = LocalSnackbarController.current
+    val bridgeManager = rememberBridgeManager(onBack = onClickBack)
 
     LaunchedEffect(webView != null) {
-        webView?.setBridgeManager(
-            BridgeManager(
-                callbackHandler = object : BridgeCallbackHandler {
-                    override suspend fun fetchToken(): TokenDto {
-                        val accessToken = viewModel.refreshAndGetToken()
-                        return TokenDto(token = accessToken.token)
-                    }
-
-                    override fun <T : Any> navigate(route: T, navigateOption: NavigateOption) {
-                        when (navigateOption) {
-                            NavigateOption.PUSH -> navigateTo(route)
-                            NavigateOption.HOME -> navigateToHome()
-                            NavigateOption.CLOSE_AND_OPEN -> {
-                                onClickBack()
-                                navigateTo(route)
-                            }
-                        }
-                    }
-
-                    override fun showSnackbar(message: String, duration: SnackbarDuration) {
-                        snackbarHostState.showMessage(message = message, duration = duration)
-                    }
-                },
-                scope = scope,
-            )
-        )
+        webView?.setBridgeManager(bridgeManager)
     }
 
     BackHandler {

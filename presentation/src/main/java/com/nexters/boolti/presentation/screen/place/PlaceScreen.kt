@@ -32,7 +32,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -44,7 +43,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,24 +85,17 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
-import com.nexters.boolti.presentation.util.bridge.BridgeCallbackHandler
-import com.nexters.boolti.presentation.util.bridge.BridgeManager
-import com.nexters.boolti.presentation.util.bridge.NavigateOption
-import com.nexters.boolti.presentation.util.bridge.TokenDto
+import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
 
 @Composable
 fun PlaceScreen(
     onBack: () -> Unit,
-    navigateTo: (route: Any) -> Unit,
-    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlaceViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    val scope = rememberCoroutineScope()
-    val snackbarController = LocalSnackbarController.current
 
     val webView by remember(context) {
         mutableStateOf(
@@ -124,30 +115,7 @@ fun PlaceScreen(
             })
     }
 
-    val bridgeManager = remember(scope) {
-        BridgeManager(
-            callbackHandler = object : BridgeCallbackHandler {
-                override suspend fun fetchToken(): TokenDto =
-                    TokenDto(token = viewModel.refreshAndGetToken())
-
-                override fun <T : Any> navigate(route: T, navigateOption: NavigateOption) {
-                    when (navigateOption) {
-                        NavigateOption.PUSH -> navigateTo(route)
-                        NavigateOption.HOME -> navigateToHome()
-                        NavigateOption.CLOSE_AND_OPEN -> {
-                            onBack()
-                            navigateTo(route)
-                        }
-                    }
-                }
-
-                override fun showSnackbar(message: String, duration: SnackbarDuration) {
-                    snackbarController.showMessage(message = message, duration = duration)
-                }
-            },
-            scope = scope,
-        )
-    }
+    val bridgeManager = rememberBridgeManager(onBack = onBack)
 
     LaunchedEffect(webView) {
         webView.setBridgeManager(bridgeManager)

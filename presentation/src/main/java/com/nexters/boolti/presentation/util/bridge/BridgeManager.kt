@@ -82,6 +82,24 @@ class BridgeManager(
                 callbackToWeb(data)
             }
 
+            CommandType.NAVIGATE_TO_PLACE_DETAIL -> {
+                val payload = data.data?.jsonObject
+                val placeId = payload?.get("placeId")?.jsonPrimitive?.contentOrNull
+
+                if (placeId != null) {
+                    Handler(Looper.getMainLooper()).post {
+                        Timber.tag("bridge").d("공연장 상세로 이동 $placeId")
+                        callbackHandler.navigate(
+                            route = MainRoute.Place(placeId = placeId),
+                            navigateOption = NavigateOption.PUSH,
+                        )
+                    }
+                } else {
+                    Timber.tag("bridge").d("공연장 상세로 이동 실패: ${data.data}")
+                }
+                callbackToWeb(data)
+            }
+
             CommandType.VIEW_PLACE_PHOTO_LIST -> {
                 val payload = data.data?.jsonObject
                 val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull

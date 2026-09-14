@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.nexters.boolti.presentation.component.Indicator
 import com.nexters.boolti.presentation.constants.posterRatio
 import com.nexters.boolti.presentation.theme.Grey95
 

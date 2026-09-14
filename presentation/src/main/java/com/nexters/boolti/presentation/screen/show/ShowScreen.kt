@@ -56,7 +56,6 @@ import com.nexters.boolti.presentation.theme.point4
 
 private val screenField = Screen.Home
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowScreen(
     navigateToBusiness: () -> Unit,

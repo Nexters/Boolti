@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.my
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -256,9 +257,22 @@ fun MyScreen(
         }
     }
 
-    if (showDebugBottomSheet) {
+    if (BuildConfig.DEBUG && showDebugBottomSheet) {
+        val context = LocalContext.current
         DebugOptionsBottomSheet(
             sheetState = sheetState,
+            onOpenImpressionTest = {
+                scope.launch {
+                    sheetState.hide()
+                    showDebugBottomSheet = false
+                    context.startActivity(
+                        Intent().setClassName(
+                            context,
+                            "${BuildConfig.LIBRARY_PACKAGE_NAME}.screen.debug.impression.ImpressionDebugActivity",
+                        )
+                    )
+                }
+            },
             onDismiss = {
                 scope.launch {
                     sheetState.hide()
@@ -274,6 +288,7 @@ fun MyScreen(
 private fun DebugOptionsBottomSheet(
     sheetState: androidx.compose.material3.SheetState,
     onDismiss: () -> Unit,
+    onOpenImpressionTest: () -> Unit,
 ) {
     BtBottomSheet(
         onDismissRequest = onDismiss,
@@ -301,6 +316,12 @@ private fun DebugOptionsBottomSheet(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
+
+        MyMenu(
+            iconRes = R.drawable.ic_list,
+            label = stringResource(R.string.debug_impression_test),
+            onClick = onOpenImpressionTest,
+        )
 
         Spacer(Modifier.height(100.dp))
     }

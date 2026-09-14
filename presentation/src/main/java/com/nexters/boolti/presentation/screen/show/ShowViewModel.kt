@@ -9,6 +9,7 @@ import com.nexters.boolti.domain.repository.ShowRepository
 import com.nexters.boolti.domain.usecase.GetPopupUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -55,8 +56,10 @@ class ShowViewModel @Inject constructor(
         }
     }
 
-    private fun loadShows() {
-        viewModelScope.launch {
+    fun refresh(): Job = loadShows()
+
+    private fun loadShows(): Job {
+        return viewModelScope.launch {
             showRepository.search("").onSuccess { shows ->
                 _uiState.update {
                     it.copy(shows = getInsertedBannerShows(shows))

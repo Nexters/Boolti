@@ -73,3 +73,6 @@ replay_pid*
 
 # 로컬 기능 개발 계획 문서 (boolti-feature-planner 스킬)
 docs/plans/
+
+.agents
+AGENTS.md

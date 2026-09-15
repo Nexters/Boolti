@@ -45,6 +45,8 @@ class ShowViewModel @Inject constructor(
     private val _events = MutableSharedFlow<ShowEvent>()
     val events: SharedFlow<ShowEvent> = _events.asSharedFlow()
 
+    private var loadShowsJob: Job? = null
+
     init {
         loadShows()
         fetchPopup()
@@ -56,16 +58,32 @@ class ShowViewModel @Inject constructor(
         }
     }
 
-    fun refresh(): Job = loadShows()
+    fun refresh() = loadShows()
 
-    private fun loadShows(): Job {
-        return viewModelScope.launch {
+    private fun loadShows() {
+        loadShowsJob?.cancel()
+
+        loadShowsJob?.invokeOnCompletion {  }
+
+        _uiState.update {
+            it.copy(isRefreshing = true)
+        }
+
+        loadShowsJob = viewModelScope.launch {
             showRepository.search("").onSuccess { shows ->
                 _uiState.update {
-                    it.copy(shows = getInsertedBannerShows(shows))
+                    it.copy(
+                        shows = getInsertedBannerShows(shows),
+                        isRefreshing = false,
+                    )
                 }
-            }.onFailure {
-                Timber.e(it)
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+                _uiState.update {
+                    it.copy(
+                        isRefreshing = false,
+                    )
+                }
             }
         }
     }

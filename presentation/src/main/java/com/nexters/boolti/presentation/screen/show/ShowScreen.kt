@@ -70,7 +70,6 @@ fun ShowScreen(
 
     val lazyGridState = rememberLazyGridState()
     var popupToShow: Popup? by remember { mutableStateOf(null) }
-    var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -86,13 +85,8 @@ fun ShowScreen(
     ) {
         PullToRefreshBox(
             modifier = Modifier.fillMaxSize(),
-            isRefreshing = isRefreshing,
-            onRefresh = {
-                isRefreshing = true
-                viewModel.refresh().invokeOnCompletion {
-                    isRefreshing = false
-                }
-            },
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = viewModel::refresh,
         ) {
             LazyVerticalGrid(
                 modifier = Modifier

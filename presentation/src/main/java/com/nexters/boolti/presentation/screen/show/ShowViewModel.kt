@@ -63,8 +63,6 @@ class ShowViewModel @Inject constructor(
     private fun loadShows() {
         loadShowsJob?.cancel()
 
-        loadShowsJob?.invokeOnCompletion {  }
-
         _uiState.update {
             it.copy(isRefreshing = true)
         }

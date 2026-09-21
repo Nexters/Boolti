@@ -5,5 +5,5 @@ data class Place(
     val name: String,
     val streetAddress: String,
     val detailAddress: String,
-    val thumbnailImage: String,
+    val thumbnailImage: String?,
 )

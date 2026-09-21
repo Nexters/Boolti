@@ -73,6 +73,8 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.component.InquiryBottomSheet
+import com.nexters.boolti.presentation.component.InquiryBottomSheetType
 import com.nexters.boolti.presentation.extension.displayName
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
@@ -393,6 +395,7 @@ private fun PlaceContactSection(
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarController = LocalSnackbarController.current
+    var inquiryBottomSheet: InquiryBottomSheetType? by remember { mutableStateOf(null) }
 
     Row(
         modifier = Modifier
@@ -423,7 +426,7 @@ private fun PlaceContactSection(
             enabled = phoneNumber != null,
             onClick = {
                 if (phoneNumber != null) {
-                    uriHandler.openUri("tel:$phoneNumber")
+                    inquiryBottomSheet = InquiryBottomSheetType.Tel(contact = phoneNumber)
                 } else {
                     snackbarController.showMessage(noPhoneNumberMessage)
                 }
@@ -438,11 +441,20 @@ private fun PlaceContactSection(
             enabled = email != null,
             onClick = {
                 if (email != null) {
-                    uriHandler.openUri("mailto:$email")
+                    inquiryBottomSheet = InquiryBottomSheetType.Mail(address = email)
                 } else {
                     snackbarController.showMessage(noEmailMessage)
                 }
             },
+        )
+    }
+
+    inquiryBottomSheet?.let {
+        InquiryBottomSheet(
+            onDismissRequest = {
+                inquiryBottomSheet = null
+            },
+            type = it
         )
     }
 }

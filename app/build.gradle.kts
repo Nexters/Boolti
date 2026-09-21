@@ -1,4 +1,5 @@
 import com.android.build.api.artifact.SingleArtifact
+import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -23,6 +24,19 @@ keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
 localProperties.load(FileInputStream(localPropertiesFile))
+
+fun resolveGitHash(repositoryDir: File): String {
+    val gitDir = repositoryDir.resolve(".git")
+    val head = gitDir.resolve("HEAD").readText().trim()
+    val commitHash = if (head.startsWith("ref:")) {
+        gitDir.resolve(head.removePrefix("ref:").trim()).readText().trim()
+    } else {
+        head
+    }
+    return commitHash.take(7)
+}
+
+val gitHash = resolveGitHash(rootProject.projectDir)
 
 android {
     namespace = libs.versions.packageName.get()
@@ -63,6 +77,7 @@ android {
         debug {
             isDebuggable = true
             applicationIdSuffix = ".debug"
+            versionNameSuffix = "-$gitHash"
         }
     }
     compileOptions {
@@ -90,10 +105,6 @@ androidComponents {
     onVariants { variant ->
         val capitalizedName = variant.name.replaceFirstChar { it.uppercase() }
         val apkDir = variant.artifacts.get(SingleArtifact.APK)
-        val gitHash = providers.exec {
-            commandLine("git", "rev-parse", "--short=7", "HEAD")
-            isIgnoreExitValue = true
-        }.standardOutput.asText.map { it.trim().ifEmpty { "nogit" } }
 
         tasks.register("copy${capitalizedName}Apk") {
             doLast {
@@ -101,10 +112,9 @@ androidComponents {
                 if (!dir.exists()) return@doLast
                 val versionName = libs.versions.versionName.get()
                 val buildType = variant.buildType ?: "unknown"
-                val hash = gitHash.get()
                 val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-                dir.listFiles()?.filter { it.extension == "apk" }?.forEach { apk ->
-                    val newName = "app-$buildType-$versionName-$hash-$date.apk"
+                dir.listFiles()?.filter { it.name == "app-$buildType.apk" }?.forEach { apk ->
+                    val newName = "app-$buildType-$versionName-$gitHash-$date.apk"
                     apk.copyTo(File(apk.parentFile, newName))
                 }
             }

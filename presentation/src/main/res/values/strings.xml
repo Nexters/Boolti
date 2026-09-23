@@ -259,9 +259,12 @@
     <string name="save_short">저장</string>
     <string name="save_cancel">취소</string>
 
+    <!-- 문의 -->
+    <string name="inquiry_call_to_ask">전화 문의하기</string>
+    <string name="inquiry_text_to_ask">문자 문의하기</string>
+    <string name="inquiry_mail_to_ask">메일 문의하기</string>
+
     <!-- 공연 -->
-    <string name="show_call_to_ask">전화 문의하기</string>
-    <string name="show_text_to_ask">문자 문의하기</string>
     <string name="show_tab_info">공연 정보</string>
     <string name="show_tab_cast">출연진</string>
     <string name="show_sold_ticket_count">%d매 판매 완료</string>
@@ -290,6 +293,8 @@
     <string name="place_no_website">웹사이트를 준비 중이에요</string>
     <string name="place_no_phone">전화 정보를 준비 중이에요</string>
     <string name="place_no_email">메일 정보를 준비 중이에요</string>
+    <string name="place_photos">사진</string>
+    <string name="description_place_photo">공연장 사진 %1$d번째</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>

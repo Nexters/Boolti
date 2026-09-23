@@ -11,16 +11,15 @@ data class PlaceUiState(
     val isLoading: Boolean = true,
 ) {
     private val subDomain = if (BuildConfig.DEBUG) "dev.place" else "place"
-    private val baseUrl = "https://$subDomain.boolti.in/${place.id}"
-    val webViewUrl = when (selectedTab) {
-        0 -> "$baseUrl/home"
-        else -> "$baseUrl/rental"
-    }
+    private val baseUrl = place.shareCode?.let { "https://$subDomain.boolti.in/$it" }
+
+    // ex. "https://dev.place.boolti.in/1234/home"
+    val webViewUrl = baseUrl?.let { if (selectedTab == 0) "$it/home" else "$it/rental" }
     val shareUrl = baseUrl
 
     companion object {
         fun getDefault(id: String) = PlaceUiState(
-            place = PlaceDetail(id, "", null, null, null, null, emptyList(), null),
+            place = PlaceDetail(id, "", null, null, null, null, emptyList(), null, shareCode = null),
             selectedTab = 0,
             isLoading = true,
         )

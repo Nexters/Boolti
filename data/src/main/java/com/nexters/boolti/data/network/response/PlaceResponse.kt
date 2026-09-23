@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 internal data class PlaceResponse(
     val id: String,
     val name: String,
-    val representativeImageUrl: String,
+    val representativeImageUrl: String?,
     val streetAddress: String,
     val detailAddress: String,
 ) {

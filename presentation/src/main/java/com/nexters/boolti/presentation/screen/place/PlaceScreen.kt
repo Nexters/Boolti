@@ -43,9 +43,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.isInvisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -74,6 +73,8 @@ import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
+import com.nexters.boolti.presentation.component.InquiryBottomSheet
+import com.nexters.boolti.presentation.component.InquiryBottomSheetType
 import com.nexters.boolti.presentation.extension.displayName
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
@@ -86,8 +87,7 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
 
 @Composable
 fun PlaceScreen(
@@ -117,9 +117,17 @@ fun PlaceScreen(
             })
     }
 
+    val bridgeManager = rememberBridgeManager(onBack = onBack)
+
+    LaunchedEffect(webView) {
+        webView.setBridgeManager(bridgeManager)
+    }
+
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
-        webView.loadUrl(webViewUrl)
+        if (webViewUrl != null) {
+            webView.loadUrl(webViewUrl)
+        }
     }
 
     val listState = rememberLazyListState()
@@ -194,7 +202,6 @@ fun PlaceScreen(
             },
         )
     }
-
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -297,7 +304,12 @@ private fun PlaceContent(
 
         item {
             var isLoading by remember { mutableStateOf(contentWebView.progress.value < 100) }
-            val scope = rememberCoroutineScope()
+
+            LaunchedEffect(contentWebView) {
+                contentWebView.progress.collect {
+                    isLoading = it < 100
+                }
+            }
 
             Box(
                 modifier = Modifier
@@ -316,11 +328,11 @@ private fun PlaceContent(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                             )
                             setOnLongClickListener { true }
-                            progress.onEach {
-                                isLoading = it < 100
-                            }.launchIn(scope)
                             setWebChromeClient()
                         }
+                    },
+                    update = { webView ->
+                        contentWebView.isInvisible = isLoading
                     },
                 )
             }
@@ -383,6 +395,7 @@ private fun PlaceContactSection(
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarController = LocalSnackbarController.current
+    var inquiryBottomSheet: InquiryBottomSheetType? by remember { mutableStateOf(null) }
 
     Row(
         modifier = Modifier
@@ -413,7 +426,7 @@ private fun PlaceContactSection(
             enabled = phoneNumber != null,
             onClick = {
                 if (phoneNumber != null) {
-                    uriHandler.openUri("tel:$phoneNumber")
+                    inquiryBottomSheet = InquiryBottomSheetType.Tel(contact = phoneNumber)
                 } else {
                     snackbarController.showMessage(noPhoneNumberMessage)
                 }
@@ -428,11 +441,20 @@ private fun PlaceContactSection(
             enabled = email != null,
             onClick = {
                 if (email != null) {
-                    uriHandler.openUri("mailto:$email")
+                    inquiryBottomSheet = InquiryBottomSheetType.Mail(address = email)
                 } else {
                     snackbarController.showMessage(noEmailMessage)
                 }
             },
+        )
+    }
+
+    inquiryBottomSheet?.let {
+        InquiryBottomSheet(
+            onDismissRequest = {
+                inquiryBottomSheet = null
+            },
+            type = it
         )
     }
 }
@@ -678,6 +700,7 @@ private fun PlaceInfoSectionPreview() {
                     phoneNumber = "010-1234-5678",
                     email = "boolti@example.com",
                 ),
+                shareCode = ""
             ),
         )
     }

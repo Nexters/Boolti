@@ -579,4 +579,5 @@
 
     <!-- 디버깅 옵션 -->
     <string name="debug_show_log">로그 보기</string>
+    <string name="debug_impression_test">임프레션 테스트</string>
 </resources>

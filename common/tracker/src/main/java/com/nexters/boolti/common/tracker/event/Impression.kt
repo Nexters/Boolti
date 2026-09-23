@@ -3,6 +3,27 @@ package com.nexters.boolti.common.tracker.event
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.impression.ImpressionEvent
+
+/** 노출 상태에서 받은 이벤트를 기존 Impression 로그로 전달함. */
+fun AppTracker.impression(
+    event: ImpressionEvent,
+    screen: Screen,
+    objectRole: Role,
+    objectValue: Any,
+    withLogcat: Boolean = true,
+) {
+    require(event.extras.keys.none { it == "screen" || it == "object_role" || it == "object_value" }) {
+        "Impression extras must not override screen, object_role or object_value"
+    }
+    impression(
+        screen = screen,
+        objectRole = objectRole,
+        objectValue = objectValue,
+        properties = event.extras,
+        withLogcat = withLogcat,
+    )
+}
 
 fun AppTracker.impression(
     screen: Screen,

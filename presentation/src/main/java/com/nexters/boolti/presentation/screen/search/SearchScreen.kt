@@ -149,7 +149,7 @@ private fun SearchScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
-                    .padding(top = 48.dp, bottom = 24.dp),
+                    .padding(top = 24.dp, bottom = 24.dp),
             )
 
             if (recentSearchKeywords.isNotEmpty()) {

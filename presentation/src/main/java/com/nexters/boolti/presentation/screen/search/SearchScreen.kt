@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -51,6 +52,7 @@ import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.Search
 import com.nexters.boolti.domain.model.Show
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtChip
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
@@ -94,9 +96,6 @@ fun SearchScreen(
         onClickSearchBar = navigateToRecentSearch,
         onSearch = navigateToSearchDetail,
         onClickShow = navigateToShowDetail,
-        onClickPlaceFinder = {
-            // TODO: 공연장 찾기 화면 네비게이션 연결
-        },
         recentSearchKeywords = uiState.searchHistory,
         deleteSearchHistory = { keyword ->
             viewModel.onIntent(SearchIntent.DeleteSearchHistory(keyword))
@@ -124,7 +123,6 @@ private fun SearchScreen(
     onClickSearchBar: () -> Unit,
     onSearch: (String) -> Unit,
     onClickShow: (id: String) -> Unit,
-    onClickPlaceFinder: () -> Unit,
     recentSearchKeywords: List<String>,
     deleteSearchHistory: (String) -> Unit,
     onClickClearButton: () -> Unit,
@@ -134,6 +132,8 @@ private fun SearchScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val uriHandler = LocalUriHandler.current
+    val placeFinderUrl = "https://${BuildConfig.DOMAIN}/place"
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -145,7 +145,7 @@ private fun SearchScreen(
                 .padding(top = 72.dp),
         ) {
             PlaceFinderBanner(
-                onClick = onClickPlaceFinder,
+                onClick = { uriHandler.openUri(placeFinderUrl) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
@@ -538,7 +538,6 @@ private fun SearchScreenPreview() {
             onClickSearchBar = {},
             onSearch = {},
             onClickShow = {},
-            onClickPlaceFinder = {},
             recentSearchKeywords = listOf("최근검색어1", "최근검색어2"),
             deleteSearchHistory = {},
             onClickClearButton = {},
@@ -561,7 +560,6 @@ private fun SearchScreenEmptyPreview() {
             onClickSearchBar = {},
             onSearch = {},
             onClickShow = {},
-            onClickPlaceFinder = {},
             recentSearchKeywords = emptyList(),
             deleteSearchHistory = {},
             onClickClearButton = {},

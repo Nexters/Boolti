@@ -45,7 +45,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -504,7 +503,7 @@ private fun PlaceStationsRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
@@ -669,6 +668,19 @@ private fun PlaceInfoSectionPreview() {
                                 name = "수인분당선",
                                 colorHex = "#FCD205",
                                 textColorHex = "#000000",
+                            ),
+                        )
+                    ),
+                    SubwayStation(
+                        id = "1",
+                        name = "왕십리",
+                        lines = listOf(
+                            SubwayLine(
+                                id = "1",
+                                key = "SEOUL_LINE_2",
+                                name = "수도권 2호선",
+                                colorHex = "#0CA34A",
+                                textColorHex = "#FFFFFF",
                             ),
                         )
                     )

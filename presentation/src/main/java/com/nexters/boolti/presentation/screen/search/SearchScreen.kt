@@ -325,7 +325,6 @@ private fun StickySearchBarWithGradient(
         ) {
             SearchBar(
                 modifier = Modifier.padding(
-                    vertical = 12.dp,
                     horizontal = marginHorizontal
                 ),
                 onClick = onClick,

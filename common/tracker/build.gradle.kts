@@ -29,12 +29,6 @@ android {
             buildConfigField("String", "MIXPANEL_TOKEN", getLocalProperty("DEV_MIXPANEL_TOKEN"))
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
             buildConfigField("String", "MIXPANEL_TOKEN", getLocalProperty("PROD_MIXPANEL_TOKEN"))
         }
     }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.domain.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 data class Sns(
@@ -9,7 +10,9 @@ data class Sns(
 ) {
     @Serializable
     enum class SnsType {
-        INSTAGRAM, YOUTUBE;
+        @SerialName("INSTAGRAM") INSTAGRAM,
+        @SerialName("YOUTUBE") YOUTUBE,
+        ;
 
         companion object {
             fun fromString(type: String?): SnsType? = when (type?.trim()?.uppercase()) {

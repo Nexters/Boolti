@@ -25,18 +25,9 @@ val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
 localProperties.load(FileInputStream(localPropertiesFile))
 
-fun resolveGitHash(repositoryDir: File): String {
-    val gitDir = repositoryDir.resolve(".git")
-    val head = gitDir.resolve("HEAD").readText().trim()
-    val commitHash = if (head.startsWith("ref:")) {
-        gitDir.resolve(head.removePrefix("ref:").trim()).readText().trim()
-    } else {
-        head
-    }
-    return commitHash.take(7)
-}
-
-val gitHash = resolveGitHash(rootProject.projectDir)
+val gitHash = providers.exec {
+    commandLine("git", "rev-parse", "--short=7", "HEAD")
+}.standardOutput.asText.get().trim()
 
 android {
     namespace = libs.versions.packageName.get()

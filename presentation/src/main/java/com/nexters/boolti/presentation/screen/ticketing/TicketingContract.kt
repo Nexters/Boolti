@@ -10,7 +10,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import java.time.LocalDateTime
 
-data class TicketingState(
+data class TicketingUiState(
+    val showId: String = "",
+    val salesTicketTypeId: String = "",
     val loading: Boolean = false,
     val poster: String = "",
     val showDate: LocalDateTime = LocalDateTime.now(),
@@ -33,6 +35,8 @@ data class TicketingState(
     ),
     val preQuestions: ImmutableList<PreQuestion> = persistentListOf(),
     val preQuestionAnswers: ImmutableMap<Long, String> = persistentMapOf(),
+    val dialog: TicketingDialog? = null,
+    val policyPageUrl: String? = null,
 ) {
     val orderAgreed: Boolean
         get() = orderAgreement.none { !it.second }
@@ -72,9 +76,42 @@ data class TicketingState(
         return answer.unicodeLength() > MAX_ANSWER_LENGTH
     }
 
-    fun toggleAgreement(): TicketingState = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
+    val depositor: String
+        get() = if (isSameContactInfo) reservationName else depositorName
+
+    val depositorPhoneNumber: String
+        get() = if (isSameContactInfo) reservationContact else depositorContact
+
+    fun toggleAgreement(): TicketingUiState = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
 
     companion object {
         const val MAX_ANSWER_LENGTH = 100
     }
+}
+
+enum class TicketingDialog { Confirm, PaymentFailure, SoldOut }
+
+sealed interface TicketingAction {
+    data class ChangeReservationName(val name: String) : TicketingAction
+    data class ChangeReservationContact(val contact: String) : TicketingAction
+    data class ChangeDepositorName(val name: String) : TicketingAction
+    data class ChangeDepositorContact(val contact: String) : TicketingAction
+    data object ToggleSameContactInfo : TicketingAction
+    data class ChangeInviteCode(val code: String) : TicketingAction
+    data object CheckInviteCode : TicketingAction
+    data class ChangePreQuestionAnswer(val questionId: Long, val answer: String) : TicketingAction
+    data object ToggleAgreement : TicketingAction
+    data class ShowPolicy(val url: String) : TicketingAction
+    data object DismissPolicy : TicketingAction
+    data object ClickPayment : TicketingAction
+    data object ConfirmReservation : TicketingAction
+    data object DismissDialog : TicketingAction
+    data class PaymentSucceeded(val reservationId: String) : TicketingAction
+    data object PaymentSoldOut : TicketingAction
+    data object PaymentFailed : TicketingAction
+}
+
+sealed interface TicketingEvent {
+    data class NavigateToPaymentComplete(val reservationId: String, val showId: String) : TicketingEvent
+    data class LaunchPayment(val userId: String, val orderId: String) : TicketingEvent
 }

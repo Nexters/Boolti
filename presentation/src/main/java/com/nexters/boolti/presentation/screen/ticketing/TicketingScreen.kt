@@ -45,7 +45,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +65,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
-import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Payment
 import com.nexters.boolti.common.tracker.field.Screen
@@ -100,18 +98,17 @@ import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_FAIL
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SOLD_OUT
 import com.nexters.boolti.tosspayments.TossPaymentWidgetActivity.Companion.RESULT_SUCCESS
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun TicketingScreen(
-    modifier: Modifier = Modifier,
-    viewModel: TicketingViewModel = hiltViewModel(),
-    onBackClicked: () -> Unit = {},
+    onBackClicked: () -> Unit,
     onReserved: (reservationId: String, showId: String) -> Unit,
     navigateToBusiness: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TicketingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.showName) {
         if (uiState.showName.isNotEmpty()) {
@@ -119,7 +116,7 @@ fun TicketingScreen(
                 screen = Screen.Payment,
                 properties = mapOf(
                     "booking_type" to "Direct",
-                    "show_id" to viewModel.showId,
+                    "show_id" to uiState.showId,
                     "ticket_type" to if (uiState.isInviteTicket) "Invite" else "Normal",
                     "ticket_quantity" to uiState.ticketCount,
                     "total_amount" to uiState.totalPrice,
@@ -128,142 +125,72 @@ fun TicketingScreen(
         }
     }
 
+    val paymentLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                RESULT_SUCCESS -> {
+                    val reservationId = result.data?.getStringExtra("reservationId")
+                        ?: return@rememberLauncherForActivityResult
+                    viewModel.onAction(TicketingAction.PaymentSucceeded(reservationId))
+                }
+
+                RESULT_SOLD_OUT -> viewModel.onAction(TicketingAction.PaymentSoldOut)
+                RESULT_FAIL -> viewModel.onAction(TicketingAction.PaymentFailed)
+            }
+        }
+
+    LaunchedEffect(viewModel.event) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is TicketingEvent.NavigateToPaymentComplete -> onReserved(event.reservationId, event.showId)
+                is TicketingEvent.LaunchPayment -> {
+                    val state = viewModel.uiState.value
+                    paymentLauncher.launch(
+                        TossPaymentWidgetActivity.getIntent(
+                            context = context,
+                            amount = state.totalPrice,
+                            clientKey = BuildConfig.TOSS_CLIENT_KEY,
+                            customerKey = "user-${event.userId}",
+                            orderId = event.orderId,
+                            orderName = "${state.showId}/${state.ticketName}/${state.ticketCount}/Android",
+                            currency = Currency.KRW.name,
+                            countryCode = "KR",
+                            showId = state.showId,
+                            salesTicketTypeId = state.salesTicketTypeId,
+                            ticketCount = state.ticketCount,
+                            reservationName = state.reservationName,
+                            reservationPhoneNumber = state.reservationContact,
+                            depositorName = state.depositor,
+                            depositorPhoneNumber = state.depositorPhoneNumber,
+                            variantKey = null, // 멀티 결제 UI 사용 시 필요
+                            redirectUrl = null, // 브랜드 페이 사용 시 필요
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     TicketingScreen(
-        showId = viewModel.showId,
-        salesTicketTypeId = viewModel.salesTicketTypeId,
         uiState = uiState,
-        event = viewModel.event,
+        onAction = viewModel::onAction,
         onBackClicked = onBackClicked,
-        onReserved = onReserved,
         navigateToBusiness = navigateToBusiness,
-        onChangeReservationName = viewModel::setReservationName,
-        onChangeReservationPhoneNumber = viewModel::setReservationPhoneNumber,
-        onChangeDepositorName = viewModel::setDepositorName,
-        onChangeDepositorPhoneNumber = viewModel::setDepositorPhoneNumber,
-        onToggleIsSameContactInfo = viewModel::toggleIsSameContactInfo,
-        onClickCheckInviteCode = viewModel::checkInviteCode,
-        onInviteCodeChanged = viewModel::setInviteCode,
-        onToggleAgreement = viewModel::toggleAgreement,
-        onClickReservation = viewModel::reservation,
-        onChangePreQuestionAnswer = viewModel::setPreQuestionAnswer,
-        onSubmitPreQuestionAnswers = viewModel::submitPreQuestionAnswersForReservation,
         modifier = modifier,
     )
 }
 
 @Composable
 private fun TicketingScreen(
-    showId: String,
-    salesTicketTypeId: String,
-    uiState: TicketingState,
-    event: Flow<TicketingEvent>,
-    onBackClicked: () -> Unit = {},
-    onReserved: (reservationId: String, showId: String) -> Unit,
+    uiState: TicketingUiState,
+    onAction: (TicketingAction) -> Unit,
+    onBackClicked: () -> Unit,
     navigateToBusiness: () -> Unit,
-    onChangeReservationName: (String) -> Unit,
-    onChangeReservationPhoneNumber: (String) -> Unit,
-    onChangeDepositorName: (String) -> Unit,
-    onChangeDepositorPhoneNumber: (String) -> Unit,
-    onToggleIsSameContactInfo: () -> Unit,
-    onClickCheckInviteCode: () -> Unit,
-    onInviteCodeChanged: (String) -> Unit,
-    onToggleAgreement: () -> Unit,
-    onClickReservation: () -> Unit,
-    onChangePreQuestionAnswer: (Long, String) -> Unit,
-    onSubmitPreQuestionAnswers: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showConfirmDialog by remember { mutableStateOf(false) }
-    var showPaymentFailureDialog by remember { mutableStateOf(false) }
-    var showTicketSoldOutDialog by remember { mutableStateOf(false) }
-    var policyPageUrl: String? by remember { mutableStateOf(null) }
-    val context = LocalContext.current
     var bottomButtonHeight by remember { mutableStateOf(0.dp) }
-
-    val uiState by rememberUpdatedState(uiState)
-
-    val paymentLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            when (result.resultCode) {
-                RESULT_SUCCESS -> {
-                    val intent = result.data ?: return@rememberLauncherForActivityResult
-                    val reservationId =
-                        intent.getStringExtra("reservationId")
-                            ?: return@rememberLauncherForActivityResult
-
-                    AppTracker.complete(
-                        target = "Purchase",
-                        properties = mapOf(
-                            "booking_type" to "Direct",
-                            "show_id" to showId,
-                            "show_name" to uiState.showName,
-                            "ticket_quantity" to uiState.ticketCount,
-                            "total_amount" to uiState.totalPrice,
-                        ),
-                    )
-
-                    onSubmitPreQuestionAnswers(reservationId)
-                    onReserved(reservationId, showId)
-                }
-
-                RESULT_SOLD_OUT -> showTicketSoldOutDialog = true
-                RESULT_FAIL -> showPaymentFailureDialog = true
-            }
-        }
-
-    LaunchedEffect(event) {
-        event.collect {
-            when (it) {
-                is TicketingEvent.TicketingSuccess -> {
-                    AppTracker.complete(
-                        target = "Purchase",
-                        properties = mapOf(
-                            "booking_type" to "Direct",
-                            "show_id" to showId,
-                            "show_name" to uiState.showName,
-                            "ticket_quantity" to uiState.ticketCount,
-                            "total_amount" to uiState.totalPrice,
-                        ),
-                    )
-
-                    showConfirmDialog = false
-                    onReserved(it.reservationId, it.showId)
-                }
-
-                is TicketingEvent.ProgressPayment -> {
-                    paymentLauncher.launch(
-                        TossPaymentWidgetActivity.getIntent(
-                            context = context,
-                            amount = uiState.totalPrice,
-                            clientKey = BuildConfig.TOSS_CLIENT_KEY,
-                            customerKey = "user-${it.userId}",
-                            orderId = it.orderId,
-                            orderName = "${showId}/${uiState.ticketName}/${uiState.ticketCount}/Android",
-                            currency = Currency.KRW.name,
-                            countryCode = "KR",
-                            showId = showId,
-                            salesTicketTypeId = salesTicketTypeId,
-                            ticketCount = uiState.ticketCount,
-                            reservationName = uiState.reservationName,
-                            reservationPhoneNumber = uiState.reservationContact,
-                            depositorName = if (uiState.isSameContactInfo) uiState.reservationName else uiState.depositorName,
-                            depositorPhoneNumber = if (uiState.isSameContactInfo) uiState.reservationContact else uiState.depositorContact,
-                            variantKey = null, // 멀티 결제 UI 사용 시 필요
-                            redirectUrl = null, // 브랜드 페이 사용 시 필요
-                        )
-                    )
-                    showConfirmDialog = false
-                }
-
-                is TicketingEvent.NoRemainingQuantity -> {
-                    showConfirmDialog = false
-                    showTicketSoldOutDialog = true
-                }
-            }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -308,8 +235,8 @@ private fun TicketingScreen(
                     name = uiState.reservationName,
                     phoneNumber = uiState.reservationContact,
                     isSameContactInfo = uiState.isSameContactInfo,
-                    onNameChanged = onChangeReservationName,
-                    onPhoneNumberChanged = onChangeReservationPhoneNumber,
+                    onNameChanged = { onAction(TicketingAction.ChangeReservationName(it)) },
+                    onPhoneNumberChanged = { onAction(TicketingAction.ChangeReservationContact(it)) },
                 )
 
                 // 입금자 정보
@@ -318,9 +245,9 @@ private fun TicketingScreen(
                         name = uiState.depositorName,
                         phoneNumber = uiState.depositorContact,
                         isSameContactInfo = uiState.isSameContactInfo,
-                        onClickSameContact = onToggleIsSameContactInfo,
-                        onNameChanged = onChangeDepositorName,
-                        onPhoneNumberChanged = onChangeDepositorPhoneNumber,
+                        onClickSameContact = { onAction(TicketingAction.ToggleSameContactInfo) },
+                        onNameChanged = { onAction(TicketingAction.ChangeDepositorName(it)) },
+                        onPhoneNumberChanged = { onAction(TicketingAction.ChangeDepositorContact(it)) },
                     )
                 }
 
@@ -329,8 +256,8 @@ private fun TicketingScreen(
                     InviteCodeSection(
                         uiState.inviteCode,
                         uiState.inviteCodeStatus,
-                        onClickCheckInviteCode = onClickCheckInviteCode,
-                        onInviteCodeChanged = onInviteCodeChanged,
+                        onClickCheckInviteCode = { onAction(TicketingAction.CheckInviteCode) },
+                        onInviteCodeChanged = { onAction(TicketingAction.ChangeInviteCode(it)) },
                     )
                 }
 
@@ -338,7 +265,7 @@ private fun TicketingScreen(
                 PreQuestionsSection(
                     preQuestions = uiState.preQuestions,
                     answers = uiState.preQuestionAnswers,
-                    onAnswerChanged = onChangePreQuestionAnswer,
+                    onAnswerChanged = { id, answer -> onAction(TicketingAction.ChangePreQuestionAnswer(id, answer)) },
                     getAnswerError = uiState::getAnswerError,
                 )
 
@@ -348,11 +275,11 @@ private fun TicketingScreen(
                 OrderAgreementSection(
                     totalAgreed = uiState.orderAgreed,
                     agreement = uiState.orderAgreement,
-                    onClickTotalAgree = onToggleAgreement,
+                    onClickTotalAgree = { onAction(TicketingAction.ToggleAgreement) },
                     onClickShow = {
                         when (it) {
-                            0 -> policyPageUrl = "https://boolti.in/site-policy/privacy"
-                            1 -> policyPageUrl = "https://boolti.in/site-policy/consent"
+                            0 -> onAction(TicketingAction.ShowPolicy("https://boolti.in/site-policy/privacy"))
+                            1 -> onAction(TicketingAction.ShowPolicy("https://boolti.in/site-policy/consent"))
                         }
                     },
                 )
@@ -388,41 +315,33 @@ private fun TicketingScreen(
                         R.string.ticketing_payment_button_label,
                         uiState.totalPrice
                     ),
-                    onClick = {
-                        showConfirmDialog = true
-                    },
+                    onClick = { onAction(TicketingAction.ClickPayment) },
                 )
             }
         }
-        if (showConfirmDialog) {
-            TicketingConfirmDialog(
+        when (uiState.dialog) {
+            TicketingDialog.Confirm -> TicketingConfirmDialog(
                 isInviteTicket = uiState.isInviteTicket,
                 reservationName = uiState.reservationName,
                 reservationContact = uiState.reservationContact,
-                depositor = if (uiState.isSameContactInfo) uiState.reservationName else uiState.depositorName,
-                depositorContact = if (uiState.isSameContactInfo) uiState.reservationContact else uiState.depositorContact,
+                depositor = uiState.depositor,
+                depositorContact = uiState.depositorPhoneNumber,
                 ticketName = uiState.ticketName,
                 ticketCount = uiState.ticketCount,
                 totalPrice = uiState.totalPrice,
-                onClick = onClickReservation,
-                onDismiss = { showConfirmDialog = false },
+                onClick = { onAction(TicketingAction.ConfirmReservation) },
+                onDismiss = { onAction(TicketingAction.DismissDialog) },
             )
+
+            TicketingDialog.PaymentFailure -> PaymentFailureDialog { onAction(TicketingAction.DismissDialog) }
+            TicketingDialog.SoldOut -> PaymentFailureDialog(onClickButton = onBackClicked)
+            null -> Unit
         }
-        if (showPaymentFailureDialog) {
-            PaymentFailureDialog {
-                showPaymentFailureDialog = false
-            }
-        }
-        if (showTicketSoldOutDialog) {
-            PaymentFailureDialog {
-                showTicketSoldOutDialog = false
-                onBackClicked()
-            }
-        }
-        policyPageUrl?.let { url ->
-            PolicyBottomSheet(onDismissRequest = {
-                policyPageUrl = null
-            }, url = url)
+        uiState.policyPageUrl?.let { url ->
+            PolicyBottomSheet(
+                onDismissRequest = { onAction(TicketingAction.DismissPolicy) },
+                url = url,
+            )
         }
     }
 }
@@ -881,7 +800,7 @@ private fun SectionTicketInfo(label: String, value: String, marginTop: Dp = 16.d
 @Preview
 @Composable
 private fun TicketingDetailScreenPreview() {
-    val uiState = TicketingState(
+    val uiState = TicketingUiState(
         showName = "2024 TOGETHER LUCKY CLUB",
         ticketName = "일반 티켓 B",
         ticketCount = 2,
@@ -890,23 +809,10 @@ private fun TicketingDetailScreenPreview() {
     BooltiTheme {
         Surface {
             TicketingScreen(
-                showId = "",
-                salesTicketTypeId = "",
                 uiState = uiState,
-                event = emptyFlow(),
-                onReserved = { _, _ -> },
+                onAction = {},
+                onBackClicked = {},
                 navigateToBusiness = {},
-                onChangeReservationName = {},
-                onChangeReservationPhoneNumber = {},
-                onChangeDepositorName = {},
-                onChangeDepositorPhoneNumber = {},
-                onToggleIsSameContactInfo = {},
-                onToggleAgreement = {},
-                onClickCheckInviteCode = {},
-                onInviteCodeChanged = {},
-                onClickReservation = {},
-                onChangePreQuestionAnswer = { _, _ -> },
-                onSubmitPreQuestionAnswers = {},
             )
         }
     }

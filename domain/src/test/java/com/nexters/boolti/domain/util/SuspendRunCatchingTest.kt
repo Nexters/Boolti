@@ -4,6 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
@@ -44,6 +46,16 @@ class SuspendRunCatchingTest : BehaviorSpec() {
                 }
 
                 result shouldBe null
+            }
+        }
+
+        given("다른 코루틴의 취소 예외가 전달되면") {
+            then("현재 코루틴은 살아 있으므로 Result.failure 로 반환한다") {
+                val cancelled = CompletableDeferred<Unit>().apply { cancel() }
+
+                val result = suspendRunCatching { cancelled.await() }
+
+                result.exceptionOrNull().shouldBeInstanceOf<CancellationException>()
             }
         }
 

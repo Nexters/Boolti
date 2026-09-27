@@ -9,4 +9,5 @@ data class PlaceDetail(
     val streetAddress: String?,
     val subwayStations: List<SubwayStation>,
     val contact: PlaceContact?,
+    val shareCode: String?,
 )

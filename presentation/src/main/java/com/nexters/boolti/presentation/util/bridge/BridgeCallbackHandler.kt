@@ -1,6 +1,7 @@
 package com.nexters.boolti.presentation.util.bridge
 
 import androidx.compose.material3.SnackbarDuration
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -20,5 +21,6 @@ enum class NavigateOption {
 
 @Serializable
 data class TokenDto(
+    @SerialName("token")
     val token: String,
 )

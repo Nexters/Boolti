@@ -18,13 +18,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,7 +57,7 @@ class GiftPreQuestionViewModel @Inject constructor(
                 giftRepository.getGift(giftUuid).first()
             }
             val preQuestions = async {
-                ticketingRepository.getPreQuestions(showId).first()
+                ticketingRepository.getPreQuestions(showId).getOrThrow()
             }
 
             _uiState.update {
@@ -105,18 +103,17 @@ class GiftPreQuestionViewModel @Inject constructor(
             )
 
             ticketingRepository.submitPreQuestionAnswers(request)
-                .retry(2)
-                .catch { throwable ->
-                    FirebaseCrashlytics.getInstance().recordException(throwable)
-                    _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
-                }
-                .collect {
+                .onSuccess {
                     _events.send(GiftPreQuestionEvent.GiftRegistered)
 
                     AppTracker.complete(
                         target = "GiftRegistration",
                         properties = mapOf("gift_id" to giftUuid, "show_id" to showId),
                     )
+                }
+                .onFailure { throwable ->
+                    Timber.e(throwable)
+                    _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
                 }
         }
     }

@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
+import androidx.annotation.StringRes
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.presentation.R
@@ -10,79 +11,85 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import java.time.LocalDateTime
 
-data class TicketingUiState(
-    val showId: String = "",
-    val salesTicketTypeId: String = "",
-    val loading: Boolean = false,
-    val poster: String = "",
-    val showDate: LocalDateTime = LocalDateTime.now(),
-    val showName: String = "",
-    val ticketName: String = "",
-    val ticketCount: Int = 1,
-    val totalPrice: Int = 0,
-    val isSameContactInfo: Boolean = false,
-    val isInviteTicket: Boolean = false,
-    val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
-    val reservationName: String = "",
-    val reservationContact: String = "",
-    val depositorName: String = "",
-    val depositorContact: String = "",
-    val inviteCode: String = "",
-    val refundPolicy: List<String> = emptyList(),
-    val orderAgreement: List<Pair<Int, Boolean>> = listOf(
-        Pair(R.string.order_agreement_privacy_collection, false),
-        Pair(R.string.order_agreement_privacy_offer, false),
-    ),
-    val preQuestions: ImmutableList<PreQuestion> = persistentListOf(),
-    val preQuestionAnswers: ImmutableMap<Long, String> = persistentMapOf(),
-    val dialog: TicketingDialog? = null,
-    val policyPageUrl: String? = null,
-) {
-    val orderAgreed: Boolean
-        get() = orderAgreement.none { !it.second }
+sealed interface TicketingUiState {
+    data object Loading : TicketingUiState
 
-    private val isBasicInfoValid: Boolean
-        get() = orderAgreed &&
-                reservationName.isNotBlank() &&
-                reservationContact.isNotBlank()
+    data object LoadFailed : TicketingUiState
 
-    private val isRequiredQuestionsAnswered: Boolean
-        get() = preQuestions
-            .filter { it.isRequired }
-            .all { question ->
-                val answer = preQuestionAnswers[question.id]
-                !answer.isNullOrBlank() && answer.unicodeLength() <= MAX_ANSWER_LENGTH
+    data class Success(
+        val showId: String = "",
+        val salesTicketTypeId: String = "",
+        val loading: Boolean = false,
+        val poster: String = "",
+        val showDate: LocalDateTime = LocalDateTime.now(),
+        val showName: String = "",
+        val ticketName: String = "",
+        val ticketCount: Int = 1,
+        val totalPrice: Int = 0,
+        val isSameContactInfo: Boolean = false,
+        val isInviteTicket: Boolean = false,
+        val inviteCodeStatus: InviteCodeStatus = InviteCodeStatus.Default,
+        val reservationName: String = "",
+        val reservationContact: String = "",
+        val depositorName: String = "",
+        val depositorContact: String = "",
+        val inviteCode: String = "",
+        val refundPolicy: List<String> = emptyList(),
+        val orderAgreement: List<Pair<Int, Boolean>> = listOf(
+            Pair(R.string.order_agreement_privacy_collection, false),
+            Pair(R.string.order_agreement_privacy_offer, false),
+        ),
+        val preQuestions: ImmutableList<PreQuestion> = persistentListOf(),
+        val preQuestionAnswers: ImmutableMap<Long, String> = persistentMapOf(),
+        val dialog: TicketingDialog? = null,
+        val policyPageUrl: String? = null,
+    ) : TicketingUiState {
+        val orderAgreed: Boolean
+            get() = orderAgreement.none { !it.second }
+
+        private val isBasicInfoValid: Boolean
+            get() = orderAgreed &&
+                    reservationName.isNotBlank() &&
+                    reservationContact.isNotBlank()
+
+        private val isRequiredQuestionsAnswered: Boolean
+            get() = preQuestions
+                .filter { it.isRequired }
+                .all { question ->
+                    val answer = preQuestionAnswers[question.id]
+                    !answer.isNullOrBlank() && answer.unicodeLength() <= MAX_ANSWER_LENGTH
+                }
+
+        private val hasInvalidAnswers: Boolean
+            get() = preQuestionAnswers.values.any { it.unicodeLength() > MAX_ANSWER_LENGTH }
+
+        private val isPreQuestionsValid: Boolean
+            get() = isRequiredQuestionsAnswered && !hasInvalidAnswers
+
+        private val isPaymentInfoValid: Boolean
+            get() = when {
+                isInviteTicket -> inviteCodeStatus is InviteCodeStatus.Valid
+                totalPrice == 0 -> true
+                else -> isSameContactInfo ||
+                        (depositorName.isNotBlank() && depositorContact.isNotBlank())
             }
 
-    private val hasInvalidAnswers: Boolean
-        get() = preQuestionAnswers.values.any { it.unicodeLength() > MAX_ANSWER_LENGTH }
+        val reservationButtonEnabled: Boolean
+            get() = isBasicInfoValid && isPreQuestionsValid && isPaymentInfoValid
 
-    private val isPreQuestionsValid: Boolean
-        get() = isRequiredQuestionsAnswered && !hasInvalidAnswers
-
-    private val isPaymentInfoValid: Boolean
-        get() = when {
-            isInviteTicket -> inviteCodeStatus is InviteCodeStatus.Valid
-            totalPrice == 0 -> true
-            else -> isSameContactInfo ||
-                    (depositorName.isNotBlank() && depositorContact.isNotBlank())
+        fun getAnswerError(questionId: Long): Boolean {
+            val answer = preQuestionAnswers[questionId] ?: return false
+            return answer.unicodeLength() > MAX_ANSWER_LENGTH
         }
 
-    val reservationButtonEnabled: Boolean
-        get() = isBasicInfoValid && isPreQuestionsValid && isPaymentInfoValid
+        val depositor: String
+            get() = if (isSameContactInfo) reservationName else depositorName
 
-    fun getAnswerError(questionId: Long): Boolean {
-        val answer = preQuestionAnswers[questionId] ?: return false
-        return answer.unicodeLength() > MAX_ANSWER_LENGTH
+        val depositorPhoneNumber: String
+            get() = if (isSameContactInfo) reservationContact else depositorContact
+
+        fun toggleAgreement(): Success = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
     }
-
-    val depositor: String
-        get() = if (isSameContactInfo) reservationName else depositorName
-
-    val depositorPhoneNumber: String
-        get() = if (isSameContactInfo) reservationContact else depositorContact
-
-    fun toggleAgreement(): TicketingUiState = copy(orderAgreement = orderAgreement.map { it.copy(second = !orderAgreed) })
 
     companion object {
         const val MAX_ANSWER_LENGTH = 100
@@ -92,6 +99,7 @@ data class TicketingUiState(
 enum class TicketingDialog { Confirm, PaymentFailure, SoldOut }
 
 sealed interface TicketingAction {
+    data object RetryLoad : TicketingAction
     data class ChangeReservationName(val name: String) : TicketingAction
     data class ChangeReservationContact(val contact: String) : TicketingAction
     data class ChangeDepositorName(val name: String) : TicketingAction
@@ -113,5 +121,10 @@ sealed interface TicketingAction {
 
 sealed interface TicketingEvent {
     data class NavigateToPaymentComplete(val reservationId: String, val showId: String) : TicketingEvent
-    data class LaunchPayment(val userId: String, val orderId: String) : TicketingEvent
+    data class LaunchPayment(
+        val userId: String,
+        val orderId: String,
+        val ticketing: TicketingUiState.Success,
+    ) : TicketingEvent
+    data class ShowErrorMessage(@StringRes val messageRes: Int) : TicketingEvent
 }

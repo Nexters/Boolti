@@ -113,6 +113,8 @@ dependencies {
     androidTestImplementation(libs.kotest.runner.junit5.jvm)
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     debugImplementation(libs.androidx.compose.ui.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.ui.test.manifest)
 }

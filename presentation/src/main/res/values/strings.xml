@@ -185,6 +185,8 @@
     <string name="ticketing_invite_code_placeholder">초청 코드를 입력해주세요</string>
     <string name="ticketing_invite_code_use_button">사용하기</string>
     <string name="ticketing_invite_code_success">사용되었어요</string>
+    <string name="ticketing_load_error">예매 정보를 불러오지 못했어요</string>
+    <string name="retry">다시 시도</string>
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
     <string name="ticketing_invite_code_invalid">올바른 초청 코드를 입력해 주세요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>

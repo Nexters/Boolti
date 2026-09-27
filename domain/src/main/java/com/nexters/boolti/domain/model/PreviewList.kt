@@ -1,12 +1,17 @@
 package com.nexters.boolti.domain.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PreviewList<T : Any>(
+    @SerialName("totalSize")
     val totalSize: Int,
+    @SerialName("hasMoreItems")
     val hasMoreItems: Boolean,
+    @SerialName("previewItems")
     val previewItems: List<T>,
+    @SerialName("isVisible")
     val isVisible: Boolean? = null,
 )
 

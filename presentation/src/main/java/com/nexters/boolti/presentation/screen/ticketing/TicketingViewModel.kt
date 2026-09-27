@@ -12,8 +12,8 @@ import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
-import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -40,13 +40,13 @@ import javax.inject.Inject
 class TicketingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
-    getUserUsecase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
     val showId: String = requireNotNull(savedStateHandle["showId"])
     val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
-    private val userId = checkNotNull(getUserUsecase()?.id) {
+    private val userId = checkNotNull(getCachedUserUseCase()?.id) {
         "[TicketingViewModel] 사용자 정보가 없습니다."
     }
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.YouTubeVideo
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetYouTubeVideoInfoByUrlUseCase
 import com.nexters.boolti.domain.usecase.GetYouTubeVideoListByUserCodeUseCase
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
@@ -23,14 +23,14 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getUserUseCase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val getYouTubeVideoListByUserCodeUseCase: GetYouTubeVideoListByUserCodeUseCase,
     private val getYouTubeVideoInfoByUrlUseCase: GetYouTubeVideoInfoByUrlUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<VideoListRoute.VideoListRoot>()
     private val userCode = route.userCode
-    private val isMine = getUserUseCase()?.userCode == userCode
+    private val isMine = getCachedUserUseCase()?.userCode == userCode
     private val isEditModeAtFirst = route.isEditMode && isMine
     private var autoNavigatedToEdit = isEditModeAtFirst
 

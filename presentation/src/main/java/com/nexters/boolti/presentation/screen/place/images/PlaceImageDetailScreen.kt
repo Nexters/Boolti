@@ -41,12 +41,13 @@ fun PlaceImageDetailScreen(
     viewModel: PlaceImageDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val initialIndex by viewModel.initialIndex.collectAsStateWithLifecycle()
 
     PlaceImageDetailScreen(
         modifier = modifier,
         images = uiState.images,
         isLoading = uiState.isLoading,
-        initialIndex = viewModel.initialIndex,
+        initialIndex = initialIndex,
         onBack = onBack,
     )
 }

@@ -17,11 +17,11 @@ fun NavGraphBuilder.placeImagesScreen(
         PlaceImagesScreen(
             modifier = modifier,
             onBack = navController::popBackStack,
-            onClickImage = { index ->
+            onClickImage = { imageId ->
                 navController.navigate(
                     MainRoute.PlaceImageDetail(
                         placeId = route.placeId,
-                        initialIndex = index,
+                        initialImageId = imageId
                     ),
                 )
             },

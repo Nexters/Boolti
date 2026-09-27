@@ -92,12 +92,11 @@ sealed interface MainRoute {
     @Serializable
     data class PlaceImages(
         val placeId: String,
-        val imageId: String? = null,
     ) : MainRoute
 
     @Serializable
     data class PlaceImageDetail(
         val placeId: String,
-        val initialIndex: Int,
+        val initialImageId: String,
     ) : MainRoute
 }

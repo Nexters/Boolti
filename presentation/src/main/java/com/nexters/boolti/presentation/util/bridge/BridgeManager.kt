@@ -123,11 +123,12 @@ class BridgeManager(
                 val placeId = payload?.get("id")?.jsonPrimitive?.contentOrNull
                 val imageId = payload?.get("imageId")?.jsonPrimitive?.contentOrNull
 
-                if (placeId != null) {
+                if (placeId != null && imageId != null) {
                     Handler(Looper.getMainLooper()).post {
                         Timber.tag("bridge").d("공연장 사진 상세로 이동 $placeId -> $imageId")
+
                         callbackHandler.navigate(
-                            route = MainRoute.PlaceImages(placeId = placeId, imageId = imageId),
+                            route = MainRoute.PlaceImageDetail(placeId = placeId, initialImageId = imageId),
                             navigateOption = NavigateOption.PUSH,
                         )
                     }

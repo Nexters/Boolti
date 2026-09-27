@@ -47,12 +47,6 @@ class PlaceImagesViewModel @Inject constructor(
                         isLoading = false,
                     )
                 }
-
-                val receivedImageId = route.imageId ?: return@onEach
-                val imageIndex = images.indexOfFirst { it.id == receivedImageId }
-                if (imageIndex != -1) {
-                    sendEvent(PlaceImagesEvent.NavigateToDetail(index = imageIndex))
-                }
             }
             .catch { e ->
                 Firebase.crashlytics.recordException(e)

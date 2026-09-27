@@ -40,7 +40,7 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 @Composable
 fun PlaceImagesScreen(
     onBack: () -> Unit,
-    onClickImage: (index: Int) -> Unit,
+    onClickImage: (index: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlaceImagesViewModel = hiltViewModel(),
 ) {
@@ -49,7 +49,7 @@ fun PlaceImagesScreen(
     ObserveAsEvents(viewModel.events) {
         when (it) {
             is PlaceImagesEvent.NavigateToDetail -> {
-                onClickImage(it.index)
+                onClickImage(it.id)
             }
         }
     }
@@ -68,7 +68,7 @@ private fun PlaceImagesScreen(
     images: List<PlaceImage>,
     isLoading: Boolean,
     onBack: () -> Unit,
-    onClickImage: (index: Int) -> Unit,
+    onClickImage: (imageId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -103,7 +103,7 @@ private fun PlaceImagesScreen(
                         PlaceImageThumbnail(
                             image = image,
                             position = index + 1,
-                            onClick = { onClickImage(index) },
+                            onClick = { onClickImage(image.id) },
                         )
                     }
                 }

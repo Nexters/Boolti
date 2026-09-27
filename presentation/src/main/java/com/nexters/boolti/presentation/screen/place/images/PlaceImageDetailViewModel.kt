@@ -25,7 +25,8 @@ class PlaceImageDetailViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<MainRoute.PlaceImageDetail>()
 
-    val initialIndex: Int = route.initialIndex.coerceAtLeast(0)
+    private val _initialIndex = MutableStateFlow(0)
+    val initialIndex = _initialIndex.asStateFlow()
 
     private val _uiState = MutableStateFlow(PlaceImagesUiState())
     val uiState = _uiState.asStateFlow()
@@ -37,6 +38,11 @@ class PlaceImageDetailViewModel @Inject constructor(
     private fun fetchImages() {
         placeRepository.getPlaceImages(route.placeId)
             .onEach { images ->
+                val initialImageIndex = images.indexOfFirst { route.initialImageId == it.id }
+                if (initialImageIndex != -1) {
+                    _initialIndex.update { initialImageIndex }
+                }
+
                 _uiState.update {
                     it.copy(
                         images = images,

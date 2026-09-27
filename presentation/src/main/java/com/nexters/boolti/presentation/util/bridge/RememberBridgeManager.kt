@@ -2,8 +2,10 @@ package com.nexters.boolti.presentation.util.bridge
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.nexters.boolti.presentation.extension.navigateToHome
 import com.nexters.boolti.presentation.screen.LocalNavController
@@ -26,27 +28,31 @@ fun rememberBridgeManager(
     val navController = LocalNavController.current
     val snackbarController = LocalSnackbarController.current
     val scope = rememberCoroutineScope()
-    val close = onBack ?: { navController.popBackStack(); Unit }
+
+    val currentNavController by rememberUpdatedState(navController)
+    val currentSnackbarController by rememberUpdatedState(snackbarController)
+    val currentBridgeViewModel by rememberUpdatedState(bridgeViewModel)
+    val currentClose by rememberUpdatedState(onBack ?: { navController.popBackStack(); Unit })
 
     return remember(scope) {
         BridgeManager(
             callbackHandler = object : BridgeCallbackHandler {
                 override suspend fun fetchToken(): TokenDto =
-                    TokenDto(token = bridgeViewModel.refreshAndGetToken())
+                    TokenDto(token = currentBridgeViewModel.refreshAndGetToken())
 
                 override fun <T : Any> navigate(route: T, navigateOption: NavigateOption) {
                     when (navigateOption) {
-                        NavigateOption.PUSH -> navController.navigate(route)
-                        NavigateOption.HOME -> navController.navigateToHome()
+                        NavigateOption.PUSH -> currentNavController.navigate(route)
+                        NavigateOption.HOME -> currentNavController.navigateToHome()
                         NavigateOption.CLOSE_AND_OPEN -> {
-                            close()
-                            navController.navigate(route)
+                            currentClose()
+                            currentNavController.navigate(route)
                         }
                     }
                 }
 
                 override fun showSnackbar(message: String, duration: SnackbarDuration) {
-                    snackbarController.showMessage(message = message, duration = duration)
+                    currentSnackbarController.showMessage(message = message, duration = duration)
                 }
             },
             scope = scope,

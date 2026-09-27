@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +30,7 @@ import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.theme.BooltiTheme
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 
 /**
  * 공연장 사진 목록 화면.
@@ -44,12 +44,10 @@ fun PlaceImagesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel.events) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is PlaceImagesEvent.NavigateToDetail -> {
-                    onClickImage(event.index)
-                }
+    ObserveAsEvents(viewModel.events) {
+        when (it) {
+            is PlaceImagesEvent.NavigateToDetail -> {
+                onClickImage(it.index)
             }
         }
     }

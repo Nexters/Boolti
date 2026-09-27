@@ -44,7 +44,7 @@ fun ShowInquiry(
             Icon(
                 modifier = Modifier.size(24.dp),
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_telephone),
-                contentDescription = stringResource(id = R.string.show_call_to_ask),
+                contentDescription = stringResource(id = R.string.inquiry_call_to_ask),
                 tint = Grey30
             )
         }
@@ -55,7 +55,7 @@ fun ShowInquiry(
             Icon(
                 modifier = Modifier.size(24.dp),
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_message),
-                contentDescription = stringResource(id = R.string.show_text_to_ask),
+                contentDescription = stringResource(id = R.string.inquiry_text_to_ask),
                 tint = Grey30
             )
         }

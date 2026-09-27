@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -90,7 +92,7 @@ private fun PlaceImagesScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .navigationBarsPadding(),
-                    columns = GridCells.Fixed(COLUMN_COUNT),
+                    columns = AdaptiveWithMaxCount(minSize = 118.dp, maxCount = 6),
                     horizontalArrangement = Arrangement.spacedBy(GRID_SPACING),
                     verticalArrangement = Arrangement.spacedBy(GRID_SPACING),
                 ) {
@@ -129,8 +131,29 @@ private fun PlaceImageThumbnail(
     )
 }
 
-private const val COLUMN_COUNT = 3
 private val GRID_SPACING = 1.dp
+
+/**
+ * [GridCells.Adaptive]와 동일하게 [minSize] 기준으로 열 개수를 정하되, 최대 [maxCount]개로 제한한다.
+ */
+private class AdaptiveWithMaxCount(
+    private val minSize: Dp,
+    private val maxCount: Int,
+) : GridCells {
+    override fun Density.calculateCrossAxisCellSizes(availableSize: Int, spacing: Int): List<Int> {
+        val count = ((availableSize + spacing) / (minSize.roundToPx() + spacing))
+            .coerceIn(1, maxCount)
+        val sizeWithoutSpacing = availableSize - spacing * (count - 1)
+        val cellSize = sizeWithoutSpacing / count
+        val remainder = sizeWithoutSpacing % count
+        return List(count) { cellSize + if (it < remainder) 1 else 0 }
+    }
+
+    override fun equals(other: Any?): Boolean =
+        other is AdaptiveWithMaxCount && minSize == other.minSize && maxCount == other.maxCount
+
+    override fun hashCode(): Int = 31 * minSize.hashCode() + maxCount
+}
 
 @Preview
 @Composable

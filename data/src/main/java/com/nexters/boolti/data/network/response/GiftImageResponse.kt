@@ -6,9 +6,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class GiftImageResponse(
+    @SerialName("id")
     val id: String,
+    @SerialName("path")
     val path: String,
     @SerialName("preview_path") val thumbnailPath: String,
+    @SerialName("sequence")
     val sequence: Int,
 ) {
     fun toDomain(): ImagePair {

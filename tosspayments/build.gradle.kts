@@ -1,6 +1,5 @@
 import java.io.FileInputStream
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -46,12 +45,6 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
     }
 }
 

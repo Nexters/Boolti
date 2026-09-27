@@ -12,7 +12,7 @@ Pre-flight 검증 → 티켓 추출 → 변경 요약 → 제목/바디 생성 �
 
 - **절차를 건너뛰지 않는다.** Pre-flight 검증을 통과하기 전까지 `gh pr create`를 호출하지 않는다.
 - **사용자 작업물을 임의로 수정하지 않는다.** 커밋이 필요하면 사용자에게 먼저 묻는다.
-- **본문은 템플릿을 따른다.** 저장소의 `.github/pull_request_template.md` 구조를 존중한다.
+- **본문은 템플릿을 따른다.** 바디 구조의 기준은 `.github/pull_request_template.md` 하나뿐이다. 매번 파일을 읽어 쓰고, 이 스킬에 섹션 구조를 복제하지 않는다.
 - **제목은 `[Boolti-XXX] 제목` 형식.** 티켓 번호가 있으면 대괄호에 감싸 맨 앞에 붙이고 한 칸 띄운 뒤 요약을 쓴다. (예: `[Boolti-470] 공연장 탭 추가`)
 - **이슈 트래커는 GitHub Issues 하나뿐.** `Boolti-XXX`는 이 저장소 GitHub Issue `#XXX`를 가리키는 내부 표기일 뿐이다. Jira나 다른 트래커 언급 금지.
 
@@ -22,29 +22,31 @@ Pre-flight 검증 → 티켓 추출 → 변경 요약 → 제목/바디 생성 �
 
 ### Step 1. Pre-flight 검증 (blocking)
 
+먼저 `git fetch origin develop`로 비교 기준을 최신화한다. worktree는 `origin/develop`에서 분기하므로 로컬 `develop`이 뒤처져 있으면 남의 커밋까지 이번 PR 변경으로 잡힌다. 그래서 이 스킬의 모든 비교는 `origin/develop` 기준이다.
+
 | 검증 | 명령 | 실패 시 |
 |------|------|---------|
 | 현재 브랜치가 `develop`/`main`이 아님 | `git branch --show-current` | 중단. 사용자에게 feature 브랜치로 이동하라고 안내 |
-| 커밋이 존재 (base와 diff 있음) | `git log develop..HEAD --oneline` | 중단. 커밋할 내용이 있는지 확인 |
+| 커밋이 존재 (base와 diff 있음) | `git log origin/develop..HEAD --oneline` | 중단. 커밋할 내용이 있는지 확인 |
 | 워킹 트리가 clean | `git status --porcelain` | 사용자에게 알리고 커밋/스태시 여부 확인 (임의 커밋 금지) |
 | 동일 브랜치로 열린 PR이 없음 | `gh pr list --head <branch> --state open --json number` | 이미 있으면 URL 안내 후 중단. 업데이트는 `git push`만 하면 된다고 안내 |
-| Quality Gate 통과 | `bash .claude/skills/boolti-feature-planner/scripts/quality-gate.sh --no-test` | 실패 항목 보고 후 중단. 사용자가 fix 요청하면 먼저 해결 |
+| Quality Gate 통과 | `bash .claude/skills/boolti-feature-planner/scripts/quality-gate.sh --no-test` | 실패 항목 보고 후 중단. 사용자가 fix 요청하면 먼저 해결. 앱 코드 변경이 없으면 (Step 7b의 `Tools` 판정과 같은 기준) 건너뛴다. CI도 이 경로들은 건너뛴다 |
 | AppTracker 변경 검증 | 아래 "AppTracker 검증" 절 참고 | 스킬 실행 → 지적 사항 반영 → 재시도 |
 
 Quality Gate 스크립트가 없거나 실행이 어려운 환경이면 최소한 `./gradlew assembleDebug --quiet`는 통과해야 한다.
 
 #### AppTracker 검증
 
-이번 PR의 커밋(`develop..HEAD`)에 **Mixpanel/AppTracker 관련 변경**이 있으면 `boolti-mixpanel-validator` 스킬을 먼저 실행해 컨벤션을 검증한다.
+이번 PR의 커밋(`origin/develop..HEAD`)에 **Mixpanel/AppTracker 관련 변경**이 있으면 `boolti-mixpanel-validator` 스킬을 먼저 실행해 컨벤션을 검증한다.
 
 검사 방법:
 
 ```bash
 # 1) 트래커 모듈 변경 여부
-git diff develop...HEAD --name-only | grep -E '^common/tracker/'
+git diff origin/develop...HEAD --name-only | grep -E '^common/tracker/'
 
 # 2) AppTracker 호출 추가/수정 여부 (.kt/.kts)
-git diff develop...HEAD -U0 -- '*.kt' '*.kts' \
+git diff origin/develop...HEAD -U0 -- '*.kt' '*.kts' \
   | grep -E '^\+[^+]' \
   | grep -E 'AppTracker\.|\btrackEvent\('
 ```
@@ -94,7 +96,7 @@ git branch --show-current
 **번호가 없는 케이스** (예: `qa/search-navigation`, `qa/prequestion-spec-change`, `release/1.13.0`):
 - GitHub 이슈가 있는지 `AskUserQuestion`으로 사용자에게 묻는다.
 - 이슈 번호를 받으면 제목은 `[Boolti-<번호>] 요약`, 바디는 `Closes #<번호>`.
-- 이슈가 없으면 제목은 대괄호 없이 요약만 쓰고, 바디의 `Issue` 섹션은 생략한다.
+- 이슈가 없으면 제목은 대괄호 없이 요약만 쓰고, 바디의 `Closes #` 줄은 생략한다.
 
 **release 브랜치 특수 처리** (`release/x.y.z`):
 - 제목은 `[Boolti-<번호>] <version> 릴리즈` (릴리즈 티켓이 있는 경우) 또는 `<version> 릴리즈`.
@@ -109,20 +111,16 @@ git branch --show-current
 다음 정보를 모아 PR 바디를 작성한다.
 
 ```bash
-git log develop..HEAD --pretty=format:'%s' --no-merges    # 커밋 메시지
-git diff develop...HEAD --stat                             # 파일 변경량
-git diff develop...HEAD --name-only                        # 변경 파일 목록
+git log origin/develop..HEAD --pretty=format:'%s' --no-merges    # 커밋 메시지
+git diff origin/develop...HEAD --stat                             # 파일 변경량
+git diff origin/develop...HEAD --name-only                        # 변경 파일 목록
 ```
 
 **요약 규칙** (핵심은 **짧게 쓰기**):
-- `작업 내용`은 **최대 3~4개 bullet**, 각 bullet은 **한 줄**. 장황한 서술·여러 절·긴 예시 금지.
 - 커밋 1:1 매핑 금지. 의미 있는 단위로 묶는다.
 - "무엇을 했는지"보다 **결과/변화**를 드러낸다. ("ReservationRepository 추가" → "예약 목록 API 연동")
 - 모듈명이나 파일 경로를 줄줄이 나열하지 않는다. 그 정보는 diff가 이미 말해준다.
-- **강조할 만한 지점이 있을 때만** `리뷰 포인트` 섹션을 추가한다. (없으면 생략)
-  - 예: 로직 변경이 큰 부분, 호환성 영향, stub/mock, TODO, 서버 배포 선행 필요, 의도적 예외 처리 등
-  - 여기도 불릿 1~3개로 간결하게.
-- API·Repository가 아직 미완성이면 `리뷰 포인트`에 stub 상태를 반드시 남긴다.
+- API·Repository가 아직 미완성이면 stub 상태를 바디에 반드시 남긴다.
 
 ### Step 4. 제목 생성
 
@@ -144,45 +142,18 @@ git diff develop...HEAD --name-only                        # 변경 파일 목�
 
 ### Step 5. 바디 생성
 
-저장소 템플릿(`.github/pull_request_template.md`)을 기준으로 **간결하게** 쓴다.
-기본 구조 (리뷰 포인트는 필요할 때만):
+1. `Read` 도구로 `.github/pull_request_template.md`를 **매번** 읽는다. 기억하고 있는 옛 구조로 쓰지 않는다.
+2. 템플릿의 섹션 헤더와 순서를 그대로 쓴다.
+3. 섹션마다 달린 `<!-- -->` 주석이 그 섹션의 작성 지침이다. 분량·생략 조건도 주석을 따른다.
+4. 다 채운 뒤 **주석은 모두 지운다.** 주석이 "삭제"라고 한 빈 섹션·빈 줄·빈 표도 지운다.
 
-```markdown
-## Issue
-- Closes #<티켓 숫자>
-
-## 작업 내용
-- <한 줄 요약 bullet 1>
-- <한 줄 요약 bullet 2>
-- <한 줄 요약 bullet 3>
-
-## 리뷰 포인트  (선택, 강조할 게 있을 때만)
-- <특히 봐야 할 변경 1>
-- <위험 요소 / stub / TODO / 호환성 메모>
-
-<img src="" width="300" />
-```
-
-**세부 규칙**:
-- **장황함 금지**. 바디는 PR 훑는 리뷰어가 10초 안에 핵심을 파악할 수 있을 만큼 짧아야 한다.
-- `Issue`: `Closes #<num>` — 불티는 GitHub Issues만 쓴다. 연결할 이슈가 없으면 섹션 자체를 생략.
-- `작업 내용`:
-  - 최대 3~4개 bullet, 각 bullet 한 줄.
-  - 메타 서술("~을 위해 ~을 추가하여 ~했습니다")로 늘리지 말고 결과만 쓴다.
-  - 여러 변경을 한 bullet에 억지로 끼워 넣지 말고, 정말 의미 있는 단위만 남긴다.
-- `리뷰 포인트` (있을 때만 추가):
-  - 다음 중 하나라도 해당되면 이 섹션을 둔다. 해당 없으면 섹션 자체를 생략.
-    - Stub / mock / 미완성 API
-    - 후속 PR로 분리된 작업
-    - 동작 전제 (서버 배포 선행 등)
-    - 로직/아키텍처 영향이 큰 변경, 리뷰어가 주의 깊게 봐야 할 부분
-    - 알려진 제약 / known issue
-  - 최대 3개 bullet. 배경 설명은 1~2문장 이내.
+**세부 규칙** (템플릿 주석에 없는 AI 전용 규칙):
+- **장황함 금지**. 리뷰어가 10초 안에 핵심을 파악할 수 있는 분량.
+- 메타 서술("~을 위해 ~을 추가하여 ~했습니다")로 늘리지 말고 결과만 쓴다.
+- 이슈 연결은 `Closes #<num>`. 불티는 GitHub Issues만 쓴다.
 - **스크린샷/영상**:
   - UI 변경이 감지되면 (예: `presentation/**`의 `.kt` 변경) 사용자에게 스크린샷·영상 첨부를 요청한다.
-  - 사용자가 이미 이미지/영상 URL을 제공했다면 본문에 삽입. 없으면 빈 `<img src="" width="300" />`를 남겨 나중에 채울 수 있게 한다.
-  - Android UI는 세로 스크린샷이 많으므로 `width="300"` 기본 유지.
-  - UI 변경이 없으면 `<img>` 자리는 생략해도 된다.
+  - 사용자가 URL을 줬으면 템플릿의 `<img>` 자리에 넣는다. 없으면 빈 `<img>`를 남겨 나중에 채우게 한다.
 
 ### Step 6. 원격 브랜치 동기화
 
@@ -244,10 +215,10 @@ gh api user -q '.login'
 - 상단·하단을 `═` 구분선으로 감싸 미리보기 영역을 시각적으로 분리
 - 섹션 헤더는 **Bold** + 아이콘 마커(`■` 상위, `▌` 하위)로 표현
   - `■ 제목`, `■ 메타` — 최상위 섹션
-  - `▌ Issue`, `▌ 작업 내용`, `▌ 스킬 사용 가이드`, `▌ 리뷰 포인트` — 바디 내부 섹션
-  - 실제 PR 바디에는 `## Issue` 등 마크다운 헤더가 들어가지만, 터미널에서 `##`는 시각적으로 튀지 않으므로 미리보기에선 아이콘 마커로 치환
+  - `▌ <섹션명>` — 바디 내부 섹션 (템플릿의 `##` 헤더를 순서대로)
+  - 실제 PR 바디에는 `##` 마크다운 헤더가 들어가지만, 터미널에서 `##`는 시각적으로 튀지 않으므로 미리보기에선 아이콘 마커로 치환
 - 메타는 `| 항목 | 값 |` 표로, 바디 헤더와의 구분은 `─` 가로선으로
-- 표로 요약 가능한 섹션(스킬 사용 가이드 등)은 표 형식 유지
+- 표로 요약 가능한 섹션은 표 형식 유지
 - 긴 인라인 코드는 `` ` ``로, 경로/값 강조는 `` ` `` 사용
 - UI 변경이 있으면 스크린샷 placeholder(`<img src="" width="300" />`)도 미리보기 하단에 표기
 
@@ -274,14 +245,13 @@ gh api user -q '.login'
 ─────────────────── 바디 ────────────────────
 ```
 
-**▌ Issue**
-- Closes #XXX
-
-**▌ 작업 내용**
+**▌ <템플릿 섹션 1>**
 - ...
 
-**▌ 리뷰 포인트** *(있을 때만)*
+**▌ <템플릿 섹션 2>**
 - ...
+
+*(Step 5에서 남긴 섹션만, 템플릿 순서대로)*
 
 ```
 ══════════════════════════════════════════════════
@@ -306,16 +276,7 @@ gh pr create \
   --milestone "<7b에서 선택한 마일스톤>" \
   --title "[Boolti-<번호>] <요약>" \
   --body "$(cat <<'EOF'
-## Issue
-- Closes #<번호>
-
-## 작업 내용
-- ...
-
-## 리뷰 포인트
-- ...
-
-<img src="" width="300" />
+<Step 5에서 만든 바디>
 EOF
 )"
 ```
@@ -329,13 +290,13 @@ EOF
 
 - 생성된 PR URL을 사용자에게 알린다.
 - UI 변경이 있었다면 스크린샷 첨부를 재차 안내.
-- `리뷰 포인트`에 stub/TODO가 있었다면 후속 작업을 언급.
+- 바디에 stub/TODO가 있었다면 후속 작업을 언급.
 - CI(PR checks) 상태는 **폴링하지 않는다**. 사용자가 요청할 때만 `gh pr checks <번호>` 실행.
 
 ## 실수 방지 체크리스트
 
-- [ ] **바디가 짧은가.** `작업 내용`은 한 줄 bullet 3~4개 이내, 리뷰어가 10초 만에 핵심을 파악할 수 있는 분량
-- [ ] 강조할 게 있을 때만 `리뷰 포인트` 섹션 사용. 할 말 없으면 **섹션 자체를 생략**
+- [ ] **바디가 짧은가.** 리뷰어가 10초 만에 핵심을 파악할 수 있는 분량
+- [ ] 바디 구조는 **방금 읽은 템플릿 파일**을 따랐고, `<!-- -->` 주석은 모두 지웠다
 - [ ] 제목은 `[Boolti-XXX] 요약` 형식. `feat:`/`fix:` 같은 conventional prefix **금지**
 - [ ] 바디의 이슈 연결은 `Closes #<숫자>` 표준 사용
 - [ ] HEREDOC 없이 `--body "..."`만 쓰다가 줄바꿈 깨뜨리지 않기
@@ -343,7 +304,8 @@ EOF
 - [ ] 리뷰어는 `mangbaam`/`HamBP` 중 **현재 Git user를 제외한 사람** 자동 지정
 - [ ] **마일스톤 필수 지정**. 사용자에게 물어서 현재 앱 버전 마일스톤(예: `1.15.0`) 또는 `Tools` 마일스톤을 고른다
 - [ ] 폐기된 마일스톤(`gift`, `ticketing`, `login` 등 영역/주제 기반)은 사용도 추천도 하지 않기
-- [ ] `--base main` 사용 금지 (항상 `develop`). main으로 올려야 하는 릴리즈 PR은 별도 요청 시에만
+- [ ] base는 `develop`. `release/*` 브랜치만 사용자에게 확인해 `main`을 쓸 수 있다
+- [ ] 바디에 `Generated with Claude Code` 같은 AI 생성 표기를 넣지 않는다
 - [ ] **Step 7c 미리보기 승인** 없이 `gh pr create` 실행 금지. 아이콘 마커(`■`, `▌`) + 구분선 포맷을 지킨다
 - [ ] 사용자 승인 없이 임의로 `git commit` / `git push --force` 실행 금지
 - [ ] 이미 열려 있는 PR에 덮어쓰려 하지 말 것 (push만으로 갱신됨)
@@ -356,11 +318,11 @@ EOF
 - **카테고리 뒤가 순수 숫자** (예: `enhance/463`): `Boolti-` 없어도 그 숫자를 이슈 번호로 사용 → `[Boolti-463] ...`.
 - **슬래시 뒤에 `-suffix`가 붙은 경우** (예: `feature/Boolti-444-textfield`, `feature/Boolti-422-navigation3`): `Boolti-` 다음의 첫 숫자 그룹만 이슈 번호, suffix는 무시.
 - **동일 티켓으로 쪼개진 후속 브랜치** (예: `feature/Boolti-405-api`, `feature/Boolti-405-2`): 같은 이슈 번호를 쓰되, 이미 그 이슈로 merge된 PR이 있는지 `gh pr list --search "Boolti-405"` 로 확인해 본 다음 후속 PR임을 바디에 명시.
-- **QA 브랜치** (`qa/*`): 한 번에 여러 QA 수정이 묶이는 경우가 많다. 티켓 번호가 있으면 `[Boolti-XXX] QA 이슈 대응`, 작업 내용 섹션에 항목별 bullet 나열.
+- **QA 브랜치** (`qa/*`): 한 번에 여러 QA 수정이 묶이는 경우가 많다. 티켓 번호가 있으면 `[Boolti-XXX] QA 이슈 대응`, 바디에 QA 항목별 bullet 나열.
 - **여러 변경 타입이 섞임** (예: feat + refactor 동시): 레이블은 주된 것 하나만. 바디에서 보조 변화 설명.
 - **릴리즈/버전업 PR** (`release/x.y.z`): 제목 `[Boolti-<번호>] <version> 릴리즈` (릴리즈 티켓이 있을 때) 또는 `<version> 릴리즈`. 레이블 `chore`. 마일스톤은 해당 버전. **base는 `main`일 가능성이 높으므로 반드시 사용자에게 확인**한 뒤 `--base` 옵션을 결정.
 - **앱 배포에 포함되지 않는 작업** (Claude 스킬·커맨드·플러그인·스크립트·CI·문서): 제목은 동일 규칙. 마일스톤은 `Tools`.
-- **도메인/데이터만 변경, UI 없음**: 스크린샷 섹션 생략. `리뷰 포인트`에 영향 범위와 호환성 명시.
+- **도메인/데이터만 변경, UI 없음**: 스크린샷 생략. 영향 범위와 호환성을 바디에 명시.
 - **revert PR**: 제목 `[Boolti-<번호>] <원 PR 요약> revert`. 바디에 원 PR 링크 필수.
 
 ## 참고

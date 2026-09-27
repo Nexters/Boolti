@@ -1,21 +1,20 @@
-package com.nexters.boolti.presentation.screen.showregistration
+package com.nexters.boolti.presentation.screen.place.images
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
-import com.nexters.boolti.presentation.screen.MainDestination
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 
-fun NavGraphBuilder.addShowRegistration(
+fun NavGraphBuilder.placeImageDetailScreen(
     modifier: Modifier = Modifier,
 ) {
-    composable(
-        route = MainDestination.ShowRegistration.route,
-    ) {
+    composable<MainRoute.PlaceImageDetail> {
         val navController = LocalNavController.current
-        ShowRegistrationScreen(
+
+        PlaceImageDetailScreen(
             modifier = modifier,
-            onClickBack = navController::popBackStack,
+            onBack = navController::popBackStack,
         )
     }
 }

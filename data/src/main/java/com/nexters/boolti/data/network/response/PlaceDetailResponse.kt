@@ -17,6 +17,8 @@ internal data class PlaceDetailResponse(
     val representativeImageUrl: String? = null,
     @SerialName("head")
     val head: ConcertHallHeadResponse? = null,
+    @SerialName("shareCode")
+    val shareCode: String,
 ) {
     fun toDomain(): PlaceDetail = PlaceDetail(
         id = id.toString(),
@@ -27,6 +29,7 @@ internal data class PlaceDetailResponse(
         streetAddress = head?.location?.streetAddress,
         subwayStations = head?.subwayStations?.map { it.toDomain() } ?: emptyList(),
         contact = head?.contact?.toDomain(),
+        shareCode = shareCode,
     )
 }
 

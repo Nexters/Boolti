@@ -11,7 +11,7 @@ internal data class PlaceResponse(
     @SerialName("name")
     val name: String,
     @SerialName("representativeImageUrl")
-    val representativeImageUrl: String,
+    val representativeImageUrl: String?,
     @SerialName("streetAddress")
     val streetAddress: String,
     @SerialName("detailAddress")

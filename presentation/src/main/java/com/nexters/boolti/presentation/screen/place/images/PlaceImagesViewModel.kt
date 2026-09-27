@@ -49,7 +49,7 @@ class PlaceImagesViewModel @Inject constructor(
                 }
 
                 val receivedImageId = route.imageId ?: return@onEach
-                val imageIndex = images.map { it.id }.indexOf(receivedImageId)
+                val imageIndex = images.indexOfFirst { it.id == receivedImageId }
                 if (imageIndex != -1) {
                     sendEvent(PlaceImagesEvent.NavigateToDetail(index = imageIndex))
                 }

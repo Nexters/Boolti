@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.DoNotRetry
 import com.nexters.boolti.data.network.response.PlaceResponse
 import com.nexters.boolti.data.network.response.MemberResponse
 import com.nexters.boolti.data.network.response.PagingResponse
@@ -42,6 +43,7 @@ internal interface SearchService {
         size: Int,
     ): PagingResponse<PlaceResponse>
 
+    @DoNotRetry
     @GET("/app/papi/v1/shows/autocomplete")
     suspend fun requestAutoCompleteKeywords(
         @Query("keyword")

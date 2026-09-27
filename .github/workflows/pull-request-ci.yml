@@ -82,3 +82,15 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: "**/test-results/**/*.xml"
+
+      - name: Notify Discord on failure
+        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -n "$DISCORD_WEBHOOK_URL" ] || exit 0
+          jq -n --arg c "❌ CI 실패: #$PR_NUMBER $PR_TITLE"$'\n'"$RUN_URL" '{content: $c}' \
+            | curl -sf -H 'Content-Type: application/json' -d @- "$DISCORD_WEBHOOK_URL"

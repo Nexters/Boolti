@@ -17,8 +17,10 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -81,75 +83,81 @@ fun ShowScreen(
         modifier = modifier.statusBarsPadding(),
         contentAlignment = Alignment.TopCenter,
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = marginHorizontal),
-            state = lazyGridState,
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(15.dp),
-            verticalArrangement = Arrangement.spacedBy(28.dp),
+        PullToRefreshBox(
+            modifier = Modifier.fillMaxSize(),
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = viewModel::refresh,
         ) {
-            item(
-                span = { GridItemSpan(2) },
-                contentType = "AppBar",
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = marginHorizontal),
+                state = lazyGridState,
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                verticalArrangement = Arrangement.spacedBy(28.dp),
             ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 28.dp),
-                    text = stringResource(
-                        id = R.string.home_sub_title,
-                        nickname.ifBlank { stringResource(id = R.string.nickname_default) }),
-                    style = point4,
-                )
-            }
-
-            items(
-                count = uiState.shows.size,
-                span = { index ->
-                    when (uiState.shows[index]) {
-                        is ShowListItem.ShowItem -> GridItemSpan(1)
-                        is ShowListItem.BannerItem -> GridItemSpan(2)
-                    }
-                },
-                contentType = { index -> uiState.shows[index]::class },
-                key = { index ->
-                    when (val item = uiState.shows[index]) {
-                        is ShowListItem.ShowItem -> item.show.id
-                        is ShowListItem.BannerItem -> "Banner"
-                    }
-                }
-            ) { index ->
-                when (val item = uiState.shows[index]) {
-                    is ShowListItem.ShowItem -> ShowFeed(
-                        show = item.show,
+                item(
+                    span = { GridItemSpan(2) },
+                    contentType = "AppBar",
+                ) {
+                    Text(
                         modifier = Modifier
-                            .clickable { onClickShowItem(item.show.id) },
-                    )
-
-                    is ShowListItem.BannerItem -> Banner(
-                        modifier = Modifier.fillMaxWidth(),
-                        navigateToShowRegistration = {
-                            AppTracker.click(
-                                screen = screenField,
-                                objectRole = Role.Banner,
-                                objectValue = "RegisterShow",
-                            )
-                            navigateToShowRegistration()
-                        },
+                            .fillMaxWidth()
+                            .padding(top = 28.dp),
+                        text = stringResource(
+                            id = R.string.home_sub_title,
+                            nickname.ifBlank { stringResource(id = R.string.nickname_default) }),
+                        style = point4,
                     )
                 }
-            }
 
-            item(
-                contentType = "BusinessInformation",
-                span = { GridItemSpan(2) },
-            ) {
-                BusinessInformation(
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    onClick = navigateToBusiness
-                )
+                items(
+                    count = uiState.shows.size,
+                    span = { index ->
+                        when (uiState.shows[index]) {
+                            is ShowListItem.ShowItem -> GridItemSpan(1)
+                            is ShowListItem.BannerItem -> GridItemSpan(2)
+                        }
+                    },
+                    contentType = { index -> uiState.shows[index]::class },
+                    key = { index ->
+                        when (val item = uiState.shows[index]) {
+                            is ShowListItem.ShowItem -> item.show.id
+                            is ShowListItem.BannerItem -> "Banner"
+                        }
+                    }
+                ) { index ->
+                    when (val item = uiState.shows[index]) {
+                        is ShowListItem.ShowItem -> ShowFeed(
+                            show = item.show,
+                            modifier = Modifier
+                                .clickable { onClickShowItem(item.show.id) },
+                        )
+
+                        is ShowListItem.BannerItem -> Banner(
+                            modifier = Modifier.fillMaxWidth(),
+                            navigateToShowRegistration = {
+                                AppTracker.click(
+                                    screen = screenField,
+                                    objectRole = Role.Banner,
+                                    objectValue = "RegisterShow",
+                                )
+                                navigateToShowRegistration()
+                            },
+                        )
+                    }
+                }
+
+                item(
+                    contentType = "BusinessInformation",
+                    span = { GridItemSpan(2) },
+                ) {
+                    BusinessInformation(
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        onClick = navigateToBusiness
+                    )
+                }
             }
         }
 

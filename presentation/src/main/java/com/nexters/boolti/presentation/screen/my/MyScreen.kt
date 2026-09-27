@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.my
 
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
@@ -85,6 +88,13 @@ fun MyScreen(
     val homeUrl = "https://${domain}/home"
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
+    val appVersion = remember(context) {
+        if (BuildConfig.DEBUG) {
+            context.getAppVersion()
+        } else {
+            BuildConfig.VERSION_NAME
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchMyInfo()
@@ -93,6 +103,7 @@ fun MyScreen(
     MyScreen(
         modifier = modifier,
         user = user,
+        appVersion = appVersion,
         onClickHeaderButton = {
             AppTracker.click(
                 screen = Screen.MyPage,
@@ -149,6 +160,7 @@ fun MyScreen(
 fun MyScreen(
     modifier: Modifier = Modifier,
     user: User.My? = null,
+    appVersion: String = BuildConfig.VERSION_NAME,
     onClickHeaderButton: () -> Unit = {},
     onClickAccountSetting: () -> Unit = {},
     onClickReservations: () -> Unit = {},
@@ -248,7 +260,7 @@ fun MyScreen(
                 )
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
-                    text = "Version ${BuildConfig.VERSION_NAME}",
+                    text = "Version $appVersion",
                     style = MaterialTheme.typography.bodySmall,
                     color = Grey80,
                 )
@@ -256,9 +268,22 @@ fun MyScreen(
         }
     }
 
-    if (showDebugBottomSheet) {
+    if (BuildConfig.DEBUG && showDebugBottomSheet) {
+        val context = LocalContext.current
         DebugOptionsBottomSheet(
             sheetState = sheetState,
+            onOpenImpressionTest = {
+                scope.launch {
+                    sheetState.hide()
+                    showDebugBottomSheet = false
+                    context.startActivity(
+                        Intent().setClassName(
+                            context,
+                            "${BuildConfig.LIBRARY_PACKAGE_NAME}.screen.debug.impression.ImpressionDebugActivity",
+                        )
+                    )
+                }
+            },
             onDismiss = {
                 scope.launch {
                     sheetState.hide()
@@ -269,11 +294,19 @@ fun MyScreen(
     }
 }
 
+private fun Context.getAppVersion(): String = runCatching {
+    val packageInfo = packageManager.getPackageInfo(packageName, 0)
+    val versionName = packageInfo.versionName ?: BuildConfig.VERSION_NAME
+    val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
+    "$versionName ($versionCode)"
+}.getOrDefault(BuildConfig.VERSION_NAME)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DebugOptionsBottomSheet(
     sheetState: androidx.compose.material3.SheetState,
     onDismiss: () -> Unit,
+    onOpenImpressionTest: () -> Unit,
 ) {
     BtBottomSheet(
         onDismissRequest = onDismiss,
@@ -301,6 +334,12 @@ private fun DebugOptionsBottomSheet(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
+
+        MyMenu(
+            iconRes = R.drawable.ic_list,
+            label = stringResource(R.string.debug_impression_test),
+            onClick = onOpenImpressionTest,
+        )
 
         Spacer(Modifier.height(100.dp))
     }

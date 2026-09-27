@@ -23,5 +23,5 @@ tasks.register<Delete>("clean") {
 }
 
 tasks.register("btTest") {
-    dependsOn(":domain:test", ":data:testDebugUnitTest", ":presentation:testDebugUnitTest")
+    dependsOn(":domain:test", ":data:testDebugUnitTest", ":presentation:testDebugUnitTest", ":common:tracker:testDebugUnitTest")
 }

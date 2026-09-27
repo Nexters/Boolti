@@ -4,6 +4,7 @@ import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,6 +13,7 @@ internal data class PlaceDetailResponse(
     val name: String,
     val representativeImageUrl: String? = null,
     val head: ConcertHallHeadResponse? = null,
+    @SerialName("shareCode")
     val shareCode: String,
 ) {
     fun toDomain(): PlaceDetail = PlaceDetail(

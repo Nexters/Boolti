@@ -1,11 +1,12 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.PlaceImage
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class PlaceImageListResponse(
-    val items: List<PlaceImageItemResponse> = emptyList(),
+    @SerialName("items") val items: List<PlaceImageItemResponse> = emptyList(),
 ) {
     fun toDomain(): List<PlaceImage> = items
         .map { it.toDomain() }
@@ -17,9 +18,13 @@ internal data class PlaceImageListResponse(
  */
 @Serializable
 internal data class PlaceImageItemResponse(
+    @SerialName("id")
     val id: String,
+    @SerialName("imageUrl")
     val imageUrl: String,
+    @SerialName("thumbnailUrl")
     val thumbnailUrl: String? = null,
+    @SerialName("sequence")
     val sequence: Int = 0,
 ) {
     fun toDomain(): PlaceImage {

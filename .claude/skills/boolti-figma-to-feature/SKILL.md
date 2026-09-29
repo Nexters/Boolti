@@ -222,7 +222,7 @@ for nid, url in d['images'].items():
 각 Phase의 Quality Gate에 다음을 추가:
 - [ ] Figma 스크린샷과 시각적으로 1:1 일치 (디바이스/Preview에서 확인)
 - [ ] 임의의 hex/dp 값 사용 없음 (모두 디자인 토큰 경유)
-- [ ] `verify-compose-conventions` 스킬 통과
+- [ ] `.claude/rules/presentation.md`의 Composable 규칙 준수
 
 최종 비교 시 Step 3 (2)와 동일한 방법으로 `scale=2` 스크린샷을 다시 받아 구현 결과와 나란히 검토한다.
 

@@ -6,8 +6,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-class GetUserUsecase @Inject constructor(
+class GetCachedUserUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    operator fun invoke(): User.My? = runBlocking { authRepository.getUserAndCache().first() }
+    // ponytail: 로컬 캐시 읽기라 runBlocking이 짧게 끝남. 호출부 ViewModel 수정 시 suspend로 전환
+    operator fun invoke(): User.My? = runBlocking { authRepository.cachedUser.first() }
 }

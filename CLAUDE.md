@@ -50,6 +50,13 @@ common/tracker/   - Mixpanel 이벤트 트래킹 (AppTracker)
 - 새 유틸을 만들기 전에 각 모듈의 `util` 패키지에 이미 있는지 먼저 찾는다
 - 처리한 에러는 `Timber.e(e)`로 남긴다 (Crashlytics로 올라감, `IOException`·취소 예외 제외). 원격 기록이 필요 없으면 `Timber.w`를 쓴다
 
+## 커밋
+
+- 형식: `[Boolti-<이슈 번호>] <요약>` (예: `[Boolti-548] 프로필 이미지 복사를 IO 디스패처로 옮기기`)
+- `feat:`, `fix:` 같은 타입 접두사는 붙이지 않는다. 변경 종류는 PR 레이블로 구분한다
+- 이슈가 없으면 대괄호 없이 요약만 쓴다
+- 이슈 번호는 브랜치 이름에서 가져온다 (`feature/548-xxx`, `feature/Boolti-548` → `548`)
+
 ## CI (PR에서 실행)
 
 `pull-request-ci`, `anti-pattern-check`는 `develop`·`feature/**` 대상 PR에서 돈다.

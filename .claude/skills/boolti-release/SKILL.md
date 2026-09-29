@@ -63,16 +63,25 @@ description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 �
 
 ### 3-2. 변경 내역 수집
 
+커밋 메시지에는 타입 접두사(`feat:` 등)가 없으므로, 분류는 머지된 PR의 레이블로 한다.
+
 ```bash
+# 기준 이후 머지된 PR과 레이블
+gh pr list --state merged --base develop --limit 100 \
+  --search "merged:>=$(git log -1 --format=%cI <base>)" \
+  --json number,title,labels
+
+# PR 없이 들어간 커밋 확인용
 git log <base>..HEAD --pretty=format:'%s' --no-merges
 ```
 
 `release/*`에서 태그가 없으면 `develop`으로 fallback하고 사용자에게 확인.
 
-### 3-3. 커밋 분류·필터링
+### 3-3. 분류·필터링
 
-- **포함**: `feat:` → **주요 업데이트**, `fix:` → **버그 수정**
-- **제외**: `refactor:`, `chore:`, `docs:`, `test:`, `ci:`, `style:`, `perf:`, Mixpanel 이벤트, 의존성/빌드 설정
+- **포함**: 레이블 `feat`·`enhancement` → **주요 업데이트**, `bug` → **버그 수정**
+- **제외**: `refactor`, `chore`, `documentation`, `style` 레이블, `Tools` 마일스톤, Mixpanel 이벤트, 의존성/빌드 설정
+- PR 없이 들어간 커밋은 메시지 내용으로 판단한다. 예전 커밋의 `feat:`/`fix:` 접두사는 그대로 분류에 쓴다
 
 ### 3-4. QA 친화 변환
 
@@ -80,9 +89,9 @@ git log <base>..HEAD --pretty=format:'%s' --no-merges
 
 | 나쁨 (기술 관점) | 좋음 (기능 관점) |
 |------------------|------------------|
-| feat: ViewModel에 공연장 탭 StateFlow 추가 | 공연 상세 화면에 공연장 탭 추가 |
-| fix: NPE in ShowListScreen | 공연 목록에서 간헐적으로 앱이 종료되던 문제 해결 |
-| refactor: Hilt 모듈 정리 | *(제외 — 사용자 체감 없음)* |
+| [Boolti-470] ViewModel에 공연장 탭 StateFlow 추가 | 공연 상세 화면에 공연장 탭 추가 |
+| [Boolti-480] ShowListScreen NPE 수정 | 공연 목록에서 간헐적으로 앱이 종료되던 문제 해결 |
+| [Boolti-490] Hilt 모듈 정리 (`refactor` 레이블) | *(제외 — 사용자 체감 없음)* |
 
 변환 원칙:
 - 앱에서 보거나 누르거나 경험할 수 있는 것만 남긴다

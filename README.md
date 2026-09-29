@@ -62,3 +62,11 @@
 | iOS | https://github.com/Nexters/Boolti-iOS
 | FE | https://github.com/Nexters/boolti-web
 | BE | 비공개
+
+</br>
+
+## License
+
+Copyright (c) 2024 Boolti. All rights reserved.
+
+이 저장소의 코드는 열람 목적으로만 공개되어 있어요. 저작권자의 서면 허락 없이 복사, 수정, 배포, 상업적 이용을 할 수 없어요.

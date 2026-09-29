@@ -3,7 +3,7 @@ package com.nexters.boolti.presentation.screen.profileedit.usercode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -17,10 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserCodeEditViewModel @Inject constructor(
-    getUserUseCase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val originalUserCode = getUserUseCase()?.userCode.orEmpty().lowercase()
+    private val originalUserCode = getCachedUserUseCase()?.userCode.orEmpty().lowercase()
 
     private val _uiState = MutableStateFlow(UserCodeEditState(userCode = originalUserCode))
     val uiState = _uiState.asStateFlow()

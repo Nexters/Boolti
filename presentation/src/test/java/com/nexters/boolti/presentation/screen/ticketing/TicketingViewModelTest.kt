@@ -5,7 +5,7 @@ import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -29,7 +29,7 @@ class TicketingViewModelTest : DescribeSpec({
     fun createViewModel(repository: TicketingRepository) = TicketingViewModel(
         savedStateHandle = SavedStateHandle(mapOf("showId" to "show", "salesTicketId" to "ticket")),
         repository = repository,
-        getUserUsecase = mockk { every { this@mockk.invoke() } returns User.My(id = "user") },
+        getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user") },
         getRefundPolicyUsecase = mockk { every { this@mockk.invoke() } returns flowOf(emptyList()) },
     )
 

@@ -8,8 +8,8 @@ import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
-import com.nexters.boolti.domain.usecase.GetUserUsecase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
@@ -31,12 +31,12 @@ import javax.inject.Inject
 @HiltViewModel
 class GiftViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getUserUseCase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val ticketingRepository: TicketingRepository,
     private val giftRepository: GiftRepository,
     private val getRefundPolicyUseCase: GetRefundPolicyUsecase,
 ) : BaseViewModel() {
-    private val userId = checkNotNull(getUserUseCase()?.id) {
+    private val userId = checkNotNull(getCachedUserUseCase()?.id) {
         "[GiftViewModel] 사용자 정보가 없습니다."
     }
     val showId: String = requireNotNull(savedStateHandle["showId"])

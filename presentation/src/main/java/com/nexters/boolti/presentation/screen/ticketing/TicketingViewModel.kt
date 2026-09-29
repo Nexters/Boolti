@@ -53,7 +53,7 @@ class TicketingViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<TicketingUiState>(TicketingUiState.Loading)
     val uiState: StateFlow<TicketingUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<TicketingEvent>()
+    private val _event = Channel<TicketingEvent>(Channel.BUFFERED)
     val event: Flow<TicketingEvent> = _event.receiveAsFlow()
 
     private var reservationJob: Job? = null

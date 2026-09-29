@@ -80,7 +80,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.view
@@ -857,7 +856,7 @@ fun getIntentFromUri(uri: String): Intent? {
     try {
         return Intent.parseUri(uri, Intent.URI_INTENT_SCHEME)
     } catch (e: URISyntaxException) {
-        FirebaseCrashlytics.getInstance().recordException(e)
+        Timber.e(e)
         return null
     }
 }

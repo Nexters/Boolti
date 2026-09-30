@@ -30,12 +30,6 @@ android {
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("DEV_TOSS_SECRET_KEY"))
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
         }

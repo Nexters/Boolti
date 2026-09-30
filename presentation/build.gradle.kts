@@ -36,12 +36,6 @@ android {
             buildConfigField("String", "DOMAIN", getLocalProperty("DEV_DOMAIN"))
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
             buildConfigField("String", "TOSS_CLIENT_KEY", getLocalProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", getLocalProperty("PROD_TOSS_SECRET_KEY"))
             buildConfigField("String", "DOMAIN", getLocalProperty("PROD_DOMAIN"))
@@ -65,6 +59,7 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 

@@ -45,7 +45,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -78,9 +77,6 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 @Composable
 fun ProfileEditScreen(
@@ -94,7 +90,6 @@ fun ProfileEditScreen(
     navigateToVideoEdit: (userCode: UserCode) -> Unit,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel.event
 
@@ -120,22 +115,7 @@ fun ProfileEditScreen(
         saving = uiState.saving,
         event = event,
         navigateBack = navigateBack,
-        onChangeThumbnail = {
-            val file = it?.let { uri ->
-                val file = File(context.cacheDir, "temp_profile_image.jpg")
-                try {
-                    context.contentResolver.openInputStream(uri).use { inputStream ->
-                        FileOutputStream(file).use { outputStream ->
-                            inputStream?.copyTo(outputStream)
-                        }
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-                file
-            }
-            viewModel.changeThumbnail(file)
-        },
+        onChangeThumbnail = { viewModel.changeThumbnail(it?.toString()) },
         onClickNickname = navigateToNicknameEdit,
         onClickUserCode = navigateToUserCodeEdit,
         onClickIntroduction = navigateToIntroductionEdit,

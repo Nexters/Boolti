@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     id("boolti.android.library")
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -27,12 +24,6 @@ android {
             buildConfigField("String", "DOMAIN", localProperty("DEV_DOMAIN"))
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
             buildConfigField("String", "TOSS_CLIENT_KEY", localProperty("PROD_TOSS_CLIENT_KEY"))
             buildConfigField("String", "TOSS_SECRET_KEY", localProperty("PROD_TOSS_SECRET_KEY"))
             buildConfigField("String", "DOMAIN", localProperty("PROD_DOMAIN"))
@@ -51,7 +42,7 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 

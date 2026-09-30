@@ -4,11 +4,9 @@ import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("boolti.android.application")
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -54,7 +52,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
@@ -75,26 +74,21 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
-    }
-}
-
 androidComponents {
     onVariants { variant ->
         val capitalizedName = variant.name.replaceFirstChar { it.uppercase() }
         val apkDir = variant.artifacts.get(SingleArtifact.APK)
+        val versionName = libs.versions.versionName.get()
+        val buildType = variant.buildType ?: "unknown"
+        val hash = gitHash
 
         tasks.register("copy${capitalizedName}Apk") {
             doLast {
                 val dir = apkDir.get().asFile
                 if (!dir.exists()) return@doLast
-                val versionName = libs.versions.versionName.get()
-                val buildType = variant.buildType ?: "unknown"
                 val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
                 dir.listFiles()?.filter { it.name == "app-$buildType.apk" }?.forEach { apk ->
-                    val newName = "app-$buildType-$versionName-$gitHash-$date.apk"
+                    val newName = "app-$buildType-$versionName-$hash-$date.apk"
                     apk.copyTo(File(apk.parentFile, newName))
                 }
             }

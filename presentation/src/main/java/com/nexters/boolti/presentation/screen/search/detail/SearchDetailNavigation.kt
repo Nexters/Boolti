@@ -41,8 +41,8 @@ fun NavGraphBuilder.searchDetailNavigation(
             navigateToProfile = { userCode ->
                 navController.navigate(MainRoute.Profile(userCode = userCode, source = Screen.SearchDetail.value))
             },
-            navigateToPlaceDetail = {
-                // TODO: 공연장 상세 화면 네비게이션 연결
+            navigateToPlaceDetail = { placeId ->
+                navController.navigate(MainRoute.Place(placeId = placeId))
             },
             navigateUp = {
                 navController.popBackStack(MainRoute.Home, false)

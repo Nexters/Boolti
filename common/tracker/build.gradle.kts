@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     id("boolti.android.library")
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
 }
@@ -20,12 +17,6 @@ android {
             buildConfigField("String", "MIXPANEL_TOKEN", localProperty("DEV_MIXPANEL_TOKEN"))
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
             buildConfigField("String", "MIXPANEL_TOKEN", localProperty("PROD_MIXPANEL_TOKEN"))
         }
     }
@@ -35,12 +26,6 @@ android {
     }
     testOptions {
         unitTests.all { it.useJUnitPlatform() }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
     }
 }
 

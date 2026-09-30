@@ -3,7 +3,7 @@ package com.nexters.boolti.presentation.screen.profileedit.sns
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -16,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SnsEditViewModel @Inject constructor(
-    getUserUsecase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : BaseViewModel() {
     private val snsList: Map<Sns.SnsType, String>? =
-        getUserUsecase()?.sns?.associate { it.type to it.username }
+        getCachedUserUseCase()?.sns?.associate { it.type to it.username }
     private val originalInstagramUsername: String = snsList?.get(Sns.SnsType.INSTAGRAM) ?: ""
     private val originalYoutubeUsername: String = snsList?.get(Sns.SnsType.YOUTUBE) ?: ""
 

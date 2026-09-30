@@ -1,7 +1,6 @@
 package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.data.datasource.HostDataSource
-import com.nexters.boolti.data.datasource.TicketDataSource
 import com.nexters.boolti.domain.exception.QrErrorType
 import com.nexters.boolti.domain.exception.QrScanException
 import com.nexters.boolti.domain.extension.errorType
@@ -18,7 +17,8 @@ internal class HostRepositoryImpl @Inject constructor(
     override fun requestEntrance(request: QrScanRequest): Flow<Boolean> = flow {
         val response = dataSource.requestEntrance(request)
         if (response.isSuccessful) {
-            emit(response.body() ?: false)
+            if (response.body() != true) throw QrScanException(QrErrorType.UsedTicket)
+            emit(true)
         } else {
             val errMsg = response.errorBody()?.string()
             throw QrScanException(QrErrorType.fromString(errMsg?.errorType))

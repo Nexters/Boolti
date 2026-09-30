@@ -81,6 +81,7 @@ fun QrScanScreen(
     val usedTicketErrMessage = stringResource(R.string.error_used_ticket)
     val notMatchedErrMessage = stringResource(R.string.error_ticket_not_matched)
     val invalidTicketErrMessage = stringResource(R.string.error_invalid_ticket)
+    val unknownErrMessage = stringResource(R.string.message_unknown_error)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var bottomPadding by remember { mutableStateOf(0.dp) }
@@ -120,6 +121,12 @@ fun QrScanScreen(
                         QrErrorType.TicketNotFound -> Triple(
                             R.drawable.ic_error,
                             notMatchedErrMessage,
+                            Error
+                        )
+
+                        QrErrorType.Unknown -> Triple(
+                            R.drawable.ic_error,
+                            unknownErrMessage,
                             Error
                         )
                     }

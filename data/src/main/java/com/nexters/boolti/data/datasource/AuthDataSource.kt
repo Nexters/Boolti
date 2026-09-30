@@ -14,9 +14,12 @@ import com.nexters.boolti.data.network.response.SignUpResponse
 import com.nexters.boolti.data.network.response.UserResponse
 import com.nexters.boolti.domain.model.PreviewList
 import com.nexters.boolti.domain.request.LoginRequest
+import com.nexters.boolti.domain.util.suspendRunCatching
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class AuthDataSource @Inject constructor(
@@ -74,10 +77,16 @@ internal class AuthDataSource @Inject constructor(
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
     }
 
-    suspend fun logout(): Result<Unit> = runCatching {
-        localLogout()
-        loginService.logout()
-        AppTracker.logout()
+    suspend fun logout(): Result<Unit> = suspendRunCatching {
+        try {
+            loginService.logout()
+        } finally {
+            // 서버 로그아웃이 실패하거나 호출한 화면이 닫혀도 로컬 정리는 끝까지 한다
+            withContext(NonCancellable) {
+                localLogout()
+                AppTracker.logout()
+            }
+        }
     }
 
     suspend fun localLogout() {
@@ -116,7 +125,7 @@ internal class AuthDataSource @Inject constructor(
         Firebase.analytics.setUserId(null)
     }
 
-    suspend fun refresh(): Result<SignUpResponse?> = runCatching {
+    suspend fun refresh(): Result<SignUpResponse?> = suspendRunCatching {
         val refreshToken = data.map { it.refreshToken }.first()
 
         if (refreshToken.isNotBlank()) loginService.refresh(RefreshRequest(refreshToken)) else null

@@ -27,11 +27,6 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
             buildConfigField("String", "BASE_URL", getApiKey("PROD_BASE_URL"))
         }
         debug {
@@ -49,6 +44,12 @@ android {
         unitTests.all {
             it.useJUnitPlatform()
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
@@ -80,6 +81,8 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(libs.kotest.runner.junit5.jvm)
 }

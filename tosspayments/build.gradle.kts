@@ -42,6 +42,7 @@ dependencies {
     ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.mixpanel.android)
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -11,6 +11,8 @@ on:
       - demilestoned
       - ready_for_review
 
+permissions: {}
+
 jobs:
   check-milestone:
     runs-on: ubuntu-latest

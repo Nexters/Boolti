@@ -4,11 +4,9 @@ import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("boolti.android.application")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -21,17 +19,12 @@ val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-val localPropertiesFile = rootProject.file("local.properties")
-val localProperties = Properties()
-localProperties.load(FileInputStream(localPropertiesFile))
-
 val gitHash = providers.exec {
     commandLine("git", "rev-parse", "--short=7", "HEAD")
 }.standardOutput.asText.get().trim()
 
 android {
     namespace = libs.versions.packageName.get()
-    compileSdk = libs.versions.compileSdk.get().toInt()
 
     signingConfigs {
         create("release") {
@@ -44,8 +37,6 @@ android {
 
     defaultConfig {
         applicationId = "com.nexters.boolti"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = libs.versions.versionCode.get().toInt()
         versionName = libs.versions.versionName.get()
 
@@ -54,9 +45,9 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "KAKAO_APP_KEY", getApiKey("KAKAO_APP_KEY"))
-        buildConfigField("String", "YOUTUBE_API_KEY", getApiKey("YOUTUBE_API_KEY"))
-        manifestPlaceholders["KAKAO_APP_KEY"] = (localProperties["KAKAO_APP_KEY"] as String).trim('"')
+        buildConfigField("String", "KAKAO_APP_KEY", localProperty("KAKAO_APP_KEY"))
+        buildConfigField("String", "YOUTUBE_API_KEY", localProperty("YOUTUBE_API_KEY"))
+        manifestPlaceholders["KAKAO_APP_KEY"] = localProperty("KAKAO_APP_KEY").trim('"')
     }
 
     buildTypes {
@@ -72,10 +63,6 @@ android {
             versionNameSuffix = "-$gitHash"
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
     buildFeatures {
         buildConfig = true
     }
@@ -84,12 +71,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
     }
 }
 
@@ -145,8 +126,4 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-}
-
-fun getApiKey(propertyKey: String): String {
-    return providers.gradleProperty(propertyKey).orNull ?: localProperties.getProperty(propertyKey)
 }

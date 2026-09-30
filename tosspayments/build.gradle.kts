@@ -15,11 +15,9 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "TOSS_CLIENT_KEY", localProperty("DEV_TOSS_CLIENT_KEY"))
-            buildConfigField("String", "TOSS_SECRET_KEY", localProperty("DEV_TOSS_SECRET_KEY"))
         }
         release {
             buildConfigField("String", "TOSS_CLIENT_KEY", localProperty("PROD_TOSS_CLIENT_KEY"))
-            buildConfigField("String", "TOSS_SECRET_KEY", localProperty("PROD_TOSS_SECRET_KEY"))
         }
     }
     buildFeatures {

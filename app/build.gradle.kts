@@ -46,7 +46,6 @@ android {
         }
 
         buildConfigField("String", "KAKAO_APP_KEY", localProperty("KAKAO_APP_KEY"))
-        buildConfigField("String", "YOUTUBE_API_KEY", localProperty("YOUTUBE_API_KEY"))
         manifestPlaceholders["KAKAO_APP_KEY"] = localProperty("KAKAO_APP_KEY").trim('"')
     }
 

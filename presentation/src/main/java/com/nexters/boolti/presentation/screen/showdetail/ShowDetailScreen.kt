@@ -122,6 +122,7 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
+import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
@@ -287,6 +288,7 @@ fun ShowDetailScreen(
     val uriHandler = LocalUriHandler.current
     var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
     var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
+    val bridgeManager = rememberBridgeManager()
     val webView = remember(context) {
         BtWebView(preUriLoading = { url ->
             preUriLoading(
@@ -298,6 +300,10 @@ fun ShowDetailScreen(
         }, context = context).apply {
             setBackgroundColor(android.graphics.Color.TRANSPARENT)
         }
+    }
+
+    LaunchedEffect(webView) {
+        webView.setBridgeManager(bridgeManager)
     }
 
     LaunchedEffect(webView, url) {

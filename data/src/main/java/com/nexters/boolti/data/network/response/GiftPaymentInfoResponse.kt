@@ -11,26 +11,47 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class GiftPaymentInfoResponse(
+    @SerialName("csReservationId")
     val csReservationId: String,
+    @SerialName("showImg")
     val showImg: String,
+    @SerialName("showName")
     val showName: String,
+    @SerialName("showDate")
     val showDate: String,
+    @SerialName("salesTicketName")
     val salesTicketName: String,
+    @SerialName("salesTicketType")
     val salesTicketType: String,
+    @SerialName("ticketCount")
     val ticketCount: Int,
+    @SerialName("salesEndTime")
     val salesEndTime: String,
+    @SerialName("meansType")
     val meansType: String?,
+    @SerialName("totalAmountPrice")
     val totalAmountPrice: Int = 0,
+    @SerialName("reservationStatus")
     val reservationStatus: String,
+    @SerialName("senderName")
     val senderName: String,
+    @SerialName("senderPhoneNumber")
     val senderPhoneNumber: String,
+    @SerialName("recipientName")
     val recipientName: String = "",
+    @SerialName("recipientPhoneNumber")
     val recipientPhoneNumber: String = "",
+    @SerialName("giftId")
     val giftId: String,
+    @SerialName("giftUuid")
     val giftUuid: String,
+    @SerialName("giftMessage")
     val giftMessage: String,
+    @SerialName("giftInvitePath")
     val giftInvitePath: String,
+    @SerialName("cardDetail")
     val cardDetail: CardDetailResponse? = null,
+    @SerialName("easyPayDetail")
     val easyPayDetail: EasyPayDetailResponse? = null,
 ) {
     fun toDomain(): ReservationDetail {

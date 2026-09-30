@@ -3,7 +3,7 @@ package com.nexters.boolti.presentation.screen.profileedit.nickname
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +15,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NicknameEditViewModel @Inject constructor(
-    getUserUseCase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val originalNickname = getUserUseCase()?.nickname.orEmpty()
+    private val originalNickname = getCachedUserUseCase()?.nickname.orEmpty()
 
     private val _uiState = MutableStateFlow(NicknameEditState(nickname = originalNickname))
     val uiState = _uiState.asStateFlow()

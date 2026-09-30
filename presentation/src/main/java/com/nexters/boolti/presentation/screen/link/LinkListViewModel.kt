@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,13 +22,13 @@ import javax.inject.Inject
 @HiltViewModel
 class LinkListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getUserUseCase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val memberRepository: MemberRepository,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<LinkListRoute.LinkListRoot>()
     private val userCode = route.userCode
-    private val isMine = getUserUseCase()?.userCode == userCode
+    private val isMine = getCachedUserUseCase()?.userCode == userCode
     private val isEditModeAtFirst = route.isEditMode && isMine
     private var autoNavigatedToEdit = isEditModeAtFirst
 

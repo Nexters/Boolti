@@ -61,7 +61,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
@@ -96,16 +97,17 @@ androidComponents {
     onVariants { variant ->
         val capitalizedName = variant.name.replaceFirstChar { it.uppercase() }
         val apkDir = variant.artifacts.get(SingleArtifact.APK)
+        val versionName = libs.versions.versionName.get()
+        val buildType = variant.buildType ?: "unknown"
+        val hash = gitHash
 
         tasks.register("copy${capitalizedName}Apk") {
             doLast {
                 val dir = apkDir.get().asFile
                 if (!dir.exists()) return@doLast
-                val versionName = libs.versions.versionName.get()
-                val buildType = variant.buildType ?: "unknown"
                 val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
                 dir.listFiles()?.filter { it.name == "app-$buildType.apk" }?.forEach { apk ->
-                    val newName = "app-$buildType-$versionName-$gitHash-$date.apk"
+                    val newName = "app-$buildType-$versionName-$hash-$date.apk"
                     apk.copyTo(File(apk.parentFile, newName))
                 }
             }

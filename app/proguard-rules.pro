@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Kakao SDK: 에러 enum 필드를 리플렉션(getField)으로 조회함
+# https://developers.kakao.com/docs/ko/android/getting-started
+-keep class com.kakao.sdk.**.model.* { <fields>; }

@@ -1,13 +1,18 @@
 package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.ImagePair
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class ImageResponse(
+    @SerialName("id")
     val id: String,
+    @SerialName("path")
     val path: String,
+    @SerialName("thumbnailPath")
     val thumbnailPath: String,
+    @SerialName("sequence")
     val sequence: Int,
 ) {
     fun toDomain(): ImagePair {

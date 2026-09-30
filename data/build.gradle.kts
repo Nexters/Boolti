@@ -1,6 +1,5 @@
 import java.io.FileInputStream
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -8,7 +7,6 @@ localProperties.load(FileInputStream(localPropertiesFile))
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
@@ -29,11 +27,6 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
             buildConfigField("String", "BASE_URL", getApiKey("PROD_BASE_URL"))
         }
         debug {
@@ -56,7 +49,7 @@ android {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
@@ -88,6 +81,8 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(libs.kotest.runner.junit5.jvm)
 }

@@ -1,6 +1,5 @@
 import java.io.FileInputStream
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties()
@@ -8,7 +7,6 @@ localProperties.load(FileInputStream(localPropertiesFile))
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
 }
@@ -29,12 +27,6 @@ android {
             buildConfigField("String", "MIXPANEL_TOKEN", getLocalProperty("DEV_MIXPANEL_TOKEN"))
         }
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
             buildConfigField("String", "MIXPANEL_TOKEN", getLocalProperty("PROD_MIXPANEL_TOKEN"))
         }
     }
@@ -48,12 +40,6 @@ android {
     }
     testOptions {
         unitTests.all { it.useJUnitPlatform() }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
     }
 }
 

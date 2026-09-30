@@ -2,7 +2,7 @@ name: Anti-Pattern Check
 
 on:
   pull_request:
-    branches: [develop]
+    branches: [develop, 'feature/**']
     paths:
       - 'data/src/main/**/*.kt'
       - '.github/workflows/anti-pattern-check.yml'

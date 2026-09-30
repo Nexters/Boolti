@@ -13,6 +13,7 @@ import com.nexters.boolti.data.di.qualifier.YouTubeRetrofit
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
 import com.nexters.boolti.data.network.CustomHeaderInterceptor
+import com.nexters.boolti.data.network.RetryInterceptor
 import com.nexters.boolti.data.network.api.AuthFileService
 import com.nexters.boolti.data.network.api.DeviceTokenService
 import com.nexters.boolti.data.network.api.FileService
@@ -249,6 +250,7 @@ internal object NetworkModule {
             .authenticator(authenticator)
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(authInterceptor)
+            .addInterceptor(RetryInterceptor())
             .addInterceptor(createLoggingInterceptor())
             .build()
     }
@@ -264,6 +266,7 @@ internal object NetworkModule {
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(authInterceptor)
+            .addInterceptor(RetryInterceptor())
             .addInterceptor(createLoggingInterceptor())
             .build()
     }
@@ -276,6 +279,7 @@ internal object NetworkModule {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(customHeaderInterceptor)
+            .addInterceptor(RetryInterceptor())
             .addInterceptor(createLoggingInterceptor())
             .build()
     }

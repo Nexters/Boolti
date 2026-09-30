@@ -2,170 +2,75 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## 프로젝트 개요
 
-Boolti is an Android application for band concert hosting, booking, and QR entry management. It's a multi-module Android project using Jetpack Compose, Hilt for dependency injection, and a clean architecture pattern.
+불티(Boolti)는 밴드 공연 등록·예매·QR 입장 관리 Android 앱이다. Jetpack Compose + Hilt + 멀티 모듈 클린 아키텍처로 되어 있다.
 
-**Links:**
 - Play Store: https://play.google.com/store/apps/details?id=com.nexters.boolti
 - App Store: https://apps.apple.com/kr/app/%EB%B6%88%ED%8B%B0/id6476589322
 - Host web: https://boolti.in
 
-## API Documentation
-
-API 개발 시 Swagger 문서를 참조하여 스펙을 파악합니다.
-
-- **Swagger URL**: https://dev.api.boolti.in/v3/api-docs/app
-- **인증 방식**: Bearer Token (bearerAuth)
-
-**주요 API 카테고리:**
-| 카테고리 | Base Path | 설명 |
-|---------|-----------|------|
-| 인증 | `/app/papi/v1/login/*` | 카카오/애플 로그인, 토큰 갱신 |
-| 유저 | `/app/api/v1/user*` | 프로필 조회/수정, 회원탈퇴 |
-| 공연 | `/app/papi/v1/show*` | 공연 검색, 상세 조회 |
-| 예약 | `/app/api/v1/reservation*` | 예약 목록/상세 |
-| 선물 | `/app/api/v1/order/*gift*` | 선물 수령/결제/취소 |
-| 결제 | `/app/api/v1/order/*payment*` | 결제 승인/취소 |
-
-**API 개발 시 참고사항:**
-- 새 API 구현 전 Swagger 스펙을 먼저 확인
-- Request/Response DTO는 스펙과 일치하도록 작성
-- `papi` 경로는 Public API (인증 불필요), `api` 경로는 인증 필요
-
-## Module Architecture
-
-The project follows a modular clean architecture with clear separation of concerns:
+## 모듈 구조
 
 ```
-app/              - Main application module, DI setup
-domain/           - Business logic, use cases, repositories (interfaces) — pure Kotlin
-data/             - Data layer, API services, repositories (implementations)
-presentation/     - UI layer with Jetpack Compose
-tosspayments/     - Payment integration module
-common/logger/    - Common logging utilities
-common/tracker/   - Common analytics tracking
+app/              - Application, DI 설정, Crashlytics/Timber 초기화
+domain/           - Repository 인터페이스, UseCase, 모델 — 순수 Kotlin (JVM 모듈)
+data/             - API(Retrofit), Room, DataStore, Repository 구현
+presentation/     - Compose 화면, ViewModel
+tosspayments/     - 토스페이먼츠 결제 위젯 Activity
+common/logger/    - 디버그 로그 수집 (CollectableDebugTree)
+common/tracker/   - Mixpanel 이벤트 트래킹 (AppTracker)
 ```
 
-**Key architectural patterns:**
-- **Clean Architecture**: Domain-driven design with clear dependency inversion
-- **MVVM**: ViewModels with StateFlow for UI state management
-- **Repository Pattern**: Data abstraction between domain and data layers
-- **Dependency Injection**: Hilt for DI throughout all modules
+- 의존 방향: `presentation → domain ← data`
+- 기능별로 패키지를 나눈다 (`presentation/screen/<기능>/`)
+- 모듈별 세부 규칙은 `.claude/rules/`에 있고, 해당 모듈 파일을 다룰 때 불러온다
 
-## Common Development Commands
+## 명령어
 
-### Building and Testing
 ```bash
-# Run all module tests
-./gradlew btTest
-
-# Build debug APK
-./gradlew assembleDebug
-
-# Build release APK
-./gradlew assembleRelease
-
-# Run specific module tests
+./gradlew btTest            # 전체 모듈 테스트 (CI와 같은 명령)
+./gradlew assembleDebug     # 디버그 APK
 ./gradlew domain:test
 ./gradlew data:testDebugUnitTest
 ./gradlew presentation:testDebugUnitTest
-
-# Clean build
-./gradlew clean
 ```
 
-### Key Build Features
-- **Custom APK naming**: Includes version, git hash, and timestamp
-- **BuildConfig secrets**: API keys loaded from `local.properties`
-- **Multi-environment support**: Debug/Release with different API endpoints
-- **Kotest**: Test framework configured across modules
+- 테스트: Kotest + MockK
+- 버전은 `gradle/libs.versions.toml`에서 확인한다
 
-## Development Setup Requirements
+## 공통 규칙
 
-### Required Files (Not in Git)
-- `local.properties` - Contains API keys and environment configs. 실제 값은 팀 비공개 채널에서 받는다.
-  ```
-  # 인증
-  KAKAO_APP_KEY="<카카오 앱 키>"
+- 금지
+  - `!!`
+  - 값이 없는 상태를 가짜 값(`"-999"` 등)으로 표현하기. `null`이나 별도 상태로 표현한다
+  - 전체 경로 클래스 이름 (import로 해결)
+  - 개인 디버그 로그 커밋 (디버깅 중 추가는 괜찮지만 커밋 전에 반드시 지운다)
+- `runBlocking`은 호출한 스레드를 멈추므로 쓰지 않는다. DataStore 값을 동기로 읽어야 할 때처럼 불가피한 경우에만 한시적으로 쓴다
+- 새 유틸을 만들기 전에 각 모듈의 `util` 패키지에 이미 있는지 먼저 찾는다
+- 처리한 에러는 `Timber.e(e)`로 남긴다 (Crashlytics로 올라감, `IOException`·취소 예외 제외). 원격 기록이 필요 없으면 `Timber.w`를 쓴다
 
-  # API 엔드포인트
-  DEV_BASE_URL="<개발 API base URL>"
-  PROD_BASE_URL="<운영 API base URL>"
-  DEV_DOMAIN="<개발 도메인>"
-  PROD_DOMAIN="<운영 도메인>"
+## 커밋
 
-  # 토스페이먼츠
-  DEV_TOSS_CLIENT_KEY="<개발 토스 클라이언트 키>"
-  DEV_TOSS_SECRET_KEY="<개발 토스 시크릿 키>"
-  PROD_TOSS_CLIENT_KEY="<운영 토스 클라이언트 키>"
-  PROD_TOSS_SECRET_KEY="<운영 토스 시크릿 키>"
+- 형식: `[Boolti-<이슈 번호>] <요약>` (예: `[Boolti-548] 프로필 이미지 복사를 IO 디스패처로 옮기기`)
+- `feat:`, `fix:` 같은 타입 접두사는 붙이지 않는다. 변경 종류는 PR 레이블로 구분한다
+- 이슈가 없으면 대괄호 없이 요약만 쓴다
+- 이슈 번호는 브랜치 이름에서 가져온다 (`feature/548-xxx`, `feature/Boolti-548` → `548`)
 
-  # 분석
-  DEV_MIXPANEL_TOKEN="<개발 Mixpanel 토큰>"
-  PROD_MIXPANEL_TOKEN="<운영 Mixpanel 토큰>"
+## CI (PR에서 실행)
 
-  # 외부 서비스
-  YOUTUBE_API_KEY="<YouTube Data API 키>"
+`pull-request-ci`, `anti-pattern-check`는 `develop`·`feature/**` 대상 PR에서 돈다.
 
-  # 디자인 도구 (Figma REST API용, 로컬 스킬에서 사용)
-  FIGMA_TOKEN="<Figma personal access token>"
-  ```
-- `keystore.properties` - Release signing configuration
 
-### Technology Stack
-- **Language**: Kotlin 2.3.10
-- **UI**: Jetpack Compose with Material3 (Compose BOM 2026.02.00)
-- **DI**: Hilt
-- **Networking**: Retrofit + OkHttp with Kotlinx Serialization
-- **Database**: Room
-- **State Management**: StateFlow, Compose State
-- **Testing**: Kotest, MockK
-- **Build**: Gradle with Version Catalogs (`gradle/libs.versions.toml`)
+| 워크플로 | 확인 내용 |
+|---|---|
+| `pull-request-ci` | `./gradlew btTest`, `assembleDebug`, APK 크기 비교. 실패 시 디스코드 알림 |
+| `anti-pattern-check` | data 레이어에 `runCatching` 추가 여부 (`suspendRunCatching`만 허용) |
+| `pr-milestone-required` | PR에 마일스톤 지정 여부 |
+| `release-version-check` | 릴리즈 PR의 versionCode·versionName |
 
-## Code Organization Patterns
+## Firebase
 
-### Domain Module
-- `model/` - Domain entities and value objects
-- `repository/` - Repository interfaces
-- `usecase/` - Business logic use cases
-- `exception/` - Domain-specific exceptions
-
-### Data Module
-- `datasource/` - Data source interfaces and implementations
-- `network/api/` - Retrofit service interfaces
-- `network/request/` - Request DTOs
-- `network/response/` - Response DTOs
-- `repository/` - Repository implementations
-- `db/` - Room database and DataStore
-
-### Presentation Module
-- `screen/` - Feature-based screen organization
-- `component/` - Reusable UI components
-- `navigation/` - Navigation setup and routes
-- `theme/` - Design system (colors, typography, dimensions)
-
-### Key Conventions
-- **Feature-based packaging**: Each feature in its own package
-- **State management**: UiState data classes with sealed class events
-- **Navigation**: Type-safe navigation with route objects
-- **Dependency flow**: domain ← data, presentation → domain
-
-## Testing Strategy
-
-- **Domain tests**: Pure unit tests with Kotest
-- **Data tests**: Repository and API integration tests
-- **Presentation tests**: ViewModel and UI component tests
-- **Test configuration**: JUnit Platform with Kotest runner
-
-## Firebase Integration
-
-- **Analytics**: User behavior tracking
-- **Crashlytics**: Crash reporting
-- **Cloud Messaging**: Push notifications
-- **Remote Config**: Feature flags and dynamic configuration
-- **App Distribution**: 테스터 배포
-  - Project ID: `boolti-9a521`
-  - Debug App ID: `1:965765235527:android:fd491b0a5869fc69d30262` (package: `com.nexters.boolti.debug`)
-  - Release App ID: `1:965765235527:android:6ed43e2462526efbd30262` (package: `com.nexters.boolti`)
-  - 테스터 그룹: `안드폰-사용자들`
+- 사용 중: Analytics, Crashlytics, Cloud Messaging(`BtFirebaseMessagingService`), Remote Config(`RemoteConfigDataSource`)
+- 디버그 앱(`com.nexters.boolti.debug`)은 Firebase에 별도 앱으로 등록돼 있어 운영 데이터와 섞이지 않는다
+- App Distribution 배포 정보는 `boolti-app-distribution` 스킬에 있다

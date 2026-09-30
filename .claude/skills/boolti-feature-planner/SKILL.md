@@ -80,7 +80,7 @@ CLAUDE.md에 없는, 이 스킬에서만 강제하는 규칙.
 - 프로젝트 클래스(`com.nexters.boolti.*`)를 fully-qualified name으로 직접 사용
 
 **Compose 작성/수정 시**
-- `verify-compose-conventions` 스킬 실행 (사용자 글로벌 스킬, `~/.claude/skills/`)
+- `.claude/rules/presentation.md`의 Composable 규칙 준수 확인
 
 ## Quality Gate
 

@@ -15,8 +15,8 @@ import kotlin.math.roundToInt
 fun asyncImageBlurModel(
     context: Context,
     imageUrl: String,
-    radius: Int = 25,
-    scale: Float = .5f,
+    radius: Int = 12,
+    scale: Float = .25f,
 ): ImageRequest = ImageRequest.Builder(context)
     .data(imageUrl)
     .transformations(
@@ -30,11 +30,11 @@ fun asyncImageBlurModel(
     .build()
 
 class BlurTransformation(
-    private val radius: Int = 25,
-    private val scale: Float = 0.5f,
+    private val radius: Int = 12,
+    private val scale: Float = .25f,
 ) : Transformation {
 
-    override val cacheKey: String = "${javaClass.name}-$radius"
+    override val cacheKey: String = "${javaClass.name}-$radius-$scale"
 
     override suspend fun transform(
         input: Bitmap,
@@ -43,22 +43,22 @@ class BlurTransformation(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        return other is BlurTransformation && radius == other.radius
+        return other is BlurTransformation && radius == other.radius && scale == other.scale
     }
 
-    override fun hashCode(): Int = radius.hashCode()
+    override fun hashCode(): Int = 31 * radius + scale.hashCode()
 
 }
 
 private suspend fun Bitmap.blur(
     scale: Float,
     radius: Int,
-): Bitmap? = withContext(Dispatchers.IO) {
+): Bitmap? = withContext(Dispatchers.Default) {
     var sentBitmap = this@blur
     val width = (sentBitmap.width * scale).roundToInt()
     val height = (sentBitmap.height * scale).roundToInt()
     sentBitmap = Bitmap.createScaledBitmap(sentBitmap, width, height, false)
-    val bitmap = sentBitmap.copy(sentBitmap.config!!, true)
+    val bitmap = sentBitmap.copy(sentBitmap.config ?: Bitmap.Config.ARGB_8888, true)
     if (radius < 1) {
         return@withContext null
     }

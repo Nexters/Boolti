@@ -48,6 +48,21 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 internal object NetworkModule {
+    private val jsonConverterFactory = Json {
+        isLenient = true
+        prettyPrint = true
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }.asConverterFactory("application/json".toMediaType())
+
+    // 모든 클라이언트가 이 클라이언트에서 파생돼 연결 풀·스레드 풀을 공유한다
+    private val baseOkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build()
+    }
+
     private fun createLoggingInterceptor(): HttpLoggingInterceptor {
         // 각 스레드별로 로그 버퍼 관리
         val logBuffer = ThreadLocal.withInitial { StringBuilder() }
@@ -82,16 +97,10 @@ internal object NetworkModule {
     @Provides
     @AuthRetrofit
     fun provideAuthRetrofit(@AuthOkHttpClient okHttpClient: OkHttpClient): Retrofit {
-        val json = Json {
-            isLenient = true
-            prettyPrint = true
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(jsonConverterFactory)
             .build()
     }
 
@@ -99,32 +108,20 @@ internal object NetworkModule {
     @Provides
     @NonAuthRetrofit
     fun provideNonAuthRetrofit(@NonAuthOkHttpClient okHttpClient: OkHttpClient): Retrofit {
-        val json = Json {
-            isLenient = true
-            prettyPrint = true
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(jsonConverterFactory)
             .build()
     }
 
     @Singleton
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val json = Json {
-            isLenient = true
-            prettyPrint = true
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(jsonConverterFactory)
             .build()
     }
 
@@ -206,16 +203,10 @@ internal object NetworkModule {
     @Provides
     @YouTubeRetrofit
     fun provideYouTubeRetrofit(@YouTubeOkHttpClient okHttpClient: OkHttpClient): Retrofit {
-        val json = Json {
-            isLenient = true
-            prettyPrint = true
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }
         return Retrofit.Builder()
             .baseUrl("https://www.googleapis.com/youtube/v3/")
             .client(okHttpClient)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(jsonConverterFactory)
             .build()
     }
 
@@ -223,9 +214,7 @@ internal object NetworkModule {
     @Provides
     @YouTubeOkHttpClient
     fun provideYouTubeOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+        return baseOkHttpClient.newBuilder()
             .addInterceptor(createLoggingInterceptor())
             .build()
     }
@@ -243,9 +232,7 @@ internal object NetworkModule {
         customHeaderInterceptor: CustomHeaderInterceptor,
         authenticator: AuthAuthenticator
     ): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+        return baseOkHttpClient.newBuilder()
             .authenticator(authenticator)
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(authInterceptor)
@@ -260,9 +247,7 @@ internal object NetworkModule {
         authInterceptor: AuthInterceptor,
         customHeaderInterceptor: CustomHeaderInterceptor,
     ): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+        return baseOkHttpClient.newBuilder()
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(authInterceptor)
             .addInterceptor(RetryInterceptor())
@@ -274,9 +259,7 @@ internal object NetworkModule {
     @Provides
     @NonAuthOkHttpClient
     fun provideNoneAuthOkHttpClient(customHeaderInterceptor: CustomHeaderInterceptor): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+        return baseOkHttpClient.newBuilder()
             .addInterceptor(customHeaderInterceptor)
             .addInterceptor(RetryInterceptor())
             .addInterceptor(createLoggingInterceptor())

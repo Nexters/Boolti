@@ -27,10 +27,10 @@ class HostRepositoryImplTest : BehaviorSpec() {
             }
             When("body가 false이면") {
                 coEvery { dataSource.requestEntrance(request) } returns Response.success(false)
-                Then("UsedTicket 에러를 던진다") {
+                Then("Unknown 에러를 던진다") {
                     shouldThrow<QrScanException> {
                         repository.requestEntrance(request).single()
-                    }.errorType shouldBe QrErrorType.UsedTicket
+                    }.errorType shouldBe QrErrorType.Unknown
                 }
             }
         }

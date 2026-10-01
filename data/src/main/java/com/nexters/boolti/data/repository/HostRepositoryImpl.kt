@@ -17,7 +17,7 @@ internal class HostRepositoryImpl @Inject constructor(
     override fun requestEntrance(request: QrScanRequest): Flow<Boolean> = flow {
         val response = dataSource.requestEntrance(request)
         if (response.isSuccessful) {
-            if (response.body() != true) throw QrScanException(QrErrorType.UsedTicket)
+            if (response.body() != true) throw QrScanException(QrErrorType.Unknown)
             emit(true)
         } else {
             val errMsg = response.errorBody()?.string()

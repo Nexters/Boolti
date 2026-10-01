@@ -21,7 +21,8 @@ annotation class DoNotRetry
  *
  * 결제·PUT 처럼 한 번만 실행돼야 하는 요청은 GET 이 아니므로 재시도하지 않는다.
  * 대기 시간에는 jitter(0~50% 랜덤 추가)를 넣어 여러 기기가 동시에 재시도하지 않게 한다.
- * 응답에 `Retry-After`(초)가 있으면 그 값만큼 기다리고, [maxRetryAfter] 보다 길면 재시도하지 않는다.
+ * 응답에 `Retry-After`(초)가 있으면 기본 대기 대신 그 값에 jitter 를 더해 기다린다.
+ * `Retry-After` 가 [maxRetryAfter] 보다 길면 재시도하지 않고, jitter 를 더한 대기도 [maxRetryAfter] 를 넘지 않는다.
  */
 internal class RetryInterceptor(
     private val maxRetries: Int = 3,
@@ -40,7 +41,7 @@ internal class RetryInterceptor(
             val retryAfter = response.header("Retry-After")?.toLongOrNull()?.seconds
             if (retryAfter != null && retryAfter > maxRetryAfter) break
             response.close()
-            Thread.sleep((retryAfter ?: delay.withJitter()).inWholeMilliseconds)
+            Thread.sleep((retryAfter ?: delay).withJitter().coerceAtMost(maxRetryAfter).inWholeMilliseconds)
             if (chain.call().isCanceled()) throw IOException("Canceled")
             delay *= 2
             response = chain.proceed(request)

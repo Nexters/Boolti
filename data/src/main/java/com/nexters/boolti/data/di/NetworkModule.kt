@@ -222,11 +222,10 @@ internal object NetworkModule {
     @Singleton
     @Provides
     @YouTubeOkHttpClient
-    fun provideYouTubeOkHttpClient(customHeaderInterceptor: CustomHeaderInterceptor): OkHttpClient {
+    fun provideYouTubeOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
-            .addInterceptor(customHeaderInterceptor)
             .addInterceptor(createLoggingInterceptor())
             .build()
     }

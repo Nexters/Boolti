@@ -1,39 +1,39 @@
 package com.nexters.boolti.presentation.screen.ticketing
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nexters.boolti.domain.exception.TicketingErrorType
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.model.InviteCodeStatus
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
+import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
+import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
-import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
-import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
-import com.nexters.boolti.presentation.base.BaseViewModel
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,231 +42,202 @@ class TicketingViewModel @Inject constructor(
     private val repository: TicketingRepository,
     getCachedUserUseCase: GetCachedUserUseCase,
     private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
-) : BaseViewModel() {
-    val showId: String = requireNotNull(savedStateHandle["showId"])
-    val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
+) : ViewModel() {
+    private val showId: String = requireNotNull(savedStateHandle["showId"])
+    private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
     private val userId = checkNotNull(getCachedUserUseCase()?.id) {
         "[TicketingViewModel] 사용자 정보가 없습니다."
     }
 
-    private val _uiState = MutableStateFlow(TicketingState())
-    val uiState = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<TicketingUiState>(TicketingUiState.Loading)
+    val uiState: StateFlow<TicketingUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<TicketingEvent>()
-    val event = _event.receiveAsFlow()
+    private val _event = Channel<TicketingEvent>(Channel.BUFFERED)
+    val event: Flow<TicketingEvent> = _event.receiveAsFlow()
 
-    private val state: TicketingState
-        get() = uiState.value
+    private var reservationJob: Job? = null
+    private var inviteCodeJob: Job? = null
 
     init {
         load()
     }
 
-    fun reservation() {
-        viewModelScope.launch(recordExceptionHandler) {
-            when {
-                state.isInviteTicket -> reservationInviteTicket()
-                !state.isInviteTicket && state.totalPrice > 0 -> progressPayment()
-                else -> reservationFreeTicket()
+    fun onAction(action: TicketingAction) {
+        val state = uiState.value as? TicketingUiState.Success
+        when (action) {
+            TicketingAction.RetryLoad -> load()
+            is TicketingAction.ChangeReservationName -> updateSuccess { it.copy(reservationName = action.name) }
+            is TicketingAction.ChangeReservationContact -> updateSuccess { it.copy(reservationContact = action.contact) }
+            is TicketingAction.ChangeDepositorName -> updateSuccess { it.copy(depositorName = action.name) }
+            is TicketingAction.ChangeDepositorContact -> updateSuccess { it.copy(depositorContact = action.contact) }
+            TicketingAction.ToggleSameContactInfo -> updateSuccess { it.copy(isSameContactInfo = !it.isSameContactInfo) }
+            is TicketingAction.ChangeInviteCode -> updateSuccess {
+                it.copy(inviteCode = action.code, inviteCodeStatus = InviteCodeStatus.Default)
             }
+            TicketingAction.CheckInviteCode -> if (state != null && inviteCodeJob?.isActive != true) {
+                inviteCodeJob = launchWithLoading { checkInviteCode(state) }
+            }
+            is TicketingAction.ChangePreQuestionAnswer -> updateSuccess {
+                it.copy(preQuestionAnswers = (it.preQuestionAnswers + (action.questionId to action.answer)).toImmutableMap())
+            }
+            TicketingAction.ToggleAgreement -> updateSuccess { it.toggleAgreement() }
+            is TicketingAction.ShowPolicy -> updateSuccess { it.copy(policyPageUrl = action.url) }
+            TicketingAction.DismissPolicy -> updateSuccess { it.copy(policyPageUrl = null) }
+            TicketingAction.ClickPayment -> updateSuccess { it.copy(dialog = TicketingDialog.Confirm) }
+            TicketingAction.ConfirmReservation -> if (state != null && reservationJob?.isActive != true) {
+                reservationJob = launchWithLoading { reservation(state) }
+            }
+            TicketingAction.DismissDialog -> updateSuccess { it.copy(dialog = null) }
+            is TicketingAction.PaymentSucceeded -> if (state != null) {
+                viewModelScope.launch { submitPreQuestionAnswers(action.reservationId, state) }
+                viewModelScope.launch { completeReservation(action.reservationId, state) }
+            }
+            TicketingAction.PaymentSoldOut -> updateSuccess { it.copy(dialog = TicketingDialog.SoldOut) }
+            TicketingAction.PaymentFailed -> updateSuccess { it.copy(dialog = TicketingDialog.PaymentFailure) }
         }
     }
 
-    private suspend fun progressPayment() {
-        requestOrderId()
-            .onStart { _uiState.update { it.copy(loading = true) } }
-            .onEach { orderId ->
-                Timber.tag("[MANGBAAM]TicketingViewModel").d("reservation orderId: %s", orderId)
-                event(TicketingEvent.ProgressPayment(userId, orderId))
-            }
-            .onCompletion { _uiState.update { it.copy(loading = false) } }
-            .firstOrNull()
-    }
-
-    private suspend fun reservationInviteTicket() {
-        val request = TicketingRequest.Invite(
-            inviteCode = state.inviteCode,
-            userId = userId,
-            showId = showId,
-            salesTicketTypeId = salesTicketTypeId,
-            reservationName = state.reservationName,
-            reservationPhoneNumber = state.reservationContact,
-        )
-        repository.requestReservation(request)
-            .onStart { _uiState.update { it.copy(loading = true) } }
-            .onCompletion { _uiState.update { it.copy(loading = false) } }
-            .singleOrNull()?.let { reservationId ->
-                Timber.tag("MANGBAAM-TicketingViewModel(reservation)").d("예매 성공: $reservationId")
-                submitPreQuestionAnswers(reservationId)
-                event(TicketingEvent.TicketingSuccess(reservationId, showId))
-            }
-    }
-
-    private suspend fun reservationFreeTicket() {
-        val request = TicketingRequest.Free(
-            ticketCount = ticketCount,
-            userId = userId,
-            showId = showId,
-            salesTicketTypeId = salesTicketTypeId,
-            reservationName = uiState.value.reservationName,
-            reservationPhoneNumber = uiState.value.reservationContact,
-        )
-        repository.requestReservation(request)
-            .catch { e ->
-                if (e !is TicketingException) throw e
-                if (
-                    e.errorType in listOf(
-                        TicketingErrorType.NoRemainingQuantity,
-                        TicketingErrorType.ApprovePaymentFailed,
-                        TicketingErrorType.Unknown,
-                    )
-                ) {
-                    event(TicketingEvent.NoRemainingQuantity)
-                }
-            }
-            .singleOrNull()?.let { reservationId ->
-                submitPreQuestionAnswers(reservationId)
-                event(TicketingEvent.TicketingSuccess(reservationId, showId))
-            }
-    }
-
+    /** 사전 질문을 못 불러오면 필수 답변 없이 예매될 수 있어서, 둘 중 하나라도 실패하면 LoadFailed로 둔다. */
     private fun load() {
-        viewModelScope.launch(recordExceptionHandler) {
-            repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
-                .onStart {
-                    _uiState.update { it.copy(loading = true) }
-                }
-                .singleOrNull()?.let { info ->
-                    _uiState.update {
-                        it.copy(
-                            loading = false,
-                            poster = info.showImg,
-                            showDate = info.showDate,
-                            showName = info.showName,
-                            ticketName = info.saleTicketName,
-                            ticketCount = info.ticketCount,
-                            totalPrice = info.totalPrice,
-                            isInviteTicket = info.isInviteTicket,
-                        )
-                    }
-                }
-            getRefundPolicyUsecase()
-                .onEach { refundPolicy ->
-                    _uiState.update {
-                        it.copy(refundPolicy = refundPolicy)
-                    }
-                }
-                .launchIn(viewModelScope + recordExceptionHandler)
+        viewModelScope.launch {
+            _uiState.value = TicketingUiState.Loading
+            val info = async { repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)) }
+            val preQuestions = async { repository.getPreQuestions(showId) }
+            val refundPolicy = async { getRefundPolicyUsecase().catch { emit(emptyList()) }.first() }
 
-            repository.getPreQuestions(showId)
-                .onEach { preQuestions ->
-                    _uiState.update {
-                        it.copy(preQuestions = preQuestions.toImmutableList())
-                    }
-                }
-                .catch { e ->
-                    Timber.e(e, "Failed to load pre-questions")
-                }
-                .launchIn(viewModelScope + recordExceptionHandler)
-        }
-    }
-
-    fun toggleIsSameContactInfo() {
-        _uiState.update {
-            it.copy(isSameContactInfo = !it.isSameContactInfo)
-        }
-    }
-
-    fun checkInviteCode() {
-        viewModelScope.launch(recordExceptionHandler) {
-            repository.checkInviteCode(
-                CheckInviteCodeRequest(
+            val ticketingInfo = info.await().onFailure { e -> Timber.e(e) }.getOrNull()
+            val questions = preQuestions.await().onFailure { e -> Timber.e(e) }.getOrNull()
+            _uiState.value = if (ticketingInfo == null || questions == null) {
+                TicketingUiState.LoadFailed
+            } else {
+                TicketingUiState.Success(
                     showId = showId,
-                    salesTicketId = salesTicketTypeId,
-                    inviteCode = state.inviteCode,
+                    salesTicketTypeId = salesTicketTypeId,
+                    poster = ticketingInfo.showImg,
+                    showDate = ticketingInfo.showDate,
+                    showName = ticketingInfo.showName,
+                    ticketName = ticketingInfo.saleTicketName,
+                    ticketCount = ticketingInfo.ticketCount,
+                    totalPrice = ticketingInfo.totalPrice,
+                    isInviteTicket = ticketingInfo.isInviteTicket,
+                    refundPolicy = refundPolicy.await(),
+                    preQuestions = questions.toImmutableList(),
                 )
-            ).onStart {
-                _uiState.update { it.copy(loading = true) }
-            }.catch { e ->
-                _uiState.update { it.copy(loading = false) }
-                throw e
-            }.singleOrNull()?.let { status ->
-                _uiState.update {
-                    it.copy(loading = false, inviteCodeStatus = status)
+            }
+        }
+    }
+
+    private suspend fun checkInviteCode(state: TicketingUiState.Success) {
+        val request = CheckInviteCodeRequest(
+            showId = showId,
+            salesTicketId = salesTicketTypeId,
+            inviteCode = state.inviteCode,
+        )
+        repository.checkInviteCode(request)
+            .onSuccess { status -> updateSuccess { it.copy(inviteCodeStatus = status) } }
+            .onFailure { e -> showError(e) }
+    }
+
+    private suspend fun reservation(state: TicketingUiState.Success) {
+        when {
+            state.isInviteTicket -> reserve(
+                state,
+                TicketingRequest.Invite(
+                    inviteCode = state.inviteCode,
+                    userId = userId,
+                    showId = showId,
+                    salesTicketTypeId = salesTicketTypeId,
+                    reservationName = state.reservationName,
+                    reservationPhoneNumber = state.reservationContact,
+                ),
+            )
+
+            state.totalPrice > 0 -> progressPayment(state)
+            else -> reserve(
+                state,
+                TicketingRequest.Free(
+                    ticketCount = ticketCount,
+                    userId = userId,
+                    showId = showId,
+                    salesTicketTypeId = salesTicketTypeId,
+                    reservationName = state.reservationName,
+                    reservationPhoneNumber = state.reservationContact,
+                ),
+            )
+        }
+    }
+
+    private suspend fun progressPayment(state: TicketingUiState.Success) {
+        repository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
+            .onSuccess { orderId ->
+                updateSuccess { it.copy(dialog = null) }
+                _event.send(TicketingEvent.LaunchPayment(userId, orderId, state))
+            }
+            .onFailure { e -> showError(e) }
+    }
+
+    private suspend fun reserve(state: TicketingUiState.Success, request: TicketingRequest) {
+        repository.requestReservation(request)
+            .onSuccess { reservationId ->
+                submitPreQuestionAnswers(reservationId, state)
+                completeReservation(reservationId, state)
+            }
+            .onFailure { e ->
+                // 무료 티켓은 서버의 예매 실패 응답을 매진으로 안내한다
+                if (request is TicketingRequest.Free && e is TicketingException) {
+                    updateSuccess { it.copy(dialog = TicketingDialog.SoldOut) }
+                } else {
+                    showError(e)
                 }
             }
-        }
     }
 
-    fun setReservationName(name: String) {
-        _uiState.update { it.copy(reservationName = name) }
+    private suspend fun completeReservation(reservationId: String, state: TicketingUiState.Success) {
+        AppTracker.complete(
+            target = "Purchase",
+            properties = mapOf(
+                "booking_type" to "Direct",
+                "show_id" to showId,
+                "show_name" to state.showName,
+                "ticket_quantity" to state.ticketCount,
+                "total_amount" to state.totalPrice,
+            ),
+        )
+        updateSuccess { it.copy(dialog = null) }
+        _event.send(TicketingEvent.NavigateToPaymentComplete(reservationId, showId))
     }
 
-    fun setReservationPhoneNumber(number: String) {
-        _uiState.update { it.copy(reservationContact = number) }
-    }
-
-    fun setDepositorName(name: String) {
-        _uiState.update { it.copy(depositorName = name) }
-    }
-
-    fun setDepositorPhoneNumber(number: String) {
-        _uiState.update { it.copy(depositorContact = number) }
-    }
-
-    fun setInviteCode(code: String) {
-        _uiState.update { it.copy(inviteCode = code, inviteCodeStatus = InviteCodeStatus.Default) }
-    }
-
-    fun toggleAgreement() {
-        _uiState.update { it.toggleAgreement() }
-    }
-
-    fun setPreQuestionAnswer(questionId: Long, answer: String) {
-        _uiState.update {
-            val newAnswers = it.preQuestionAnswers.toMutableMap()
-            newAnswers[questionId] = answer
-            it.copy(preQuestionAnswers = newAnswers.toImmutableMap())
-        }
-    }
-
-    private suspend fun submitPreQuestionAnswers(reservationId: String) {
+    private suspend fun submitPreQuestionAnswers(reservationId: String, state: TicketingUiState.Success) {
         if (state.preQuestions.isEmpty()) return
-
-        val answers = state.preQuestionAnswers
-            .map { (questionId, answer) ->
-                PreQuestionAnswerRequest(
-                    preQuestionId = questionId,
-                    answer = answer,
-                )
-            }
 
         val request = SubmitPreQuestionAnswersRequest(
             reservationId = reservationId,
-            answers = answers,
+            answers = state.preQuestionAnswers.map { (questionId, answer) ->
+                PreQuestionAnswerRequest(preQuestionId = questionId, answer = answer)
+            },
         )
-
         repository.submitPreQuestionAnswers(request)
-            .catch { e ->
-                Timber.e(e, "Failed to submit pre-question answers")
-            }
-            .firstOrNull()
+            .onFailure { e -> Timber.e(e, "Failed to submit pre-question answers") }
     }
 
-    fun submitPreQuestionAnswersForReservation(reservationId: String) {
-        viewModelScope.launch(recordExceptionHandler) {
-            submitPreQuestionAnswers(reservationId)
-        }
+    private suspend fun showError(e: Throwable) {
+        Timber.e(e)
+        updateSuccess { it.copy(dialog = null) }
+        val message = if (e is IOException) R.string.error_network else R.string.message_unknown_error
+        _event.send(TicketingEvent.ShowErrorMessage(message))
     }
 
-    private fun requestOrderId(): Flow<String> {
-        return repository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
+    private inline fun updateSuccess(transform: (TicketingUiState.Success) -> TicketingUiState.Success) {
+        _uiState.update { if (it is TicketingUiState.Success) transform(it) else it }
     }
 
-    private fun event(event: TicketingEvent) {
-        viewModelScope.launch {
-            _event.send(event)
+    private fun launchWithLoading(block: suspend () -> Unit): Job = viewModelScope.launch {
+        updateSuccess { it.copy(loading = true) }
+        try {
+            block()
+        } finally {
+            updateSuccess { it.copy(loading = false) }
         }
     }
 }

@@ -7,9 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -20,13 +23,14 @@ import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.core.graphics.createBitmap
 
 @Composable
 fun rememberQrBitmapPainter(
     content: String,
     size: Dp = 150.dp,
     padding: Dp = 0.dp,
-): BitmapPainter {
+): Painter {
 
     val density = LocalDensity.current
     val sizePx = with(density) { size.roundToPx() }
@@ -61,32 +65,24 @@ fun rememberQrBitmapPainter(
 
             val matrixWidth = bitmapMatrix?.width ?: sizePx
             val matrixHeight = bitmapMatrix?.height ?: sizePx
+            val black = Color.Black.toArgb()
+            val white = Color.White.toArgb()
 
-            val newBitmap = Bitmap.createBitmap(
-                bitmapMatrix?.width ?: sizePx,
-                bitmapMatrix?.height ?: sizePx,
-                Bitmap.Config.ARGB_8888,
-            )
-
-            for (x in 0 until matrixWidth) {
-                for (y in 0 until matrixHeight) {
-                    val shouldColorPixel = bitmapMatrix?.get(x, y) ?: false
-                    val pixelColor = if (shouldColorPixel) Color.Black else Color.White
-
-                    newBitmap.setPixel(x, y, pixelColor.toArgb())
-                }
+            val pixels = IntArray(matrixWidth * matrixHeight) { i ->
+                if (bitmapMatrix?.get(i % matrixWidth, i / matrixWidth) == true) black else white
             }
+
+            val newBitmap = createBitmap(matrixWidth, matrixHeight)
+            newBitmap.setPixels(pixels, 0, matrixWidth, 0, 0, matrixWidth, matrixHeight)
 
             bitmap = newBitmap
         }
     }
 
     return remember(bitmap) {
-        val currentBitmap = bitmap ?: Bitmap.createBitmap(
-            sizePx, sizePx,
-            Bitmap.Config.ARGB_8888,
-        ).apply { eraseColor(Color.Transparent.toArgb()) }
-
-        BitmapPainter(currentBitmap.asImageBitmap())
+        bitmap?.let { BitmapPainter(it.asImageBitmap()) } ?: object : Painter() {
+            override val intrinsicSize = Size(sizePx.toFloat(), sizePx.toFloat())
+            override fun DrawScope.onDraw() = Unit
+        }
     }
 }

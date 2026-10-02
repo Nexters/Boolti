@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.PreQuestionAnswer
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -28,7 +28,7 @@ class ReservationDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
     private val giftRepository: GiftRepository,
-    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : BaseViewModel() {
     private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
         "reservationId가 전달되어야 합니다."
@@ -104,7 +104,7 @@ class ReservationDetailViewModel @Inject constructor(
     }
 
     private fun fetchRefundPolicy() {
-        getRefundPolicyUsecase()
+        getRefundPolicyUseCase()
             .onEach { refundPolicy ->
                 _refundPolicy.value = refundPolicy
             }

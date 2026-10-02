@@ -14,8 +14,8 @@ import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
 import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -41,7 +41,7 @@ class TicketingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
     getCachedUserUseCase: GetCachedUserUseCase,
-    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : ViewModel() {
     private val showId: String = requireNotNull(savedStateHandle["showId"])
     private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
@@ -104,7 +104,7 @@ class TicketingViewModel @Inject constructor(
             _uiState.value = TicketingUiState.Loading
             val info = async { repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)) }
             val preQuestions = async { repository.getPreQuestions(showId) }
-            val refundPolicy = async { getRefundPolicyUsecase().catch { emit(emptyList()) }.first() }
+            val refundPolicy = async { getRefundPolicyUseCase().catch { emit(emptyList()) }.first() }
 
             val ticketingInfo = info.await().onFailure { e -> Timber.e(e) }.getOrNull()
             val questions = preQuestions.await().onFailure { e -> Timber.e(e) }.getOrNull()

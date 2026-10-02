@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.nexters.boolti.domain.model.TicketingInfo
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.TicketingRepository
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import io.kotest.core.spec.style.DescribeSpec
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -29,7 +29,7 @@ class TicketingViewModelTest : DescribeSpec({
         savedStateHandle = SavedStateHandle(mapOf("showId" to "show", "salesTicketId" to "ticket")),
         repository = repository,
         getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user") },
-        getRefundPolicyUsecase = mockk { every { this@mockk.invoke() } returns flowOf(emptyList()) },
+        getRefundPolicyUseCase = mockk { every { this@mockk.invoke() } returns flowOf(emptyList()) },
     )
 
     describe("유료 티켓 예매") {

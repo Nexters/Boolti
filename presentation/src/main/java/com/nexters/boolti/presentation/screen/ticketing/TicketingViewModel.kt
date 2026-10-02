@@ -218,7 +218,7 @@ class TicketingViewModel @Inject constructor(
             },
         )
         repository.submitPreQuestionAnswers(request)
-            .onFailure { e -> Timber.e(e, "Failed to submit pre-question answers") }
+            .onFailure { e -> Timber.e(e, "사전 질문 답변 등록 실패: reservationId=$reservationId") }
     }
 
     private suspend fun showError(e: Throwable) {

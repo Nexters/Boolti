@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -74,26 +75,24 @@ class GiftViewModel @Inject constructor(
             }
             .launchIn(viewModelScope + recordExceptionHandler)
 
-        ticketingRepository.getTicketingInfo(
-            TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)
-        ).onStart {
+        viewModelScope.launch(recordExceptionHandler) {
             _uiState.update { it.copy(loading = true) }
-        }.onEach { info ->
-            _uiState.update {
-                it.copy(
-                    poster = info.showImg,
-                    showDate = info.showDate,
-                    showName = info.showName,
-                    ticketName = info.saleTicketName,
-                    ticketCount = info.ticketCount,
-                    totalPrice = info.totalPrice,
-                )
-            }
-        }.onCompletion {
-            _uiState.update {
-                it.copy(loading = false)
-            }
-        }.launchIn(viewModelScope + recordExceptionHandler)
+            ticketingRepository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
+                .onSuccess { info ->
+                    _uiState.update {
+                        it.copy(
+                            poster = info.showImg,
+                            showDate = info.showDate,
+                            showName = info.showName,
+                            ticketName = info.saleTicketName,
+                            ticketCount = info.ticketCount,
+                            totalPrice = info.totalPrice,
+                        )
+                    }
+                }
+                .onFailure { e -> Timber.e(e) }
+            _uiState.update { it.copy(loading = false) }
+        }
     }
 
     fun updateMessage(message: String) {
@@ -148,13 +147,13 @@ class GiftViewModel @Inject constructor(
             return
         }
 
-        ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
-            .onStart { _uiState.update { it.copy(loading = true) } }
-            .onEach { orderId ->
-                sendEvent(GiftEvent.ProgressPayment(userId, orderId))
-            }
-            .onCompletion { _uiState.update { it.copy(loading = false) } }
-            .launchIn(viewModelScope + recordExceptionHandler)
+        viewModelScope.launch(recordExceptionHandler) {
+            _uiState.update { it.copy(loading = true) }
+            ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
+                .onSuccess { orderId -> sendEvent(GiftEvent.ProgressPayment(userId, orderId)) }
+                .onFailure { e -> Timber.e(e) }
+            _uiState.update { it.copy(loading = false) }
+        }
     }
 
     private fun sendEvent(event: GiftEvent) {

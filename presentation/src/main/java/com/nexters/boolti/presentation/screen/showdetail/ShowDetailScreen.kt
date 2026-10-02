@@ -124,20 +124,16 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
+import com.nexters.boolti.presentation.util.rememberCountdown
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -226,23 +222,28 @@ fun ShowDetailScreen(
                 ) {
                     BtCircularProgressIndicator()
                 }
-            } else if (uiState.showDetail != null) {
-                ShowDetailScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    showDetail = uiState.showDetail!!,
-                    castTeams = uiState.castTeams,
-                    selectedTab = uiState.selectedTab,
-                    navigateToLogin = navigateToLogin,
-                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-                    onTicketSelected = onTicketSelected,
-                    onGiftTicketSelected = onGiftTicketSelected,
-                    navigateToProfile = navigateToProfile,
-                    navigateToPlace = navigateToPlace,
-                    isLoggedIn = isLoggedIn == true,
-                    onSelectTab = viewModel::selectTab,
-                    shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
-                    doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
-                )
+            } else {
+                val showDetail = uiState.showDetail
+                val showState = uiState.showState
+                if (showDetail != null && showState != null) {
+                    ShowDetailScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        showDetail = showDetail,
+                        showState = showState,
+                        castTeams = uiState.castTeams,
+                        selectedTab = uiState.selectedTab,
+                        navigateToLogin = navigateToLogin,
+                        navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                        onTicketSelected = onTicketSelected,
+                        onGiftTicketSelected = onGiftTicketSelected,
+                        navigateToProfile = navigateToProfile,
+                        navigateToPlace = navigateToPlace,
+                        isLoggedIn = isLoggedIn == true,
+                        onSelectTab = viewModel::selectTab,
+                        shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
+                        doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
+                    )
+                }
             }
         }
     }
@@ -251,6 +252,7 @@ fun ShowDetailScreen(
 @Composable
 fun ShowDetailScreen(
     showDetail: ShowDetail,
+    showState: ShowState,
     castTeams: List<CastTeams>,
     selectedTab: Int,
     navigateToLogin: () -> Unit,
@@ -274,15 +276,6 @@ fun ShowDetailScreen(
     doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showState by remember(showDetail) {
-        flow {
-            while (true) {
-                emit(showDetail.state.truncatedToSeconds())
-                delay(200.milliseconds)
-            }
-        }.distinctUntilChanged()
-    }.collectAsStateWithLifecycle(showDetail.state)
-
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
     val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
@@ -1117,19 +1110,7 @@ private fun Divider(modifier: Modifier = Modifier) {
 private fun CountDownBanner(
     deadlineDateTime: LocalDateTime,
 ) {
-    val remainingTime by remember(deadlineDateTime) {
-        flow {
-            while (true) {
-                val duration = Duration.between(
-                    LocalDateTime.now(),
-                    deadlineDateTime
-                )
-                emit(Duration.ofSeconds(maxOf(duration, Duration.ZERO).seconds))
-                if (duration <= Duration.ZERO) break
-                delay(200.milliseconds)
-            }
-        }.distinctUntilChanged()
-    }.collectAsStateWithLifecycle(Duration.ZERO)
+    val remainingTime by rememberCountdown(deadlineDateTime)
 
     Box(
         modifier = Modifier
@@ -1145,15 +1126,13 @@ private fun CountDownBanner(
     }
 }
 
-private fun ShowState.truncatedToSeconds(): ShowState =
-    if (this is ShowState.WaitingTicketing) copy(remainingTime = Duration.ofSeconds(remainingTime.seconds)) else this
-
 @Preview
 @Composable
 private fun ShowDetailScreenPreview() {
     BooltiTheme {
         ShowDetailScreen(
             showDetail = ShowDetail(),
+            showState = ShowState.TicketingInProgress,
             castTeams = emptyList(),
             selectedTab = 0,
             navigateToLogin = {},

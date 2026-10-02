@@ -76,7 +76,7 @@ class TicketingViewModel @Inject constructor(
                 it.copy(inviteCode = action.code, inviteCodeStatus = InviteCodeStatus.Default)
             }
             TicketingAction.CheckInviteCode -> if (state != null && inviteCodeJob?.isActive != true) {
-                inviteCodeJob = launchWithLoading { checkInviteCode(state) }
+                inviteCodeJob = viewModelScope.launch { checkInviteCode(state) }
             }
             is TicketingAction.ChangePreQuestionAnswer -> updateSuccess {
                 it.copy(preQuestionAnswers = (it.preQuestionAnswers + (action.questionId to action.answer)).toImmutableMap())
@@ -86,7 +86,7 @@ class TicketingViewModel @Inject constructor(
             TicketingAction.DismissPolicy -> updateSuccess { it.copy(policyPageUrl = null) }
             TicketingAction.ClickPayment -> updateSuccess { it.copy(dialog = TicketingDialog.Confirm) }
             TicketingAction.ConfirmReservation -> if (state != null && reservationJob?.isActive != true) {
-                reservationJob = launchWithLoading { reservation(state) }
+                reservationJob = viewModelScope.launch { reservation(state) }
             }
             TicketingAction.DismissDialog -> updateSuccess { it.copy(dialog = null) }
             is TicketingAction.PaymentSucceeded -> if (state != null) {
@@ -230,14 +230,5 @@ class TicketingViewModel @Inject constructor(
 
     private inline fun updateSuccess(transform: (TicketingUiState.Success) -> TicketingUiState.Success) {
         _uiState.update { if (it is TicketingUiState.Success) transform(it) else it }
-    }
-
-    private fun launchWithLoading(block: suspend () -> Unit): Job = viewModelScope.launch {
-        updateSuccess { it.copy(loading = true) }
-        try {
-            block()
-        } finally {
-            updateSuccess { it.copy(loading = false) }
-        }
     }
 }

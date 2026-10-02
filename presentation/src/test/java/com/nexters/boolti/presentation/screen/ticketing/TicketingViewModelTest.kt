@@ -7,7 +7,6 @@ import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -46,7 +45,6 @@ class TicketingViewModelTest : DescribeSpec({
             viewModel.onAction(TicketingAction.ConfirmReservation)
 
             coVerify(exactly = 1) { repository.requestOrderId(any()) }
-            (viewModel.uiState.value as TicketingUiState.Success).loading shouldBe true
         }
 
         it("초청 코드 확인 중이어도 예매 요청은 막히지 않는다") {

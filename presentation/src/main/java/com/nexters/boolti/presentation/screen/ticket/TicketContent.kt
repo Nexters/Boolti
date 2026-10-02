@@ -115,7 +115,7 @@ private fun TicketContent(
     ) {
         // 배경 블러된 이미지
         AsyncImage(
-            model = asyncImageBlurModel(context, ticket.poster, radius = 24),
+            model = asyncImageBlurModel(context, ticket.poster),
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(.8f),

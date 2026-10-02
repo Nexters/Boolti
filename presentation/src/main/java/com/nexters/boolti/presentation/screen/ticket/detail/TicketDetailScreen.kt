@@ -260,11 +260,7 @@ private fun TicketDetailScreen(
                     // 배경 블러된 이미지
                     Box(contentAlignment = Alignment.BottomCenter) {
                         AsyncImage(
-                            model = asyncImageBlurModel(
-                                context,
-                                ticketGroup.poster,
-                                radius = 24
-                            ),
+                            model = asyncImageBlurModel(context, ticketGroup.poster),
                             modifier = Modifier
                                 .width(contentWidth.toDp())
                                 .aspectRatio(317 / 570f)

@@ -93,6 +93,7 @@ import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -124,6 +125,7 @@ import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -135,6 +137,7 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -271,11 +274,13 @@ fun ShowDetailScreen(
     doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showState by flow {
-        while (true) {
-            emit(showDetail.state)
-            delay(200)
-        }
+    val showState by remember(showDetail) {
+        flow {
+            while (true) {
+                emit(showDetail.state.truncatedToSeconds())
+                delay(200.milliseconds)
+            }
+        }.distinctUntilChanged()
     }.collectAsStateWithLifecycle(showDetail.state)
 
     val scope = rememberCoroutineScope()
@@ -1112,16 +1117,18 @@ private fun Divider(modifier: Modifier = Modifier) {
 private fun CountDownBanner(
     deadlineDateTime: LocalDateTime,
 ) {
-    val remainingTime by flow {
-        while (true) {
-            val duration = Duration.between(
-                LocalDateTime.now(),
-                deadlineDateTime
-            )
-            emit(maxOf(duration, Duration.ZERO))
-            if (duration <= Duration.ZERO) break
-            delay(200L)
-        }
+    val remainingTime by remember(deadlineDateTime) {
+        flow {
+            while (true) {
+                val duration = Duration.between(
+                    LocalDateTime.now(),
+                    deadlineDateTime
+                )
+                emit(Duration.ofSeconds(maxOf(duration, Duration.ZERO).seconds))
+                if (duration <= Duration.ZERO) break
+                delay(200.milliseconds)
+            }
+        }.distinctUntilChanged()
     }.collectAsStateWithLifecycle(Duration.ZERO)
 
     Box(
@@ -1137,6 +1144,9 @@ private fun CountDownBanner(
         )
     }
 }
+
+private fun ShowState.truncatedToSeconds(): ShowState =
+    if (this is ShowState.WaitingTicketing) copy(remainingTime = Duration.ofSeconds(remainingTime.seconds)) else this
 
 @Preview
 @Composable

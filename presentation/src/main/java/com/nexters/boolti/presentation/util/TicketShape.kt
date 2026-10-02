@@ -10,8 +10,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
 class TicketShape(
-    private val width: Float,
-    private val height: Float,
     private val circleRadius: Float,
     private val cornerRadius: Float,
     private val bottomAreaHeight: Float,
@@ -19,8 +17,8 @@ class TicketShape(
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         return Outline.Generic(
             path = ticketPath(
-                width = width,
-                height = height,
+                width = size.width,
+                height = size.height,
                 circleRadius = circleRadius,
                 cornerRadius = cornerRadius,
                 bottomAreaHeight = bottomAreaHeight,

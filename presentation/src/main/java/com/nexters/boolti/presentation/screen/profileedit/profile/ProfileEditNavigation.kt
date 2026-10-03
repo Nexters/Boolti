@@ -30,7 +30,7 @@ fun NavGraphBuilder.profileEditScreen(
                 navController.navigate(ProfileRoute.ProfileSnsEdit)
             },
             navigateToVideoEdit = { userCode ->
-                navController.navigate(VideoListRoute.VideoListRoot(userCode, true))
+                navController.navigate(VideoListRoute.VideoList(userCode, true))
             },
             navigateToLinkEdit = { userCode ->
                 navController.navigate(LinkListRoute.LinkList(userCode, true))

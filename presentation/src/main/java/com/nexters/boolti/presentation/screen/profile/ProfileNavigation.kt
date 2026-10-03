@@ -27,7 +27,7 @@ fun NavGraphBuilder.profileScreen(
 
             },
             navigateToVideos = { userCode ->
-                navController.navigate(VideoListRoute.VideoListRoot(userCode, false))
+                navController.navigate(VideoListRoute.VideoList(userCode, false))
             },
             navigateToPerformedShows = { userCode ->
                 navController.navigate(MainRoute.PerformedShows(userCode))

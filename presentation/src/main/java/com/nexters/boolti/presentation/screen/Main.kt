@@ -46,7 +46,6 @@ import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
 import com.nexters.boolti.presentation.screen.navigation.TicketRoute
-import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import com.nexters.boolti.presentation.screen.payment.paymentCompleteScreen
 import com.nexters.boolti.presentation.screen.perforemdshows.performedShowsScreen
 import com.nexters.boolti.presentation.screen.prequestionedit.preQuestionEditScreen
@@ -248,16 +247,8 @@ fun MainNavigation(
         linkListScreen()
         linkEditScreen()
 
-        navigation<VideoListRoute.VideoListRoot>(
-            startDestination = VideoListRoute.VideoList,
-        ) {
-            videoListScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-            videoEditScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-        }
+        videoListScreen()
+        videoEditScreen()
 
         performedShowsScreen()
         placeScreen()

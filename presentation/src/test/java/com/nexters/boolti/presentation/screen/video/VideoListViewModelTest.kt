@@ -36,7 +36,7 @@ class VideoListViewModelTest : DescribeSpec({
         videos: List<YouTubeVideo> = emptyList(),
     ) = VideoListViewModel(
         savedStateHandle = SavedStateHandle().also {
-            every { it.toRoute<VideoListRoute.VideoListRoot>() } returns VideoListRoute.VideoListRoot(userCode = "me", isEditMode = false)
+            every { it.toRoute<VideoListRoute.VideoList>() } returns VideoListRoute.VideoList(userCode = "me", isEditMode = false)
         },
         getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "me") },
         getYouTubeVideoListByUserCodeUseCase = mockk<GetYouTubeVideoListByUserCodeUseCase> {
@@ -52,9 +52,7 @@ class VideoListViewModelTest : DescribeSpec({
         it("YouTube 정보를 가져오면 그 정보로 추가한다") {
             val viewModel = createViewModel(videoInfo = YouTubeVideo.EMPTY.copy(title = "공연 영상", url = url))
 
-            viewModel.onAction(VideoListAction.ClickAddVideo)
-            viewModel.onAction(VideoListAction.ChangeVideoUrl(url))
-            viewModel.onAction(VideoListAction.CompleteVideo)
+            viewModel.onAction(VideoListAction.EditResultReceived(VideoEditResult.Added(url)))
 
             viewModel.uiState.value.videos.single().title shouldBe "공연 영상"
         }
@@ -62,9 +60,7 @@ class VideoListViewModelTest : DescribeSpec({
         it("YouTube 정보를 못 가져와도 입력한 주소로 추가한다") {
             val viewModel = createViewModel(videoInfo = null)
 
-            viewModel.onAction(VideoListAction.ClickAddVideo)
-            viewModel.onAction(VideoListAction.ChangeVideoUrl(url))
-            viewModel.onAction(VideoListAction.CompleteVideo)
+            viewModel.onAction(VideoListAction.EditResultReceived(VideoEditResult.Added(url)))
 
             viewModel.uiState.value.videos.single().url shouldBe url
         }
@@ -75,9 +71,7 @@ class VideoListViewModelTest : DescribeSpec({
             val saved = YouTubeVideo.EMPTY.copy(localId = "saved", url = url)
             val viewModel = createViewModel(videoInfo = null, videos = listOf(saved))
 
-            viewModel.onAction(VideoListAction.ClickVideo(saved.localId))
-            viewModel.onAction(VideoListAction.ChangeVideoUrl("https://youtu.be/new"))
-            viewModel.onAction(VideoListAction.CompleteVideo)
+            viewModel.onAction(VideoListAction.EditResultReceived(VideoEditResult.Edited(localId = saved.localId, url = "https://youtu.be/new")))
 
             viewModel.uiState.value.videos shouldBe listOf(saved.copy(url = "https://youtu.be/new"))
         }

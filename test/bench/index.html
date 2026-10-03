@@ -1,281 +1,155 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes" />
-    <style>
-      html {
-        font-family: BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-        -webkit-font-smoothing: antialiased;
-        background-color: #fff;
-        font-size: 16px;
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>불티 릴리즈 지표</title>
+  <style>
+    :root {
+      --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --muted: #475569; --border: #e2e8f0;
+      --good: #15803d; --good-bg: #dcfce7; --bad: #b91c1c; --bad-bg: #fee2e2; --flat-bg: #f1f5f9;
+      --compose: #2563eb; --size: #d97706; --quality: #7c3aed;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1120; --card: #111827; --text: #e5e7eb; --muted: #9ca3af; --border: #1f2937;
+        --good: #4ade80; --good-bg: #052e16; --bad: #f87171; --bad-bg: #450a0a; --flat-bg: #1f2937;
+        --compose: #60a5fa; --size: #fbbf24; --quality: #a78bfa;
       }
-      body {
-        color: #4a4a4a;
-        margin: 8px;
-        font-size: 1em;
-        font-weight: 400;
-      }
-      header {
-        margin-bottom: 8px;
-        display: flex;
-        flex-direction: column;
-      }
-      main {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      a {
-        color: #3273dc;
-        cursor: pointer;
-        text-decoration: none;
-      }
-      a:hover {
-        color: #000;
-      }
-      button {
-        color: #fff;
-        background-color: #3298dc;
-        border-color: transparent;
-        cursor: pointer;
-        text-align: center;
-      }
-      button:hover {
-        background-color: #2793da;
-        flex: none;
-      }
-      .spacer {
-        flex: auto;
-      }
-      .small {
-        font-size: 0.75rem;
-      }
-      footer {
-        margin-top: 16px;
-        display: flex;
-        align-items: center;
-      }
-      .header-label {
-        margin-right: 4px;
-      }
-      .benchmark-set {
-        margin: 8px 0;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      .benchmark-title {
-        font-size: 3rem;
-        font-weight: 600;
-        word-break: break-word;
-        text-align: center;
-      }
-      .benchmark-graphs {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        flex-wrap: wrap;
-        width: 100%;
-      }
-      .benchmark-chart {
-        max-width: 1000px;
-      }
-    </style>
-    <title>Benchmarks</title>
-  </head>
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    }
+    main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+    header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
+    h1 { font-size: 22px; margin: 0; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .meta a { color: inherit; }
+    section { margin-top: 24px; }
+    h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+    h2::before { content: ""; width: 4px; height: 14px; border-radius: 2px; background: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--accent);
+      border-radius: 10px; padding: 14px 16px 10px;
+    }
+    .name { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+    .tag { font-size: 11px; font-weight: 600; color: var(--accent); }
+    .row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 2px 0 6px; }
+    .value { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .unit { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+    .delta { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .delta.good { color: var(--good); background: var(--good-bg); }
+    .delta.bad { color: var(--bad); background: var(--bad-bg); }
+    .delta.flat { color: var(--muted); background: var(--flat-bg); }
+    .spark { height: 56px; }
+    .empty { height: 56px; display: flex; align-items: center; font-size: 12px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); }
+    th:nth-child(-n+3), td:nth-child(-n+3) { text-align: left; }
+    th { color: var(--muted); font-weight: 600; white-space: normal; vertical-align: bottom; }
+    tr:last-child td { border-bottom: none; }
+    td a { color: var(--compose); }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>불티 릴리즈 지표</h1>
+    <div class="meta" id="meta"></div>
+  </header>
+  <div class="grid" id="cards"></div>
+  <section>
+    <h2 style="--accent: var(--muted)">기록</h2>
+    <div class="table-wrap"><table id="history"></table></div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" integrity="sha384-NrKB+u6Ts6AtkIhwPixiKTzgSKNblyhlk0Sohlgar9UHUBzai/sgnNNWWd291xqt" crossorigin="anonymous"></script>
+<script src="data.js"></script>
+<script>
+  // lowerIsBetter: 값이 줄어들면 개선
+  const GROUPS = [
+    { title: 'Compose 안정성', accent: '--compose', metrics: [
+      { name: 'Compose unstable 파라미터', lowerIsBetter: true },
+      { name: 'Compose 불안정 클래스', lowerIsBetter: true },
+    ] },
+    { title: '앱 크기', accent: '--size', metrics: [
+      { name: 'release APK 크기', lowerIsBetter: true },
+    ] },
+    { title: '코드 품질', accent: '--quality', metrics: [
+      { name: 'lint 경고', lowerIsBetter: true },
+      { name: '테스트', lowerIsBetter: false },
+      { name: '줄 커버리지', lowerIsBetter: false },
+    ] },
+  ];
 
-  <body>
-    <header id="header">
-      <div class="header-item">
-        <strong class="header-label">Last Update:</strong>
-        <span id="last-update"></span>
+  const data = window.BENCHMARK_DATA;
+  const entries = Object.values(data.entries)[0] ?? [];
+  const css = getComputedStyle(document.documentElement);
+  const fmtDate = (ms) => new Date(ms).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const round = (n) => Math.round(n * 100) / 100;
+  const series = (name) => entries.map((e) => e.benches.find((b) => b.name === name)).map((b) => b?.value ?? null);
+  // 버전은 extra에 담겨 있다. 버전 기록 전 데이터는 커밋으로 대신한다
+  const versionOf = (e) => (e.benches[0]?.extra ? `v${e.benches[0].extra}` : e.commit.id.slice(0, 7));
+  const unitOf = (name) => entries.flatMap((e) => e.benches).find((b) => b.name === name)?.unit ?? '';
+
+  document.getElementById('meta').innerHTML =
+    `최신 ${entries.length ? versionOf(entries.at(-1)) : '-'} · 마지막 기록 ${fmtDate(data.lastUpdate)} · 기록 ${entries.length}개 · <a href="${data.repoUrl}">GitHub</a>`;
+
+  function deltaChip(values, lowerIsBetter) {
+    const known = values.filter((v) => v !== null);
+    if (known.length < 2) return '<span class="delta flat">첫 기록</span>';
+    const diff = round(known.at(-1) - known.at(-2));
+    if (diff === 0) return '<span class="delta flat">변화 없음</span>';
+    const improved = (diff < 0) === lowerIsBetter;
+    const arrow = diff > 0 ? '▲' : '▼';
+    return `<span class="delta ${improved ? 'good' : 'bad'}">${arrow} ${Math.abs(diff)} ${improved ? '개선' : '악화'}</span>`;
+  }
+
+  const grid = document.getElementById('cards');
+  GROUPS.forEach((group) => group.metrics.forEach((metric) => {
+    const values = series(metric.name);
+    const latest = values.filter((v) => v !== null).at(-1);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.setProperty('--accent', `var(${group.accent})`);
+    card.innerHTML = `
+      <div class="name"><span>${metric.name}</span><span class="tag">${group.title}</span></div>
+      <div class="row">
+        <div class="value">${latest ?? '-'}<span class="unit">${unitOf(metric.name)}</span></div>
+        ${deltaChip(values, metric.lowerIsBetter)}
       </div>
-      <div class="header-item">
-        <strong class="header-label">Repository:</strong>
-        <a id="repository-link" rel="noopener"></a>
-      </div>
-    </header>
-    <main id="main"></main>
-    <footer>
-      <button id="dl-button">Download data as JSON</button>
-      <div class="spacer"></div>
-      <div class="small">Powered by <a rel="noopener" href="https://github.com/marketplace/actions/continuous-benchmark">github-action-benchmark</a></div>
-    </footer>
+      ${values.length >= 2 ? '<div class="spark"><canvas></canvas></div>' : '<div class="empty">기록이 2개 이상이면 추이가 보여요</div>'}`;
+    grid.appendChild(card);
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.2/dist/Chart.min.js"></script>
-    <script src="data.js"></script>
-    <script id="main-script">
-      'use strict';
-      (function() {
-        // Colors from https://github.com/github/linguist/blob/master/lib/linguist/languages.yml
-        const toolColors = {
-          cargo: '#dea584',
-          go: '#00add8',
-          benchmarkjs: '#f1e05a',
-          benchmarkluau: '#000080',
-          pytest: '#3572a5',
-          googlecpp: '#f34b7d',
-          catch2: '#f34b7d',
-          julia: '#a270ba',
-          jmh: '#b07219',
-          benchmarkdotnet: '#178600',
-          customBiggerIsBetter: '#38ff38',
-          customSmallerIsBetter: '#ff3838',
-          _: '#333333'
-        };
+    const canvas = card.querySelector('canvas');
+    if (!canvas) return;
+    const color = css.getPropertyValue(group.accent).trim();
+    new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: entries.map((e) => `${versionOf(e)} · ${fmtDate(e.date)}`),
+        datasets: [{ data: values, borderColor: color, backgroundColor: color + '22', fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2 }],
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { displayColors: false, callbacks: { label: (c) => `${c.parsed.y} ${unitOf(metric.name)}` } } },
+        scales: { x: { display: false }, y: { display: false, grace: '10%' } },
+        interaction: { mode: 'index', intersect: false },
+      },
+    });
+  }));
 
-        function init() {
-          function collectBenchesPerTestCase(entries) {
-            const map = new Map();
-            for (const entry of entries) {
-              const {commit, date, tool, benches} = entry;
-              for (const bench of benches) {
-                const result = { commit, date, tool, bench };
-                const arr = map.get(bench.name);
-                if (arr === undefined) {
-                  map.set(bench.name, [result]);
-                } else {
-                  arr.push(result);
-                }
-              }
-            }
-            return map;
-          }
-
-          const data = window.BENCHMARK_DATA;
-
-          // Render header
-          document.getElementById('last-update').textContent = new Date(data.lastUpdate).toString();
-          const repoLink = document.getElementById('repository-link');
-          repoLink.href = data.repoUrl;
-          repoLink.textContent = data.repoUrl;
-
-          // Render footer
-          document.getElementById('dl-button').onclick = () => {
-            const dataUrl = 'data:,' + JSON.stringify(data, null, 2);
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = 'benchmark_data.json';
-            a.click();
-          };
-
-          // Prepare data points for charts
-          return Object.keys(data.entries).map(name => ({
-            name,
-            dataSet: collectBenchesPerTestCase(data.entries[name]),
-          }));
-        }
-
-        function renderAllChars(dataSets) {
-
-          function renderGraph(parent, name, dataset) {
-            const canvas = document.createElement('canvas');
-            canvas.className = 'benchmark-chart';
-            parent.appendChild(canvas);
-
-            const color = toolColors[dataset.length > 0 ? dataset[0].tool : '_'];
-            const data = {
-              labels: dataset.map(d => d.commit.id.slice(0, 7)),
-              datasets: [
-                {
-                  label: name,
-                  data: dataset.map(d => d.bench.value),
-                  borderColor: color,
-                  backgroundColor: color + '60', // Add alpha for #rrggbbaa
-                }
-              ],
-            };
-            const options = {
-              scales: {
-                xAxes: [
-                  {
-                    scaleLabel: {
-                      display: true,
-                      labelString: 'commit',
-                    },
-                  }
-                ],
-                yAxes: [
-                  {
-                    scaleLabel: {
-                      display: true,
-                      labelString: dataset.length > 0 ? dataset[0].bench.unit : '',
-                    },
-                    ticks: {
-                      beginAtZero: true,
-                    }
-                  }
-                ],
-              },
-              tooltips: {
-                callbacks: {
-                  afterTitle: items => {
-                    const {index} = items[0];
-                    const data = dataset[index];
-                    return '\n' + data.commit.message + '\n\n' + data.commit.timestamp + ' committed by @' + data.commit.committer.username + '\n';
-                  },
-                  label: item => {
-                    let label = item.value;
-                    const { range, unit } = dataset[item.index].bench;
-                    label += ' ' + unit;
-                    if (range) {
-                      label += ' (' + range + ')';
-                    }
-                    return label;
-                  },
-                  afterLabel: item => {
-                    const { extra } = dataset[item.index].bench;
-                    return extra ? '\n' + extra : '';
-                  }
-                }
-              },
-              onClick: (_mouseEvent, activeElems) => {
-                if (activeElems.length === 0) {
-                  return;
-                }
-                // XXX: Undocumented. How can we know the index?
-                const index = activeElems[0]._index;
-                const url = dataset[index].commit.url;
-                window.open(url, '_blank');
-              },
-            };
-
-            new Chart(canvas, {
-              type: 'line',
-              data,
-              options,
-            });
-          }
-
-          function renderBenchSet(name, benchSet, main) {
-            const setElem = document.createElement('div');
-            setElem.className = 'benchmark-set';
-            main.appendChild(setElem);
-
-            const nameElem = document.createElement('h1');
-            nameElem.className = 'benchmark-title';
-            nameElem.textContent = name;
-            setElem.appendChild(nameElem);
-
-            const graphsElem = document.createElement('div');
-            graphsElem.className = 'benchmark-graphs';
-            setElem.appendChild(graphsElem);
-
-            for (const [benchName, benches] of benchSet.entries()) {
-              renderGraph(graphsElem, benchName, benches)
-            }
-          }
-
-          const main = document.getElementById('main');
-          for (const {name, dataSet} of dataSets) {
-            renderBenchSet(name, dataSet, main);
-          }
-        }
-
-        renderAllChars(init()); // Start
-      })();
-    </script>
-  </body>
+  const names = GROUPS.flatMap((g) => g.metrics.map((m) => m.name));
+  const head = `<tr><th>버전</th><th>날짜</th><th>커밋</th>${names.map((n) => `<th>${n}<br>(${unitOf(n)})</th>`).join('')}</tr>`;
+  const rows = [...entries].reverse().map((e) => {
+    const cells = names.map((n) => `<td>${e.benches.find((b) => b.name === n)?.value ?? '-'}</td>`).join('');
+    return `<tr><td><strong>${versionOf(e)}</strong></td><td>${fmtDate(e.date)}</td><td><a href="${e.commit.url}">${e.commit.id.slice(0, 7)}</a></td>${cells}</tr>`;
+  }).join('');
+  document.getElementById('history').innerHTML = head + rows;
+</script>
+</body>
 </html>

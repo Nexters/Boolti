@@ -115,7 +115,7 @@ private fun SnsEditScreen(
             BTDialog(
                 enableDismiss = true,
                 showCloseButton = true,
-                onDismiss = { onAction(SnsEditAction.ConfirmExit) },
+                onDismiss = { onAction(SnsEditAction.DismissExitAlertDialog) },
                 negativeButtonLabel = stringResource(R.string.btn_exit),
                 onClickNegativeButton = { onAction(SnsEditAction.ConfirmExit) },
                 positiveButtonLabel = stringResource(R.string.save),

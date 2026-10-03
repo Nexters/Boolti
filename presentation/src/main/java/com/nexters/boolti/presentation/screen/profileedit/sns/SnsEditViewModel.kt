@@ -83,6 +83,6 @@ class SnsEditViewModel @Inject constructor(
         val state = uiState.value
         val unchanged = state.instagramUsername == originalInstagramUsername &&
                 state.youtubeUsername == originalYoutubeUsername
-        return unchanged || (state.instagramUsernameError != null && state.youtubeUsernameError != null)
+        return unchanged || state.instagramUsernameError != null || state.youtubeUsernameError != null
     }
 }

@@ -86,7 +86,8 @@
     ] },
   ];
 
-  const data = window.BENCHMARK_DATA;
+  // 첫 릴리즈 기록 전에는 data.js가 없다
+  const data = window.BENCHMARK_DATA ?? { entries: {}, lastUpdate: null, repoUrl: 'https://github.com/Nexters/Boolti' };
   const entries = Object.values(data.entries)[0] ?? [];
   const css = getComputedStyle(document.documentElement);
   const fmtDate = (ms) => new Date(ms).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -97,7 +98,7 @@
   const unitOf = (name) => entries.flatMap((e) => e.benches).find((b) => b.name === name)?.unit ?? '';
 
   document.getElementById('meta').innerHTML =
-    `최신 ${entries.length ? versionOf(entries.at(-1)) : '-'} · 마지막 기록 ${fmtDate(data.lastUpdate)} · 기록 ${entries.length}개 · <a href="${data.repoUrl}">GitHub</a>`;
+    `최신 ${entries.length ? versionOf(entries.at(-1)) : '-'} · 마지막 기록 ${data.lastUpdate ? fmtDate(data.lastUpdate) : '-'} · 기록 ${entries.length}개 · <a href="${data.repoUrl}">GitHub</a>`;
 
   function deltaChip(values, lowerIsBetter) {
     const known = values.filter((v) => v !== null);

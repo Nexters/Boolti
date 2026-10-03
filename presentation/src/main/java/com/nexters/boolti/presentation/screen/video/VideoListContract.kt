@@ -44,7 +44,7 @@ sealed interface VideoListEvent {
     data object Added : VideoListEvent
     data object Edited : VideoListEvent
     data object Removed : VideoListEvent
-    data class NavigateToEdit(val isEditMode: Boolean) : VideoListEvent
+    data object NavigateToEdit : VideoListEvent
     data object CloseEdit : VideoListEvent
     data object Finish : VideoListEvent
 }

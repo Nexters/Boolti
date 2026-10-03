@@ -53,7 +53,7 @@ class LinkListViewModelTest : DescribeSpec({
             val viewModel = createViewModel(links = emptyList())
 
             viewModel.uiState.value.editing shouldBe true
-            viewModel.event.first() shouldBe LinkListEvent.NavigateToEdit(isEditMode = false)
+            viewModel.event.first() shouldBe LinkListEvent.NavigateToEdit
         }
     }
 
@@ -68,7 +68,7 @@ class LinkListViewModelTest : DescribeSpec({
 
             viewModel.uiState.value.links.map { it.name } shouldContainExactly listOf("유튜브", "인스타그램")
             viewModel.event.take(3).toList() shouldContainExactly listOf(
-                LinkListEvent.NavigateToEdit(isEditMode = false),
+                LinkListEvent.NavigateToEdit,
                 LinkListEvent.CloseEdit,
                 LinkListEvent.Added,
             )

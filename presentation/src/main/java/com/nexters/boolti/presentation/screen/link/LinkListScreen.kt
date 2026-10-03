@@ -86,7 +86,7 @@ internal fun LinkListEventEffect(event: Flow<LinkListEvent>) {
             LinkListEvent.Added -> snackbarController.showMessage(linkAddMsg)
             LinkListEvent.Edited -> snackbarController.showMessage(linkEditMsg)
             LinkListEvent.Removed -> snackbarController.showMessage(linkRemoveMsg)
-            is LinkListEvent.NavigateToEdit -> navController.navigate(LinkListRoute.LinkEdit(it.isEditMode))
+            LinkListEvent.NavigateToEdit -> navController.navigate(LinkListRoute.LinkEdit)
             LinkListEvent.CloseEdit -> navController.popBackStack<LinkListRoute.LinkEdit>(inclusive = true)
             LinkListEvent.Finish -> navController.popBackStack<LinkListRoute.LinkListRoot>(inclusive = true)
         }

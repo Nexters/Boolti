@@ -59,11 +59,11 @@ class LinkListViewModel @Inject constructor(
             is LinkListAction.Reorder -> reorder(action.from, action.to)
             LinkListAction.ClickAddLink -> {
                 startAddOrEditLink(null)
-                sendEvent(LinkListEvent.NavigateToEdit(isEditMode = false))
+                sendEvent(LinkListEvent.NavigateToEdit)
             }
             is LinkListAction.ClickLink -> {
                 startAddOrEditLink(action.linkId)
-                sendEvent(LinkListEvent.NavigateToEdit(isEditMode = true))
+                sendEvent(LinkListEvent.NavigateToEdit)
             }
             is LinkListAction.ChangeLinkName -> onLinkNameChanged(action.name)
             is LinkListAction.ChangeLinkUrl -> onLinkUrlChanged(action.url)
@@ -85,7 +85,7 @@ class LinkListViewModel @Inject constructor(
                     }
                     if (isMine && links.isEmpty()) {
                         autoNavigatedToEdit = true
-                        sendEvent(LinkListEvent.NavigateToEdit(isEditMode = false))
+                        sendEvent(LinkListEvent.NavigateToEdit)
                     }
                 }
                 .onFailure {

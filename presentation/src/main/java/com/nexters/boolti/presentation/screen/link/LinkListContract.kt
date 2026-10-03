@@ -36,7 +36,7 @@ sealed interface LinkListEvent {
     data object Added : LinkListEvent
     data object Edited : LinkListEvent
     data object Removed : LinkListEvent
-    data class NavigateToEdit(val isEditMode: Boolean) : LinkListEvent
+    data object NavigateToEdit : LinkListEvent
     data object CloseEdit : LinkListEvent
     data object Finish : LinkListEvent
 }

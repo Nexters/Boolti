@@ -95,7 +95,7 @@ internal fun VideoListEventEffect(event: Flow<VideoListEvent>) {
             VideoListEvent.Added -> snackbarController.showMessage(videoAddMsg)
             VideoListEvent.Edited -> snackbarController.showMessage(videoEditMsg)
             VideoListEvent.Removed -> snackbarController.showMessage(videoDeleteMsg)
-            is VideoListEvent.NavigateToEdit -> navController.navigate(VideoListRoute.VideoEdit(it.isEditMode))
+            VideoListEvent.NavigateToEdit -> navController.navigate(VideoListRoute.VideoEdit)
             VideoListEvent.CloseEdit -> navController.popBackStack<VideoListRoute.VideoEdit>(inclusive = true)
             VideoListEvent.Finish -> navController.popBackStack<VideoListRoute.VideoListRoot>(inclusive = true)
         }

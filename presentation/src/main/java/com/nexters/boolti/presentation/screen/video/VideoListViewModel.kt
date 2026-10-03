@@ -62,11 +62,11 @@ class VideoListViewModel @Inject constructor(
             is VideoListAction.Reorder -> reorder(action.from, action.to)
             VideoListAction.ClickAddVideo -> {
                 startAddOrEditVideo(null)
-                sendEvent(VideoListEvent.NavigateToEdit(isEditMode = false))
+                sendEvent(VideoListEvent.NavigateToEdit)
             }
             is VideoListAction.ClickVideo -> {
                 startAddOrEditVideo(action.localId)
-                sendEvent(VideoListEvent.NavigateToEdit(isEditMode = true))
+                sendEvent(VideoListEvent.NavigateToEdit)
             }
             is VideoListAction.ChangeVideoUrl -> onVideoUrlChanged(action.url)
             VideoListAction.CompleteVideo -> completeAddOrEditVideo()
@@ -88,7 +88,7 @@ class VideoListViewModel @Inject constructor(
                     }
                     if (isMine && videos.isEmpty()) {
                         autoNavigatedToEdit = true
-                        sendEvent(VideoListEvent.NavigateToEdit(isEditMode = false))
+                        sendEvent(VideoListEvent.NavigateToEdit)
                     }
                 }
                 .onFailure {

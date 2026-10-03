@@ -4,8 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
@@ -65,7 +63,6 @@ class ShowDetailViewModel @Inject constructor(
                 }
                 .onFailure {
                     _uiState.update { it.copy(isLoading = false) }
-                    Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }
         }
@@ -80,7 +77,6 @@ class ShowDetailViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                    Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }
         }

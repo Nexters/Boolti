@@ -5,6 +5,7 @@ import com.kakao.sdk.common.KakaoSdk
 import com.mangbaam.logger.CollectableDebugTree
 import com.nexters.boolti.BuildConfig
 import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.logger.CrashlyticsTree
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -20,6 +21,7 @@ class BooltiApplication : Application() {
     }
 
     private fun initLogger() {
+        Timber.plant(CrashlyticsTree())
         if (BuildConfig.DEBUG) Timber.plant(CollectableDebugTree())
     }
 

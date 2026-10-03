@@ -27,6 +27,7 @@
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>
     <string name="error_ticket_not_found">존재하지 않는 티켓이에요</string>
     <string name="error_invalid_ticket">불티에서 발권된 티켓이 아니에요</string>
+    <string name="error_invalid_reservation">취소되었거나 유효하지 않은 예매예요</string>
 
     <string name="kakao">카카오</string>
 

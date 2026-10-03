@@ -96,6 +96,7 @@ fun ManagerCodeDialog(
                 ManagerCodeErrorType.Unknown -> stringResource(R.string.message_unknown_error)
                 ManagerCodeErrorType.Mismatch -> stringResource(R.string.enter_code_dialog_error_mismatch)
                 ManagerCodeErrorType.ShowNotToday -> stringResource(R.string.error_show_not_today)
+                ManagerCodeErrorType.UsedTicket -> stringResource(R.string.error_used_ticket)
             }
             Text(
                 text = message,

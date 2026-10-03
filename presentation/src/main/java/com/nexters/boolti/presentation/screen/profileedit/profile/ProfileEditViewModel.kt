@@ -1,18 +1,21 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,12 +23,12 @@ class ProfileEditViewModel @Inject constructor(
     private val userConfigRepository: UserConfigRepository,
     private val authRepository: AuthRepository,
     private val fileRepository: FileRepository,
-) : BaseViewModel() {
-    private val _uiState = MutableStateFlow(ProfileEditState())
-    val uiState = _uiState.asStateFlow()
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(ProfileEditUiState())
+    val uiState: StateFlow<ProfileEditUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<ProfileEditEvent>()
-    val event = _event.receiveAsFlow()
+    private val _event = Channel<ProfileEditEvent>(Channel.BUFFERED)
+    val event: Flow<ProfileEditEvent> = _event.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -35,7 +38,7 @@ class ProfileEditViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             userCode = user.userCode,
-                            thumbnail = user.photo ?: "",
+                            thumbnail = user.photo.orEmpty(),
                             nickname = user.nickname,
                             introduction = user.introduction,
                             snsCount = user.sns.size,
@@ -51,24 +54,59 @@ class ProfileEditViewModel @Inject constructor(
         }
     }
 
-    fun changeThumbnail(imageUri: String?) {
-        imageUri ?: return
-        viewModelScope.launch {
-            val newThumbnailUrl =
-                fileRepository.requestUrlForUpload(imageUri).getOrNull() ?: return@launch
-            userConfigRepository.saveThumbnail(newThumbnailUrl)
+    fun onAction(action: ProfileEditAction) {
+        when (action) {
+            ProfileEditAction.ClickBack -> _event.trySend(ProfileEditEvent.NavigateUp)
+            is ProfileEditAction.SelectThumbnail -> changeThumbnail(action.imageUri)
+            ProfileEditAction.ClickNickname -> _event.trySend(ProfileEditEvent.NavigateToNicknameEdit)
+            ProfileEditAction.ClickUserCode -> _event.trySend(ProfileEditEvent.NavigateToUserCodeEdit)
+            ProfileEditAction.ClickIntroduction -> _event.trySend(ProfileEditEvent.NavigateToIntroductionEdit)
+            ProfileEditAction.ClickSns -> _event.trySend(ProfileEditEvent.NavigateToSnsEdit)
+            ProfileEditAction.ToggleUpcomingShows -> toggleUpcomingShows()
+            ProfileEditAction.TogglePastShows -> togglePastShows()
+            ProfileEditAction.ClickVideo -> _event.trySend(ProfileEditEvent.NavigateToVideoEdit(uiState.value.userCode))
+            ProfileEditAction.ClickLink -> _event.trySend(ProfileEditEvent.NavigateToLinkEdit(uiState.value.userCode))
         }
     }
 
-    fun toggleShowUpcomingShows() {
+    private fun changeThumbnail(imageUri: String) {
+        if (uiState.value.uploading) return
+
+        _uiState.update { it.copy(uploadingThumbnail = imageUri) }
         viewModelScope.launch {
-            userConfigRepository.setUpcomingShowVisible(!uiState.value.showUpcomingShows)
+            fileRepository.requestUrlForUpload(imageUri)
+                .mapCatching { url -> userConfigRepository.saveThumbnail(url).getOrThrow() }
+                .onFailure {
+                    Timber.e(it)
+                    _event.send(ProfileEditEvent.ShowUnknownError)
+                }
+            _uiState.update { it.copy(uploadingThumbnail = null) }
         }
     }
 
-    fun toggleShowPerformedShows() {
+    private fun toggleUpcomingShows() {
+        val state = uiState.value
+        if (state.upcomingShowCount == 0) return
+
         viewModelScope.launch {
-            userConfigRepository.setPastShowVisible(!uiState.value.showPerformedShows)
+            userConfigRepository.setUpcomingShowVisible(!state.showUpcomingShows)
+                .onFailure {
+                    Timber.e(it)
+                    _event.send(ProfileEditEvent.ShowUnknownError)
+                }
+        }
+    }
+
+    private fun togglePastShows() {
+        val state = uiState.value
+        if (state.pastShowCount == 0) return
+
+        viewModelScope.launch {
+            userConfigRepository.setPastShowVisible(!state.showPerformedShows)
+                .onFailure {
+                    Timber.e(it)
+                    _event.send(ProfileEditEvent.ShowUnknownError)
+                }
         }
     }
 }

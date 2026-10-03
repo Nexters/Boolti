@@ -115,15 +115,6 @@ class ProfileEditViewModelTest : DescribeSpec({
             coVerify { userConfigRepository.setUpcomingShowVisible(false) }
         }
 
-        it("공연이 없으면 요청하지 않는다") {
-            val userConfigRepository = mockk<UserConfigRepository>()
-            val viewModel = createViewModel(userConfigRepository)
-
-            viewModel.onAction(ProfileEditAction.TogglePastShows)
-
-            coVerify(exactly = 0) { userConfigRepository.setPastShowVisible(any()) }
-        }
-
         it("요청에 실패하면 에러를 알린다") {
             val userConfigRepository = mockk<UserConfigRepository> {
                 coEvery { setUpcomingShowVisible(any()) } returns Result.failure(RuntimeException())

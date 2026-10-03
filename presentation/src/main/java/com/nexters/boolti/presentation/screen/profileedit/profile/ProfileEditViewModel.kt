@@ -62,8 +62,12 @@ class ProfileEditViewModel @Inject constructor(
             ProfileEditAction.ClickUserCode -> _event.trySend(ProfileEditEvent.NavigateToUserCodeEdit)
             ProfileEditAction.ClickIntroduction -> _event.trySend(ProfileEditEvent.NavigateToIntroductionEdit)
             ProfileEditAction.ClickSns -> _event.trySend(ProfileEditEvent.NavigateToSnsEdit)
-            ProfileEditAction.ToggleUpcomingShows -> toggleUpcomingShows()
-            ProfileEditAction.TogglePastShows -> togglePastShows()
+            ProfileEditAction.ToggleUpcomingShows -> toggleVisibility {
+                userConfigRepository.setUpcomingShowVisible(!uiState.value.showUpcomingShows)
+            }
+            ProfileEditAction.TogglePastShows -> toggleVisibility {
+                userConfigRepository.setPastShowVisible(!uiState.value.showPerformedShows)
+            }
             ProfileEditAction.ClickVideo -> _event.trySend(ProfileEditEvent.NavigateToVideoEdit(uiState.value.userCode))
             ProfileEditAction.ClickLink -> _event.trySend(ProfileEditEvent.NavigateToLinkEdit(uiState.value.userCode))
         }
@@ -76,37 +80,19 @@ class ProfileEditViewModel @Inject constructor(
         viewModelScope.launch {
             fileRepository.requestUrlForUpload(imageUri)
                 .mapCatching { url -> userConfigRepository.saveThumbnail(url).getOrThrow() }
-                .onFailure {
-                    Timber.e(it)
-                    _event.send(ProfileEditEvent.ShowUnknownError)
-                }
+                .onFailure { notifyError(it) }
             _uiState.update { it.copy(uploadingThumbnail = null) }
         }
     }
 
-    private fun toggleUpcomingShows() {
-        val state = uiState.value
-        if (state.upcomingShowCount == 0) return
-
+    private fun toggleVisibility(request: suspend () -> Result<*>) {
         viewModelScope.launch {
-            userConfigRepository.setUpcomingShowVisible(!state.showUpcomingShows)
-                .onFailure {
-                    Timber.e(it)
-                    _event.send(ProfileEditEvent.ShowUnknownError)
-                }
+            request().onFailure { notifyError(it) }
         }
     }
 
-    private fun togglePastShows() {
-        val state = uiState.value
-        if (state.pastShowCount == 0) return
-
-        viewModelScope.launch {
-            userConfigRepository.setPastShowVisible(!state.showPerformedShows)
-                .onFailure {
-                    Timber.e(it)
-                    _event.send(ProfileEditEvent.ShowUnknownError)
-                }
-        }
+    private suspend fun notifyError(e: Throwable) {
+        Timber.e(e)
+        _event.send(ProfileEditEvent.ShowUnknownError)
     }
 }

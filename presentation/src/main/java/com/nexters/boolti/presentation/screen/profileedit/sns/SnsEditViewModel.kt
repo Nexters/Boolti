@@ -1,13 +1,15 @@
 package com.nexters.boolti.presentation.screen.profileedit.sns
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
-import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -18,55 +20,58 @@ import javax.inject.Inject
 class SnsEditViewModel @Inject constructor(
     getCachedUserUseCase: GetCachedUserUseCase,
     private val userConfigRepository: UserConfigRepository,
-) : BaseViewModel() {
+) : ViewModel() {
     private val snsList: Map<Sns.SnsType, String>? =
         getCachedUserUseCase()?.sns?.associate { it.type to it.username }
-    private val originalInstagramUsername: String = snsList?.get(Sns.SnsType.INSTAGRAM) ?: ""
-    private val originalYoutubeUsername: String = snsList?.get(Sns.SnsType.YOUTUBE) ?: ""
+    private val originalInstagramUsername: String = snsList?.get(Sns.SnsType.INSTAGRAM).orEmpty()
+    private val originalYoutubeUsername: String = snsList?.get(Sns.SnsType.YOUTUBE).orEmpty()
 
     private val _uiState = MutableStateFlow(
-        SnsEditState(
+        SnsEditUiState(
             originalInstagramUsername = originalInstagramUsername,
             originalYoutubeUsername = originalYoutubeUsername,
             instagramUsername = originalInstagramUsername,
             youtubeUsername = originalYoutubeUsername,
         )
     )
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<SnsEditUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<SnsEditEvent>()
-    val event = _event.receiveAsFlow()
+    private val _event = Channel<SnsEditEvent>(Channel.BUFFERED)
+    val event: Flow<SnsEditEvent> = _event.receiveAsFlow()
 
-    fun changeInstagramUsername(username: String) {
-        _uiState.update { it.copy(instagramUsername = username) }
+    fun onAction(action: SnsEditAction) {
+        when (action) {
+            is SnsEditAction.ChangeInstagramUsername -> _uiState.update { it.copy(instagramUsername = action.username) }
+            is SnsEditAction.ChangeYoutubeUsername -> _uiState.update { it.copy(youtubeUsername = action.username) }
+            SnsEditAction.Save -> save()
+            SnsEditAction.ClickBack -> if (canExit()) {
+                _event.trySend(SnsEditEvent.NavigateUp)
+            } else {
+                _uiState.update { it.copy(showExitAlertDialog = true) }
+            }
+            SnsEditAction.DismissExitAlertDialog -> _uiState.update { it.copy(showExitAlertDialog = false) }
+            SnsEditAction.ConfirmExit -> {
+                _uiState.update { it.copy(showExitAlertDialog = false) }
+                _event.trySend(SnsEditEvent.NavigateUp)
+            }
+        }
     }
 
-    fun changeYoutubeUsername(username: String) {
-        _uiState.update { it.copy(youtubeUsername = username) }
-    }
-
-    fun saveSns() {
-        if (uiState.value.saving) return
+    private fun save() {
+        val state = uiState.value
+        if (state.saving) return
 
         _uiState.update { it.copy(saving = true) }
         viewModelScope.launch {
             userConfigRepository.saveSns(
                 listOf(
-                    Sns(
-                        id = "",
-                        type = Sns.SnsType.INSTAGRAM,
-                        username = uiState.value.instagramUsername,
-                    ),
-                    Sns(
-                        id = "",
-                        type = Sns.SnsType.YOUTUBE,
-                        username = uiState.value.youtubeUsername,
-                    ),
+                    Sns(id = "", type = Sns.SnsType.INSTAGRAM, username = state.instagramUsername),
+                    Sns(id = "", type = Sns.SnsType.YOUTUBE, username = state.youtubeUsername),
                 )
             )
                 .onSuccess {
                     _uiState.update { it.copy(saving = false) }
-                    event(SnsEditEvent.Saved)
+                    _event.send(SnsEditEvent.NavigateUp)
                 }
                 .onFailure {
                     _uiState.update { it.copy(saving = false) }
@@ -74,27 +79,10 @@ class SnsEditViewModel @Inject constructor(
         }
     }
 
-    fun showExitAlertDialog() {
-        _uiState.update { it.copy(showExitAlertDialog = true) }
-    }
-
-    fun dismissExitAlertDialog() {
-        _uiState.update { it.copy(showExitAlertDialog = false) }
-    }
-
-    fun checkCanExit(): Boolean {
+    private fun canExit(): Boolean {
         val state = uiState.value
-        val canExit = (state.instagramUsername == originalInstagramUsername &&
-                state.youtubeUsername == originalYoutubeUsername) ||
-                (state.instagramUsernameError != null &&
-                        state.youtubeUsernameError != null)
-        if (!canExit) showExitAlertDialog()
-        return canExit
-    }
-
-    private fun event(event: SnsEditEvent) {
-        viewModelScope.launch {
-            _event.send(event)
-        }
+        val unchanged = state.instagramUsername == originalInstagramUsername &&
+                state.youtubeUsername == originalYoutubeUsername
+        return unchanged || (state.instagramUsernameError != null && state.youtubeUsernameError != null)
     }
 }

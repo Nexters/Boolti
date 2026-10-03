@@ -6,7 +6,9 @@ import com.nexters.boolti.domain.repository.UserConfigRepository
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -20,29 +22,43 @@ class NicknameEditViewModel @Inject constructor(
 ) : ViewModel() {
     private val originalNickname = getCachedUserUseCase()?.nickname.orEmpty()
 
-    private val _uiState = MutableStateFlow(NicknameEditState(nickname = originalNickname))
-    val uiState = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(NicknameEditUiState(nickname = originalNickname))
+    val uiState: StateFlow<NicknameEditUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<NicknameEditEvent>()
-    val event = _event.receiveAsFlow()
+    private val _event = Channel<NicknameEditEvent>(Channel.BUFFERED)
+    val event: Flow<NicknameEditEvent> = _event.receiveAsFlow()
 
-    fun changeNickname(nickname: String) {
-        _uiState.update { it.copy(nickname = nickname) }
+    fun onAction(action: NicknameEditAction) {
+        when (action) {
+            is NicknameEditAction.ChangeNickname -> _uiState.update { it.copy(nickname = action.nickname) }
+            NicknameEditAction.Save -> save()
+            NicknameEditAction.ClickBack -> if (canExit()) {
+                _event.trySend(NicknameEditEvent.NavigateUp)
+            } else {
+                _uiState.update { it.copy(showExitAlertDialog = true) }
+            }
+            NicknameEditAction.DismissExitAlertDialog -> _uiState.update { it.copy(showExitAlertDialog = false) }
+            NicknameEditAction.ConfirmExit -> {
+                _uiState.update { it.copy(showExitAlertDialog = false) }
+                _event.trySend(NicknameEditEvent.NavigateUp)
+            }
+        }
     }
 
-    fun saveNickname() {
-        if (uiState.value.saving) return
-        if (uiState.value.nickname == originalNickname) {
-            event(NicknameEditEvent.Saved)
+    private fun save() {
+        val state = uiState.value
+        if (state.saving) return
+        if (state.nickname == originalNickname) {
+            _event.trySend(NicknameEditEvent.NavigateUp)
             return
         }
 
         _uiState.update { it.copy(saving = true) }
         viewModelScope.launch {
-            userConfigRepository.saveNickname(uiState.value.nickname)
+            userConfigRepository.saveNickname(state.nickname)
                 .onSuccess { nickname ->
                     _uiState.update { it.copy(nickname = nickname, saving = false) }
-                    event(NicknameEditEvent.Saved)
+                    _event.send(NicknameEditEvent.NavigateUp)
                 }
                 .onFailure {
                     _uiState.update { it.copy(saving = false) }
@@ -50,24 +66,8 @@ class NicknameEditViewModel @Inject constructor(
         }
     }
 
-    fun showExitAlertDialog() {
-        _uiState.update { it.copy(showExitAlertDialog = true) }
-    }
-
-    fun dismissExitAlertDialog() {
-        _uiState.update { it.copy(showExitAlertDialog = false) }
-    }
-
-    fun checkCanExit(): Boolean {
-        val canExit = uiState.value.nickname == originalNickname ||
-                uiState.value.nicknameError != null
-        if (!canExit) showExitAlertDialog()
-        return canExit
-    }
-
-    private fun event(event: NicknameEditEvent) {
-        viewModelScope.launch {
-            _event.send(event)
-        }
+    private fun canExit(): Boolean {
+        val state = uiState.value
+        return state.nickname == originalNickname || state.nicknameError != null
     }
 }

@@ -1,10 +1,6 @@
 package com.nexters.boolti.presentation.screen.profileedit.sns
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.nexters.boolti.presentation.R
-
-data class SnsEditState(
+data class SnsEditUiState(
     val instagramUsername: String = "",
     val youtubeUsername: String = "",
     val originalInstagramUsername: String = "",
@@ -33,10 +29,15 @@ enum class SnsError {
     ContainsAtSign, ContainsUnsupportedCharacter
 }
 
-internal val SnsError?.message: String?
-    @Composable
-    get() = when (this) {
-        SnsError.ContainsAtSign -> stringResource(R.string.sns_edit_error_contains_at_sign)
-        SnsError.ContainsUnsupportedCharacter -> stringResource(R.string.sns_edit_error_contains_unsupported_character)
-        null -> null
-    }
+sealed interface SnsEditAction {
+    data class ChangeInstagramUsername(val username: String) : SnsEditAction
+    data class ChangeYoutubeUsername(val username: String) : SnsEditAction
+    data object Save : SnsEditAction
+    data object ClickBack : SnsEditAction
+    data object DismissExitAlertDialog : SnsEditAction
+    data object ConfirmExit : SnsEditAction
+}
+
+sealed interface SnsEditEvent {
+    data object NavigateUp : SnsEditEvent
+}

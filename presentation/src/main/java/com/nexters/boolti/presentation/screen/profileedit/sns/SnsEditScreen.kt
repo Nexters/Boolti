@@ -39,71 +39,36 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun SnsEditScreen(
-    modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: SnsEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel.event
-    val dismissDialogAndNavigateUp = {
-        viewModel.dismissExitAlertDialog()
-        navigateUp()
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            SnsEditEvent.NavigateUp -> navigateUp()
+        }
     }
 
-    BackHandler {
-        val canExit = viewModel.checkCanExit()
-        if (canExit) dismissDialogAndNavigateUp()
-    }
+    BackHandler { viewModel.onAction(SnsEditAction.ClickBack) }
 
     SnsEditScreen(
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
-        instagramUsername = uiState.instagramUsername,
-        youtubeUsername = uiState.youtubeUsername,
-        onChangeInstagramUsername = viewModel::changeInstagramUsername,
-        onChangeYoutubeUsername = viewModel::changeYoutubeUsername,
-        tryBack = {
-            val canExit = viewModel.checkCanExit()
-            if (canExit) dismissDialogAndNavigateUp()
-        },
-        event = event,
-        instagramUsernameError = uiState.instagramUsernameError,
-        youtubeUsernameError = uiState.youtubeUsernameError,
-        showExitAlertDialog = uiState.showExitAlertDialog,
-        onDismissExitAlertDialog = dismissDialogAndNavigateUp,
-        navigateUp = dismissDialogAndNavigateUp,
-        saveEnabled = uiState.saveEnabled,
-        onSave = viewModel::saveSns,
     )
 }
 
 @Composable
 private fun SnsEditScreen(
+    uiState: SnsEditUiState,
+    onAction: (SnsEditAction) -> Unit,
     modifier: Modifier = Modifier,
-    instagramUsername: String = "",
-    youtubeUsername: String = "",
-    showExitAlertDialog: Boolean = false,
-    event: Flow<SnsEditEvent> = emptyFlow(),
-    saveEnabled: Boolean = true,
-    instagramUsernameError: SnsError? = null,
-    youtubeUsernameError: SnsError? = null,
-    onChangeInstagramUsername: (String) -> Unit = {},
-    onChangeYoutubeUsername: (String) -> Unit = {},
-    tryBack: () -> Unit = {}, // 이탈 가능 상태 확인 후 이탈
-    navigateUp: () -> Unit = {}, // 진짜로 화면 이탈
-    onSave: () -> Unit = {},
-    onDismissExitAlertDialog: () -> Unit = {},
 ) {
-    ObserveAsEvents(event) {
-        when (it) {
-            SnsEditEvent.Saved -> navigateUp()
-        }
-    }
-
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -111,15 +76,15 @@ private fun SnsEditScreen(
                 title = stringResource(R.string.sns),
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = tryBack,
+                        onClick = { onAction(SnsEditAction.ClickBack) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.save_short),
-                        onClick = onSave,
-                        enabled = saveEnabled,
+                        onClick = { onAction(SnsEditAction.Save) },
+                        enabled = uiState.saveEnabled,
                     )
                 }
             )
@@ -134,27 +99,27 @@ private fun SnsEditScreen(
         ) {
             SnsUsernameInput(
                 snsType = Sns.SnsType.INSTAGRAM,
-                username = instagramUsername,
-                onUsernameChanged = onChangeInstagramUsername,
-                error = instagramUsernameError,
+                username = uiState.instagramUsername,
+                onUsernameChanged = { onAction(SnsEditAction.ChangeInstagramUsername(it)) },
+                error = uiState.instagramUsernameError,
             )
             SnsUsernameInput(
                 snsType = Sns.SnsType.YOUTUBE,
-                username = youtubeUsername,
-                onUsernameChanged = onChangeYoutubeUsername,
-                error = youtubeUsernameError,
+                username = uiState.youtubeUsername,
+                onUsernameChanged = { onAction(SnsEditAction.ChangeYoutubeUsername(it)) },
+                error = uiState.youtubeUsernameError,
             )
         }
 
-        if (showExitAlertDialog) {
+        if (uiState.showExitAlertDialog) {
             BTDialog(
                 enableDismiss = true,
                 showCloseButton = true,
-                onDismiss = onDismissExitAlertDialog,
+                onDismiss = { onAction(SnsEditAction.ConfirmExit) },
                 negativeButtonLabel = stringResource(R.string.btn_exit),
-                onClickNegativeButton = navigateUp,
+                onClickNegativeButton = { onAction(SnsEditAction.ConfirmExit) },
                 positiveButtonLabel = stringResource(R.string.save),
-                onClickPositiveButton = onSave,
+                onClickPositiveButton = { onAction(SnsEditAction.Save) },
             ) {
                 Text(
                     text = stringResource(R.string.profile_edit_exit_alert),
@@ -215,6 +180,14 @@ private fun SnsUsernameInput(
     }
 }
 
+private val SnsError?.message: String?
+    @Composable
+    get() = when (this) {
+        SnsError.ContainsAtSign -> stringResource(R.string.sns_edit_error_contains_at_sign)
+        SnsError.ContainsUnsupportedCharacter -> stringResource(R.string.sns_edit_error_contains_unsupported_character)
+        null -> null
+    }
+
 @Preview
 @Composable
 private fun SnsUsernameInputPreview() {
@@ -230,8 +203,11 @@ private fun SnsUsernameInputPreview() {
 
 @Preview
 @Composable
-private fun SnsEditPreview() {
+private fun SnsEditScreenPreview() {
     BooltiTheme {
-        SnsEditScreen()
+        SnsEditScreen(
+            uiState = SnsEditUiState(),
+            onAction = {},
+        )
     }
 }

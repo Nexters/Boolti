@@ -35,6 +35,12 @@
 
 ![architecture](https://github.com/Nexters/Boolti/assets/35232655/ebc7714c-c954-4758-9551-f60fb78079d9)
 
+## Release Metrics
+
+릴리즈가 `main`에 머지될 때마다 갱신돼요. 버전별 추이는 [대시보드](https://nexters.github.io/Boolti/dev/bench/)에서 볼 수 있어요.
+
+[![release metrics](https://nexters.github.io/Boolti/dev/bench/latest.png)](https://nexters.github.io/Boolti/dev/bench/)
+
 ## Android Developers
 
 |Android|Android|

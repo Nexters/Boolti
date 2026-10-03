@@ -44,6 +44,14 @@ kotlin {
     }
 }
 
+// ./gradlew ... -PcomposeReports=true 일 때만 Compose 안정성 리포트 생성
+if (providers.gradleProperty("composeReports").isPresent) {
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_reports")
+        metricsDestination = layout.buildDirectory.dir("compose_metrics")
+    }
+}
+
 dependencies {
     implementation(projects.domain)
     implementation(projects.tosspayments)

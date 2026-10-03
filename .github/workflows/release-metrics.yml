@@ -47,6 +47,7 @@ jobs:
         run: chmod +x gradlew
 
       # 빌드 캐시를 쓰면 컴파일이 건너뛰어져 Compose 리포트가 생기지 않는다
+      # 측정용 빌드라 Crashlytics mapping 파일은 올리지 않는다
       - name: Build and measure
         env:
           KEYSTORE: ${{ secrets.KEYSTORE }}
@@ -54,11 +55,12 @@ jobs:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
         run: |
-          echo "$KEYSTORE" | base64 -d > ./app/boolti-keystore.keystore
+          echo "$KEYSTORE" | base64 -d > ./app/boolti-keystore
           echo "$KEYSTORE_PROPERTIES" > keystore.properties
           echo "$LOCAL_PROPERTIES" > local.properties
           echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
-          ./gradlew btTest koverXmlReportUnit lintRelease assembleRelease -PcomposeReports=true --no-build-cache --stacktrace
+          ./gradlew btTest koverXmlReportUnit lintRelease assembleRelease -PcomposeReports=true \
+            -x uploadCrashlyticsMappingFileRelease --no-build-cache --stacktrace
 
       - name: Collect metrics
         run: node .github/scripts/release-metrics.js metrics.json

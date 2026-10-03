@@ -77,6 +77,33 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
 
+      # 카드 영역만 캡처해 README용 latest.png로 올리고 디스코드에 첨부한다
+      - name: Capture dashboard
+        if: github.event_name == 'push'
+        run: |
+          sudo apt-get install -y -qq fonts-noto-cjk > /dev/null
+          git fetch --depth=1 origin gh-pages
+          git worktree add pages origin/gh-pages
+          google-chrome --headless=new --disable-gpu --hide-scrollbars --window-size=1200,410 \
+            --virtual-time-budget=5000 --screenshot="$PWD/pages/$BENCH_DIR/latest.png" \
+            "file://$PWD/pages/$BENCH_DIR/index.html"
+          cd pages
+          git add "$BENCH_DIR/latest.png"
+          git -c user.name=github-actions[bot] -c user.email=41898282+github-actions[bot]@users.noreply.github.com \
+            commit -m "릴리즈 지표 캡처 갱신"
+          git push origin HEAD:gh-pages
+
+      - name: Notify Discord
+        if: github.event_name == 'push'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DASHBOARD_URL: https://nexters.github.io/Boolti/${{ env.BENCH_DIR }}/
+        run: |
+          [ -n "$DISCORD_WEBHOOK_URL" ] || exit 0
+          version=$(awk -F '"' '/^versionName = /{ print $2; exit }' gradle/libs.versions.toml)
+          jq -n --arg c "[테스트] 📊 릴리즈 지표 갱신: v$version"$'\n'"$DASHBOARD_URL" '{content: $c}' > payload.json
+          curl -sf -F "payload_json=<payload.json" -F "file1=@pages/$BENCH_DIR/latest.png" "$DISCORD_WEBHOOK_URL"
+
       - name: Fetch baseline from gh-pages
         if: github.event_name == 'pull_request'
         continue-on-error: true

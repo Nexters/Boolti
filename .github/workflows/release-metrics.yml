@@ -96,13 +96,13 @@ jobs:
       - name: Notify Discord
         if: github.event_name == 'push'
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_METRICS_WEBHOOK_URL }}
           DASHBOARD_URL: https://nexters.github.io/Boolti/${{ env.BENCH_DIR }}/
         run: |
           [ -n "$DISCORD_WEBHOOK_URL" ] || exit 0
           version=$(awk -F '"' '/^versionName = /{ print $2; exit }' gradle/libs.versions.toml)
           jq -n --arg c "[테스트] 📊 릴리즈 지표 갱신: v$version"$'\n'"$DASHBOARD_URL" '{content: $c}' > payload.json
-          curl -sf -F "payload_json=<payload.json" -F "file1=@pages/$BENCH_DIR/latest.png" "$DISCORD_WEBHOOK_URL"
+          curl -sS --fail-with-body -F "payload_json=<payload.json" -F "files[0]=@pages/$BENCH_DIR/latest.png" "$DISCORD_WEBHOOK_URL"
 
       - name: Fetch baseline from gh-pages
         if: github.event_name == 'pull_request'

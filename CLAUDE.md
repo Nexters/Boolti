@@ -34,6 +34,7 @@ common/tracker/   - Mixpanel 이벤트 트래킹 (AppTracker)
 ./gradlew domain:test
 ./gradlew data:testDebugUnitTest
 ./gradlew presentation:testDebugUnitTest
+./gradlew koverHtmlReportUnit  # 커버리지 리포트 (build/reports/kover/htmlUnit), UI·자동 생성 코드 제외
 ```
 
 - 테스트: Kotest + MockK

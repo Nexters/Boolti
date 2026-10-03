@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791021204469,
+  "lastUpdate": 1791022526361,
   "repoUrl": "https://github.com/Nexters/Boolti",
   "entries": {
     "Release Metrics": [
@@ -54,6 +54,66 @@ window.BENCHMARK_DATA = {
             "name": "줄 커버리지",
             "value": 6.08,
             "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pmb0836@gmail.com",
+            "name": "mangbaam",
+            "username": "mangbaam"
+          },
+          "committer": {
+            "email": "pmb0836@gmail.com",
+            "name": "mangbaam",
+            "username": "mangbaam"
+          },
+          "distinct": true,
+          "id": "8ddc8679ee08bef1f56af54c95d316dab2a50825",
+          "message": "[Boolti-571] 릴리즈 지표에 앱 버전 기록",
+          "timestamp": "2026-10-03T19:07:59+09:00",
+          "tree_id": "98fe1ca11472a36144410df9500843b0ce09a3b2",
+          "url": "https://github.com/Nexters/Boolti/commit/8ddc8679ee08bef1f56af54c95d316dab2a50825"
+        },
+        "date": 1791022525378,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Compose unstable 파라미터",
+            "value": 485,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "Compose 불안정 클래스",
+            "value": 104,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "release APK 크기",
+            "value": 12.64,
+            "unit": "MB",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "lint 경고",
+            "value": 89,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "테스트",
+            "value": 57,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "줄 커버리지",
+            "value": 6.08,
+            "unit": "%",
+            "extra": "1.14.3"
           }
         ]
       }

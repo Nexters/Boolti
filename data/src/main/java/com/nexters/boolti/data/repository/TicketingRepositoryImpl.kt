@@ -75,7 +75,8 @@ internal class TicketingRepositoryImpl @Inject constructor(
     override fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse> = flow {
         val response = dataSource.approvePayment(request)
         if (response.isSuccessful) {
-            response.body()?.let { emit(it.toDomain()) }
+            val body = response.body() ?: throw TicketingException(TicketingErrorType.Unknown)
+            emit(body.toDomain())
         } else {
             val errMsg = response.errorBody()?.string()
             throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))

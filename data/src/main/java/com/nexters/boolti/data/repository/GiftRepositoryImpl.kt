@@ -3,6 +3,9 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.datasource.GiftDataSource
 import com.nexters.boolti.data.network.request.GiftReceiveRequest
 import com.nexters.boolti.data.network.response.toDomains
+import com.nexters.boolti.domain.exception.TicketingErrorType
+import com.nexters.boolti.domain.exception.TicketingException
+import com.nexters.boolti.domain.extension.errorType
 import com.nexters.boolti.domain.model.ApproveGiftPayment
 import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.ImagePair
@@ -28,7 +31,14 @@ internal class GiftRepositoryImpl @Inject constructor(
     }
 
     override fun approveGiftPayment(request: GiftApproveRequest): Flow<ApproveGiftPayment> = flow {
-        emit(dataSource.approveGiftPayment(request).toDomain())
+        val response = dataSource.approveGiftPayment(request)
+        if (response.isSuccessful) {
+            val body = response.body() ?: throw TicketingException(TicketingErrorType.Unknown)
+            emit(body.toDomain())
+        } else {
+            val errMsg = response.errorBody()?.string()
+            throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
+        }
     }
 
     override fun sendFreeGift(request: FreeGiftRequest): Flow<ApproveGiftPayment> = flow {

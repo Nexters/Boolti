@@ -42,7 +42,6 @@ import com.nexters.boolti.presentation.screen.giftprequestion.giftPreQuestionScr
 import com.nexters.boolti.presentation.screen.home.homeScreen
 import com.nexters.boolti.presentation.screen.link.linkListScreen
 import com.nexters.boolti.presentation.screen.login.loginScreen
-import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import com.nexters.boolti.presentation.screen.navigation.ShowRoute
@@ -246,16 +245,8 @@ fun MainNavigation(
             profileIntroduceEditScreen()
         }
 
-        navigation<LinkListRoute.LinkListRoot>(
-            startDestination = LinkListRoute.LinkList,
-        ) {
-            linkListScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-            linkEditScreen(
-                getSharedViewModel = { entry -> entry.sharedViewModel() },
-            )
-        }
+        linkListScreen()
+        linkEditScreen()
 
         navigation<VideoListRoute.VideoListRoot>(
             startDestination = VideoListRoute.VideoList,

@@ -2,9 +2,9 @@ name: Release Metrics
 
 on:
   push:
-    branches: [main, test/metrics-main]
+    branches: [main]
   pull_request:
-    branches: [main, test/metrics-main]
+    branches: [main]
     types:
       - opened
       - synchronize
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BENCH_DIR: test/bench
+  BENCH_DIR: dev/bench
 
 jobs:
   metrics:
@@ -101,7 +101,7 @@ jobs:
         run: |
           [ -n "$DISCORD_WEBHOOK_URL" ] || exit 0
           version=$(awk -F '"' '/^versionName = /{ print $2; exit }' gradle/libs.versions.toml)
-          jq -n --arg c "[테스트] 📊 릴리즈 지표 갱신: v$version"$'\n'"$DASHBOARD_URL" '{content: $c}' > payload.json
+          jq -n --arg c "📊 릴리즈 지표 갱신: v$version"$'\n'"$DASHBOARD_URL" '{content: $c}' > payload.json
           curl -sS --fail-with-body -F "payload_json=<payload.json" -F "files[0]=@pages/$BENCH_DIR/latest.png" "$DISCORD_WEBHOOK_URL"
 
       - name: Fetch baseline from gh-pages

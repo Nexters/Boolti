@@ -88,7 +88,6 @@ class ShowDetailViewModel @Inject constructor(
                 }
                 .onFailure {
                     _uiState.update { it.copy(isLoading = false) }
-                    Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }
         }
@@ -103,7 +102,6 @@ class ShowDetailViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                    Firebase.crashlytics.recordException(it)
                     Timber.e(it)
                 }
         }

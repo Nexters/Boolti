@@ -7,9 +7,9 @@ import com.nexters.boolti.data.network.response.ApproveGiftPaymentResponse
 import com.nexters.boolti.data.network.response.GiftImageResponse
 import com.nexters.boolti.data.network.response.GiftPaymentInfoResponse
 import com.nexters.boolti.data.network.response.GiftResponse
-import com.nexters.boolti.data.network.response.ImageResponse
 import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.GiftApproveRequest
+import retrofit2.Response
 import javax.inject.Inject
 
 internal class GiftDataSource @Inject constructor(
@@ -20,7 +20,7 @@ internal class GiftDataSource @Inject constructor(
         return response.isSuccessful
     }
 
-    suspend fun approveGiftPayment(request: GiftApproveRequest): ApproveGiftPaymentResponse =
+    suspend fun approveGiftPayment(request: GiftApproveRequest): Response<ApproveGiftPaymentResponse> =
         service.approveGiftPayment(request)
 
     suspend fun createFreeGift(request: FreeGiftRequest): ApproveGiftPaymentResponse =

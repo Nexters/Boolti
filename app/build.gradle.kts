@@ -121,6 +121,8 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
+
+    testImplementation(libs.bundles.kotest)
 }
 
 tasks.withType<Test>().configureEach {

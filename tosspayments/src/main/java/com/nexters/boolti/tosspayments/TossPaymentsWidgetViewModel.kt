@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -77,16 +78,7 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                 depositorPhoneNumber = state.depositorPhoneNumber,
             )
         ).catch { e ->
-            if (e !is TicketingException) throw e
-            if (
-                e.errorType in listOf(
-                    TicketingErrorType.NoRemainingQuantity,
-                    TicketingErrorType.ApprovePaymentFailed,
-                    TicketingErrorType.Unknown,
-                )
-            ) {
-                event(PaymentEvent.TicketSoldOut)
-            }
+            onApproveFailed(orderId, e)
         }.singleOrNull()?.let { (orderId, reservationId) ->
             event(PaymentEvent.Approved(orderId, reservationId))
         }
@@ -114,19 +106,20 @@ class TossPaymentsWidgetViewModel @Inject constructor(
                 recipientPhoneNumber = state.receiverContact,
             )
         ).catch { e ->
-            if (e !is TicketingException) throw e
-            if (
-                e.errorType in listOf(
-                    TicketingErrorType.NoRemainingQuantity,
-                    TicketingErrorType.ApprovePaymentFailed,
-                    TicketingErrorType.Unknown,
-                )
-            ) {
-                event(PaymentEvent.TicketSoldOut)
-            }
+            onApproveFailed(orderId, e)
         }.singleOrNull()?.let {
             event(PaymentEvent.Approved(it.orderId, it.reservationId, it.giftId))
         }
+    }
+
+    private fun onApproveFailed(orderId: String, e: Throwable) {
+        Timber.e(e, "결제 승인 실패. orderId: $orderId")
+
+        val soldOut = e is TicketingException && e.errorType in listOf(
+            TicketingErrorType.NoRemainingQuantity,
+            TicketingErrorType.ApprovePaymentFailed,
+        )
+        event(if (soldOut) PaymentEvent.TicketSoldOut else PaymentEvent.Failed)
     }
 
     fun onLoadPaymentWidget(success: Boolean) {

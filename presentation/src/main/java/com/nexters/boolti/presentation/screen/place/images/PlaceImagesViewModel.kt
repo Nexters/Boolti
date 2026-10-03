@@ -3,8 +3,6 @@ package com.nexters.boolti.presentation.screen.place.images
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
@@ -49,7 +47,6 @@ class PlaceImagesViewModel @Inject constructor(
                 }
             }
             .catch { e ->
-                Firebase.crashlytics.recordException(e)
                 Timber.e(e, "공연장 사진 목록 조회 실패")
                 _uiState.update { it.copy(isLoading = false) }
             }

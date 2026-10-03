@@ -12,7 +12,9 @@ import com.nexters.boolti.domain.usecase.GetYouTubeVideoListByUserCodeUseCase
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -35,22 +37,41 @@ class VideoListViewModel @Inject constructor(
     private var autoNavigatedToEdit = isEditModeAtFirst
 
     private val _uiState = MutableStateFlow(
-        VideoListState(
+        VideoListUiState(
             isMine = isMine,
             loading = true,
             editing = isEditModeAtFirst,
         )
     )
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<VideoListUiState> = _uiState.asStateFlow()
 
-    private val _videoListEvent = Channel<VideoListEvent>()
-    val videoListEvent = _videoListEvent.receiveAsFlow()
-
-    private val _videoEditEvent = Channel<VideoEditEvent>()
-    val videoEditEvent = _videoEditEvent.receiveAsFlow()
+    private val _event = Channel<VideoListEvent>(Channel.BUFFERED)
+    val event: Flow<VideoListEvent> = _event.receiveAsFlow()
 
     init {
         fetchVideos()
+    }
+
+    fun onAction(action: VideoListAction) {
+        when (action) {
+            VideoListAction.Back -> tryBack()
+            VideoListAction.Exit -> sendEvent(VideoListEvent.Finish)
+            VideoListAction.Save -> save()
+            VideoListAction.StartEditing -> _uiState.update { it.copy(editing = true) }
+            VideoListAction.DismissExitAlertDialog -> _uiState.update { it.copy(showExitAlertDialog = false) }
+            is VideoListAction.Reorder -> reorder(action.from, action.to)
+            VideoListAction.ClickAddVideo -> {
+                startAddOrEditVideo(null)
+                sendEvent(VideoListEvent.NavigateToEdit(isEditMode = false))
+            }
+            is VideoListAction.ClickVideo -> {
+                startAddOrEditVideo(action.localId)
+                sendEvent(VideoListEvent.NavigateToEdit(isEditMode = true))
+            }
+            is VideoListAction.ChangeVideoUrl -> onVideoUrlChanged(action.url)
+            VideoListAction.CompleteVideo -> completeAddOrEditVideo()
+            VideoListAction.RemoveVideo -> removeVideo()
+        }
     }
 
     private fun fetchVideos() {
@@ -67,7 +88,7 @@ class VideoListViewModel @Inject constructor(
                     }
                     if (isMine && videos.isEmpty()) {
                         autoNavigatedToEdit = true
-                        videoListEvent(VideoListEvent.NavigateToEdit)
+                        sendEvent(VideoListEvent.NavigateToEdit(isEditMode = false))
                     }
                 }
                 .onFailure {
@@ -77,7 +98,7 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    fun save() {
+    private fun save() {
         _uiState.update { it.copy(saving = true) }
         viewModelScope.launch {
             userConfigRepository.saveVideos(
@@ -97,11 +118,11 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    fun tryBack() {
+    private fun tryBack() {
         when {
             uiState.value.editing && autoNavigatedToEdit && !uiState.value.saveEnabled -> {
-                videoEditEvent(VideoEditEvent.Finish)
-                videoListEvent(VideoListEvent.Finish)
+                sendEvent(VideoListEvent.CloseEdit)
+                sendEvent(VideoListEvent.Finish)
             }
 
             uiState.value.editing && uiState.value.edited -> {
@@ -109,21 +130,21 @@ class VideoListViewModel @Inject constructor(
             }
 
             uiState.value.editing && uiState.value.originalVideos.isEmpty() -> {
-                videoListEvent(VideoListEvent.Finish)
+                sendEvent(VideoListEvent.Finish)
             }
 
             uiState.value.editing -> {
                 _uiState.update { it.copy(editing = false) }
-                videoEditEvent(VideoEditEvent.Finish)
+                sendEvent(VideoListEvent.CloseEdit)
             }
 
             else -> {
-                videoListEvent(VideoListEvent.Finish)
+                sendEvent(VideoListEvent.Finish)
             }
         }
     }
 
-    fun startAddOrEditVideo(
+    private fun startAddOrEditVideo(
         videoId: String?,
     ) {
         val targetVideo = uiState.value.videos.find { it.localId == videoId }
@@ -136,7 +157,7 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    fun onVideoUrlChanged(
+    private fun onVideoUrlChanged(
         url: String,
     ) {
         if (uiState.value.editingVideo == null) startAddOrEditVideo(null)
@@ -148,7 +169,7 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    fun removeVideo() {
+    private fun removeVideo() {
         val targetVideo = uiState.value.editingVideo ?: return
         _uiState.update {
             it.copy(
@@ -158,11 +179,11 @@ class VideoListViewModel @Inject constructor(
             )
         }
         autoNavigatedToEdit = false
-        videoEditEvent(VideoEditEvent.Finish)
-        videoListEvent(VideoListEvent.Removed)
+        sendEvent(VideoListEvent.CloseEdit)
+        sendEvent(VideoListEvent.Removed)
     }
 
-    fun completeAddOrEditVideo() {
+    private fun completeAddOrEditVideo() {
         val video = uiState.value.editingVideo ?: return
         val editMode = video.localId.isNotEmpty()
 
@@ -173,22 +194,22 @@ class VideoListViewModel @Inject constructor(
                 val updatedVideo = youTubeVideo?.copy(localId = video.localId)
                     ?: createInvalidVideo(video.url).copy(localId = video.localId)
                 editVideo(updatedVideo)
-                videoEditEvent(VideoEditEvent.Finish)
-                videoListEvent(VideoListEvent.Edited)
+                sendEvent(VideoListEvent.CloseEdit)
+                sendEvent(VideoListEvent.Edited)
             } else {
                 // 새 동영상 추가 시 YouTube API로 정보 가져오기
                 val youTubeVideo = getYouTubeVideoInfoByUrlUseCase(video.url)
                 if (youTubeVideo != null) {
                     addVideo(youTubeVideo)
-                    videoListEvent(VideoListEvent.Added)
+                    sendEvent(VideoListEvent.Added)
                 } else {
                     // 유효하지 않은 URL인 경우 기본 비디오 객체 생성하여 추가
                     val invalidVideo = createInvalidVideo(video.url)
                     addVideo(invalidVideo)
-                    videoListEvent(VideoListEvent.Added)
+                    sendEvent(VideoListEvent.Added)
                 }
                 autoNavigatedToEdit = false
-                videoEditEvent(VideoEditEvent.Finish)
+                sendEvent(VideoListEvent.CloseEdit)
             }
         }
     }
@@ -220,7 +241,7 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    fun reorder(from: Int, to: Int) {
+    private fun reorder(from: Int, to: Int) {
         val videos = uiState.value.videos.toMutableList()
         if (from !in videos.indices || to !in videos.indices) return
 
@@ -231,23 +252,9 @@ class VideoListViewModel @Inject constructor(
         }
     }
 
-    fun setEditMode() {
-        _uiState.update { it.copy(editing = true) }
-    }
-
-    fun dismissExitAlertDialog() {
-        _uiState.update { it.copy(showExitAlertDialog = false) }
-    }
-
-    private fun videoListEvent(event: VideoListEvent) {
+    private fun sendEvent(event: VideoListEvent) {
         viewModelScope.launch {
-            _videoListEvent.send(event)
-        }
-    }
-
-    private fun videoEditEvent(event: VideoEditEvent) {
-        viewModelScope.launch {
-            _videoEditEvent.send(event)
+            _event.send(event)
         }
     }
 

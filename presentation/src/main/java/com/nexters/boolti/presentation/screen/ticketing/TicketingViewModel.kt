@@ -14,8 +14,8 @@ import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
 import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -41,7 +41,7 @@ class TicketingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
     getCachedUserUseCase: GetCachedUserUseCase,
-    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : ViewModel() {
     private val showId: String = requireNotNull(savedStateHandle["showId"])
     private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
@@ -76,7 +76,7 @@ class TicketingViewModel @Inject constructor(
                 it.copy(inviteCode = action.code, inviteCodeStatus = InviteCodeStatus.Default)
             }
             TicketingAction.CheckInviteCode -> if (state != null && inviteCodeJob?.isActive != true) {
-                inviteCodeJob = launchWithLoading { checkInviteCode(state) }
+                inviteCodeJob = viewModelScope.launch { checkInviteCode(state) }
             }
             is TicketingAction.ChangePreQuestionAnswer -> updateSuccess {
                 it.copy(preQuestionAnswers = (it.preQuestionAnswers + (action.questionId to action.answer)).toImmutableMap())
@@ -86,7 +86,7 @@ class TicketingViewModel @Inject constructor(
             TicketingAction.DismissPolicy -> updateSuccess { it.copy(policyPageUrl = null) }
             TicketingAction.ClickPayment -> updateSuccess { it.copy(dialog = TicketingDialog.Confirm) }
             TicketingAction.ConfirmReservation -> if (state != null && reservationJob?.isActive != true) {
-                reservationJob = launchWithLoading { reservation(state) }
+                reservationJob = viewModelScope.launch { reservation(state) }
             }
             TicketingAction.DismissDialog -> updateSuccess { it.copy(dialog = null) }
             is TicketingAction.PaymentSucceeded -> if (state != null) {
@@ -104,7 +104,7 @@ class TicketingViewModel @Inject constructor(
             _uiState.value = TicketingUiState.Loading
             val info = async { repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)) }
             val preQuestions = async { repository.getPreQuestions(showId) }
-            val refundPolicy = async { getRefundPolicyUsecase().catch { emit(emptyList()) }.first() }
+            val refundPolicy = async { getRefundPolicyUseCase().catch { emit(emptyList()) }.first() }
 
             val ticketingInfo = info.await().onFailure { e -> Timber.e(e) }.getOrNull()
             val questions = preQuestions.await().onFailure { e -> Timber.e(e) }.getOrNull()
@@ -218,7 +218,7 @@ class TicketingViewModel @Inject constructor(
             },
         )
         repository.submitPreQuestionAnswers(request)
-            .onFailure { e -> Timber.e(e, "Failed to submit pre-question answers") }
+            .onFailure { e -> Timber.e(e, "사전 질문 답변 등록 실패: reservationId=$reservationId") }
     }
 
     private suspend fun showError(e: Throwable) {
@@ -230,14 +230,5 @@ class TicketingViewModel @Inject constructor(
 
     private inline fun updateSuccess(transform: (TicketingUiState.Success) -> TicketingUiState.Success) {
         _uiState.update { if (it is TicketingUiState.Success) transform(it) else it }
-    }
-
-    private fun launchWithLoading(block: suspend () -> Unit): Job = viewModelScope.launch {
-        updateSuccess { it.copy(loading = true) }
-        try {
-            block()
-        } finally {
-            updateSuccess { it.copy(loading = false) }
-        }
     }
 }

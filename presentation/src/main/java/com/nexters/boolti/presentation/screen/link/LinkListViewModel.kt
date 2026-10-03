@@ -11,7 +11,9 @@ import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -33,21 +35,41 @@ class LinkListViewModel @Inject constructor(
     private var autoNavigatedToEdit = isEditModeAtFirst
 
     private val _uiState = MutableStateFlow(
-        LinkListState(
+        LinkListUiState(
             isMine = isMine,
             editing = isEditModeAtFirst,
         )
     )
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<LinkListUiState> = _uiState.asStateFlow()
 
-    private val _linkListEvent = Channel<LinkListEvent>()
-    val linkListEvent = _linkListEvent.receiveAsFlow()
-
-    private val _linkEditEvent = Channel<LinkEditEvent>()
-    val linkEditEvent = _linkEditEvent.receiveAsFlow()
+    private val _event = Channel<LinkListEvent>(Channel.BUFFERED)
+    val event: Flow<LinkListEvent> = _event.receiveAsFlow()
 
     init {
         fetchLinks()
+    }
+
+    fun onAction(action: LinkListAction) {
+        when (action) {
+            LinkListAction.Back -> tryBack()
+            LinkListAction.Exit -> sendEvent(LinkListEvent.Finish)
+            LinkListAction.Save -> save()
+            LinkListAction.StartEditing -> _uiState.update { it.copy(editing = true) }
+            LinkListAction.DismissExitAlertDialog -> _uiState.update { it.copy(showExitAlertDialog = false) }
+            is LinkListAction.Reorder -> reorder(action.from, action.to)
+            LinkListAction.ClickAddLink -> {
+                startAddOrEditLink(null)
+                sendEvent(LinkListEvent.NavigateToEdit)
+            }
+            is LinkListAction.ClickLink -> {
+                startAddOrEditLink(action.linkId)
+                sendEvent(LinkListEvent.NavigateToEdit)
+            }
+            is LinkListAction.ChangeLinkName -> onLinkNameChanged(action.name)
+            is LinkListAction.ChangeLinkUrl -> onLinkUrlChanged(action.url)
+            LinkListAction.CompleteLink -> completeAddOrEditLink()
+            LinkListAction.RemoveLink -> removeLink()
+        }
     }
 
     private fun fetchLinks() {
@@ -63,7 +85,7 @@ class LinkListViewModel @Inject constructor(
                     }
                     if (isMine && links.isEmpty()) {
                         autoNavigatedToEdit = true
-                        linkListEvent(LinkListEvent.NavigateToEdit)
+                        sendEvent(LinkListEvent.NavigateToEdit)
                     }
                 }
                 .onFailure {
@@ -72,7 +94,7 @@ class LinkListViewModel @Inject constructor(
         }
     }
 
-    fun save() {
+    private fun save() {
         _uiState.update { it.copy(saving = true) }
         viewModelScope.launch {
             userConfigRepository.saveLinks(
@@ -91,11 +113,11 @@ class LinkListViewModel @Inject constructor(
         }
     }
 
-    fun tryBack() {
+    private fun tryBack() {
         when {
             uiState.value.editing && autoNavigatedToEdit && !uiState.value.saveEnabled -> {
-                linkEditEvent(LinkEditEvent.Finish)
-                linkListEvent(LinkListEvent.Finish)
+                sendEvent(LinkListEvent.CloseEdit)
+                sendEvent(LinkListEvent.Finish)
             }
 
             uiState.value.editing && uiState.value.edited -> {
@@ -103,21 +125,21 @@ class LinkListViewModel @Inject constructor(
             }
 
             uiState.value.editing && uiState.value.originalLinks.isEmpty() -> {
-                linkListEvent(LinkListEvent.Finish)
+                sendEvent(LinkListEvent.Finish)
             }
 
             uiState.value.editing -> {
-                linkEditEvent(LinkEditEvent.Finish)
+                sendEvent(LinkListEvent.CloseEdit)
                 _uiState.update { it.copy(editing = false) }
             }
 
             else -> {
-                linkListEvent(LinkListEvent.Finish)
+                sendEvent(LinkListEvent.Finish)
             }
         }
     }
 
-    fun startAddOrEditLink(
+    private fun startAddOrEditLink(
         linkId: String?,
     ) {
         val targetLink = uiState.value.links.find { it.id == linkId }
@@ -129,7 +151,7 @@ class LinkListViewModel @Inject constructor(
         _uiState.update { it.copy(editingLink = targetLink) }
     }
 
-    fun onLinkNameChanged(
+    private fun onLinkNameChanged(
         name: String,
     ) {
         if (uiState.value.editingLink == null) startAddOrEditLink(null)
@@ -141,7 +163,7 @@ class LinkListViewModel @Inject constructor(
         }
     }
 
-    fun onLinkUrlChanged(
+    private fun onLinkUrlChanged(
         url: String,
     ) {
         if (uiState.value.editingLink == null) startAddOrEditLink(null)
@@ -153,7 +175,7 @@ class LinkListViewModel @Inject constructor(
         }
     }
 
-    fun removeLink() {
+    private fun removeLink() {
         val targetLink = uiState.value.editingLink ?: return
         _uiState.update {
             it.copy(
@@ -162,11 +184,11 @@ class LinkListViewModel @Inject constructor(
             )
         }
         autoNavigatedToEdit = false
-        linkEditEvent(LinkEditEvent.Finish)
-        linkListEvent(LinkListEvent.Removed)
+        sendEvent(LinkListEvent.CloseEdit)
+        sendEvent(LinkListEvent.Removed)
     }
 
-    fun completeAddOrEditLink() {
+    private fun completeAddOrEditLink() {
         val link = uiState.value.editingLink ?: return
         val editMode = link.id.isNotEmpty()
         if (editMode) {
@@ -175,8 +197,8 @@ class LinkListViewModel @Inject constructor(
             addLink(link)
         }
         autoNavigatedToEdit = false
-        linkEditEvent(LinkEditEvent.Finish)
-        linkListEvent(
+        sendEvent(LinkListEvent.CloseEdit)
+        sendEvent(
             if (editMode) LinkListEvent.Edited else LinkListEvent.Added,
         )
     }
@@ -206,7 +228,7 @@ class LinkListViewModel @Inject constructor(
         }
     }
 
-    fun reorder(from: Int, to: Int) {
+    private fun reorder(from: Int, to: Int) {
         val links = uiState.value.links.toMutableList()
         if (from !in links.indices || to !in links.indices) return
 
@@ -217,23 +239,9 @@ class LinkListViewModel @Inject constructor(
         }
     }
 
-    fun setEditMode() {
-        _uiState.update { it.copy(editing = true) }
-    }
-
-    fun disMissExitAlertDialog() {
-        _uiState.update { it.copy(showExitAlertDialog = false) }
-    }
-
-    private fun linkListEvent(event: LinkListEvent) {
+    private fun sendEvent(event: LinkListEvent) {
         viewModelScope.launch {
-            _linkListEvent.send(event)
-        }
-    }
-
-    private fun linkEditEvent(event: LinkEditEvent) {
-        viewModelScope.launch {
-            _linkEditEvent.send(event)
+            _event.send(event)
         }
     }
 }

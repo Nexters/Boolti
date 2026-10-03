@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.presentation.R
@@ -41,9 +39,12 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.extension.toValidUrlString
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.marginHorizontal
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 import kotlinx.coroutines.flow.Flow
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.ReorderableLazyListState
@@ -53,99 +54,63 @@ import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun LinkListScreen(
-    navigateToAddLink: () -> Unit,
-    navigateToEditLink: () -> Unit,
-    navigateUp: () -> Unit,
+    viewModel: LinkListViewModel,
     modifier: Modifier = Modifier,
-    viewModel: LinkListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler {
-        viewModel.tryBack()
+        viewModel.onAction(LinkListAction.Back)
     }
 
+    LinkListEventEffect(viewModel.event)
+
     LinkListScreen(
-        links = uiState.links,
-        onClickAdd = { id ->
-            if (id != null) {
-                navigateToEditLink()
-            } else {
-                navigateToAddLink()
-            }
-            viewModel.startAddOrEditLink(id)
-        },
-        onSave = viewModel::save,
-        tryBack = viewModel::tryBack,
-        navigateUp = navigateUp,
-        navigateToEditLink = navigateToEditLink,
-        event = viewModel.linkListEvent,
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
-        showActionButton = uiState.isMine,
-        actionButtonEnabled = uiState.saveEnabled,
-        editing = uiState.editing,
-        showExitAlertDialog = uiState.showExitAlertDialog,
-        onDismissExitAlertDialog = viewModel::disMissExitAlertDialog,
-        setEditMode = viewModel::setEditMode,
-        onReorder = viewModel::reorder,
     )
+}
+
+/** 목록·편집 화면이 ViewModel을 함께 쓰므로 Event 처리도 같은 함수로 한다 */
+@Composable
+internal fun LinkListEventEffect(event: Flow<LinkListEvent>) {
+    val navController = LocalNavController.current
+    val snackbarController = LocalSnackbarController.current
+    val linkAddMsg = stringResource(R.string.link_add_msg)
+    val linkEditMsg = stringResource(R.string.link_edit_msg)
+    val linkRemoveMsg = stringResource(R.string.link_remove_msg)
+
+    ObserveAsEvents(event) {
+        when (it) {
+            LinkListEvent.Added -> snackbarController.showMessage(linkAddMsg)
+            LinkListEvent.Edited -> snackbarController.showMessage(linkEditMsg)
+            LinkListEvent.Removed -> snackbarController.showMessage(linkRemoveMsg)
+            LinkListEvent.NavigateToEdit -> navController.navigate(LinkListRoute.LinkEdit)
+            LinkListEvent.CloseEdit -> navController.popBackStack<LinkListRoute.LinkEdit>(inclusive = true)
+            LinkListEvent.Finish -> navController.popBackStack<LinkListRoute.LinkListRoot>(inclusive = true)
+        }
+    }
 }
 
 @Composable
 private fun LinkListScreen(
-    links: List<Link>,
-    onClickAdd: (id: String?) -> Unit,
-    onSave: () -> Unit,
-    tryBack: () -> Unit,
-    navigateUp: () -> Unit,
-    navigateToEditLink: () -> Unit,
-    event: Flow<LinkListEvent>,
+    uiState: LinkListUiState,
+    onAction: (LinkListAction) -> Unit,
     modifier: Modifier = Modifier,
-    showActionButton: Boolean = false,
-    actionButtonEnabled: Boolean = false,
-    editing: Boolean = false,
-    showExitAlertDialog: Boolean = false,
-    onDismissExitAlertDialog: () -> Unit = {},
-    setEditMode: () -> Unit = {},
-    onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
 ) {
+    val links = uiState.links
+    val editing = uiState.editing
     val reorderableState = rememberReorderableLazyListState(
         onMove = { from, to ->
-            onReorder(from.index, to.index)
+            onAction(LinkListAction.Reorder(from.index, to.index))
         },
     )
 
     val snackbarHostState = LocalSnackbarController.current
 
     val uriHandler = LocalUriHandler.current
-    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
     val invalidUrlMsg = stringResource(R.string.invalid_link)
-
-    val linkAddMsg = stringResource(R.string.link_add_msg)
-    val linkEditMsg = stringResource(R.string.link_edit_msg)
-    val linkRemoveMsg = stringResource(R.string.link_remove_msg)
-
-    LaunchedEffect(Unit) {
-        event.collect {
-            when (it) {
-                is LinkListEvent.Added -> {
-                    snackbarHostState.showMessage(linkAddMsg)
-                }
-
-                is LinkListEvent.Edited -> {
-                    snackbarHostState.showMessage(linkEditMsg)
-                }
-
-                is LinkListEvent.Removed -> {
-                    snackbarHostState.showMessage(linkRemoveMsg)
-                }
-
-                is LinkListEvent.Finish -> navigateUp()
-
-                is LinkListEvent.NavigateToEdit -> navigateToEditLink()
-            }
-        }
-    }
 
     Scaffold(
         modifier = modifier,
@@ -153,23 +118,23 @@ private fun LinkListScreen(
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = tryBack,
+                        onClick = { onAction(LinkListAction.Back) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
                 title = stringResource(R.string.link),
                 actionButtons = {
                     when {
-                        !showActionButton -> Unit
+                        !uiState.isMine -> Unit
                         editing -> BtAppBarDefaults.AppBarTextButton(
                             label = stringResource(R.string.save_short),
-                            enabled = actionButtonEnabled,
-                            onClick = onSave,
+                            enabled = uiState.saveEnabled,
+                            onClick = { onAction(LinkListAction.Save) },
                         )
 
                         else -> BtAppBarDefaults.AppBarIconButton(
                             iconRes = R.drawable.ic_edit_pen,
-                            onClick = setEditMode,
+                            onClick = { onAction(LinkListAction.StartEditing) },
                         )
                     }
                 },
@@ -183,7 +148,7 @@ private fun LinkListScreen(
         ) {
             if (links.isEmpty()) {
                 EmptyListAddButton(
-                    onClickAdd = { onClickAdd(null) }
+                    onClickAdd = { onAction(LinkListAction.ClickAddLink) }
                 )
             } else {
                 LinksContent(
@@ -191,10 +156,10 @@ private fun LinkListScreen(
                     editing = editing,
                     reorderableState = reorderableState,
                     reorderable = editing,
-                    onClickAdd = { id -> onClickAdd(id) },
+                    onClickAdd = { onAction(LinkListAction.ClickAddLink) },
                     onClickLink = { id ->
                         if (editing) {
-                            onClickAdd(id)
+                            onAction(LinkListAction.ClickLink(id))
                         } else {
                             try {
                                 uriHandler.openUri(links.first { it.id == id }.url.toValidUrlString())
@@ -211,15 +176,15 @@ private fun LinkListScreen(
             }
         }
 
-        if (showExitAlertDialog) {
+        if (uiState.showExitAlertDialog) {
             BTDialog(
                 enableDismiss = true,
                 showCloseButton = true,
-                onDismiss = onDismissExitAlertDialog,
+                onDismiss = { onAction(LinkListAction.DismissExitAlertDialog) },
                 negativeButtonLabel = stringResource(R.string.btn_exit),
-                onClickNegativeButton = navigateUp,
+                onClickNegativeButton = { onAction(LinkListAction.Exit) },
                 positiveButtonLabel = stringResource(R.string.save),
-                onClickPositiveButton = onSave,
+                onClickPositiveButton = { onAction(LinkListAction.Save) },
             ) {
                 Text(
                     text = stringResource(R.string.profile_edit_exit_alert),
@@ -238,7 +203,7 @@ private fun LinksContent(
     editing: Boolean,
     reorderable: Boolean,
     reorderableState: ReorderableLazyListState,
-    onClickAdd: (id: String?) -> Unit,
+    onClickAdd: () -> Unit,
     onClickLink: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -248,7 +213,7 @@ private fun LinksContent(
         ListToolbar(
             totalCount = links.size,
             onClickAdd = if (editing) {
-                { onClickAdd(null) }
+                onClickAdd
             } else {
                 null
             },

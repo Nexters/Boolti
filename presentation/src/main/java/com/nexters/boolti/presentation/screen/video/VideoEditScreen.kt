@@ -40,48 +40,35 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import com.nexters.boolti.presentation.util.ObserveAsEvents
 
 @Composable
 fun VideoEditScreen(
-    navigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: VideoListViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel.videoEditEvent
 
     BackHandler {
-        viewModel.tryBack()
+        viewModel.onAction(VideoListAction.Back)
     }
 
-    ObserveAsEvents(event) {
-        when (it) {
-            VideoEditEvent.Finish -> navigateUp()
-        }
-    }
+    VideoListEventEffect(viewModel.event)
 
     VideoEditScreen(
         isEditMode = uiState.editingVideo?.localId?.isNotEmpty() == true,
         videoUrl = uiState.editingVideo?.url.orEmpty(),
         completeEnabled = uiState.editingVideoCompleteEnabled,
-        onClickBack = viewModel::tryBack,
-        onClickComplete = viewModel::completeAddOrEditVideo,
-        onChangeVideoUrl = viewModel::onVideoUrlChanged,
-        requireRemove = viewModel::removeVideo,
+        onAction = viewModel::onAction,
         modifier = modifier,
     )
 }
 
 @Composable
-fun VideoEditScreen(
+private fun VideoEditScreen(
     isEditMode: Boolean,
     videoUrl: String,
     completeEnabled: Boolean,
-    onClickBack: () -> Unit,
-    onClickComplete: () -> Unit,
-    onChangeVideoUrl: (String) -> Unit,
-    requireRemove: () -> Unit,
+    onAction: (VideoListAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showVideoRemoveDialog by remember { mutableStateOf(false) }
@@ -94,14 +81,14 @@ fun VideoEditScreen(
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = onClickBack,
+                        onClick = { onAction(VideoListAction.Back) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
-                        onClick = onClickComplete,
+                        onClick = { onAction(VideoListAction.CompleteVideo) },
                         enabled = completeEnabled,
                     )
                 },
@@ -136,7 +123,7 @@ fun VideoEditScreen(
                             .fillMaxWidth(),
                         text = videoUrl,
                         placeholder = stringResource(R.string.video_edit_placeholer),
-                        onValueChanged = onChangeVideoUrl,
+                        onValueChanged = { onAction(VideoListAction.ChangeVideoUrl(it)) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
@@ -174,7 +161,7 @@ fun VideoEditScreen(
                 positiveButtonLabel = stringResource(R.string.btn_delete),
                 negativeButtonLabel = stringResource(R.string.cancel),
                 onClickPositiveButton = {
-                    requireRemove()
+                    onAction(VideoListAction.RemoveVideo)
                     showVideoRemoveDialog = false
                 },
                 onClickNegativeButton = { showVideoRemoveDialog = false },
@@ -199,10 +186,7 @@ private fun VideoEditScreenPreview() {
             isEditMode = true,
             videoUrl = "https://www.youtube.com/watch?v=example",
             completeEnabled = false,
-            onClickBack = {},
-            onClickComplete = {},
-            onChangeVideoUrl = {},
-            requireRemove = {},
+            onAction = {},
         )
     }
 }

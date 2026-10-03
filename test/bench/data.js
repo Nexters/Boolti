@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791023182048,
+  "lastUpdate": 1791024446416,
   "repoUrl": "https://github.com/Nexters/Boolti",
   "entries": {
     "Release Metrics": [
@@ -137,6 +137,66 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Nexters/Boolti/commit/dbdab6756f9a44f6c136924c58bf6f14b2edac1b"
         },
         "date": 1791023181036,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "Compose unstable 파라미터",
+            "value": 485,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "Compose 불안정 클래스",
+            "value": 104,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "release APK 크기",
+            "value": 12.64,
+            "unit": "MB",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "lint 경고",
+            "value": 89,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "테스트",
+            "value": 57,
+            "unit": "개",
+            "extra": "1.14.3"
+          },
+          {
+            "name": "줄 커버리지",
+            "value": 6.08,
+            "unit": "%",
+            "extra": "1.14.3"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "pmb0836@gmail.com",
+            "name": "mangbaam",
+            "username": "mangbaam"
+          },
+          "committer": {
+            "email": "pmb0836@gmail.com",
+            "name": "mangbaam",
+            "username": "mangbaam"
+          },
+          "distinct": true,
+          "id": "7491f637f1e1531f138147a0b63aeaceae8610b3",
+          "message": "[Boolti-571] 릴리즈 지표 알림을 전용 디스코드 웹훅으로 보내기",
+          "timestamp": "2026-10-03T19:37:44+09:00",
+          "tree_id": "9187bb5ec7ee254be19c14235f44255b25601a16",
+          "url": "https://github.com/Nexters/Boolti/commit/7491f637f1e1531f138147a0b63aeaceae8610b3"
+        },
+        "date": 1791024445660,
         "tool": "customSmallerIsBetter",
         "benches": [
           {

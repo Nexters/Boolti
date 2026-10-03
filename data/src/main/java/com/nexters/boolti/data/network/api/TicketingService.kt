@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.DoNotRetry
 import com.nexters.boolti.data.network.request.ReservationInviteTicketRequest
 import com.nexters.boolti.data.network.request.ReservationSalesTicketRequest
 import com.nexters.boolti.data.network.request.SubmitPreQuestionAnswersRequestDto
@@ -44,6 +45,7 @@ internal interface TicketingService {
         @Body request: ReservationInviteTicketRequest,
     ): Response<ReservationDto>
 
+    @DoNotRetry
     @GET("/app/api/v1/check/invite-code")
     suspend fun checkInviteCode(
         @Query("showId") showId: String,

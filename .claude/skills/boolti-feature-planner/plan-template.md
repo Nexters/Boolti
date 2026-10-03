@@ -127,7 +127,7 @@ bash .claude/skills/boolti-feature-planner/scripts/quality-gate.sh
 - [ ] 단위 테스트 통과: `./gradlew btTest`
 
 수동 검증 (Compose 추가/수정한 경우)
-- [ ] `verify-compose-conventions` 스킬 통과
+- [ ] `.claude/rules/presentation.md`의 Composable 규칙 준수
 
 수동 검증 (기능)
 - [ ] [기능 1 동작 확인]

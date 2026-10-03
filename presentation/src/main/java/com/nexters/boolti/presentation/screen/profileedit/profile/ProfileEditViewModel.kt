@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,11 +51,11 @@ class ProfileEditViewModel @Inject constructor(
         }
     }
 
-    fun changeThumbnail(file: File?) {
-        file ?: return
+    fun changeThumbnail(imageUri: String?) {
+        imageUri ?: return
         viewModelScope.launch {
             val newThumbnailUrl =
-                fileRepository.requestUrlForUpload(file).getOrNull() ?: return@launch
+                fileRepository.requestUrlForUpload(imageUri).getOrNull() ?: return@launch
             userConfigRepository.saveThumbnail(newThumbnailUrl)
         }
     }

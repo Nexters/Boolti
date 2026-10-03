@@ -100,7 +100,7 @@ class HomeViewModel @Inject constructor(
                 .first()
             val senderId = gift.senderUserId
             val hasPreQuestion =
-                ticketingRepository.getPreQuestions(gift.showId).first().isNotEmpty()
+                ticketingRepository.getPreQuestions(gift.showId).getOrThrow().isNotEmpty()
             val myUserId = authRepository.cachedUser.first()?.id ?: return@launch
 
             pendingGift = PendingGift.Ready(

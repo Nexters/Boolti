@@ -3,6 +3,10 @@ package com.nexters.boolti.presentation.screen.search.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.search
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.Search
 import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
@@ -121,6 +125,8 @@ class SearchDetailViewModel @Inject constructor(
                 },
             ).awaitAll()
 
+            trackSearch(keyword)
+
             _uiState.update {
                 it.copy(
                     searchedKeyword = keyword,
@@ -128,6 +134,18 @@ class SearchDetailViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun trackSearch(keyword: String) {
+        val resultCount = shows.value.totalCount + profiles.value.totalCount + places.value.totalCount
+        AppTracker.search(
+            screen = Screen.Search,
+            keyword = keyword,
+            properties = buildMap {
+                route.searchSource?.let { put("search_source", it) }
+                put("result_count", resultCount)
+            },
+        )
     }
 
     private fun changeTabIndex(index: Int) {

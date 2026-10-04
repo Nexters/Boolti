@@ -57,7 +57,7 @@ class RecentSearchViewModel @Inject constructor(
             is RecentSearchIntent.DeleteSearchHistory -> deleteSearchHistory(intent.keyword)
             is RecentSearchIntent.ShowClearHistoriesDialog -> changeClearHistoriesDialogVisible(true)
             is RecentSearchIntent.DismissClearHistoriesDialog -> changeClearHistoriesDialogVisible(false)
-            is RecentSearchIntent.Search -> search(intent.keyword.trim())
+            is RecentSearchIntent.Search -> search(intent.keyword.trim(), intent.searchSource)
         }
     }
 
@@ -123,11 +123,11 @@ class RecentSearchViewModel @Inject constructor(
         }
     }
 
-    private fun search(keyword: String) {
+    private fun search(keyword: String, searchSource: String) {
         if (keyword.isBlank()) {
             event(RecentSearchEvent.EmptyKeyword)
         } else {
-            event(RecentSearchEvent.Search(keyword))
+            event(RecentSearchEvent.Search(keyword, searchSource))
         }
     }
 

@@ -12,5 +12,5 @@ sealed interface RecentSearchIntent {
     data object DismissClearHistoriesDialog : RecentSearchIntent
 
     // 검색
-    data class Search(val keyword: String) : RecentSearchIntent
+    data class Search(val keyword: String, val searchSource: String) : RecentSearchIntent
 }

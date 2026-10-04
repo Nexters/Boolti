@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.Flow
 fun HomeScreen(
     navigateToShowDetail: (showId: String) -> Unit,
     navigateToRecentSearch: () -> Unit,
-    navigateToSearchDetail: (keyword: String) -> Unit,
+    navigateToSearchDetail: (keyword: String, searchSource: String) -> Unit,
     navigateToTicketDetail: (ticketId: String) -> Unit,
     navigateToQrScan: () -> Unit,
     navigateToAccountSetting: () -> Unit,

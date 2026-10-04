@@ -45,8 +45,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
-import com.nexters.boolti.common.tracker.event.search
 import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Banner
 import com.nexters.boolti.common.tracker.field.Chip
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
@@ -71,7 +71,7 @@ import java.time.LocalDateTime
 @Composable
 fun SearchScreen(
     navigateToRecentSearch: () -> Unit,
-    navigateToSearchDetail: (keyword: String) -> Unit,
+    navigateToSearchDetail: (keyword: String, searchSource: String) -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
@@ -121,7 +121,7 @@ private fun SearchScreen(
     risingKeywords: List<String>,
     risingKeywordsTime: String,
     onClickSearchBar: () -> Unit,
-    onSearch: (String) -> Unit,
+    onSearch: (keyword: String, searchSource: String) -> Unit,
     onClickShow: (id: String) -> Unit,
     recentSearchKeywords: List<String>,
     deleteSearchHistory: (String) -> Unit,
@@ -145,7 +145,14 @@ private fun SearchScreen(
                 .padding(top = 72.dp),
         ) {
             PlaceFinderBanner(
-                onClick = { uriHandler.openUri(placeFinderUrl) },
+                onClick = {
+                    AppTracker.click(
+                        screen = Screen.Search,
+                        objectRole = Role.Banner,
+                        objectValue = "FindPlace",
+                    )
+                    uriHandler.openUri(placeFinderUrl)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = marginHorizontal)
@@ -164,14 +171,7 @@ private fun SearchScreen(
                                 "keyword" to keyword,
                             ),
                         )
-                        AppTracker.search(
-                            screen = Screen.Search,
-                            keyword = keyword,
-                            properties = mapOf(
-                                "search_source" to "Recent",
-                            ),
-                        )
-                        onSearch(keyword)
+                        onSearch(keyword, "Recent")
                     },
                     deleteSearchHistory = deleteSearchHistory,
                     onClickClearButton = onClickClearButton,
@@ -195,14 +195,7 @@ private fun SearchScreen(
                             "keyword" to keyword,
                         ),
                     )
-                    AppTracker.search(
-                        screen = Screen.Search,
-                        keyword = keyword,
-                        properties = mapOf(
-                            "search_source" to "Trending",
-                        ),
-                    )
-                    onSearch(keyword)
+                    onSearch(keyword, "Trending")
                 },
             )
         }
@@ -533,7 +526,7 @@ private fun SearchScreenPreview() {
             risingKeywords = listOf("keyword1", "keyword2", "keyword3"),
             risingKeywordsTime = "2024.01.20 18:00",
             onClickSearchBar = {},
-            onSearch = {},
+            onSearch = { _, _ -> },
             onClickShow = {},
             recentSearchKeywords = listOf("최근검색어1", "최근검색어2"),
             deleteSearchHistory = {},
@@ -555,7 +548,7 @@ private fun SearchScreenEmptyPreview() {
             risingKeywords = emptyList(),
             risingKeywordsTime = "2024.01.20 18:00",
             onClickSearchBar = {},
-            onSearch = {},
+            onSearch = { _, _ -> },
             onClickShow = {},
             recentSearchKeywords = emptyList(),
             deleteSearchHistory = {},

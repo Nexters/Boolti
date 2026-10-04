@@ -1003,9 +1003,17 @@ private fun Poster(
                 .then(
                     if (placeId != null) {
                         Modifier.clickable {
-                            navigateToPlace(
-                                placeId
+                            AppTracker.click(
+                                screen = Screen.ShowDetail,
+                                objectRole = Role.Item,
+                                objectValue = "PlaceProfile",
+                                properties = mapOf(
+                                    "show_id" to showDetail.id,
+                                    "place_id" to placeId,
+                                    "entry_point" to "Summary",
+                                ),
                             )
+                            navigateToPlace(placeId)
                         }
                     } else {
                         Modifier

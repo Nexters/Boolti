@@ -7,5 +7,8 @@ sealed interface SearchRoute {
     data class RecentSearch(val keyword: String = "") : SearchRoute
 
     @Serializable
-    data class SearchDetail(val keyword: String) : SearchRoute
+    data class SearchDetail(
+        val keyword: String,
+        val searchSource: String? = null,
+    ) : SearchRoute
 }

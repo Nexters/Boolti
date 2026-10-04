@@ -8,11 +8,8 @@ class GetYouTubeVideoListByUserCodeUseCase @Inject constructor(
     private val memberRepository: MemberRepository,
     private val getYouTubeVideoInfoByUrlListUseCase: GetYouTubeVideoInfoByUrlListUseCase,
 ) {
-    suspend operator fun invoke(
-        userCode: String,
-        refresh: Boolean = false,
-    ): Result<List<YouTubeVideo>> {
-        return memberRepository.getVideoLinks(userCode, refresh)
+    suspend operator fun invoke(userCode: String): Result<List<YouTubeVideo>> {
+        return memberRepository.getVideoLinks(userCode)
             .mapCatching { videoUrls ->
                 if (videoUrls.isEmpty()) {
                     emptyList<YouTubeVideo>()

@@ -5,7 +5,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.nexters.boolti.data.cache.CacheStore
 import com.nexters.boolti.data.datasource.AuthDataSource
 import com.nexters.boolti.data.datasource.AuthTokenDataSource
-import com.nexters.boolti.data.datasource.LocalMemberDataSource
 import com.nexters.boolti.data.datasource.PolicyDataSource
 import com.nexters.boolti.data.datasource.PopupDataSource
 import com.nexters.boolti.data.datasource.RemoteConfigDataSource
@@ -59,8 +58,4 @@ internal object DataSourceModule {
     @Provides
     fun providePopupDataSource(service: PopupService, @ApplicationContext context: Context) =
         PopupDataSource(service, context)
-
-    @Singleton
-    @Provides
-    fun provideLocalMemberDataSource(): LocalMemberDataSource = LocalMemberDataSource()
 }

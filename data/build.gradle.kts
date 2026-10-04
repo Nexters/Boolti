@@ -70,5 +70,4 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.bundles.android.test)
-    androidTestImplementation(libs.kotest.runner.junit5.jvm)
 }

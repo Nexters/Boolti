@@ -11,6 +11,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.google.firebase.analytics.logEvent
+import com.nexters.boolti.presentation.BuildConfig
 import timber.log.Timber
 
 @Composable
@@ -24,6 +25,10 @@ fun rememberNavControllerWithLog(
             .collect {
                 val screenName = it.screenName()
                 val args = it.argumentsText()
+
+                if (BuildConfig.DEBUG) {
+                    DebugManager.currentScreen = listOfNotNull(screenName, args).joinToString(" / ")
+                }
 
                 Timber.tag("MANGBAAM-(rememberNavControllerWithLog)")
                     .d("screenName: $screenName, arguments: $args")

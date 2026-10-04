@@ -68,7 +68,6 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
-import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.util.DebugManager
 import com.nexters.boolti.presentation.util.openDebugInfo
 import kotlinx.coroutines.launch
@@ -272,14 +271,13 @@ fun MyScreen(
 
     if (BuildConfig.DEBUG && showDebugBottomSheet) {
         val context = LocalContext.current
-        val navController = LocalNavController.current
         DebugOptionsBottomSheet(
             sheetState = sheetState,
             onOpenDebugInfo = {
                 scope.launch {
                     sheetState.hide()
                     showDebugBottomSheet = false
-                    openDebugInfo(context, navController)
+                    openDebugInfo(context, DebugManager.currentScreen)
                 }
             },
             onOpenImpressionTest = {

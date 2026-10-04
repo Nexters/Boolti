@@ -1,5 +1,7 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.cache.CacheKeys
+import com.nexters.boolti.data.cache.CacheStore
 import com.nexters.boolti.data.datasource.PlaceDataSource
 import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.PlaceImage
@@ -10,12 +12,13 @@ import javax.inject.Inject
 
 internal class PlaceRepositoryImpl @Inject constructor(
     private val placeDataSource: PlaceDataSource,
+    private val cacheStore: CacheStore,
 ) : PlaceRepository {
     override fun getPlace(placeId: String): Flow<PlaceDetail> = flow {
         emit(placeDataSource.getPlace(placeId).toDomain())
     }
 
     override fun getPlaceImages(placeId: String): Flow<List<PlaceImage>> = flow {
-        emit(placeDataSource.getPlaceImages(placeId).toDomain())
+        emit(cacheStore.getOrFetch(CacheKeys.placeImages(placeId)) { placeDataSource.getPlaceImages(placeId).toDomain() })
     }
 }

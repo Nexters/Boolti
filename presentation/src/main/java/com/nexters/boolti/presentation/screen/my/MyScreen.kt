@@ -68,7 +68,9 @@ import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.util.DebugManager
+import com.nexters.boolti.presentation.util.openDebugInfo
 import kotlinx.coroutines.launch
 
 @Composable
@@ -270,8 +272,16 @@ fun MyScreen(
 
     if (BuildConfig.DEBUG && showDebugBottomSheet) {
         val context = LocalContext.current
+        val navController = LocalNavController.current
         DebugOptionsBottomSheet(
             sheetState = sheetState,
+            onOpenDebugInfo = {
+                scope.launch {
+                    sheetState.hide()
+                    showDebugBottomSheet = false
+                    openDebugInfo(context, navController)
+                }
+            },
             onOpenImpressionTest = {
                 scope.launch {
                     sheetState.hide()
@@ -306,6 +316,7 @@ private fun Context.getAppVersion(): String = runCatching {
 private fun DebugOptionsBottomSheet(
     sheetState: androidx.compose.material3.SheetState,
     onDismiss: () -> Unit,
+    onOpenDebugInfo: () -> Unit,
     onOpenImpressionTest: () -> Unit,
 ) {
     BtBottomSheet(
@@ -334,6 +345,12 @@ private fun DebugOptionsBottomSheet(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
+
+        MyMenu(
+            iconRes = R.drawable.ic_list,
+            label = stringResource(R.string.debug_info),
+            onClick = onOpenDebugInfo,
+        )
 
         MyMenu(
             iconRes = R.drawable.ic_list,

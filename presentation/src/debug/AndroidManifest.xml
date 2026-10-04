@@ -4,5 +4,9 @@
         <activity
             android:name="com.nexters.boolti.presentation.screen.debug.impression.ImpressionDebugActivity"
             android:exported="false" />
+        <activity
+            android:name="com.nexters.boolti.presentation.screen.debug.info.DebugInfoActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 </manifest>

@@ -247,7 +247,6 @@ private fun PlaceFinderBanner(
                 color = Color.White.copy(alpha = 0.75f),
             )
             Row(
-                modifier = Modifier.padding(top = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
@@ -364,7 +363,7 @@ private fun SearchHistorySection(
                 .padding(start = marginHorizontal)
                 .weight(1f),
             text = stringResource(R.string.search_recent_keyword_label),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = Grey05,
         )
 
@@ -374,7 +373,6 @@ private fun SearchHistorySection(
                     .padding(horizontal = marginHorizontal / 2)
                     .clip(RoundedCornerShape(4.dp))
                     .clickable(onClick = onClickClearButton)
-                    .padding(vertical = 4.dp)
                     .padding(horizontal = marginHorizontal / 2),
                 text = stringResource(R.string.btn_delete_all),
                 color = Grey50,

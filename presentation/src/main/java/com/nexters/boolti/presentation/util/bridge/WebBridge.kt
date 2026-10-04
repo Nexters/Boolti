@@ -42,7 +42,7 @@ class WebBridge(
      *
      * ```
      * handle { t: ShowToast -> snackbar.showMessage(t.message) }
-     * handle { _: RequestToken -> TokenDto(token) }
+     * handle { _: RequestToken -> TokenResponse(token) }
      * ```
      *
      * - 반환값이 응답 data가 된다. [Unit]이면 `null`을 보낸다

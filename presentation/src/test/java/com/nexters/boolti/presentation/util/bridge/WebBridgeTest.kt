@@ -19,15 +19,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-@WebBridgeCommand("SHOW_TOAST")
-private data class ShowToast(val message: String)
-
-@WebBridgeCommand("REQUEST_TOKEN")
-private data object RequestToken
-
-@Serializable
-private data class TokenResponse(val token: String)
-
 @Serializable
 private data class NotCommand(val message: String)
 

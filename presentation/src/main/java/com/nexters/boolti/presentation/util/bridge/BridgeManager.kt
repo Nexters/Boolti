@@ -90,7 +90,7 @@ class BridgeManager(
                     Handler(Looper.getMainLooper()).post {
                         Timber.tag("bridge").d("공연장 상세로 이동 $placeId")
                         callbackHandler.navigate(
-                            route = MainRoute.Place(placeId = placeId),
+                            route = MainRoute.Place(placeId = placeId, source = Screen.WebBridge.value),
                             navigateOption = NavigateOption.PUSH,
                         )
                     }

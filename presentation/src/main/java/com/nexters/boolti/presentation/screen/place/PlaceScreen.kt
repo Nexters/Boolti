@@ -64,6 +64,14 @@ import androidx.core.view.isInvisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.PlaceProfile
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.SubwayLine
@@ -123,6 +131,22 @@ fun PlaceScreen(
         webView.setBridgeManager(bridgeManager)
     }
 
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading) {
+            val place = uiState.place
+            AppTracker.view(
+                screen = Screen.PlaceProfile,
+                properties = buildMap {
+                    put("place_id", place.id)
+                    put("place_name", place.name)
+                    viewModel.source?.let { put("source", it) }
+                    put("profile_status", "Active")
+                    regionOf(place.streetAddress)?.let { put("region", it) }
+                },
+            )
+        }
+    }
+
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
         if (webViewUrl != null) {
@@ -154,7 +178,15 @@ fun PlaceScreen(
                 modifier = Modifier.fillMaxSize(),
                 place = uiState.place,
                 selectedTab = uiState.selectedTab,
-                onSelectTab = viewModel::selectTab,
+                onSelectTab = { index ->
+                    AppTracker.click(
+                        screen = Screen.PlaceProfile,
+                        objectRole = Role.Tab,
+                        objectValue = if (index == 0) "Home" else "RentalInfo",
+                        properties = mapOf("place_id" to viewModel.placeId),
+                    )
+                    viewModel.selectTab(index)
+                },
                 contentWebView = webView,
                 listState = listState,
             )
@@ -179,15 +211,15 @@ fun PlaceScreen(
                     iconRes = R.drawable.ic_share,
                     description = stringResource(R.string.ticketing_share),
                     onClick = {
-                        // TODO: 유사한 케이스의 로그를 복사한 것임. 나중에 스펙 확인 후 추가할 것
-//                        AppTracker.click(
-//                            screen = Screen.ShowDetail,
-//                            objectRole = Role.Button,
-//                            objectValue = "Share",
-//                            properties = mapOf(
-//                                "share_method" to "LinkCopy"
-//                            ),
-//                        )
+                        AppTracker.click(
+                            screen = Screen.PlaceProfile,
+                            objectRole = Role.Button,
+                            objectValue = "Share",
+                            properties = mapOf(
+                                "place_id" to viewModel.placeId,
+                                "share_method" to "WithInfo",
+                            ),
+                        )
 
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
@@ -284,6 +316,7 @@ private fun PlaceContent(
                 place.contact?.let { contact ->
                     if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
                         PlaceContactSection(
+                            placeId = place.id,
                             url = contact.websiteUrl,
                             phoneNumber = contact.phoneNumber,
                             email = contact.email,
@@ -389,6 +422,7 @@ private fun PlaceInfoSection(
 
 @Composable
 private fun PlaceContactSection(
+    placeId: String,
     url: String?,
     phoneNumber: String?,
     email: String?,
@@ -411,6 +445,7 @@ private fun PlaceContactSection(
             enabled = url != null,
             onClick = {
                 if (url != null) {
+                    trackContactClick(placeId = placeId, objectValue = "Website")
                     uriHandler.openUri(url)
                 } else {
                     snackbarController.showMessage(noWebsiteMessage)
@@ -426,6 +461,7 @@ private fun PlaceContactSection(
             enabled = phoneNumber != null,
             onClick = {
                 if (phoneNumber != null) {
+                    trackContactClick(placeId = placeId, objectValue = "Call")
                     inquiryBottomSheet = InquiryBottomSheetType.Tel(contact = phoneNumber)
                 } else {
                     snackbarController.showMessage(noPhoneNumberMessage)
@@ -441,6 +477,7 @@ private fun PlaceContactSection(
             enabled = email != null,
             onClick = {
                 if (email != null) {
+                    trackContactClick(placeId = placeId, objectValue = "Email")
                     inquiryBottomSheet = InquiryBottomSheetType.Mail(address = email)
                 } else {
                     snackbarController.showMessage(noEmailMessage)
@@ -457,6 +494,15 @@ private fun PlaceContactSection(
             type = it
         )
     }
+}
+
+private fun trackContactClick(placeId: String, objectValue: String) {
+    AppTracker.click(
+        screen = Screen.PlaceProfile,
+        objectRole = Role.Button,
+        objectValue = objectValue,
+        properties = mapOf("place_id" to placeId),
+    )
 }
 
 @Composable
@@ -724,6 +770,7 @@ private fun PlaceInfoSectionPreview() {
 fun PlaceContactSectionPreview() {
     BooltiTheme {
         PlaceContactSection(
+            placeId = "1",
             url = "https://boolti.in",
             phoneNumber = "010-1234-5678",
             email = "boolti@example.com",

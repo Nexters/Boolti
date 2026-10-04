@@ -63,6 +63,14 @@ class BtWebView @JvmOverloads constructor(
 }
 
 /**
+ * 웹뷰 안에서 열어도 되는 불티 도메인인지 확인한다. 브릿지(토큰 요청 등)가 노출되므로 다른 도메인은 외부 브라우저로 연다.
+ */
+internal fun isBooltiHost(host: String): Boolean =
+    host.equals(BOOLTI_HOST, ignoreCase = true) || host.endsWith(".$BOOLTI_HOST", ignoreCase = true)
+
+private const val BOOLTI_HOST = "boolti.in"
+
+/**
  * @param preUriLoading redirect 될 때 우선적으로 처리돼야 하는 로직. 반환 값은 해당 이벤트의 consume 여부를 의미한다.
  */
 class BtWebViewClient(
@@ -80,7 +88,7 @@ class BtWebViewClient(
 
         if (preUriLoading(url)) return true
 
-        if (url != "null" && domain != null && !domain.contains("boolti.in") && context != null) {
+        if (url != "null" && domain != null && !isBooltiHost(domain) && context != null) {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             context.startActivity(intent)
             return true

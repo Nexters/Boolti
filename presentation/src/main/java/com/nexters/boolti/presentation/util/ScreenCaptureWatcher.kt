@@ -25,7 +25,7 @@ class ScreenCaptureWatcher : Application.ActivityLifecycleCallbacks {
             } else {
                 activity.javaClass.simpleName
             }
-            openDebugInfo(activity, currentScreen)
+            openDebugInfoWithScreenshot(activity, currentScreen)
         }
         activity.registerScreenCaptureCallback(activity.mainExecutor, callback)
         registered = activity to callback

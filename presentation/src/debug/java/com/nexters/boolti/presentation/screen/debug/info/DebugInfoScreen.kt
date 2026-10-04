@@ -37,6 +37,7 @@ import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey15
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey80
+import com.nexters.boolti.presentation.util.ObserveAsEvents
 
 @Composable
 internal fun DebugInfoScreen(
@@ -47,10 +48,21 @@ internal fun DebugInfoScreen(
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val copiedMessage = stringResource(R.string.debug_info_copied)
+    val sentMessage = stringResource(R.string.debug_info_sent)
+    val sendFailedMessage = stringResource(R.string.debug_info_send_failed)
+
+    ObserveAsEvents(viewModel.event) { event ->
+        val message = when (event) {
+            DebugInfoEvent.SendSucceeded -> sentMessage
+            DebugInfoEvent.SendFailed -> sendFailedMessage
+        }
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 
     DebugInfoScreen(
         uiState = uiState,
         onDismiss = onDismiss,
+        onClickSend = { viewModel.onAction(DebugInfoAction.ClickSend) },
         onClickCopy = {
             clipboardManager.setText(AnnotatedString(uiState.text))
             // Android 13부터는 시스템이 복사 알림을 띄운다
@@ -66,6 +78,7 @@ private fun DebugInfoScreen(
     uiState: DebugInfoUiState,
     onDismiss: () -> Unit,
     onClickCopy: () -> Unit,
+    onClickSend: () -> Unit,
 ) {
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -111,8 +124,20 @@ private fun DebugInfoScreen(
                     MainButton(
                         modifier = Modifier.weight(1f),
                         label = stringResource(R.string.debug_info_copy),
+                        colors = MainButtonDefaults.buttonColors(
+                            containerColor = Grey80,
+                            contentColor = Grey05,
+                        ),
                         enabled = uiState.text.isNotEmpty(),
                         onClick = onClickCopy,
+                    )
+                    MainButton(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(
+                            if (uiState.isSending) R.string.debug_info_sending else R.string.debug_info_send,
+                        ),
+                        enabled = uiState.canSend && uiState.text.isNotEmpty() && !uiState.isSending,
+                        onClick = onClickSend,
                     )
                 }
             }
@@ -128,6 +153,7 @@ private fun DebugInfoScreenPreview() {
             uiState = DebugInfoUiState(text = "[앱]\n버전: 1.0.0-abc1234\n\n[유저]\n로그인 안 함"),
             onDismiss = {},
             onClickCopy = {},
+            onClickSend = {},
         )
     }
 }

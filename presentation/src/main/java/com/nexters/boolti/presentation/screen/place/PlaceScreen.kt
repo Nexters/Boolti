@@ -76,7 +76,9 @@ import com.nexters.boolti.presentation.component.BtWebView
 import com.nexters.boolti.presentation.component.InquiryBottomSheet
 import com.nexters.boolti.presentation.component.InquiryBottomSheetType
 import com.nexters.boolti.presentation.extension.displayName
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.showdetail.preUriLoading
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey10
@@ -87,7 +89,9 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point3
-import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
+import com.nexters.boolti.presentation.util.bridge.ViewPlacePhotoDetail
+import com.nexters.boolti.presentation.util.bridge.ViewPlacePhotoList
+import com.nexters.boolti.presentation.util.bridge.rememberWebBridge
 
 @Composable
 fun PlaceScreen(
@@ -98,6 +102,21 @@ fun PlaceScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
+
+    val navController = LocalNavController.current
+    val bridge = rememberWebBridge {
+        handle { p: ViewPlacePhotoList ->
+            navController.navigate(MainRoute.PlaceImages(placeId = p.placeId.toString()))
+        }
+        handle { p: ViewPlacePhotoDetail ->
+            navController.navigate(
+                MainRoute.PlaceImageDetail(
+                    placeId = p.placeId.toString(),
+                    initialImageId = p.imageId.toString()
+                ),
+            )
+        }
+    }
 
     val webView by remember(context) {
         mutableStateOf(
@@ -114,13 +133,8 @@ fun PlaceScreen(
                 context = context,
             ).apply {
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                bridge.attach(this)
             })
-    }
-
-    val bridgeManager = rememberBridgeManager(onBack = onBack)
-
-    LaunchedEffect(webView) {
-        webView.setBridgeManager(bridgeManager)
     }
 
     val webViewUrl = uiState.webViewUrl

@@ -477,7 +477,7 @@ private fun PlaceContactSection(
             enabled = email != null,
             onClick = {
                 if (email != null) {
-                    trackContactClick(placeId = placeId, objectValue = "Email")
+                    trackContactClick(placeId = placeId, objectValue = "Mail")
                     inquiryBottomSheet = InquiryBottomSheetType.Mail(address = email)
                 } else {
                     snackbarController.showMessage(noEmailMessage)

@@ -1,17 +1,18 @@
 ---
-name: boolti-release
-description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 선택 → Pre-release 검증 → 버전 상향 → QA 친화 릴리즈 노트 초안 생성까지 수행한 뒤, 사용자 승인을 받으면 배포 경로별 sub-skill(`boolti-app-distribution`, 추후 `boolti-play-console`)에 위임한다. "릴리즈 준비해줘", "테스터 배포해줘", "릴리즈 노트 써줘", "버전 올려줘", "릴리즈 빌드" 등 릴리즈 전체 흐름을 요청할 때 트리거.
+name: boolti-distribution
+description: 불티 Android 앱 배포 오케스트레이터. 배포 경로 선택 → Pre-release 검증 → QA 친화 릴리즈 노트 초안 생성 → 빌드까지 수행한 뒤, 사용자 승인을 받으면 배포 경로별 sub-skill(`boolti-app-distribution`, 추후 `boolti-play-console`)에 위임한다. "테스터 배포해줘", "QA 빌드 올려줘", "릴리즈 노트 써줘", "릴리즈 빌드" 등 빌드·배포 흐름을 요청할 때 트리거. 릴리즈 브랜치·버전·태그는 boolti-release-start/finish, boolti-hotfix-start/finish가 담당한다.
 ---
 
-# 불티 릴리즈 오케스트레이터
+# 불티 배포 오케스트레이터
 
-불티 Android 앱 릴리즈의 **공통 전처리**(경로 선택, 검증, 버전 상향, 릴리즈 노트 생성)를 담당한다. 빌드·업로드 같은 경로별 작업은 sub-skill로 위임한다.
+불티 Android 앱 배포의 **공통 전처리**(경로 선택, 검증, 릴리즈 노트 생성)를 담당한다. 빌드·업로드 같은 경로별 작업은 sub-skill로 위임한다.
 
 ## 스킬 분리 구조
 
 | 스킬 | 역할 |
 |------|------|
-| **`boolti-release` (본 스킬)** | 오케스트레이션. 공통 전처리만 담당 |
+| **`boolti-distribution` (본 스킬)** | 오케스트레이션. 공통 전처리만 담당 |
+| `boolti-release-*` · `boolti-hotfix-*` | 릴리즈·핫픽스 브랜치, 버전 상향, 태그 (`.github/scripts/release/`) |
 | `boolti-app-distribution` | Firebase App Distribution 업로드 전담 (단독 호출 가능) |
 | `boolti-play-console` | Play Console 업로드 전담 (현재 미구현) |
 
@@ -27,7 +28,7 @@ description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 �
 > 1. **App Distribution** (테스터 배포)
 > 2. **Play Console** (운영 배포)
 
-- **1** → Step 1 진행. Step 5에서 `boolti-app-distribution` 위임.
+- **1** → Step 1 진행. Step 4에서 `boolti-app-distribution` 위임.
 - **2** → 아래 안내 후 즉시 종료.
   > Play Console 자동 배포는 미지원(향후 `boolti-play-console`로 추가 예정). AAB 빌드 후 [Play Console](https://play.google.com/console) 수동 업로드 필요.
   >
@@ -39,21 +40,15 @@ description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 �
 
 | 검증 | 명령 | 실패 시 |
 |------|------|---------|
-| 릴리즈용 브랜치 (`qa/*` · `release/*` · `feature/*` · `fix/*`) | `git branch --show-current` | `develop`·`main`이면 중단 |
+| 릴리즈용 브랜치 (`qa/*` · `release/*` · `hotfix/*` · `feature/*` · `fix/*`) | `git branch --show-current` | `develop`·`main`이면 중단 |
 | 워킹 트리 clean | `git status --porcelain` | 사용자에게 커밋/스태시 확인 (임의 커밋 금지) |
 | `local.properties` 존재 | `test -f local.properties` | 팀 비공개 채널에서 값 확보 안내 |
 | `keystore.properties` 존재 | `test -f keystore.properties` | release APK 빌드 시에만 필수 (debug 배포면 skip) |
-| 버전 확인 | `grep -E 'versionCode\|versionName' gradle/libs.versions.toml` | 값 보고 후 Step 2 |
+| 버전 확인 | `grep '^versionName' gradle/libs.versions.toml` | 값 보고 후 Step 2 |
 
-## Step 2. 버전 상향
+## Step 2. 릴리즈 노트 초안 생성 (핵심)
 
-`gradle/libs.versions.toml`의 `[versions]`에서 `versionCode`(+1), `versionName`(SemVer)을 갱신.
-
-사용자에게는 근거와 함께 제안: "현재 `1.14.1` → 신규 기능 2건, 버그 수정 3건 → `1.15.0` 제안".
-
-## Step 3. 릴리즈 노트 초안 생성 (핵심)
-
-### 3-1. 브랜치 유형별 diff 기준
+### 2-1. 브랜치 유형별 diff 기준
 
 | 브랜치 패턴 | Diff 기준 |
 |-------------|-----------|
@@ -61,7 +56,7 @@ description: 불티 Android 앱 릴리즈 오케스트레이터. 배포 경로 �
 | `release/*` | 마지막 릴리즈 태그 (`git describe --tags --abbrev=0`) |
 | 그 외 | 사용자에게 base 브랜치 확인 |
 
-### 3-2. 변경 내역 수집
+### 2-2. 변경 내역 수집
 
 커밋 메시지에는 타입 접두사(`feat:` 등)가 없으므로, 분류는 머지된 PR의 레이블로 한다.
 
@@ -77,13 +72,13 @@ git log <base>..HEAD --pretty=format:'%s' --no-merges
 
 `release/*`에서 태그가 없으면 `develop`으로 fallback하고 사용자에게 확인.
 
-### 3-3. 분류·필터링
+### 2-3. 분류·필터링
 
-- **포함**: 레이블 `feat`·`enhancement` → **주요 업데이트**, `bug` → **버그 수정**
-- **제외**: `refactor`, `chore`, `documentation`, `style` 레이블, `Tools` 마일스톤, Mixpanel 이벤트, 의존성/빌드 설정
+- 레이블별 포함·제외는 `.github/release.yml`(GitHub Release 노트 분류)을 따른다
+- 추가로 제외: `Tools` 마일스톤, Mixpanel 이벤트, 의존성/빌드 설정
 - PR 없이 들어간 커밋은 메시지 내용으로 판단한다. 예전 커밋의 `feat:`/`fix:` 접두사는 그대로 분류에 쓴다
 
-### 3-4. QA 친화 변환
+### 2-4. QA 친화 변환
 
 커밋 메시지를 그대로 쓰지 말고 사용자 체감 관점으로 재작성.
 
@@ -100,7 +95,7 @@ git log <base>..HEAD --pretty=format:'%s' --no-merges
 - 한 줄 = 한 가지 변경
 - 티켓 번호(`Boolti-XXX`)는 QA에겐 노이즈이므로 제외
 
-### 3-5. 템플릿
+### 2-5. 템플릿
 
 ```
 ## v{versionName}
@@ -114,11 +109,11 @@ git log <base>..HEAD --pretty=format:'%s' --no-merges
 
 비어 있는 섹션은 제거. 항목이 0개면 "이번 빌드는 내부 개선 위주입니다" 로 사용자 재확인.
 
-### 3-6. 사용자 확인 (blocking)
+### 2-6. 사용자 확인 (blocking)
 
-초안을 보여주고 명시적 승인을 받는다. 수정 요청 시 반영 후 재확인. OK 전에는 Step 4로 넘어가지 않는다.
+초안을 보여주고 명시적 승인을 받는다. 수정 요청 시 반영 후 재확인. OK 전에는 Step 3로 넘어가지 않는다.
 
-## Step 4. 릴리즈 빌드
+## Step 3. 릴리즈 빌드
 
 빌드 variant(`debug`/`release`)를 먼저 정한다. 각 variant는 전용 Firebase 앱에 매핑되며 sub-skill이 artifact 경로로 자동 구분한다. 기본은 **debug**(빠른 테스터 배포), 스토어 직전 QA처럼 release가 필요한 맥락이면 사용자에게 확인한다.
 
@@ -128,34 +123,25 @@ git log <base>..HEAD --pretty=format:'%s' --no-merges
 ./gradlew assembleRelease    # → app/build/outputs/apk/release/app-release.apk  (keystore.properties 필요)
 ```
 
-빌드 산출물의 실제 경로를 Step 5로 넘긴다.
+빌드 산출물의 실제 경로를 Step 4로 넘긴다.
 
-## Step 5. 배포 sub-skill 위임
+## Step 4. 배포 sub-skill 위임
 
 **App Distribution 경로**: `boolti-app-distribution` 스킬을 호출하고 아래 입력을 전달한다.
 
 | 입력 | 값 |
 |------|----|
-| `artifact` | Step 4에서 빌드된 APK/AAB 경로 |
-| `release_notes` | Step 3에서 승인된 인라인 텍스트 |
+| `artifact` | Step 3에서 빌드된 APK/AAB 경로 |
+| `release_notes` | Step 2에서 승인된 인라인 텍스트 |
 | `groups` | sub-skill 기본값 사용 (사용자가 변경 요청하면 override) |
 
-App ID는 sub-skill이 `artifact` 경로로 자동 결정한다. 오케스트레이터는 Step 4 variant와 빌드 경로가 일치하는지만 위임 직전에 재확인.
+App ID는 sub-skill이 `artifact` 경로로 자동 결정한다. 오케스트레이터는 Step 3 variant와 빌드 경로가 일치하는지만 위임 직전에 재확인.
 
 CLI 실행·검증·결과 보고는 sub-skill 책임. 본 스킬은 결과만 사용자에게 전달.
 
 **Play Console 경로**: Step 0에서 종료됐어야 함. 여기 도달하면 오케스트레이션 버그.
 
-## Step 6. (선택) 릴리즈 태깅
-
-운영 릴리즈에서만. App Distribution 단독은 대개 생략.
-
-```bash
-git tag -a v{versionName} -m "Release v{versionName}"
-git push origin v{versionName}
-```
-
 ## 단독 호출 경로
 
 - "이미 빌드된 APK만 테스터에게 배포해줘" → `boolti-app-distribution` 직접 호출
-- "릴리즈 노트만 뽑아줘" → 본 스킬 Step 3만 실행
+- "릴리즈 노트만 뽑아줘" → 본 스킬 Step 2만 실행

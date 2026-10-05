@@ -74,6 +74,13 @@ lint/             - 커스텀 Android Lint 규칙 (presentation에 lintChecks로
 - 이슈가 없으면 대괄호 없이 요약만 쓴다
 - 이슈 번호는 브랜치 이름에서 가져온다 (`feature/548-xxx`, `feature/Boolti-548` → `548`)
 
+## 릴리즈
+
+- 정기 릴리즈는 `develop` → `release/<버전>`, 핫픽스는 `main` → `hotfix/<버전>`으로 나가고, 둘 다 `main`에 머지한 뒤 `v<버전>` 태그를 달고 `develop`에 역머지한다
+- 시작·마무리·취소는 `.github/scripts/release/`의 스크립트로만 한다. 사용법은 그 폴더의 `README.md`에 있다
+- 버전은 `gradle/libs.versions.toml`의 `versionName`만 관리한다. versionCode는 `app/app-version.gradle`이 계산한다 (`major * 100000 + minor * 100 + patch`)
+- 테스터 배포(App Distribution)는 `boolti-distribution` 스킬을 쓴다
+
 ## CI (PR에서 실행)
 
 `pull-request-ci`, `anti-pattern-check`는 `develop`·`feature/**` 대상 PR에서 돈다.
@@ -84,7 +91,7 @@ lint/             - 커스텀 Android Lint 규칙 (presentation에 lintChecks로
 | `pull-request-ci` | `./gradlew btTest`, `assembleDebug`, APK 크기 비교. 실패 시 디스코드 알림 |
 | `anti-pattern-check` | data 레이어에 `runCatching` 추가 여부 (`suspendRunCatching`만 허용) |
 | `pr-milestone-required` | PR에 마일스톤 지정 여부 |
-| `release-version-check` | 릴리즈 PR의 versionCode·versionName |
+| `release-version-check` | `release/*`·`hotfix/*` PR의 versionName (브랜치 이름과 같고 main보다 큰지) |
 
 ## Firebase
 

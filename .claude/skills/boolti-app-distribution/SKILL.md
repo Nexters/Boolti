@@ -1,6 +1,6 @@
 ---
 name: boolti-app-distribution
-description: 이미 빌드된 불티 Android APK/AAB를 Firebase App Distribution으로 업로드한다. 오케스트레이터 `boolti-release`에서 호출되거나, "이 APK 테스터한테 배포해줘", "빌드된 거 App Distribution에 올려줘", "Firebase App Distribution 배포" 같은 요청에 단독 트리거. 빌드·릴리즈 노트 생성은 수행하지 않고, 인라인으로 받은 릴리즈 노트를 그대로 `--release-notes`로 전달한다.
+description: 이미 빌드된 불티 Android APK/AAB를 Firebase App Distribution으로 업로드한다. 오케스트레이터 `boolti-distribution`에서 호출되거나, "이 APK 테스터한테 배포해줘", "빌드된 거 App Distribution에 올려줘", "Firebase App Distribution 배포" 같은 요청에 단독 트리거. 빌드·릴리즈 노트 생성은 수행하지 않고, 인라인으로 받은 릴리즈 노트를 그대로 `--release-notes`로 전달한다.
 ---
 
 # Firebase App Distribution 업로드 스킬

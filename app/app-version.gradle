@@ -1,0 +1,17 @@
+// versionName은 gradle/libs.versions.toml에서 읽고, versionCode는 versionName에서 계산한다
+// versionCode = major * 100000 + minor * 100 + patch (예: 1.15.0 → 101500)
+def name = extensions.getByType(VersionCatalogsExtension)
+    .named("libs").findVersion("versionName").get().requiredVersion
+def parts = name.tokenize('.')
+if (parts.size() != 3 || !parts.every { it.isInteger() }) {
+    throw new GradleException("versionName($name)은 major.minor.patch 형식이어야 해요")
+}
+def (major, minor, patch) = parts*.toInteger()
+if (major > 99 || minor > 999 || patch > 99) {
+    throw new GradleException("versionName($name) 범위 초과: major ≤ 99, minor ≤ 999, patch ≤ 99")
+}
+
+android.defaultConfig {
+    versionName = name
+    versionCode = major * 100000 + minor * 100 + patch
+}

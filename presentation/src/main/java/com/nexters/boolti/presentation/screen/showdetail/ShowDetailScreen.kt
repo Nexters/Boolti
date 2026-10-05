@@ -31,9 +31,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +50,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,6 +88,7 @@ import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -122,18 +119,15 @@ import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
 import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
+import com.nexters.boolti.presentation.util.rememberCountdown
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.math.ceil
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -222,23 +216,28 @@ fun ShowDetailScreen(
                 ) {
                     BtCircularProgressIndicator()
                 }
-            } else if (uiState.showDetail != null) {
-                ShowDetailScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    showDetail = uiState.showDetail!!,
-                    castTeams = uiState.castTeams,
-                    selectedTab = uiState.selectedTab,
-                    navigateToLogin = navigateToLogin,
-                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-                    onTicketSelected = onTicketSelected,
-                    onGiftTicketSelected = onGiftTicketSelected,
-                    navigateToProfile = navigateToProfile,
-                    navigateToPlace = navigateToPlace,
-                    isLoggedIn = isLoggedIn == true,
-                    onSelectTab = viewModel::selectTab,
-                    shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
-                    doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
-                )
+            } else {
+                val showDetail = uiState.showDetail
+                val showState = uiState.showState
+                if (showDetail != null && showState != null) {
+                    ShowDetailScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        showDetail = showDetail,
+                        showState = showState,
+                        castTeams = uiState.castTeams,
+                        selectedTab = uiState.selectedTab,
+                        navigateToLogin = navigateToLogin,
+                        navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                        onTicketSelected = onTicketSelected,
+                        onGiftTicketSelected = onGiftTicketSelected,
+                        navigateToProfile = navigateToProfile,
+                        navigateToPlace = navigateToPlace,
+                        isLoggedIn = isLoggedIn == true,
+                        onSelectTab = viewModel::selectTab,
+                        shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
+                        doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
+                    )
+                }
             }
         }
     }
@@ -247,6 +246,7 @@ fun ShowDetailScreen(
 @Composable
 fun ShowDetailScreen(
     showDetail: ShowDetail,
+    showState: ShowState,
     castTeams: List<CastTeams>,
     selectedTab: Int,
     navigateToLogin: () -> Unit,
@@ -270,13 +270,6 @@ fun ShowDetailScreen(
     doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showState by flow {
-        while (true) {
-            emit(showDetail.state)
-            delay(200)
-        }
-    }.collectAsStateWithLifecycle(showDetail.state)
-
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
     val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
@@ -870,7 +863,6 @@ private fun trackNaverMap() {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName")
 fun LazyListScope.CastTab(
     teams: List<CastTeams>,
@@ -901,7 +893,7 @@ fun LazyListScope.CastTab(
             }
         }
     } else {
-        itemsIndexed(teams) { index, team ->
+        itemsIndexed(teams, key = { _, team -> team.id }) { index, team ->
             if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
             Section(
                 modifier = paddingModifier,
@@ -909,27 +901,20 @@ fun LazyListScope.CastTab(
                 space = if (team.members.isNotEmpty()) 20.dp else 0.dp,
                 paddingVertical = 24.dp,
                 content = {
-                    val spacedBySize = 20.dp
-                    val memberHeight = 46.dp
                     val spanCount = 2
-                    val rows = ceil(team.members.size / spanCount.toFloat())
-
-                    /**
-                     * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요
-                     */
-                    val gridHeight = memberHeight * rows + spacedBySize * (rows - 1)
-                    LazyVerticalGrid(
-                        modifier = Modifier.height(gridHeight),
-                        columns = GridCells.Fixed(spanCount),
-                        verticalArrangement = Arrangement.spacedBy(spacedBySize),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items(team.members) { member ->
-                            Cast(
-                                memberHeight,
-                                member,
-                                onClick = { onClickMember(member.userCode) },
-                            )
+                    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        team.members.chunked(spanCount).forEach { rowMembers ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                rowMembers.forEach { member ->
+                                    Cast(
+                                        modifier = Modifier.weight(1f),
+                                        memberHeight = 46.dp,
+                                        member = member,
+                                        onClick = { onClickMember(member.userCode) },
+                                    )
+                                }
+                                repeat(spanCount - rowMembers.size) { Spacer(modifier = Modifier.weight(1f)) }
+                            }
                         }
                     }
                 }
@@ -946,7 +931,7 @@ private fun Poster(
     navigateToPlace: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val images by remember { derivedStateOf { showDetail.images.map { it.originImage } } }
+    val images = remember(showDetail.images) { showDetail.images.map { it.originImage } }
 
     Column(
         modifier = modifier.padding(horizontal = 38.dp)
@@ -1068,10 +1053,11 @@ private fun SectionTitle(
 private fun Cast(
     memberHeight: Dp,
     member: Cast,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .height(memberHeight)
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
@@ -1111,17 +1097,7 @@ private fun Divider(modifier: Modifier = Modifier) {
 private fun CountDownBanner(
     deadlineDateTime: LocalDateTime,
 ) {
-    val remainingTime by flow {
-        while (true) {
-            val duration = Duration.between(
-                LocalDateTime.now(),
-                deadlineDateTime
-            )
-            emit(maxOf(duration, Duration.ZERO))
-            if (duration <= Duration.ZERO) break
-            delay(200L)
-        }
-    }.collectAsStateWithLifecycle(Duration.ZERO)
+    val remainingTime by rememberCountdown(deadlineDateTime)
 
     Box(
         modifier = Modifier
@@ -1143,6 +1119,7 @@ private fun ShowDetailScreenPreview() {
     BooltiTheme {
         ShowDetailScreen(
             showDetail = ShowDetail(),
+            showState = ShowState.TicketingInProgress,
             castTeams = emptyList(),
             selectedTab = 0,
             navigateToLogin = {},

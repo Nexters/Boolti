@@ -20,10 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,7 +33,6 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -87,12 +82,7 @@ private fun TicketContent(
     val context = LocalContext.current
     val bottomAreaHeight = 125.dp
 
-    var ticketWidth by remember { mutableFloatStateOf(0f) }
-    var ticketHeight by remember { mutableFloatStateOf(0f) }
-
     val ticketShape = TicketShape(
-        width = ticketWidth,
-        height = ticketHeight,
         circleRadius = 10.dp.toPx(),
         cornerRadius = 8.dp.toPx(),
         bottomAreaHeight = bottomAreaHeight.toPx(),
@@ -100,10 +90,6 @@ private fun TicketContent(
 
     Box(
         modifier = modifier
-            .onGloballyPositioned { coordinates ->
-                ticketWidth = coordinates.size.width.toFloat()
-                ticketHeight = coordinates.size.height.toFloat()
-            }
             .background(MaterialTheme.colorScheme.background)
             .clip(ticketShape)
             .border(
@@ -129,8 +115,6 @@ private fun TicketContent(
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(Color(0x33C5CACD), Grey95.copy(alpha = .2f)),
-                        start = Offset.Zero,
-                        end = Offset(ticketWidth, ticketHeight),
                     ),
                 )
         )

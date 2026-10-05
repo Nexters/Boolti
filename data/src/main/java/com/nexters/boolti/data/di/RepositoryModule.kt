@@ -2,6 +2,7 @@ package com.nexters.boolti.data.di
 
 import com.nexters.boolti.data.repository.AuthRepositoryImpl
 import com.nexters.boolti.data.repository.ConfigRepositoryImpl
+import com.nexters.boolti.data.repository.DeviceInfoRepositoryImpl
 import com.nexters.boolti.data.repository.FileRepositoryImpl
 import com.nexters.boolti.data.repository.GiftRepositoryImpl
 import com.nexters.boolti.data.repository.HostRepositoryImpl
@@ -18,6 +19,7 @@ import com.nexters.boolti.data.repository.PlaceRepositoryImpl
 import com.nexters.boolti.data.repository.YouTubeRepositoryImpl
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ConfigRepository
+import com.nexters.boolti.domain.repository.DeviceInfoRepository
 import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.HostRepository
@@ -87,4 +89,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPlaceRepository(repository: PlaceRepositoryImpl): PlaceRepository
+
+    @Binds
+    abstract fun bindDeviceInfoRepository(repository: DeviceInfoRepositoryImpl): DeviceInfoRepository
 }

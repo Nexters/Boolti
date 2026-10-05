@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,7 +24,8 @@ import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.marginHorizontal
-import java.time.Duration
+import com.nexters.boolti.presentation.util.rememberCountdown
+import java.time.LocalDateTime
 
 @Composable
 fun ShowDetailButtons(
@@ -79,12 +81,12 @@ private fun TicketingButton(
     val enabled = showState is ShowState.TicketingInProgress
     val text = when (showState) {
         is ShowState.WaitingTicketing -> {
-            val days = showState.remainingTime.toDays()
+            val remainingTime by rememberCountdown(showState.startDateTime)
 
             stringResource(
                 id = R.string.ticketing_button_ticket_countdown,
-                days
-            ) + " " + showState.remainingTime.asString()
+                remainingTime.toDays(),
+            ) + " " + remainingTime.asString()
         }
 
         ShowState.TicketingInProgress -> stringResource(id = R.string.ticketing_button_label)
@@ -128,7 +130,7 @@ fun ShowDetailButtonsBeforeTicketingPreview() {
             Spacer(Modifier.weight(1f))
             ShowDetailButtons(
                 showState = ShowState.WaitingTicketing(
-                    Duration.ofSeconds(1 * 86400 + 2 * 3600 + 17)
+                    LocalDateTime.now().plusDays(1).plusHours(2)
                 ),
                 onTicketingClicked = {},
                 onGiftClicked = {}

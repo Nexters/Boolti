@@ -1,6 +1,5 @@
 package com.nexters.boolti.presentation.screen.profileedit.profile
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -35,9 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -62,7 +57,6 @@ import com.nexters.boolti.common.tracker.field.ProfileEdit
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.UserCode
 import com.nexters.boolti.presentation.R
-import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
@@ -76,93 +70,56 @@ import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun ProfileEditScreen(
-    modifier: Modifier = Modifier,
-    navigateBack: () -> Unit,
+    navigateUp: () -> Unit,
     navigateToNicknameEdit: () -> Unit,
     navigateToUserCodeEdit: () -> Unit,
     navigateToIntroductionEdit: () -> Unit,
     navigateToSnsEdit: () -> Unit,
     navigateToLinkEdit: (userCode: UserCode) -> Unit,
     navigateToVideoEdit: (userCode: UserCode) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ProfileEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel.event
+    val snackbarController = LocalSnackbarController.current
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
 
     LaunchedEffect(Unit) {
         AppTracker.view(Screen.ProfileEdit)
     }
 
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            ProfileEditEvent.NavigateUp -> navigateUp()
+            ProfileEditEvent.NavigateToNicknameEdit -> navigateToNicknameEdit()
+            ProfileEditEvent.NavigateToUserCodeEdit -> navigateToUserCodeEdit()
+            ProfileEditEvent.NavigateToIntroductionEdit -> navigateToIntroductionEdit()
+            ProfileEditEvent.NavigateToSnsEdit -> navigateToSnsEdit()
+            is ProfileEditEvent.NavigateToVideoEdit -> navigateToVideoEdit(event.userCode)
+            is ProfileEditEvent.NavigateToLinkEdit -> navigateToLinkEdit(event.userCode)
+            ProfileEditEvent.ShowUnknownError -> snackbarController.showMessage(unknownErrorMsg)
+        }
+    }
+
+    BackHandler { viewModel.onAction(ProfileEditAction.ClickBack) }
+
     ProfileEditScreen(
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
-        thumbnail = uiState.thumbnail,
-        nickname = uiState.nickname,
-        userCode = uiState.userCode,
-        introduction = uiState.introduction,
-        snsCount = uiState.snsCount,
-        upcomingShowCount = uiState.upcomingShowCount,
-        pastShowCount = uiState.pastShowCount,
-        showUpcomingShows = uiState.showUpcomingShows,
-        showPerformedShows = uiState.showPerformedShows,
-        onClickUpcomingShows = viewModel::toggleShowUpcomingShows,
-        onClickPastShows = viewModel::toggleShowPerformedShows,
-        videoCount = uiState.videoCount,
-        linkCount = uiState.linkCount,
-        saving = uiState.saving,
-        event = event,
-        navigateBack = navigateBack,
-        onChangeThumbnail = { viewModel.changeThumbnail(it?.toString()) },
-        onClickNickname = navigateToNicknameEdit,
-        onClickUserCode = navigateToUserCodeEdit,
-        onClickIntroduction = navigateToIntroductionEdit,
-        onClickSns = navigateToSnsEdit,
-        onClickVideo = { navigateToVideoEdit(uiState.userCode) },
-        onClickLink = { navigateToLinkEdit(uiState.userCode) },
     )
 }
 
 @Composable
 private fun ProfileEditScreen(
+    uiState: ProfileEditUiState,
+    onAction: (ProfileEditAction) -> Unit,
     modifier: Modifier = Modifier,
-    thumbnail: String,
-    nickname: String,
-    userCode: UserCode,
-    introduction: String,
-    snsCount: Int,
-    upcomingShowCount: Int,
-    pastShowCount: Int,
-    showUpcomingShows: Boolean,
-    showPerformedShows: Boolean,
-    onClickUpcomingShows: () -> Unit,
-    onClickPastShows: () -> Unit,
-    videoCount: Int,
-    linkCount: Int,
-    saving: Boolean,
-    event: Flow<ProfileEditEvent>,
-    navigateBack: () -> Unit,
-    onChangeThumbnail: (Uri?) -> Unit,
-    onClickNickname: () -> Unit,
-    onClickUserCode: () -> Unit,
-    onClickIntroduction: () -> Unit,
-    onClickSns: () -> Unit,
-    onClickVideo: () -> Unit,
-    onClickLink: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
-    val snackbarHostState = LocalSnackbarController.current
-
-    val linkAddMsg = stringResource(R.string.link_add_msg)
-    val linkEditMsg = stringResource(R.string.link_edit_msg)
-    val linkRemoveMsg = stringResource(R.string.link_remove_msg)
-    val snsAddMsg = stringResource(R.string.sns_add_msg)
-    val snsEditMsg = stringResource(R.string.sns_edit_msg)
-    val snsRemoveMsg = stringResource(R.string.sns_remove_msg)
-    val profileEditSuccessMsg = stringResource(R.string.profile_edit_success_msg)
-    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
 
     val appBarBgColor by animateColorAsState(
         targetValue = if (scrollState.canScrollBackward) {
@@ -173,41 +130,12 @@ private fun ProfileEditScreen(
         label = "appBarBgColor",
     )
 
-    var selectedImage by remember { mutableStateOf<Uri?>(null) }
-
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
-            selectedImage = uri
-            onChangeThumbnail(uri)
+            if (uri != null) onAction(ProfileEditAction.SelectThumbnail(uri.toString()))
         }
     )
-
-    var showUnAuthorizedDialog by remember { mutableStateOf(false) }
-
-    fun tryBack() {
-        navigateBack()
-    }
-
-    BackHandler { tryBack() }
-
-    ObserveAsEvents(event) {
-        when (it) {
-            ProfileEditEvent.OnLinkAdded -> snackbarHostState.showMessage(linkAddMsg)
-            ProfileEditEvent.OnLinkEdited -> snackbarHostState.showMessage(linkEditMsg)
-            ProfileEditEvent.OnLinkRemoved -> snackbarHostState.showMessage(linkRemoveMsg)
-            ProfileEditEvent.OnSnsAdded -> snackbarHostState.showMessage(snsAddMsg)
-            ProfileEditEvent.OnSnsEdited -> snackbarHostState.showMessage(snsEditMsg)
-            ProfileEditEvent.OnSnsRemoved -> snackbarHostState.showMessage(snsRemoveMsg)
-            ProfileEditEvent.OnSuccessEditProfile -> {
-                snackbarHostState.showMessage(profileEditSuccessMsg)
-                navigateBack()
-            }
-
-            ProfileEditEvent.UnAuthorized -> showUnAuthorizedDialog = true
-            ProfileEditEvent.EditFailed -> snackbarHostState.showMessage(unknownErrorMsg)
-        }
-    }
 
     Scaffold(
         modifier = modifier,
@@ -219,7 +147,7 @@ private fun ProfileEditScreen(
                 modifier = Modifier.zIndex(1f),
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = ::tryBack,
+                        onClick = { onAction(ProfileEditAction.ClickBack) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
@@ -236,9 +164,9 @@ private fun ProfileEditScreen(
             ) {
                 ProfileHeader(
                     modifier = Modifier.fillMaxWidth(),
-                    thumbnail = selectedImage ?: thumbnail,
+                    thumbnail = uiState.displayedThumbnail,
                     onClickPhotoButton = {
-                        if (!saving) photoPickerLauncher.launch(
+                        if (!uiState.uploading) photoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     }
@@ -246,28 +174,28 @@ private fun ProfileEditScreen(
                 Section(title = stringResource(R.string.label_information)) {
                     SectionItem(
                         label = stringResource(R.string.label_nickname),
-                        value = nickname,
-                        defaultValue = userCode,
-                        onClick = onClickNickname,
+                        value = uiState.nickname,
+                        defaultValue = uiState.userCode,
+                        onClick = { onAction(ProfileEditAction.ClickNickname) },
                     )
                     SectionItem(
                         label = stringResource(R.string.label_id),
-                        value = userCode,
-                        defaultValue = userCode,
-                        onClick = onClickUserCode,
+                        value = uiState.userCode,
+                        defaultValue = uiState.userCode,
+                        onClick = { onAction(ProfileEditAction.ClickUserCode) },
                     )
                     SectionItem(
                         label = stringResource(R.string.label_introduction),
-                        value = introduction,
+                        value = uiState.introduction,
                         defaultValue = stringResource(R.string.hint_add_introduction),
-                        onClick = onClickIntroduction,
+                        onClick = { onAction(ProfileEditAction.ClickIntroduction) },
                     )
                     SectionItem(
                         label = stringResource(R.string.sns),
-                        count = snsCount,
+                        count = uiState.snsCount,
                         defaultValue = stringResource(R.string.hint_add_sns),
-                        onClick = onClickSns,
-                        right = if (snsCount > 0) {
+                        onClick = { onAction(ProfileEditAction.ClickSns) },
+                        right = if (uiState.snsCount > 0) {
                             { ArrowRight() }
                         } else {
                             null
@@ -278,33 +206,33 @@ private fun ProfileEditScreen(
                 Section(title = stringResource(R.string.label_activity_visibility)) {
                     SectionItem(
                         label = stringResource(R.string.label_upcoming_shows),
-                        count = upcomingShowCount,
+                        count = uiState.upcomingShowCount,
                         defaultValue = "-",
-                        onClick = if (upcomingShowCount > 0) {
-                            onClickUpcomingShows
+                        onClick = if (uiState.upcomingShowCount > 0) {
+                            { onAction(ProfileEditAction.ToggleUpcomingShows) }
                         } else {
                             null
                         },
                         right = {
                             BtSwitch(
-                                checked = upcomingShowCount > 0 && showUpcomingShows,
-                                enabled = upcomingShowCount > 0,
+                                checked = uiState.upcomingShowCount > 0 && uiState.showUpcomingShows,
+                                enabled = uiState.upcomingShowCount > 0,
                             )
                         },
                     )
                     SectionItem(
                         label = stringResource(R.string.label_past_shows),
-                        count = pastShowCount,
+                        count = uiState.pastShowCount,
                         defaultValue = "-",
-                        onClick = if (pastShowCount > 0) {
-                            onClickPastShows
+                        onClick = if (uiState.pastShowCount > 0) {
+                            { onAction(ProfileEditAction.TogglePastShows) }
                         } else {
                             null
                         },
                         right = {
                             BtSwitch(
-                                checked = pastShowCount > 0 && showPerformedShows,
-                                enabled = pastShowCount > 0,
+                                checked = uiState.pastShowCount > 0 && uiState.showPerformedShows,
+                                enabled = uiState.pastShowCount > 0,
                             )
                         },
                     )
@@ -313,10 +241,10 @@ private fun ProfileEditScreen(
                 Section(title = stringResource(R.string.label_video_and_link)) {
                     SectionItem(
                         label = stringResource(R.string.video),
-                        count = videoCount,
+                        count = uiState.videoCount,
                         defaultValue = stringResource(R.string.video_add),
-                        onClick = onClickVideo,
-                        right = if (videoCount > 0) {
+                        onClick = { onAction(ProfileEditAction.ClickVideo) },
+                        right = if (uiState.videoCount > 0) {
                             { ArrowRight() }
                         } else {
                             null
@@ -324,10 +252,10 @@ private fun ProfileEditScreen(
                     )
                     SectionItem(
                         label = stringResource(R.string.link),
-                        count = linkCount,
+                        count = uiState.linkCount,
                         defaultValue = stringResource(R.string.link_add),
-                        onClick = onClickLink,
-                        right = if (linkCount > 0) {
+                        onClick = { onAction(ProfileEditAction.ClickLink) },
+                        right = if (uiState.linkCount > 0) {
                             { ArrowRight() }
                         } else {
                             null
@@ -336,23 +264,7 @@ private fun ProfileEditScreen(
                 }
             }
 
-            if (saving) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-
-        if (showUnAuthorizedDialog) {
-            BTDialog(
-                enableDismiss = false,
-                showCloseButton = false,
-                onDismiss = navigateBack,
-                onClickPositiveButton = navigateBack,
-                positiveButtonLabel = stringResource(R.string.btn_exit),
-            ) {
-                Text(
-                    text = unknownErrorMsg,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
+            if (uiState.uploading) BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }

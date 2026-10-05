@@ -96,7 +96,6 @@ dependencies {
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.ui.test.junit4)
-    androidTestImplementation(libs.kotest.runner.junit5.jvm)
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)
     testImplementation(libs.mockk)

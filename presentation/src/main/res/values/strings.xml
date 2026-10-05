@@ -379,7 +379,6 @@
     <string name="profile_edit_introduction_placeholder">예) 재즈와 펑크락을 좋아해요</string>
     <string name="remove_link_dialog_message">링크를 삭제하시겠어요?</string>
     <string name="change_thumbnail_description">썸네일 이미지 변경</string>
-    <string name="profile_edit_success_msg">프로필 편집을 완료했어요</string>
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
@@ -399,9 +398,6 @@
     <string name="sns_edit">SNS 편집</string>
     <string name="sns_delete">SNS 삭제</string>
     <string name="sns_delete_message">SNS를 삭제하시겠어요?</string>
-    <string name="sns_add_msg">SNS를 추가했어요</string>
-    <string name="sns_edit_msg">SNS를 편집했어요</string>
-    <string name="sns_remove_msg">SNS를 삭제했어요</string>
     <string name="sns_reorder_description">SNS 순서 변경</string>
     <string name="sns_username_placeholder">ex) boolti_official</string>
     <string name="sns_username_contains_at_error">\@을 제외한 Username을 입력해 주세요</string>
@@ -588,4 +584,5 @@
     <!-- 디버깅 옵션 -->
     <string name="debug_show_log">로그 보기</string>
     <string name="debug_impression_test">임프레션 테스트</string>
+    <string name="debug_info">디버그 정보</string>
 </resources>

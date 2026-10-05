@@ -142,7 +142,7 @@ class SearchDetailViewModel @Inject constructor(
             screen = Screen.Search,
             keyword = keyword,
             properties = buildMap {
-                put("search_source", route.searchSource)
+                put("search_source", route.searchSource.value)
                 put("result_count", resultCount)
             },
         )

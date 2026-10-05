@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.screen.navigation
 
+import com.nexters.boolti.presentation.screen.search.SearchSource
 import kotlinx.serialization.Serializable
 
 sealed interface SearchRoute {
@@ -9,6 +10,6 @@ sealed interface SearchRoute {
     @Serializable
     data class SearchDetail(
         val keyword: String,
-        val searchSource: String,
+        val searchSource: SearchSource,
     ) : SearchRoute
 }

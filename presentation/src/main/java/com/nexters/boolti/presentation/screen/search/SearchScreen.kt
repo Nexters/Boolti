@@ -71,7 +71,7 @@ import java.time.LocalDateTime
 @Composable
 fun SearchScreen(
     navigateToRecentSearch: () -> Unit,
-    navigateToSearchDetail: (keyword: String, searchSource: String) -> Unit,
+    navigateToSearchDetail: (keyword: String, searchSource: SearchSource) -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
@@ -121,7 +121,7 @@ private fun SearchScreen(
     risingKeywords: List<String>,
     risingKeywordsTime: String,
     onClickSearchBar: () -> Unit,
-    onSearch: (keyword: String, searchSource: String) -> Unit,
+    onSearch: (keyword: String, searchSource: SearchSource) -> Unit,
     onClickShow: (id: String) -> Unit,
     recentSearchKeywords: List<String>,
     deleteSearchHistory: (String) -> Unit,
@@ -171,7 +171,7 @@ private fun SearchScreen(
                                 "keyword" to keyword,
                             ),
                         )
-                        onSearch(keyword, "Recent")
+                        onSearch(keyword, SearchSource.Recent)
                     },
                     deleteSearchHistory = deleteSearchHistory,
                     onClickClearButton = onClickClearButton,
@@ -195,7 +195,7 @@ private fun SearchScreen(
                             "keyword" to keyword,
                         ),
                     )
-                    onSearch(keyword, "Trending")
+                    onSearch(keyword, SearchSource.Trending)
                 },
             )
         }

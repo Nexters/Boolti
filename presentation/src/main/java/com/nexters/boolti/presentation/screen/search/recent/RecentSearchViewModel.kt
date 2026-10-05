@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.SearchHistory
 import com.nexters.boolti.presentation.screen.navigation.SearchRoute
+import com.nexters.boolti.presentation.screen.search.SearchSource
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.presentation.base.BaseViewModel
@@ -123,7 +124,7 @@ class RecentSearchViewModel @Inject constructor(
         }
     }
 
-    private fun search(keyword: String, searchSource: String) {
+    private fun search(keyword: String, searchSource: SearchSource) {
         if (keyword.isBlank()) {
             event(RecentSearchEvent.EmptyKeyword)
         } else {

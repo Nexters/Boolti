@@ -9,7 +9,7 @@ import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 
 fun NavGraphBuilder.searchScreen(
     navigateToRecentSearch: () -> Unit,
-    navigateToSearchDetail: (keyword: String, searchSource: String) -> Unit,
+    navigateToSearchDetail: (keyword: String, searchSource: SearchSource) -> Unit,
     navigateToShowDetail: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {

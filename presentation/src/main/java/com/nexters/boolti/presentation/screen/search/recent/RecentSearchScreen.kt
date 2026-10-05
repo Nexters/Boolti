@@ -54,6 +54,7 @@ import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.extension.highlightMatches
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.search.ClearSearchHistoriesDialog
+import com.nexters.boolti.presentation.screen.search.SearchSource
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -68,7 +69,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecentSearchScreen(
     navigateBack: () -> Unit,
-    search: (keyword: String, searchSource: String) -> Unit,
+    search: (keyword: String, searchSource: SearchSource) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RecentSearchViewModel = hiltViewModel(),
 ) {
@@ -141,7 +142,7 @@ private fun RecentSearchScreen(
     showClearButton: Boolean,
     dismissClearDialog: () -> Unit,
     navigateBack: () -> Unit,
-    search: (keyword: String, searchSource: String) -> Unit,
+    search: (keyword: String, searchSource: SearchSource) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -190,7 +191,7 @@ private fun RecentSearchScreen(
                 },
                 hint = stringResource(R.string.search_search_hint),
                 search = {
-                    search(textFieldValue.text, "Direct")
+                    search(textFieldValue.text, SearchSource.Direct)
                 },
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -203,7 +204,7 @@ private fun RecentSearchScreen(
                     recentKeywords = recentKeywords,
                     showClearButton = showClearButton,
                     onClickKeyword = {
-                        search(it, "Recent")
+                        search(it, SearchSource.Recent)
                     },
                     onClickDeleteButton = deleteKeyword,
                     onClickClearButton = onClickClearButton,
@@ -221,7 +222,7 @@ private fun RecentSearchScreen(
                                 "keyword" to keyword,
                             ),
                         )
-                        search(keyword, "AutoComplete")
+                        search(keyword, SearchSource.AutoComplete)
                     },
                 )
             }

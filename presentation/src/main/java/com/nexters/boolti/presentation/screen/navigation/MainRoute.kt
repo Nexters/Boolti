@@ -87,6 +87,7 @@ sealed interface MainRoute {
     @Serializable
     data class Place(
         val placeId: String,
+        val source: String,
     ) : MainRoute
 
     @Serializable

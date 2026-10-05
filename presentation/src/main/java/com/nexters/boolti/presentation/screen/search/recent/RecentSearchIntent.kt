@@ -1,5 +1,7 @@
 package com.nexters.boolti.presentation.screen.search.recent
 
+import com.nexters.boolti.presentation.screen.search.SearchSource
+
 sealed interface RecentSearchIntent {
     // 검색어
     data object ClearKeyword : RecentSearchIntent
@@ -12,5 +14,5 @@ sealed interface RecentSearchIntent {
     data object DismissClearHistoriesDialog : RecentSearchIntent
 
     // 검색
-    data class Search(val keyword: String) : RecentSearchIntent
+    data class Search(val keyword: String, val searchSource: SearchSource) : RecentSearchIntent
 }

@@ -14,8 +14,8 @@ fun NavGraphBuilder.recentSearchScreen(
 
         RecentSearchScreen(
             navigateBack = navController::navigateUp,
-            search = { keyword ->
-                navController.navigate(SearchRoute.SearchDetail(keyword))
+            search = { keyword, searchSource ->
+                navController.navigate(SearchRoute.SearchDetail(keyword = keyword, searchSource = searchSource))
             },
             modifier = modifier,
         )

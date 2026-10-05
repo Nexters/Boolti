@@ -285,7 +285,7 @@ fun ShowDetailScreen(
     var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
     val navController = LocalNavController.current
     val bridge = rememberWebBridge {
-        handle { p: NavigateToPlaceDetail -> navController.navigate(MainRoute.Place(placeId = p.placeId.toString())) }
+        handle { p: NavigateToPlaceDetail -> navController.navigate(MainRoute.Place(placeId = p.placeId.toString(), source = Screen.ShowDetail.value)) }
     }
     val webView = remember(context) {
         BtWebView(preUriLoading = { url ->
@@ -991,9 +991,17 @@ private fun Poster(
                 .then(
                     if (placeId != null) {
                         Modifier.clickable {
-                            navigateToPlace(
-                                placeId
+                            AppTracker.click(
+                                screen = Screen.ShowDetail,
+                                objectRole = Role.Item,
+                                objectValue = "PlaceProfile",
+                                properties = mapOf(
+                                    "show_id" to showDetail.id,
+                                    "place_id" to placeId,
+                                    "entry_point" to "Summary",
+                                ),
                             )
+                            navigateToPlace(placeId)
                         }
                     } else {
                         Modifier

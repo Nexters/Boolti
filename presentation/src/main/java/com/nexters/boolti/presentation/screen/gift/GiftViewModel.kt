@@ -9,7 +9,7 @@ import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
@@ -34,7 +34,7 @@ class GiftViewModel @Inject constructor(
     getCachedUserUseCase: GetCachedUserUseCase,
     private val ticketingRepository: TicketingRepository,
     private val giftRepository: GiftRepository,
-    private val getRefundPolicyUseCase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : BaseViewModel() {
     private val userId = checkNotNull(getCachedUserUseCase()?.id) {
         "[GiftViewModel] 사용자 정보가 없습니다."

@@ -156,8 +156,6 @@ private fun TicketDetailScreen(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
-    var contentWidth by remember { mutableFloatStateOf(0f) }
-    var ticketSectionHeight by remember { mutableFloatStateOf(0f) }
     var ticketSectionHeightUntilTicketInfo by remember { mutableFloatStateOf(0f) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -232,8 +230,6 @@ private fun TicketDetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 val ticketShape = TicketShape(
-                    width = contentWidth,
-                    height = ticketSectionHeight,
                     circleRadius = 10.dp.toPx(),
                     cornerRadius = 8.dp.toPx(),
                     bottomAreaHeight = ticketSectionHeightUntilTicketInfo,
@@ -241,10 +237,6 @@ private fun TicketDetailScreen(
                 Box(
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .onGloballyPositioned { coordinates ->
-                            contentWidth = coordinates.size.width.toFloat()
-                            ticketSectionHeight = coordinates.size.height.toFloat()
-                        }
                         .clip(ticketShape)
                         .border(
                             width = 1.dp,
@@ -262,7 +254,7 @@ private fun TicketDetailScreen(
                         AsyncImage(
                             model = asyncImageBlurModel(context, ticketGroup.poster),
                             modifier = Modifier
-                                .width(contentWidth.toDp())
+                                .fillMaxWidth()
                                 .aspectRatio(317 / 570f)
                                 .alpha(.8f),
                             contentScale = ContentScale.Crop,

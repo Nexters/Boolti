@@ -1,7 +1,6 @@
 [versions]
 minSdk = "28"
 targetSdk = "36"
-versionCode = "53"
 versionName = "1.14.3"
 packageName = "com.nexters.boolti"
 compileSdk = "36"

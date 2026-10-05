@@ -15,6 +15,8 @@ plugins {
     id("kotlin-parcelize")
 }
 
+apply(from = "app-version.gradle")
+
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 keystoreProperties.load(FileInputStream(keystorePropertiesFile))
@@ -37,8 +39,6 @@ android {
 
     defaultConfig {
         applicationId = "com.nexters.boolti"
-        versionCode = libs.versions.versionCode.get().toInt()
-        versionName = libs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

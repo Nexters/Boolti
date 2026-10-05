@@ -14,5 +14,5 @@ sealed interface VideoListRoute {
     data object VideoList : VideoListRoute
 
     @Serializable
-    data class VideoEdit(val isEditMode: Boolean) : VideoListRoute
+    data object VideoEdit : VideoListRoute
 }

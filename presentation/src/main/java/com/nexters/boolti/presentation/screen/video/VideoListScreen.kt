@@ -35,7 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.nexters.boolti.domain.model.YouTubeVideo
@@ -46,7 +45,9 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
+import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
@@ -62,99 +63,63 @@ import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun VideoListScreen(
-    navigateToAddVideo: () -> Unit,
-    navigateToEditVideo: () -> Unit,
-    navigateUp: () -> Unit,
+    viewModel: VideoListViewModel,
     modifier: Modifier = Modifier,
-    viewModel: VideoListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler {
-        viewModel.tryBack()
+        viewModel.onAction(VideoListAction.Back)
     }
 
+    VideoListEventEffect(viewModel.event)
+
     VideoListScreen(
-        videos = uiState.videos,
-        onClickAdd = { id ->
-            if (id != null) {
-                navigateToEditVideo()
-            } else {
-                navigateToAddVideo()
-            }
-            viewModel.startAddOrEditVideo(id)
-        },
-        onSave = viewModel::save,
-        tryBack = viewModel::tryBack,
-        navigateUp = navigateUp,
-        navigateToEditVideo = navigateToEditVideo,
-        event = viewModel.videoListEvent,
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
-        showActionButton = uiState.isMine,
-        actionButtonEnabled = uiState.saveEnabled,
-        editing = uiState.editing,
-        loading = uiState.loading,
-        showExitAlertDialog = uiState.showExitAlertDialog,
-        onDismissExitAlertDialog = viewModel::dismissExitAlertDialog,
-        setEditMode = viewModel::setEditMode,
-        onReorder = viewModel::reorder,
     )
 }
 
+/** 목록·편집 화면이 ViewModel을 함께 쓰므로 Event 처리도 같은 함수로 한다 */
 @Composable
-private fun VideoListScreen(
-    videos: List<YouTubeVideo>,
-    onClickAdd: (id: String?) -> Unit,
-    onSave: () -> Unit,
-    tryBack: () -> Unit,
-    navigateUp: () -> Unit,
-    navigateToEditVideo: () -> Unit,
-    event: Flow<VideoListEvent>,
-    modifier: Modifier = Modifier,
-    showActionButton: Boolean = false,
-    actionButtonEnabled: Boolean = false,
-    editing: Boolean = false,
-    loading: Boolean = false,
-    showExitAlertDialog: Boolean = false,
-    onDismissExitAlertDialog: () -> Unit = {},
-    setEditMode: () -> Unit = {},
-    onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
-) {
-    val reorderableState = rememberReorderableLazyListState(
-        onMove = { from, to ->
-            onReorder(from.index, to.index)
-        },
-    )
-
-    val snackbarHostState = LocalSnackbarController.current
-
-    val uriHandler = LocalUriHandler.current
-    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
-    val invalidUrlMsg = stringResource(R.string.invalid_link)
-
+internal fun VideoListEventEffect(event: Flow<VideoListEvent>) {
+    val navController = LocalNavController.current
+    val snackbarController = LocalSnackbarController.current
     val videoAddMsg = stringResource(R.string.video_add_msg)
     val videoEditMsg = stringResource(R.string.video_edit_msg)
     val videoDeleteMsg = stringResource(R.string.video_delete_msg)
 
     ObserveAsEvents(event) {
         when (it) {
-            is VideoListEvent.Added -> {
-                snackbarHostState.showMessage(videoAddMsg)
-            }
-
-            is VideoListEvent.Edited -> {
-                snackbarHostState.showMessage(videoEditMsg)
-            }
-
-            is VideoListEvent.Removed -> {
-                snackbarHostState.showMessage(videoDeleteMsg)
-            }
-
-            is VideoListEvent.Finish -> navigateUp()
-
-            is VideoListEvent.NavigateToEdit -> navigateToEditVideo()
+            VideoListEvent.Added -> snackbarController.showMessage(videoAddMsg)
+            VideoListEvent.Edited -> snackbarController.showMessage(videoEditMsg)
+            VideoListEvent.Removed -> snackbarController.showMessage(videoDeleteMsg)
+            VideoListEvent.NavigateToEdit -> navController.navigate(VideoListRoute.VideoEdit)
+            VideoListEvent.CloseEdit -> navController.popBackStack<VideoListRoute.VideoEdit>(inclusive = true)
+            VideoListEvent.Finish -> navController.popBackStack<VideoListRoute.VideoListRoot>(inclusive = true)
         }
     }
+}
+
+@Composable
+private fun VideoListScreen(
+    uiState: VideoListUiState,
+    onAction: (VideoListAction) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val videos = uiState.videos
+    val editing = uiState.editing
+    val reorderableState = rememberReorderableLazyListState(
+        onMove = { from, to ->
+            onAction(VideoListAction.Reorder(from.index, to.index))
+        },
+    )
+
+    val snackbarHostState = LocalSnackbarController.current
+
+    val uriHandler = LocalUriHandler.current
+    val invalidUrlMsg = stringResource(R.string.invalid_link)
 
     Scaffold(
         modifier = modifier,
@@ -162,23 +127,23 @@ private fun VideoListScreen(
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = tryBack,
+                        onClick = { onAction(VideoListAction.Back) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
                 title = stringResource(R.string.video),
                 actionButtons = {
                     when {
-                        !showActionButton -> Unit
+                        !uiState.isMine -> Unit
                         editing -> BtAppBarDefaults.AppBarTextButton(
                             label = stringResource(R.string.save_short),
-                            enabled = actionButtonEnabled,
-                            onClick = onSave,
+                            enabled = uiState.saveEnabled,
+                            onClick = { onAction(VideoListAction.Save) },
                         )
 
                         else -> BtAppBarDefaults.AppBarIconButton(
                             iconRes = R.drawable.ic_edit_pen,
-                            onClick = setEditMode,
+                            onClick = { onAction(VideoListAction.StartEditing) },
                         )
                     }
                 },
@@ -190,13 +155,13 @@ private fun VideoListScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            if (loading) {
+            if (uiState.loading) {
                 BtCircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else if (videos.isEmpty()) {
                 EmptyListAddButton(
-                    onClickAdd = { onClickAdd(null) }
+                    onClickAdd = { onAction(VideoListAction.ClickAddVideo) }
                 )
             } else {
                 VideosContent(
@@ -204,10 +169,10 @@ private fun VideoListScreen(
                     editing = editing,
                     reorderableState = reorderableState,
                     reorderable = editing,
-                    onClickAdd = { id -> onClickAdd(id) },
+                    onClickAdd = { onAction(VideoListAction.ClickAddVideo) },
                     onClickVideo = { localId ->
                         if (editing) {
-                            onClickAdd(localId.ifEmpty { null })
+                            onAction(VideoListAction.ClickVideo(localId))
                         } else {
                             try {
                                 uriHandler.openUri(videos.first { it.localId == localId }.url)
@@ -224,15 +189,15 @@ private fun VideoListScreen(
             }
         }
 
-        if (showExitAlertDialog) {
+        if (uiState.showExitAlertDialog) {
             BTDialog(
                 enableDismiss = true,
                 showCloseButton = true,
-                onDismiss = onDismissExitAlertDialog,
+                onDismiss = { onAction(VideoListAction.DismissExitAlertDialog) },
                 negativeButtonLabel = stringResource(R.string.btn_exit),
-                onClickNegativeButton = navigateUp,
+                onClickNegativeButton = { onAction(VideoListAction.Exit) },
                 positiveButtonLabel = stringResource(R.string.save),
-                onClickPositiveButton = onSave,
+                onClickPositiveButton = { onAction(VideoListAction.Save) },
             ) {
                 Text(
                     text = stringResource(R.string.profile_edit_exit_alert),
@@ -251,7 +216,7 @@ private fun VideosContent(
     editing: Boolean,
     reorderable: Boolean,
     reorderableState: ReorderableLazyListState,
-    onClickAdd: (id: String?) -> Unit,
+    onClickAdd: () -> Unit,
     onClickVideo: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -261,7 +226,7 @@ private fun VideosContent(
         ListToolbar(
             totalCount = videos.size,
             onClickAdd = if (editing) {
-                { onClickAdd(null) }
+                onClickAdd
             } else {
                 null
             },

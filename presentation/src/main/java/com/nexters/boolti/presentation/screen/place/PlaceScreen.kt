@@ -139,7 +139,7 @@ fun PlaceScreen(
                 properties = buildMap {
                     put("place_id", place.id)
                     put("place_name", place.name)
-                    viewModel.source?.let { put("source", it) }
+                    put("source", viewModel.source)
                     put("profile_status", "Active")
                     regionOf(place.streetAddress)?.let { put("region", it) }
                 },

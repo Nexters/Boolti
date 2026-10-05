@@ -33,5 +33,5 @@ val Role.Companion.Tab
 val Role.Companion.Chip
     get() = Role("Chip")
 
-val Role.Companion.EmptyState
-    get() = Role("EmptyState")
+val Role.Companion.Section
+    get() = Role("Section")

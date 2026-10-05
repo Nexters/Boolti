@@ -52,7 +52,7 @@ import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.impression
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Button
-import com.nexters.boolti.common.tracker.field.EmptyState
+import com.nexters.boolti.common.tracker.field.Section
 import com.nexters.boolti.common.tracker.field.Item
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
@@ -499,7 +499,7 @@ private fun TabContainer(
                                 onImpressed = {
                                     AppTracker.impression(
                                         screen = Screen.SearchDetail,
-                                        objectRole = Role.EmptyState,
+                                        objectRole = Role.Section,
                                         objectValue = "NoResult",
                                         properties = mapOf(
                                             "tab" to "Place",

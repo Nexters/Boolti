@@ -9,6 +9,6 @@ sealed interface SearchRoute {
     @Serializable
     data class SearchDetail(
         val keyword: String,
-        val searchSource: String? = null,
+        val searchSource: String,
     ) : SearchRoute
 }

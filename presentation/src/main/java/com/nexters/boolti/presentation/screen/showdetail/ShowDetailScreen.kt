@@ -50,7 +50,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -932,7 +931,7 @@ private fun Poster(
     navigateToPlace: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val images by remember { derivedStateOf { showDetail.images.map { it.originImage } } }
+    val images = remember(showDetail.images) { showDetail.images.map { it.originImage } }
 
     Column(
         modifier = modifier.padding(horizontal = 38.dp)

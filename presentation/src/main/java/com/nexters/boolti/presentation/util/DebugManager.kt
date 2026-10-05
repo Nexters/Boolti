@@ -21,6 +21,9 @@ object DebugManager {
     var logViewerState by mutableStateOf(LogViewerState())
         private set
 
+    /** 디버그 정보 팝업에 보여줄 마지막 화면. rememberNavControllerWithLog가 갱신한다 */
+    var currentScreen: String? = null
+
     fun openLogViewer() {
         logViewerState = logViewerState.copy(
             isVisible = true,

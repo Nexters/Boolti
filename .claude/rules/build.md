@@ -23,6 +23,7 @@ paths:
   DEV_MIXPANEL_TOKEN="<개발 Mixpanel 토큰>"
   PROD_MIXPANEL_TOKEN="<운영 Mixpanel 토큰>"
   YOUTUBE_API_KEY="<YouTube Data API 키>"
+  DISCORD_DEBUG_INFO_WEBHOOK_URL="<디버그 정보 디스코드 웹훅>"   # 선택. 없으면 전송 버튼 비활성화
   FIGMA_TOKEN="<Figma personal access token>"   # 로컬 스킬용
   ```
 - `keystore.properties` - 릴리즈 서명 설정

@@ -8,6 +8,7 @@ compileSdk = "36"
 targetJvm = "17"
 kotlin = "2.3.10"
 android = "9.0.0"
+lint = "32.0.0" # android 버전 + 23
 ksp = "2.3.6"
 composeBom = "2026.02.00"
 
@@ -92,6 +93,9 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax-inject" }
 junit = { module = "junit:junit", version.ref = "junit" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lint" }
+lint-cli = { module = "com.android.tools.lint:lint", version.ref = "lint" }
+lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "lint" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }

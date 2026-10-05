@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTClearableTextField
@@ -45,45 +46,39 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 @Composable
 fun VideoEditScreen(
     navigateUp: () -> Unit,
+    closeList: () -> Unit,
+    returnResult: (VideoEditResult) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: VideoListViewModel,
+    viewModel: VideoEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel.videoEditEvent
 
     BackHandler {
-        viewModel.tryBack()
+        viewModel.onAction(VideoEditAction.Back)
     }
 
-    ObserveAsEvents(event) {
+    ObserveAsEvents(viewModel.event) {
         when (it) {
-            VideoEditEvent.Finish -> navigateUp()
+            is VideoEditEvent.Done -> returnResult(it.result)
+            VideoEditEvent.Close -> navigateUp()
+            VideoEditEvent.CloseWithList -> closeList()
         }
     }
 
     VideoEditScreen(
-        isEditMode = uiState.editingVideo?.localId?.isNotEmpty() == true,
-        videoUrl = uiState.editingVideo?.url.orEmpty(),
-        completeEnabled = uiState.editingVideoCompleteEnabled,
-        onClickBack = viewModel::tryBack,
-        onClickComplete = viewModel::completeAddOrEditVideo,
-        onChangeVideoUrl = viewModel::onVideoUrlChanged,
-        requireRemove = viewModel::removeVideo,
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
     )
 }
 
 @Composable
-fun VideoEditScreen(
-    isEditMode: Boolean,
-    videoUrl: String,
-    completeEnabled: Boolean,
-    onClickBack: () -> Unit,
-    onClickComplete: () -> Unit,
-    onChangeVideoUrl: (String) -> Unit,
-    requireRemove: () -> Unit,
+private fun VideoEditScreen(
+    uiState: VideoEditUiState,
+    onAction: (VideoEditAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isEditMode = uiState.isEditMode
     var showVideoRemoveDialog by remember { mutableStateOf(false) }
     val videoUrlInteractionSource = remember { MutableInteractionSource() }
     val videoUrlFocused by videoUrlInteractionSource.collectIsFocusedAsState()
@@ -94,15 +89,15 @@ fun VideoEditScreen(
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = onClickBack,
+                        onClick = { onAction(VideoEditAction.Back) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
-                        onClick = onClickComplete,
-                        enabled = completeEnabled,
+                        onClick = { onAction(VideoEditAction.Complete) },
+                        enabled = uiState.completeEnabled,
                     )
                 },
                 title = if (isEditMode) {
@@ -134,9 +129,9 @@ fun VideoEditScreen(
                         modifier = Modifier
                             .padding(start = 12.dp)
                             .fillMaxWidth(),
-                        text = videoUrl,
+                        text = uiState.url,
                         placeholder = stringResource(R.string.video_edit_placeholer),
-                        onValueChanged = onChangeVideoUrl,
+                        onValueChanged = { onAction(VideoEditAction.ChangeUrl(it)) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
@@ -174,7 +169,7 @@ fun VideoEditScreen(
                 positiveButtonLabel = stringResource(R.string.btn_delete),
                 negativeButtonLabel = stringResource(R.string.cancel),
                 onClickPositiveButton = {
-                    requireRemove()
+                    onAction(VideoEditAction.Remove)
                     showVideoRemoveDialog = false
                 },
                 onClickNegativeButton = { showVideoRemoveDialog = false },
@@ -196,13 +191,8 @@ fun VideoEditScreen(
 private fun VideoEditScreenPreview() {
     BooltiTheme {
         VideoEditScreen(
-            isEditMode = true,
-            videoUrl = "https://www.youtube.com/watch?v=example",
-            completeEnabled = false,
-            onClickBack = {},
-            onClickComplete = {},
-            onChangeVideoUrl = {},
-            requireRemove = {},
+            uiState = VideoEditUiState(isEditMode = true, url = "https://www.youtube.com/watch?v=example"),
+            onAction = {},
         )
     }
 }

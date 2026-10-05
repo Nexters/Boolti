@@ -6,19 +6,14 @@ import android.content.Intent
 import android.net.Uri
 import android.util.AttributeSet
 import android.webkit.ConsoleMessage
-import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.net.toUri
-import com.nexters.boolti.presentation.util.bridge.BridgeDto
-import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.net.URI
 
@@ -65,61 +60,15 @@ class BtWebView @JvmOverloads constructor(
             onProgressChanged = { _progress.value = it },
         )
     }
-
-    /**
-     * 웹 브릿지를 등록한다.
-     *
-     * 웹 페이지의 초기 스크립트가 브릿지를 인식하려면 [loadUrl] 보다 **먼저** 호출되어야 한다.
-     * 등록 이후 앱 → 웹 메시지를 보내려면 [collectBridgeMessages] 를 함께 호출한다.
-     */
-    fun bindBridge(bridgeManager: BridgeManager) {
-        addJavascriptInterface(
-            object {
-                @JavascriptInterface
-                fun postMessage(message: String) {
-                    Timber.tag("webview_bridge").d("(WEB -> APP) $message 수신")
-                    try {
-                        // JSON 메시지 파싱
-                        val dto = Json.decodeFromString(BridgeDto.serializer(), message)
-                        bridgeManager.handleIncomingData(dto)
-                    } catch (e: SerializationException) {
-                        Timber.tag("webview_bridge")
-                            .e(e, "(WEB -> APP) 유효하지 않은 JSON 포맷: $message")
-                    } catch (e: IllegalArgumentException) {
-                        Timber.tag("webview_bridge")
-                            .e(e, "(WEB -> APP) BridgeDto 타입으로 파싱 실패: $message")
-                    } catch (e: Exception) {
-                        Timber.tag("webview_bridge")
-                            .e(e, "(WEB -> APP) 알 수 없는 에러")
-                        e.printStackTrace() // 에러 처리
-                    }
-                }
-            },
-            bridgeManager.bridgeName,
-        )
-    }
-
-    /**
-     * 앱에서 웹으로 보낼 메시지를 구독한다. 취소될 때까지 반환되지 않는다.
-     */
-    suspend fun collectBridgeMessages(bridgeManager: BridgeManager) {
-        bridgeManager.dataToSendWeb.collect {
-            evaluateJavascript(it) { result ->
-                Timber.tag("webview_bridge").d("(APP -> WEB)\n\t$it\n전송 결과:\n\t$result")
-            }
-        }
-    }
-
-    /**
-     * [bindBridge] 와 [collectBridgeMessages] 를 한 번에 수행한다.
-     *
-     * 페이지 로딩 시점을 직접 제어해야 한다면 두 메서드를 나눠서 호출한다.
-     */
-    suspend fun setBridgeManager(bridgeManager: BridgeManager) {
-        bindBridge(bridgeManager)
-        collectBridgeMessages(bridgeManager)
-    }
 }
+
+/**
+ * 웹뷰 안에서 열어도 되는 불티 도메인인지 확인한다. 브릿지(토큰 요청 등)가 노출되므로 다른 도메인은 외부 브라우저로 연다.
+ */
+internal fun isBooltiHost(host: String): Boolean =
+    host.equals(BOOLTI_HOST, ignoreCase = true) || host.endsWith(".$BOOLTI_HOST", ignoreCase = true)
+
+private const val BOOLTI_HOST = "boolti.in"
 
 /**
  * @param preUriLoading redirect 될 때 우선적으로 처리돼야 하는 로직. 반환 값은 해당 이벤트의 consume 여부를 의미한다.
@@ -139,7 +88,7 @@ class BtWebViewClient(
 
         if (preUriLoading(url)) return true
 
-        if (url != "null" && domain != null && !domain.contains("boolti.in") && context != null) {
+        if (url != "null" && domain != null && !isBooltiHost(domain) && context != null) {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             context.startActivity(intent)
             return true

@@ -102,19 +102,15 @@ class GiftPreQuestionViewModel @Inject constructor(
                     },
             )
 
+            // 선물은 이미 받았으므로 답변 등록이 실패해도 등록 완료로 안내한다. 답변은 티켓 상세에서 다시 작성할 수 있다
             ticketingRepository.submitPreQuestionAnswers(request)
-                .onSuccess {
-                    _events.send(GiftPreQuestionEvent.GiftRegistered)
+                .onFailure { e -> Timber.e(e, "선물 사전 질문 답변 등록 실패: reservationId=${state.gift.reservationId}") }
 
-                    AppTracker.complete(
-                        target = "GiftRegistration",
-                        properties = mapOf("gift_id" to giftUuid, "show_id" to showId),
-                    )
-                }
-                .onFailure { throwable ->
-                    Timber.e(throwable)
-                    _events.send(GiftPreQuestionEvent.GiftRegistrationFailed)
-                }
+            _events.send(GiftPreQuestionEvent.GiftRegistered)
+            AppTracker.complete(
+                target = "GiftRegistration",
+                properties = mapOf("gift_id" to giftUuid, "show_id" to showId),
+            )
         }
     }
 }

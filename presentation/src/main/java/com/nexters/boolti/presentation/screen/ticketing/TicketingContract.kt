@@ -19,7 +19,6 @@ sealed interface TicketingUiState {
     data class Success(
         val showId: String = "",
         val salesTicketTypeId: String = "",
-        val loading: Boolean = false,
         val poster: String = "",
         val showDate: LocalDateTime = LocalDateTime.now(),
         val showName: String = "",

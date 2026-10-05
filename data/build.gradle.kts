@@ -21,6 +21,8 @@ android {
         }
         debug {
             buildConfigField("String", "BASE_URL", localProperty("DEV_BASE_URL"))
+            // QA 디버그 정보 전송용. 없으면 전송 버튼이 비활성화된다
+            buildConfigField("String", "DISCORD_DEBUG_INFO_WEBHOOK_URL", localPropertyOrNull("DISCORD_DEBUG_INFO_WEBHOOK_URL") ?: "\"\"")
         }
     }
     buildFeatures {

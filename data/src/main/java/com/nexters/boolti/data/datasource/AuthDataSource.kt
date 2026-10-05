@@ -6,6 +6,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.nexters.boolti.common.tracker.AppTracker
 import com.google.firebase.analytics.analytics
+import com.nexters.boolti.data.cache.CacheStore
 import com.nexters.boolti.data.db.AppSettings
 import com.nexters.boolti.data.db.dataStore
 import com.nexters.boolti.data.network.api.LoginService
@@ -25,6 +26,7 @@ import javax.inject.Inject
 internal class AuthDataSource @Inject constructor(
     private val context: Context,
     private val loginService: LoginService,
+    private val cacheStore: CacheStore,
 ) {
     private val dataStore: DataStore<AppSettings>
         get() = context.dataStore
@@ -123,6 +125,7 @@ internal class AuthDataSource @Inject constructor(
             )
         }
         Firebase.analytics.setUserId(null)
+        cacheStore.clear()
     }
 
     suspend fun refresh(): Result<SignUpResponse?> = suspendRunCatching {

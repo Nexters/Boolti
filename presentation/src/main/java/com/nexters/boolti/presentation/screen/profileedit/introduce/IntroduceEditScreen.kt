@@ -10,9 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -30,72 +27,43 @@ import com.nexters.boolti.presentation.extension.takeForUnicode
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun IntroduceEditScreen(
-    modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: IntroduceEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel.event
-    val dismissDialogAndNavigateUp = {
-        viewModel.dismissExitAlertDialog()
-        navigateUp()
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            IntroduceEditEvent.NavigateUp -> navigateUp()
+        }
     }
 
-    BackHandler {
-        val canExit = viewModel.checkCanExit()
-        if (canExit) dismissDialogAndNavigateUp()
-    }
+    BackHandler { viewModel.onAction(IntroduceEditAction.ClickBack) }
 
     IntroduceEditScreen(
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
-        navigateUp = dismissDialogAndNavigateUp,
-        introduce = uiState.introduce,
-        maxLength = viewModel.maxLength,
-        showExitAlertDialog = uiState.showExitAlertDialog,
-        event = event,
-        onDismissExitAlertDialog = viewModel::dismissExitAlertDialog,
-        tryBack = {
-            val canExit = viewModel.checkCanExit()
-            if (canExit) dismissDialogAndNavigateUp()
-        },
-        onChangeIntroduce = viewModel::changeIntroduction,
-        saveEnabled = uiState.saveEnabled,
-        onSave = viewModel::saveIntroduction,
     )
 }
 
 @Composable
 private fun IntroduceEditScreen(
-    introduce: String,
-    onChangeIntroduce: (String) -> Unit,
-    maxLength: Int,
-    saveEnabled: Boolean,
-    showExitAlertDialog: Boolean,
-    event: Flow<IntroduceEditEvent>,
-    tryBack: () -> Unit, // 이탈 가능 상태 확인 후 이탈
-    navigateUp: () -> Unit, // 진짜로 화면 이탈
-    onSave: () -> Unit,
-    onDismissExitAlertDialog: () -> Unit,
+    uiState: IntroduceEditUiState,
+    onAction: (IntroduceEditAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ObserveAsEvents(event) {
-        when (it) {
-            IntroduceEditEvent.Saved -> navigateUp()
-        }
-    }
-
     Scaffold(
         modifier = modifier,
         topBar = {
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = tryBack,
+                        onClick = { onAction(IntroduceEditAction.ClickBack) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
@@ -103,8 +71,8 @@ private fun IntroduceEditScreen(
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.save_short),
-                        onClick = onSave,
-                        enabled = saveEnabled,
+                        onClick = { onAction(IntroduceEditAction.Save) },
+                        enabled = uiState.saveEnabled,
                     )
                 },
             )
@@ -121,25 +89,25 @@ private fun IntroduceEditScreen(
                     .fillMaxWidth()
                     .padding(top = 20.dp)
                     .padding(horizontal = marginHorizontal),
-                text = introduce.takeForUnicode(maxLength),
+                text = uiState.introduce.takeForUnicode(IntroduceEditUiState.MAX_LENGTH),
                 placeholder = stringResource(R.string.introduce_edit_placeholder),
                 singleLine = false,
-                bottomEndText = "${introduce.length}/${maxLength}자",
+                bottomEndText = "${uiState.introduce.length}/${IntroduceEditUiState.MAX_LENGTH}자",
                 onValueChanged = {
-                    onChangeIntroduce(it.takeForUnicode(maxLength))
+                    onAction(IntroduceEditAction.ChangeIntroduce(it.takeForUnicode(IntroduceEditUiState.MAX_LENGTH)))
                 },
             )
         }
 
-        if (showExitAlertDialog) {
+        if (uiState.showExitAlertDialog) {
             BTDialog(
                 enableDismiss = true,
                 showCloseButton = true,
-                onDismiss = onDismissExitAlertDialog,
+                onDismiss = { onAction(IntroduceEditAction.DismissExitAlertDialog) },
                 negativeButtonLabel = stringResource(R.string.btn_exit),
-                onClickNegativeButton = navigateUp,
+                onClickNegativeButton = { onAction(IntroduceEditAction.ConfirmExit) },
                 positiveButtonLabel = stringResource(R.string.save),
-                onClickPositiveButton = onSave,
+                onClickPositiveButton = { onAction(IntroduceEditAction.Save) },
             ) {
                 Text(
                     text = stringResource(R.string.profile_edit_exit_alert),
@@ -154,20 +122,11 @@ private fun IntroduceEditScreen(
 
 @Preview
 @Composable
-private fun NicknameEditScreenPreview() {
-    var introduce by remember { mutableStateOf("mangbaam") }
+private fun IntroduceEditScreenPreview() {
     BooltiTheme {
         IntroduceEditScreen(
-            introduce = introduce,
-            maxLength = 60,
-            onChangeIntroduce = { introduce = it },
-            saveEnabled = false,
-            showExitAlertDialog = false,
-            event = emptyFlow(),
-            onDismissExitAlertDialog = {},
-            tryBack = {},
-            navigateUp = {},
-            onSave = {},
+            uiState = IntroduceEditUiState(introduce = "mangbaam"),
+            onAction = {},
         )
     }
 }

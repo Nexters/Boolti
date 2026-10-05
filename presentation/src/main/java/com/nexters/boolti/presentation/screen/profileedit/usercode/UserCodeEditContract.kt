@@ -2,7 +2,7 @@ package com.nexters.boolti.presentation.screen.profileedit.usercode
 
 import com.nexters.boolti.domain.model.UserCode
 
-data class UserCodeEditState(
+data class UserCodeEditUiState(
     val userCode: String = "",
     val checkingDuplicated: Boolean = false,
     val saving: Boolean = false,
@@ -27,4 +27,16 @@ enum class UserCodeError {
     companion object {
         val InvalidRegex = Regex("""^(?!\s)([0-9a-z_]{4,20})(?<!\s)$""")
     }
+}
+
+sealed interface UserCodeEditAction {
+    data class ChangeUserCode(val userCode: String) : UserCodeEditAction
+    data object Save : UserCodeEditAction
+    data object ClickBack : UserCodeEditAction
+    data object DismissExitAlertDialog : UserCodeEditAction
+    data object ConfirmExit : UserCodeEditAction
+}
+
+sealed interface UserCodeEditEvent {
+    data object NavigateUp : UserCodeEditEvent
 }

@@ -1,6 +1,6 @@
 package com.nexters.boolti.presentation.screen.profileedit.nickname
 
-data class NicknameEditState(
+data class NicknameEditUiState(
     val nickname: String = "",
     val saving: Boolean = false,
     val showExitAlertDialog: Boolean = false,
@@ -22,4 +22,16 @@ enum class NicknameError {
     companion object {
         val InvalidRegex = Regex("""^(?!\s)([0-9a-zA-Z\sㄱ-ㅎㅏ-ㅣ가-힣]{1,12})(?<!\s)$""")
     }
+}
+
+sealed interface NicknameEditAction {
+    data class ChangeNickname(val nickname: String) : NicknameEditAction
+    data object Save : NicknameEditAction
+    data object ClickBack : NicknameEditAction
+    data object DismissExitAlertDialog : NicknameEditAction
+    data object ConfirmExit : NicknameEditAction
+}
+
+sealed interface NicknameEditEvent {
+    data object NavigateUp : NicknameEditEvent
 }

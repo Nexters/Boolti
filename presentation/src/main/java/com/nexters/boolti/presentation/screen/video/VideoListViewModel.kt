@@ -70,7 +70,7 @@ class VideoListViewModel @Inject constructor(
 
     private fun fetchVideos() {
         viewModelScope.launch {
-            getYouTubeVideoListByUserCodeUseCase(userCode, refresh = true)
+            getYouTubeVideoListByUserCodeUseCase(userCode)
                 .onSuccess { videos ->
                     _uiState.update {
                         it.copy(

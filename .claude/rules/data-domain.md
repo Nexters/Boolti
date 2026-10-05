@@ -9,7 +9,7 @@ paths:
 ## 패키지
 
 - domain: `model/`, `repository/`(인터페이스), `usecase/`, `exception/`, `util/`
-- data: `datasource/`, `network/api/`(Retrofit), `network/request/`, `network/response/`, `repository/`(구현), `db/`(Room, DataStore), `di/`
+- data: `datasource/`, `network/api/`(Retrofit), `network/request/`, `network/response/`, `repository/`(구현), `db/`(Room, DataStore), `cache/`(메모리 캐시), `di/`
 
 ## 레이어
 
@@ -26,6 +26,13 @@ paths:
 - 스펙은 Swagger에서 먼저 확인한다: https://dev.api.boolti.in/v3/api-docs/app
 - `papi` 경로는 인증 불필요, `api` 경로는 Bearer 토큰 필요
 - Request/Response DTO는 스펙과 일치시킨다
+
+## 캐시
+
+- 메모리 캐시는 Repository에서 `CacheStore`를 주입받아 `getOrFetch`로 감싼다. Map을 직접 만들지 않는다
+- 키는 `CacheKeys`에 `cacheKey<T>("종류:id", ttl)`로 정의한다. TTL은 데이터가 얼마나 자주 바뀌는지로 정한다
+- 데이터를 바꾸는 API를 호출한 뒤에는 관련 키를 `invalidate`한다
+- 로그아웃하면 `AuthDataSource.localLogout()`에서 캐시를 모두 비운다
 
 ## 재시도
 

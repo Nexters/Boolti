@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.cache.MemoryCacheStore
 import com.nexters.boolti.data.datasource.GiftDataSource
 import com.nexters.boolti.domain.exception.TicketingErrorType
 import com.nexters.boolti.domain.exception.TicketingException
@@ -14,7 +15,7 @@ import retrofit2.Response
 
 class GiftRepositoryImplTest : BehaviorSpec() {
     private val dataSource = mockk<GiftDataSource>()
-    private val repository = GiftRepositoryImpl(dataSource)
+    private val repository = GiftRepositoryImpl(dataSource, MemoryCacheStore())
 
     init {
         Given("선물 결제 승인") {

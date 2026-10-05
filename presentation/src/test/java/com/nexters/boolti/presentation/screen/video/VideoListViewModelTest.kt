@@ -40,7 +40,7 @@ class VideoListViewModelTest : DescribeSpec({
         },
         getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "me") },
         getYouTubeVideoListByUserCodeUseCase = mockk<GetYouTubeVideoListByUserCodeUseCase> {
-            coEvery { this@mockk.invoke(any(), any()) } returns Result.success(videos)
+            coEvery { this@mockk.invoke(any()) } returns Result.success(videos)
         },
         getYouTubeVideoInfoByUrlUseCase = mockk<GetYouTubeVideoInfoByUrlUseCase> {
             coEvery { this@mockk.invoke(any()) } returns videoInfo

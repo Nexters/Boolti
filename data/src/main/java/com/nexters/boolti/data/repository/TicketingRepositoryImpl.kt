@@ -1,5 +1,7 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.cache.CacheKeys
+import com.nexters.boolti.data.cache.CacheStore
 import com.nexters.boolti.data.datasource.ReservationDataSource
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
@@ -24,17 +26,13 @@ import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.domain.util.suspendRunCatching
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 internal class TicketingRepositoryImpl @Inject constructor(
     private val dataSource: TicketingDataSource,
     private val reservationDataSource: ReservationDataSource,
+    private val cacheStore: CacheStore,
 ) : TicketingRepository {
-    private data class CacheEntry<T>(val value: T, val cachedAt: Long)
-
-    private val preQuestionsCache = ConcurrentHashMap<String, CacheEntry<List<PreQuestion>>>()
-    private val cacheTtlMs = 60_000L
     override fun getSalesTickets(request: SalesTicketRequest): Flow<List<TicketWithQuantity>> = flow {
         emit(dataSource.getSalesTickets(request))
     }
@@ -88,13 +86,7 @@ internal class TicketingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPreQuestions(showId: String): Result<List<PreQuestion>> = suspendRunCatching {
-        val cached = preQuestionsCache[showId]
-        if (cached != null && System.currentTimeMillis() - cached.cachedAt < cacheTtlMs) {
-            return@suspendRunCatching cached.value
-        }
-        dataSource.getPreQuestions(showId).also {
-            preQuestionsCache[showId] = CacheEntry(it, System.currentTimeMillis())
-        }
+        cacheStore.getOrFetch(CacheKeys.preQuestions(showId)) { dataSource.getPreQuestions(showId) }
     }
 
     override suspend fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Result<Unit> = suspendRunCatching {

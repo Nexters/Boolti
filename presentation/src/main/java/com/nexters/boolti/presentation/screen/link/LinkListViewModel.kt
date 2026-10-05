@@ -68,7 +68,7 @@ class LinkListViewModel @Inject constructor(
 
     private fun fetchLinks() {
         viewModelScope.launch {
-            memberRepository.getLinks(userCode, refresh = true)
+            memberRepository.getLinks(userCode)
                 .onSuccess { links ->
                     _uiState.update {
                         it.copy(

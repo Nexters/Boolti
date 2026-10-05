@@ -44,7 +44,7 @@ class LinkListViewModelTest : DescribeSpec({
         },
         getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "me") },
         memberRepository = mockk<MemberRepository> {
-            coEvery { getLinks(any(), any()) } returns Result.success(links)
+            coEvery { getLinks(any()) } returns Result.success(links)
         },
         userConfigRepository = mockk(),
     )

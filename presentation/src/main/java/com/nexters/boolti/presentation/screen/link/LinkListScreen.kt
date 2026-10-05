@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.presentation.R
@@ -39,13 +40,10 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
 import com.nexters.boolti.presentation.extension.toValidUrlString
-import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.coroutines.flow.Flow
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.ReorderableLazyListState
 import org.burnoutcrew.reorderable.detectReorder
@@ -54,43 +52,38 @@ import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun LinkListScreen(
-    viewModel: LinkListViewModel,
+    navigateUp: () -> Unit,
+    navigateToAddLink: (closeListOnBack: Boolean) -> Unit,
+    navigateToEditLink: (Link) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: LinkListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarController = LocalSnackbarController.current
+    val linkAddMsg = stringResource(R.string.link_add_msg)
+    val linkEditMsg = stringResource(R.string.link_edit_msg)
+    val linkRemoveMsg = stringResource(R.string.link_remove_msg)
 
     BackHandler {
         viewModel.onAction(LinkListAction.Back)
     }
 
-    LinkListEventEffect(viewModel.event)
+    ObserveAsEvents(viewModel.event) {
+        when (it) {
+            LinkListEvent.Added -> snackbarController.showMessage(linkAddMsg)
+            LinkListEvent.Edited -> snackbarController.showMessage(linkEditMsg)
+            LinkListEvent.Removed -> snackbarController.showMessage(linkRemoveMsg)
+            is LinkListEvent.NavigateToAddLink -> navigateToAddLink(it.closeListOnBack)
+            is LinkListEvent.NavigateToEditLink -> navigateToEditLink(it.link)
+            LinkListEvent.Finish -> navigateUp()
+        }
+    }
 
     LinkListScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         modifier = modifier,
     )
-}
-
-/** 목록·편집 화면이 ViewModel을 함께 쓰므로 Event 처리도 같은 함수로 한다 */
-@Composable
-internal fun LinkListEventEffect(event: Flow<LinkListEvent>) {
-    val navController = LocalNavController.current
-    val snackbarController = LocalSnackbarController.current
-    val linkAddMsg = stringResource(R.string.link_add_msg)
-    val linkEditMsg = stringResource(R.string.link_edit_msg)
-    val linkRemoveMsg = stringResource(R.string.link_remove_msg)
-
-    ObserveAsEvents(event) {
-        when (it) {
-            LinkListEvent.Added -> snackbarController.showMessage(linkAddMsg)
-            LinkListEvent.Edited -> snackbarController.showMessage(linkEditMsg)
-            LinkListEvent.Removed -> snackbarController.showMessage(linkRemoveMsg)
-            LinkListEvent.NavigateToEdit -> navController.navigate(LinkListRoute.LinkEdit)
-            LinkListEvent.CloseEdit -> navController.popBackStack<LinkListRoute.LinkEdit>(inclusive = true)
-            LinkListEvent.Finish -> navController.popBackStack<LinkListRoute.LinkListRoot>(inclusive = true)
-        }
-    }
 }
 
 @Composable

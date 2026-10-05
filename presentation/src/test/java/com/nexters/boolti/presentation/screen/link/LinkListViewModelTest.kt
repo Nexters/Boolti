@@ -6,6 +6,7 @@ import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
+import com.nexters.boolti.presentation.screen.profileedit.link.LinkEditResult
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
@@ -39,7 +40,7 @@ class LinkListViewModelTest : DescribeSpec({
         isEditMode: Boolean = false,
     ) = LinkListViewModel(
         savedStateHandle = SavedStateHandle().also {
-            every { it.toRoute<LinkListRoute.LinkListRoot>() } returns LinkListRoute.LinkListRoot(userCode = "me", isEditMode = isEditMode)
+            every { it.toRoute<LinkListRoute.LinkList>() } returns LinkListRoute.LinkList(userCode = "me", isEditMode = isEditMode)
         },
         getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "me") },
         memberRepository = mockk<MemberRepository> {
@@ -49,46 +50,36 @@ class LinkListViewModelTest : DescribeSpec({
     )
 
     describe("링크 불러오기") {
-        it("내 링크가 비어 있으면 편집 모드로 바꾸고 편집 화면으로 이동한다") {
+        it("내 링크가 비어 있으면 편집 모드로 바꾸고, 뒤로 가면 목록까지 닫히는 추가 화면을 연다") {
             val viewModel = createViewModel(links = emptyList())
 
             viewModel.uiState.value.editing shouldBe true
-            viewModel.event.first() shouldBe LinkListEvent.NavigateToEdit
+            viewModel.event.first() shouldBe LinkListEvent.NavigateToAddLink(closeListOnBack = true)
         }
     }
 
-    describe("링크 추가·수정·삭제") {
-        it("새 링크를 완료하면 목록 맨 위에 추가하고 편집 화면을 닫는다") {
+    describe("편집 결과 반영") {
+        it("추가 결과를 받으면 목록 맨 위에 추가한다") {
             val viewModel = createViewModel()
 
-            viewModel.onAction(LinkListAction.ClickAddLink)
-            viewModel.onAction(LinkListAction.ChangeLinkName("유튜브"))
-            viewModel.onAction(LinkListAction.ChangeLinkUrl("https://youtube.com"))
-            viewModel.onAction(LinkListAction.CompleteLink)
+            viewModel.onAction(LinkListAction.EditResultReceived(LinkEditResult.Added(name = "유튜브", url = "https://youtube.com")))
 
             viewModel.uiState.value.links.map { it.name } shouldContainExactly listOf("유튜브", "인스타그램")
-            viewModel.event.take(3).toList() shouldContainExactly listOf(
-                LinkListEvent.NavigateToEdit,
-                LinkListEvent.CloseEdit,
-                LinkListEvent.Added,
-            )
+            viewModel.event.first() shouldBe LinkListEvent.Added
         }
 
-        it("기존 링크를 고치면 같은 자리의 링크가 바뀐다") {
+        it("수정 결과를 받으면 같은 자리의 링크가 바뀐다") {
             val viewModel = createViewModel()
 
-            viewModel.onAction(LinkListAction.ClickLink(savedLink.id))
-            viewModel.onAction(LinkListAction.ChangeLinkName("인스타"))
-            viewModel.onAction(LinkListAction.CompleteLink)
+            viewModel.onAction(LinkListAction.EditResultReceived(LinkEditResult.Edited(id = savedLink.id, name = "인스타", url = savedLink.url)))
 
             viewModel.uiState.value.links shouldContainExactly listOf(savedLink.copy(name = "인스타"))
         }
 
-        it("링크를 지우면 목록에서 빠진다") {
+        it("삭제 결과를 받으면 목록에서 빠진다") {
             val viewModel = createViewModel()
 
-            viewModel.onAction(LinkListAction.ClickLink(savedLink.id))
-            viewModel.onAction(LinkListAction.RemoveLink)
+            viewModel.onAction(LinkListAction.EditResultReceived(LinkEditResult.Removed(id = savedLink.id)))
 
             viewModel.uiState.value.links shouldBe emptyList()
         }
@@ -106,8 +97,7 @@ class LinkListViewModelTest : DescribeSpec({
         it("편집 중 바뀐 게 있으면 나가기 확인 창을 띄운다") {
             val viewModel = createViewModel()
             viewModel.onAction(LinkListAction.StartEditing)
-            viewModel.onAction(LinkListAction.ClickLink(savedLink.id))
-            viewModel.onAction(LinkListAction.RemoveLink)
+            viewModel.onAction(LinkListAction.EditResultReceived(LinkEditResult.Removed(id = savedLink.id)))
 
             viewModel.onAction(LinkListAction.Back)
 
@@ -121,32 +111,24 @@ class LinkListViewModelTest : DescribeSpec({
             viewModel.onAction(LinkListAction.Back)
 
             viewModel.uiState.value.editing shouldBe false
-            viewModel.event.first() shouldBe LinkListEvent.CloseEdit
         }
 
         it("편집하다 원래처럼 빈 목록으로 돌아오면 화면을 닫는다") {
             val viewModel = createViewModel(links = emptyList())
-            viewModel.onAction(LinkListAction.ClickAddLink)
-            viewModel.onAction(LinkListAction.ChangeLinkName("유튜브"))
-            viewModel.onAction(LinkListAction.ChangeLinkUrl("https://youtube.com"))
-            viewModel.onAction(LinkListAction.CompleteLink)
-            viewModel.onAction(LinkListAction.ClickLink(viewModel.uiState.value.links.single().id))
-            viewModel.onAction(LinkListAction.RemoveLink)
+            viewModel.onAction(LinkListAction.EditResultReceived(LinkEditResult.Added(name = "유튜브", url = "https://youtube.com")))
+            viewModel.onAction(LinkListAction.EditResultReceived(LinkEditResult.Removed(id = viewModel.uiState.value.links.single().id)))
 
             viewModel.onAction(LinkListAction.Back)
 
-            viewModel.event.take(8).toList().last() shouldBe LinkListEvent.Finish
+            viewModel.event.take(4).toList().last() shouldBe LinkListEvent.Finish
         }
 
-        it("편집 모드로 바로 들어와 바뀐 게 없으면 편집·목록 화면을 모두 닫는다") {
+        it("편집 모드로 바로 들어와 바뀐 게 없으면 화면을 닫는다") {
             val viewModel = createViewModel(isEditMode = true)
 
             viewModel.onAction(LinkListAction.Back)
 
-            viewModel.event.take(2).toList() shouldContainExactly listOf(
-                LinkListEvent.CloseEdit,
-                LinkListEvent.Finish,
-            )
+            viewModel.event.first() shouldBe LinkListEvent.Finish
         }
     }
 })

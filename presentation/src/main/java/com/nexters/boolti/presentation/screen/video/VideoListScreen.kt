@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import com.nexters.boolti.domain.model.YouTubeVideo
@@ -45,16 +46,13 @@ import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.EmptyListAddButton
 import com.nexters.boolti.presentation.component.ListToolbar
-import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
-import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.Grey70
 import com.nexters.boolti.presentation.theme.Grey80
 import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlinx.coroutines.flow.Flow
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.ReorderableLazyListState
 import org.burnoutcrew.reorderable.detectReorder
@@ -63,43 +61,38 @@ import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun VideoListScreen(
-    viewModel: VideoListViewModel,
+    navigateUp: () -> Unit,
+    navigateToAddVideo: (closeListOnBack: Boolean) -> Unit,
+    navigateToEditVideo: (YouTubeVideo) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: VideoListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarController = LocalSnackbarController.current
+    val videoAddMsg = stringResource(R.string.video_add_msg)
+    val videoEditMsg = stringResource(R.string.video_edit_msg)
+    val videoDeleteMsg = stringResource(R.string.video_delete_msg)
 
     BackHandler {
         viewModel.onAction(VideoListAction.Back)
     }
 
-    VideoListEventEffect(viewModel.event)
+    ObserveAsEvents(viewModel.event) {
+        when (it) {
+            VideoListEvent.Added -> snackbarController.showMessage(videoAddMsg)
+            VideoListEvent.Edited -> snackbarController.showMessage(videoEditMsg)
+            VideoListEvent.Removed -> snackbarController.showMessage(videoDeleteMsg)
+            is VideoListEvent.NavigateToAddVideo -> navigateToAddVideo(it.closeListOnBack)
+            is VideoListEvent.NavigateToEditVideo -> navigateToEditVideo(it.video)
+            VideoListEvent.Finish -> navigateUp()
+        }
+    }
 
     VideoListScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         modifier = modifier,
     )
-}
-
-/** 목록·편집 화면이 ViewModel을 함께 쓰므로 Event 처리도 같은 함수로 한다 */
-@Composable
-internal fun VideoListEventEffect(event: Flow<VideoListEvent>) {
-    val navController = LocalNavController.current
-    val snackbarController = LocalSnackbarController.current
-    val videoAddMsg = stringResource(R.string.video_add_msg)
-    val videoEditMsg = stringResource(R.string.video_edit_msg)
-    val videoDeleteMsg = stringResource(R.string.video_delete_msg)
-
-    ObserveAsEvents(event) {
-        when (it) {
-            VideoListEvent.Added -> snackbarController.showMessage(videoAddMsg)
-            VideoListEvent.Edited -> snackbarController.showMessage(videoEditMsg)
-            VideoListEvent.Removed -> snackbarController.showMessage(videoDeleteMsg)
-            VideoListEvent.NavigateToEdit -> navController.navigate(VideoListRoute.VideoEdit)
-            VideoListEvent.CloseEdit -> navController.popBackStack<VideoListRoute.VideoEdit>(inclusive = true)
-            VideoListEvent.Finish -> navController.popBackStack<VideoListRoute.VideoListRoot>(inclusive = true)
-        }
-    }
 }
 
 @Composable

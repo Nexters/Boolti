@@ -47,6 +47,13 @@ paths:
   - 본문을 `BooltiTheme { }`로 감싼다
   - 이름은 `{컴포넌트명}Preview`, `private`으로 둔다
 
+## 웹 브릿지
+
+- 커맨드는 `util/bridge/WebBridgeCommands.kt`에 `@WebBridgeCommand("웹 커맨드 이름")` 데이터 클래스로 정의한다. `@Serializable`은 붙이지 않는다
+- 모든 웹뷰 화면에 필요한 커맨드는 `rememberWebBridge` 안에, 한 화면만 쓰는 커맨드는 그 화면의 `rememberWebBridge { handle { ... } }`에 등록한다
+- `handle { t: 타입 -> }`의 반환값이 웹 응답 data다 (`Unit`이면 `null`). 실패하면 응답하지 않는다
+- 웹뷰를 만들 때 `loadUrl`보다 먼저 `bridge.attach(webView)`를 호출한다
+
 ## 실패 표시
 
 - 처음 로딩 실패: 에러 화면 + 다시 시도

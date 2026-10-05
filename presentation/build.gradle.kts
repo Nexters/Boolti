@@ -91,6 +91,8 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.reorderable)
 
+    lintChecks(project(":lint"))
+
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.andoridx.compose.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.ui.test.junit4)

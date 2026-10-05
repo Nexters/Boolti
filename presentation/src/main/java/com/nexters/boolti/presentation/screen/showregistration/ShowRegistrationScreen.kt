@@ -17,12 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,13 +30,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.field.WebBridge
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.BtWebView
-import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.ShowRoute
+import com.nexters.boolti.presentation.util.bridge.NavigateToShowDetail
+import com.nexters.boolti.presentation.util.bridge.rememberWebBridge
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -62,10 +67,14 @@ fun ShowRegistrationScreen(
     var webviewProgress by remember { mutableIntStateOf(0) }
     val loading by remember { derivedStateOf { webviewProgress < 100 } }
 
-    val bridgeManager = rememberBridgeManager(onBack = onClickBack)
-
-    LaunchedEffect(webView != null) {
-        webView?.setBridgeManager(bridgeManager)
+    val navController = LocalNavController.current
+    val currentOnClickBack by rememberUpdatedState(onClickBack)
+    val bridge = rememberWebBridge {
+        // 등록을 마친 공연의 상세로 이동한다. 등록 화면은 닫는다
+        handle { s: NavigateToShowDetail ->
+            currentOnClickBack()
+            navController.navigate(ShowRoute.ShowRoot(showId = s.showId.toString(), source = Screen.WebBridge.value))
+        }
     }
 
     BackHandler {
@@ -100,9 +109,10 @@ fun ShowRegistrationScreen(
                         scope.launch {
                             progress.collect { webviewProgress = it }
                         }
+                        bridge.attach(this)
+                        loadUrl(url)
                     }.also { webView = it }
                 },
-                update = { webView -> webView.loadUrl(url) },
             )
 
             AnimatedVisibility(

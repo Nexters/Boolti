@@ -20,6 +20,7 @@ presentation/     - Compose 화면, ViewModel
 tosspayments/     - 토스페이먼츠 결제 위젯 Activity
 common/logger/    - 디버그 로그 수집 (CollectableDebugTree)
 common/tracker/   - Mixpanel 이벤트 트래킹 (AppTracker)
+lint/             - 커스텀 Android Lint 규칙 (presentation에 lintChecks로 연결)
 ```
 
 - 의존 방향: `presentation → domain ← data`

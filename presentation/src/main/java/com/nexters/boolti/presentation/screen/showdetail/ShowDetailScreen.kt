@@ -102,6 +102,8 @@ import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -118,7 +120,8 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
-import com.nexters.boolti.presentation.util.bridge.rememberBridgeManager
+import com.nexters.boolti.presentation.util.bridge.NavigateToPlaceDetail
+import com.nexters.boolti.presentation.util.bridge.rememberWebBridge
 import com.nexters.boolti.presentation.util.rememberCountdown
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -280,7 +283,10 @@ fun ShowDetailScreen(
     val uriHandler = LocalUriHandler.current
     var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
     var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
-    val bridgeManager = rememberBridgeManager()
+    val navController = LocalNavController.current
+    val bridge = rememberWebBridge {
+        handle { p: NavigateToPlaceDetail -> navController.navigate(MainRoute.Place(placeId = p.placeId.toString())) }
+    }
     val webView = remember(context) {
         BtWebView(preUriLoading = { url ->
             preUriLoading(
@@ -291,11 +297,8 @@ fun ShowDetailScreen(
                 navigateWithIntent = { intent -> intentToNavigateTo = intent })
         }, context = context).apply {
             setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            bridge.attach(this)
         }
-    }
-
-    LaunchedEffect(webView) {
-        webView.setBridgeManager(bridgeManager)
     }
 
     LaunchedEffect(webView, url) {

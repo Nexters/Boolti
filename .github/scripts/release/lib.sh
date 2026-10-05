@@ -77,8 +77,10 @@ ensure_milestone() {
   run gh api -X POST "repos/{owner}/{repo}/milestones" -f title="$1" --silent
 }
 
-# 디스코드 웹훅 주소가 없으면 알림만 건너뛴다
+# 웹훅 주소는 CI에서는 환경변수, 로컬에서는 local.properties에서 읽는다. 없으면 알림만 건너뛴다
 notify() {
+  [ -n "${DISCORD_RELEASE_WEBHOOK_URL:-}" ] || [ ! -f local.properties ] ||
+    DISCORD_RELEASE_WEBHOOK_URL=$(sed -n 's/^DISCORD_RELEASE_WEBHOOK_URL=//p' local.properties | tr -d '"')
   [ -n "${DISCORD_RELEASE_WEBHOOK_URL:-}" ] || return 0
   if ! $APPLY; then echo "  [미리보기] 디스코드 알림: $1"; return 0; fi
   jq -n --arg c "$1" '{content: $c}' |

@@ -27,6 +27,12 @@ gh auth login
 
 Windows는 Git Bash에서 실행해요.
 
+디스코드 알림을 받으려면 `local.properties`에 웹훅 주소를 한 줄 추가해요. 주소는 팀 비공개 채널에서 받아요.
+
+```properties
+DISCORD_RELEASE_WEBHOOK_URL="https://discord.com/api/webhooks/..."
+```
+
 ## 명령
 
 `--apply`를 빼면 미리보기만 하고 아무것도 바꾸지 않아요.

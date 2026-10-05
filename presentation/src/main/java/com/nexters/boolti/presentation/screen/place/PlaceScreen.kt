@@ -145,22 +145,6 @@ fun PlaceScreen(
             })
     }
 
-    LaunchedEffect(uiState.isLoading) {
-        if (!uiState.isLoading) {
-            val place = uiState.place
-            AppTracker.view(
-                screen = Screen.PlaceProfile,
-                properties = buildMap {
-                    put("place_id", place.id)
-                    put("place_name", place.name)
-                    put("source", viewModel.source)
-                    put("profile_status", "Active")
-                    regionOf(place.streetAddress)?.let { put("region", it) }
-                },
-            )
-        }
-    }
-
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
         if (webViewUrl != null) {
@@ -188,6 +172,19 @@ fun PlaceScreen(
         if (uiState.isLoading) {
             BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
+            LaunchedEffect(Unit) {
+                val place = uiState.place
+                AppTracker.view(
+                    screen = Screen.PlaceProfile,
+                    properties = buildMap {
+                        put("place_id", place.id)
+                        put("place_name", place.name)
+                        put("source", viewModel.source)
+                        put("profile_status", "Active")
+                        regionOf(place.streetAddress)?.let { put("region", it) }
+                    },
+                )
+            }
             PlaceContent(
                 modifier = Modifier.fillMaxSize(),
                 place = uiState.place,

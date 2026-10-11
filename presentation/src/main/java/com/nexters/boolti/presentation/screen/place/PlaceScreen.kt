@@ -74,6 +74,7 @@ import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.PlaceContact
 import com.nexters.boolti.domain.model.PlaceDetail
+import com.nexters.boolti.domain.model.PlaceRegion
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
 import com.nexters.boolti.presentation.R
@@ -720,6 +721,12 @@ private fun PlaceInfoSectionPreview() {
                 id = "1",
                 name = "예시 공연장",
                 imageUrl = null,
+                region = PlaceRegion(
+                    id = "1",
+                    name = "홍대/합정/망원",
+                    groupId = "1",
+                    groupName = "서울",
+                ),
                 rentalFee = "50만원/일",
                 capacity = 300,
                 streetAddress = "서울시 강남구 테헤란로 123",

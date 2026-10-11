@@ -19,7 +19,18 @@ data class PlaceUiState(
 
     companion object {
         fun getDefault(id: String) = PlaceUiState(
-            place = PlaceDetail(id, "", null, null, null, null, emptyList(), null, shareCode = null),
+            place = PlaceDetail(
+                id = id,
+                name = "",
+                imageUrl = null,
+                region = null,
+                rentalFee = null,
+                capacity = null,
+                streetAddress = null,
+                subwayStations = emptyList(),
+                contact = null,
+                shareCode = null,
+            ),
             selectedTab = 0,
             isLoading = true,
         )

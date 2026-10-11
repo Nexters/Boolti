@@ -2,6 +2,7 @@ package com.nexters.boolti.data.network.response
 
 import com.nexters.boolti.domain.model.PlaceDetail
 import com.nexters.boolti.domain.model.PlaceContact
+import com.nexters.boolti.domain.model.PlaceRegion
 import com.nexters.boolti.domain.model.SubwayLine
 import com.nexters.boolti.domain.model.SubwayStation
 import kotlinx.serialization.SerialName
@@ -15,6 +16,8 @@ internal data class PlaceDetailResponse(
     val name: String,
     @SerialName("representativeImageUrl")
     val representativeImageUrl: String? = null,
+    @SerialName("region")
+    val region: ConcertHallRegionResponse? = null,
     @SerialName("head")
     val head: ConcertHallHeadResponse? = null,
     @SerialName("shareCode")
@@ -24,12 +27,32 @@ internal data class PlaceDetailResponse(
         id = id.toString(),
         name = name,
         imageUrl = representativeImageUrl,
+        region = region?.toDomain(),
         rentalFee = head?.rentalFeeSummary,
         capacity = head?.capacity?.let { (it.seatedCapacity + it.standingCapacity).takeIf { total -> total > 0 } },
         streetAddress = head?.location?.streetAddress,
         subwayStations = head?.subwayStations?.map { it.toDomain() } ?: emptyList(),
         contact = head?.contact?.toDomain(),
         shareCode = shareCode,
+    )
+}
+
+@Serializable
+internal data class ConcertHallRegionResponse(
+    @SerialName("regionId")
+    val regionId: String,
+    @SerialName("name")
+    val name: String,
+    @SerialName("groupId")
+    val groupId: String,
+    @SerialName("groupName")
+    val groupName: String,
+) {
+    fun toDomain(): PlaceRegion = PlaceRegion(
+        id = regionId,
+        name = name,
+        groupId = groupId,
+        groupName = groupName,
     )
 }
 

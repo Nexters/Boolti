@@ -54,7 +54,7 @@ fun NavGraphBuilder.showDetailScreen(
                 navController.navigate(MainRoute.Profile(userCode = userCode, source = Screen.ShowDetail.value))
             },
             navigateToPlace = { placeId ->
-                navController.navigate(MainRoute.Place(placeId = placeId))
+                navController.navigate(MainRoute.Place(placeId = placeId, source = Screen.ShowDetail.value))
             },
         )
     }

@@ -49,13 +49,16 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.impression
 import com.nexters.boolti.common.tracker.event.view
 import com.nexters.boolti.common.tracker.field.Button
+import com.nexters.boolti.common.tracker.field.Section
 import com.nexters.boolti.common.tracker.field.Item
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.common.tracker.field.SearchDetail
 import com.nexters.boolti.common.tracker.field.Tab
+import com.nexters.boolti.common.tracker.impression.impression
 import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
@@ -491,6 +494,20 @@ private fun TabContainer(
                         EmptyContents(
                             keyword = keyword,
                             content = stringResource(R.string.search_no_place_result),
+                            modifier = Modifier.impression(
+                                key = keyword,
+                                onImpressed = {
+                                    AppTracker.impression(
+                                        screen = Screen.SearchDetail,
+                                        objectRole = Role.Section,
+                                        objectValue = "NoResult",
+                                        properties = mapOf(
+                                            "tab" to "Place",
+                                            "search_keyword" to keyword,
+                                        ),
+                                    )
+                                },
+                            ),
                         )
                     } else {
                         PlacesTab(

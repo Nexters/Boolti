@@ -182,7 +182,9 @@ fun PlaceScreen(
                         put("place_name", place.name)
                         put("source", viewModel.source)
                         put("profile_status", "Active")
-                        regionOf(place.streetAddress)?.let { put("region", it) }
+                        place.region?.let { region ->
+                            put("region", region)
+                        }
                     },
                 )
             }

@@ -46,6 +46,16 @@ class BtWebView @JvmOverloads constructor(
         this.domStorageEnabled = domStorageEnabled
     }
 
+    override fun loadUrl(url: String) {
+        _progress.value = 0
+        super.loadUrl(url)
+    }
+
+    override fun loadUrl(url: String, additionalHttpHeaders: Map<String, String>) {
+        _progress.value = 0
+        super.loadUrl(url, additionalHttpHeaders)
+    }
+
     private fun setupWebViewClient() {
         webViewClient = BtWebViewClient(preUriLoading)
     }

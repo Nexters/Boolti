@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.place
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -47,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,7 +62,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.isInvisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -149,7 +150,7 @@ fun PlaceScreen(
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
         if (webViewUrl != null) {
-            webView.loadUrl(webViewUrl)
+            webView.clearAndLoadUrl(webViewUrl)
         }
     }
 
@@ -363,11 +364,10 @@ private fun PlaceContent(
                     .heightIn(min = 200.dp)
                     .fillMaxWidth(),
             ) {
-                if (isLoading) {
-                    BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
                 AndroidView(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clipToBounds(),
                     factory = {
                         contentWebView.apply {
                             layoutParams = ViewGroup.LayoutParams(
@@ -378,10 +378,19 @@ private fun PlaceContent(
                             setWebChromeClient()
                         }
                     },
-                    update = { webView ->
-                        contentWebView.isInvisible = isLoading
-                    },
                 )
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        BtCircularProgressIndicator(
+                            modifier = Modifier.padding(top = 32.dp)
+                        )
+                    }
+                }
             }
         }
 
@@ -700,6 +709,13 @@ private fun PlaceTab(
         },
         onClick = onSelect,
     )
+}
+
+private fun WebView.clearAndLoadUrl(url: String) {
+    if (this.url != null) {
+        evaluateJavascript("document.documentElement.innerHTML = ''", null)
+    }
+    loadUrl(url)
 }
 
 private fun String.toComposeColor(): Color {

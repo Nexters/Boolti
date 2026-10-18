@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,7 +61,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.isInvisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -363,11 +363,10 @@ private fun PlaceContent(
                     .heightIn(min = 200.dp)
                     .fillMaxWidth(),
             ) {
-                if (isLoading) {
-                    BtCircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
                 AndroidView(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clipToBounds(),
                     factory = {
                         contentWebView.apply {
                             layoutParams = ViewGroup.LayoutParams(
@@ -378,10 +377,19 @@ private fun PlaceContent(
                             setWebChromeClient()
                         }
                     },
-                    update = { webView ->
-                        contentWebView.isInvisible = isLoading
-                    },
                 )
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        BtCircularProgressIndicator(
+                            modifier = Modifier.padding(top = 32.dp)
+                        )
+                    }
+                }
             }
         }
 

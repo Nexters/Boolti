@@ -3,6 +3,7 @@ package com.nexters.boolti.presentation.screen.place
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -149,7 +150,7 @@ fun PlaceScreen(
     val webViewUrl = uiState.webViewUrl
     LaunchedEffect(webView, webViewUrl) {
         if (webViewUrl != null) {
-            webView.loadUrl(webViewUrl)
+            webView.clearAndLoadUrl(webViewUrl)
         }
     }
 
@@ -381,7 +382,7 @@ private fun PlaceContent(
                 if (isLoading) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .matchParentSize()
                             .background(MaterialTheme.colorScheme.background),
                         contentAlignment = Alignment.TopCenter,
                     ) {
@@ -708,6 +709,13 @@ private fun PlaceTab(
         },
         onClick = onSelect,
     )
+}
+
+private fun WebView.clearAndLoadUrl(url: String) {
+    if (this.url != null) {
+        evaluateJavascript("document.documentElement.innerHTML = ''", null)
+    }
+    loadUrl(url)
 }
 
 private fun String.toComposeColor(): Color {

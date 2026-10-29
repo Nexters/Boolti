@@ -67,6 +67,6 @@ data class ClientInfoResponse(
     val screenResolution: String,
     @SerialName("isLoggedIn")
     val isLoggedIn: Boolean,
-    @SerialName("user_id")
+    @SerialName("userId")
     val userId: String? = null,
 )

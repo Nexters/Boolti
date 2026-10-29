@@ -307,9 +307,6 @@ fun ShowDetailScreen(
 
     LaunchedEffect(intentToNavigateTo) {
         if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
-            if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                trackNaverMap()
-            }
             context.startActivity(intentToNavigateTo)
             intentToNavigateTo = null
         }
@@ -466,9 +463,6 @@ fun ShowDetailScreen(
             },
             positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
             onClickPositiveButton = {
-                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                    trackNaverMap()
-                }
                 context.startActivity(intentToNavigateTo)
                 doNotShowNaverMapDialog()
                 intentToNavigateTo = null
@@ -831,7 +825,6 @@ fun preUriLoading(
             val lng = fallbackUri.getQueryParameter("lng")
             val name = fallbackUri.getQueryParameter("name")
 
-            trackNaverMap()
             uriHandler.openUri("https://map.naver.com/?lat=${lat}&lng=${lng}&title=${name}")
         }
         return true
@@ -855,15 +848,6 @@ fun getIntentFromUri(uri: String): Intent? {
         Timber.e(e)
         return null
     }
-}
-
-private fun trackNaverMap() {
-    AppTracker.click(
-        screen = Screen.ShowDetail,
-        objectRole = Role.Item,
-        objectValue = "Map",
-        properties = mapOf("map_provider" to "NaverMap"),
-    )
 }
 
 @Suppress("FunctionName")

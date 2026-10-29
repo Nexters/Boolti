@@ -198,7 +198,7 @@ fun PlaceScreen(
                         screen = Screen.PlaceProfile,
                         objectRole = Role.Tab,
                         objectValue = if (index == 0) "Home" else "RentalInfo",
-                        properties = mapOf("place_id" to viewModel.placeId),
+                        properties = mapOf("place_id" to (uiState.place.shareCode ?: uiState.place.id)),
                     )
                     viewModel.selectTab(index)
                 },
@@ -231,7 +231,7 @@ fun PlaceScreen(
                             objectRole = Role.Button,
                             objectValue = "Share",
                             properties = mapOf(
-                                "place_id" to viewModel.placeId,
+                                "place_id" to (uiState.place.shareCode ?: uiState.place.id),
                                 "share_method" to "WithInfo",
                             ),
                         )
@@ -331,7 +331,7 @@ private fun PlaceContent(
                 place.contact?.let { contact ->
                     if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
                         PlaceContactSection(
-                            placeId = place.id,
+                            placeId = place.shareCode ?: place.id,
                             url = contact.websiteUrl,
                             phoneNumber = contact.phoneNumber,
                             email = contact.email,

@@ -116,7 +116,16 @@ fun PlaceScreen(
     val navController = LocalNavController.current
     val bridge = rememberWebBridge {
         handle { p: ViewPlacePhotoList ->
-            navController.navigate(MainRoute.PlaceImages(placeId = p.placeId.toString()))
+            val place = uiState.place
+            navController.navigate(
+                MainRoute.PlaceImages(
+                    placeId = p.placeId.toString(),
+                    placeShareCode = place.shareCode,
+                    placeName = place.name,
+                    regionName = place.region?.name,
+                    source = Screen.PlaceProfile.value,
+                ),
+            )
         }
         handle { p: ViewPlacePhotoDetail ->
             navController.navigate(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.click
+import com.nexters.boolti.common.tracker.event.view
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.field.PlacePhotoList
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
 import com.nexters.boolti.domain.model.PlaceImage
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
@@ -46,6 +54,19 @@ fun PlaceImagesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        AppTracker.view(
+            screen = Screen.PlacePhotoList,
+            properties = buildMap {
+                put("place_id", viewModel.shareCode)
+                put("place_name", viewModel.placeName)
+                put("source", viewModel.source)
+                put("profile_status", "Active")
+                viewModel.regionName?.let { put("region", it) }
+            },
+        )
+    }
+
     ObserveAsEvents(viewModel.events) {
         when (it) {
             is PlaceImagesEvent.NavigateToDetail -> {
@@ -59,7 +80,15 @@ fun PlaceImagesScreen(
         images = uiState.images,
         isLoading = uiState.isLoading,
         onBack = onBack,
-        onClickImage = onClickImage,
+        onClickImage = { imageId ->
+            AppTracker.click(
+                screen = Screen.PlacePhotoList,
+                objectRole = Role.Item,
+                objectValue = "Photo",
+                properties = mapOf("place_id" to viewModel.shareCode),
+            )
+            onClickImage(imageId)
+        },
     )
 }
 

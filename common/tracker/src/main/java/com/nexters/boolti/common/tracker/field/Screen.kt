@@ -53,3 +53,6 @@ val Screen.Companion.WebBridge
 
 val Screen.Companion.PlaceProfile
     get() = Screen("PlaceProfile")
+
+val Screen.Companion.PlacePhotoList
+    get() = Screen("PlacePhotoList")

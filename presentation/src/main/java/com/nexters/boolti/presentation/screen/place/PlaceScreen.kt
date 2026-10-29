@@ -179,12 +179,12 @@ fun PlaceScreen(
                 AppTracker.view(
                     screen = Screen.PlaceProfile,
                     properties = buildMap {
-                        put("place_id", place.id)
+                        put("place_id", place.shareCode ?: place.id)
                         put("place_name", place.name)
                         put("source", viewModel.source)
                         put("profile_status", "Active")
                         place.region?.let { region ->
-                            put("region", region)
+                            put("region", region.name)
                         }
                     },
                 )

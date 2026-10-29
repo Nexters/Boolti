@@ -116,7 +116,16 @@ fun PlaceScreen(
     val navController = LocalNavController.current
     val bridge = rememberWebBridge {
         handle { p: ViewPlacePhotoList ->
-            navController.navigate(MainRoute.PlaceImages(placeId = p.placeId.toString()))
+            val place = uiState.place
+            navController.navigate(
+                MainRoute.PlaceImages(
+                    placeId = p.placeId.toString(),
+                    placeShareCode = place.shareCode,
+                    placeName = place.name,
+                    regionName = place.region?.name,
+                    source = Screen.PlaceProfile.value,
+                ),
+            )
         }
         handle { p: ViewPlacePhotoDetail ->
             navController.navigate(
@@ -179,12 +188,12 @@ fun PlaceScreen(
                 AppTracker.view(
                     screen = Screen.PlaceProfile,
                     properties = buildMap {
-                        put("place_id", place.id)
+                        put("place_id", place.shareCode ?: place.id)
                         put("place_name", place.name)
                         put("source", viewModel.source)
                         put("profile_status", "Active")
                         place.region?.let { region ->
-                            put("region", region)
+                            put("region", region.name)
                         }
                     },
                 )
@@ -198,7 +207,7 @@ fun PlaceScreen(
                         screen = Screen.PlaceProfile,
                         objectRole = Role.Tab,
                         objectValue = if (index == 0) "Home" else "RentalInfo",
-                        properties = mapOf("place_id" to viewModel.placeId),
+                        properties = mapOf("place_id" to (uiState.place.shareCode ?: uiState.place.id)),
                     )
                     viewModel.selectTab(index)
                 },
@@ -231,7 +240,7 @@ fun PlaceScreen(
                             objectRole = Role.Button,
                             objectValue = "Share",
                             properties = mapOf(
-                                "place_id" to viewModel.placeId,
+                                "place_id" to (uiState.place.shareCode ?: uiState.place.id),
                                 "share_method" to "WithInfo",
                             ),
                         )
@@ -331,7 +340,7 @@ private fun PlaceContent(
                 place.contact?.let { contact ->
                     if (contact.websiteUrl != null || contact.email != null || contact.phoneNumber != null) {
                         PlaceContactSection(
-                            placeId = place.id,
+                            placeId = place.shareCode ?: place.id,
                             url = contact.websiteUrl,
                             phoneNumber = contact.phoneNumber,
                             email = contact.email,

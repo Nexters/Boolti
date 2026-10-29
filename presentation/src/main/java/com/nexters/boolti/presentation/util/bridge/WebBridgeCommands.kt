@@ -49,3 +49,24 @@ data class ViewPlacePhotoDetail(
     @SerialName("imageId")
     val imageId: Long,
 )
+
+@WebBridgeCommand("REQUEST_CLIENT_INFO")
+data object RequestClientInfo
+
+@Serializable
+data class ClientInfoResponse(
+    @SerialName("platform")
+    val platform: String,
+    @SerialName("osVersion")
+    val osVersion: String,
+    @SerialName("appVersion")
+    val appVersion: String,
+    @SerialName("deviceModel")
+    val deviceModel: String,
+    @SerialName("screenResolution")
+    val screenResolution: String,
+    @SerialName("isLoggedIn")
+    val isLoggedIn: Boolean,
+    @SerialName("user_id")
+    val userId: String? = null,
+)

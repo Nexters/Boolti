@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,11 +73,7 @@ fun ReservationDetailScreen(
     val preQuestionAnswers by viewModel.preQuestionAnswers.collectAsStateWithLifecycle()
     var showRefundDialog by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchReservation()
-    }
-
-    OnResume { viewModel.refreshPreQuestionAnswers() }
+    OnResume { viewModel.fetchReservation() }
 
     Scaffold(
         modifier = modifier.navigationBarsPadding(),

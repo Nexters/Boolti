@@ -1,0 +1,11 @@
+# gh release create --generate-notes가 PR 레이블로 Release 노트를 나누는 기준
+changelog:
+  exclude:
+    labels: [chore, refactor, style, documentation]
+  categories:
+    - title: 주요 업데이트
+      labels: [feat, enhancement]
+    - title: 버그 수정
+      labels: [bug]
+    - title: 기타
+      labels: ['*']

@@ -1,5 +1,7 @@
 package com.nexters.boolti.data.repository
 
+import com.nexters.boolti.data.cache.CacheKeys
+import com.nexters.boolti.data.cache.CacheStore
 import com.nexters.boolti.data.datasource.ReservationDataSource
 import com.nexters.boolti.data.datasource.TicketingDataSource
 import com.nexters.boolti.data.network.request.toData
@@ -21,52 +23,42 @@ import com.nexters.boolti.domain.request.SalesTicketRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
 import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
+import com.nexters.boolti.domain.util.suspendRunCatching
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 internal class TicketingRepositoryImpl @Inject constructor(
     private val dataSource: TicketingDataSource,
     private val reservationDataSource: ReservationDataSource,
+    private val cacheStore: CacheStore,
 ) : TicketingRepository {
-    private data class CacheEntry<T>(val value: T, val cachedAt: Long)
-
-    private val preQuestionsCache = ConcurrentHashMap<String, CacheEntry<List<PreQuestion>>>()
-    private val cacheTtlMs = 60_000L
     override fun getSalesTickets(request: SalesTicketRequest): Flow<List<TicketWithQuantity>> = flow {
         emit(dataSource.getSalesTickets(request))
     }
 
-    override fun getTicketingInfo(request: TicketingInfoRequest): Flow<TicketingInfo> = flow {
-        emit(dataSource.getTicketingInfo(request))
+    override suspend fun getTicketingInfo(request: TicketingInfoRequest): Result<TicketingInfo> = suspendRunCatching {
+        dataSource.getTicketingInfo(request)
     }
 
-    override fun requestReservation(request: TicketingRequest): Flow<String> = flow {
+    override suspend fun requestReservation(request: TicketingRequest): Result<String> = suspendRunCatching {
         val response = when (request) {
             is TicketingRequest.Invite -> dataSource.requestReservationInviteTicket(request.toData())
             is TicketingRequest.Free -> dataSource.requestReservationSalesTicket(request.toData())
         }
-        if (response.isSuccessful) {
-            response.body()?.reservationId?.let { emit(it) }
-        } else {
+        if (!response.isSuccessful) {
             val errMsg = response.errorBody()?.string()
             throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
         }
+        checkNotNull(response.body()?.reservationId) { "예매 응답에 reservationId가 없습니다." }
     }
 
-    override fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus> = flow {
+    override suspend fun checkInviteCode(request: CheckInviteCodeRequest): Result<InviteCodeStatus> = suspendRunCatching {
         val response = dataSource.checkInviteCode(request)
-        if (response.isSuccessful) {
-            if (response.body()?.isUsed?.not() == true) {
-                emit(InviteCodeStatus.Valid)
-            } else {
-                emit(InviteCodeStatus.Duplicated)
-            }
-        } else {
-            val errMsg = response.errorBody()?.string()
-            val status = InviteCodeStatus.fromString(errMsg?.errorType)
-            emit(status)
+        when {
+            !response.isSuccessful -> InviteCodeStatus.fromString(response.errorBody()?.string()?.errorType)
+            response.body()?.isUsed?.not() == true -> InviteCodeStatus.Valid
+            else -> InviteCodeStatus.Duplicated
         }
     }
 
@@ -74,14 +66,15 @@ internal class TicketingRepositoryImpl @Inject constructor(
         emit(reservationDataSource.findReservationById(reservationId).toDomain())
     }
 
-    override fun requestOrderId(request: OrderIdRequest): Flow<String> = flow {
-        emit(dataSource.requestOrderId(request))
+    override suspend fun requestOrderId(request: OrderIdRequest): Result<String> = suspendRunCatching {
+        dataSource.requestOrderId(request)
     }
 
     override fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse> = flow {
         val response = dataSource.approvePayment(request)
         if (response.isSuccessful) {
-            response.body()?.let { emit(it.toDomain()) }
+            val body = response.body() ?: throw TicketingException(TicketingErrorType.Unknown)
+            emit(body.toDomain())
         } else {
             val errMsg = response.errorBody()?.string()
             throw TicketingException(TicketingErrorType.fromString(errMsg?.errorType))
@@ -92,19 +85,11 @@ internal class TicketingRepositoryImpl @Inject constructor(
         emit(dataSource.cancelPayment(request))
     }
 
-    override fun getPreQuestions(showId: String): Flow<List<PreQuestion>> = flow {
-        val cached = preQuestionsCache[showId]
-        if (cached != null && System.currentTimeMillis() - cached.cachedAt < cacheTtlMs) {
-            emit(cached.value)
-            return@flow
-        }
-        val preQuestions = dataSource.getPreQuestions(showId)
-        preQuestionsCache[showId] = CacheEntry(preQuestions, System.currentTimeMillis())
-        emit(preQuestions)
+    override suspend fun getPreQuestions(showId: String): Result<List<PreQuestion>> = suspendRunCatching {
+        cacheStore.getOrFetch(CacheKeys.preQuestions(showId)) { dataSource.getPreQuestions(showId) }
     }
 
-    override fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Flow<Unit> = flow {
+    override suspend fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Result<Unit> = suspendRunCatching {
         dataSource.submitPreQuestionAnswers(request.toData())
-        emit(Unit)
     }
 }

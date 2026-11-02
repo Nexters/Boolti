@@ -43,7 +43,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.kakao.sdk.share.ShareClient
 import com.kakao.sdk.template.model.Button
 import com.kakao.sdk.template.model.Content
@@ -267,7 +266,6 @@ fun sendMessage(
 
     ShareClient.instance.shareDefault(context, defaultFeed) { sharingResult, error ->
         if (error != null) {
-            FirebaseCrashlytics.getInstance().recordException(error)
             Timber.e(error)
         } else if (sharingResult != null) {
             context.startActivity(sharingResult.intent)

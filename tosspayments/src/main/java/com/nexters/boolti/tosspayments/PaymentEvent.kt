@@ -8,4 +8,6 @@ sealed interface PaymentEvent {
     ) : PaymentEvent
 
     data object TicketSoldOut : PaymentEvent
+
+    data object Failed : PaymentEvent
 }

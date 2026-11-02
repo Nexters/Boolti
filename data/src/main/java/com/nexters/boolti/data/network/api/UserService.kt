@@ -1,5 +1,6 @@
 package com.nexters.boolti.data.network.api
 
+import com.nexters.boolti.data.network.DoNotRetry
 import com.nexters.boolti.data.network.request.SaveIntroduceRequest
 import com.nexters.boolti.data.network.request.SaveLinksRequest
 import com.nexters.boolti.data.network.request.SaveNicknameRequest
@@ -45,6 +46,7 @@ internal interface UserService {
         @Body request: SetVisibleRequest,
     ): ToggleResultDto
 
+    @DoNotRetry
     @GET("/app/api/v1/user/code/check-duplicate")
     suspend fun checkUserCodeDuplicate(
         @Query("userCode") userCode: String,

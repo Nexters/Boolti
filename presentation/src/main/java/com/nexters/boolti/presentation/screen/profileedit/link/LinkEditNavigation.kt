@@ -1,24 +1,24 @@
 package com.nexters.boolti.presentation.screen.profileedit.link
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.nexters.boolti.presentation.screen.LocalNavController
-import com.nexters.boolti.presentation.screen.link.LinkListViewModel
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 
 fun NavGraphBuilder.linkEditScreen(
     modifier: Modifier = Modifier,
-    getSharedViewModel: @Composable (NavBackStackEntry) -> LinkListViewModel,
 ) {
-    composable<LinkListRoute.LinkEdit> { entry ->
+    composable<LinkListRoute.LinkEdit> {
         val navController = LocalNavController.current
         LinkEditScreen(
             modifier = modifier,
             navigateUp = navController::navigateUp,
-            viewModel = getSharedViewModel(entry),
+            closeList = { navController.popBackStack<LinkListRoute.LinkList>(inclusive = true) },
+            returnResult = { result ->
+                navController.previousBackStackEntry?.savedStateHandle?.set(LinkEditResult.KEY, result)
+                navController.navigateUp()
+            },
         )
     }
 }

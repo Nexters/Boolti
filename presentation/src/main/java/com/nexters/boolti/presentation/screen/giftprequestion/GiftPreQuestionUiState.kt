@@ -3,7 +3,6 @@ package com.nexters.boolti.presentation.screen.giftprequestion
 import com.nexters.boolti.domain.model.Gift
 import com.nexters.boolti.domain.model.PreQuestion
 import com.nexters.boolti.presentation.extension.unicodeLength
-import com.nexters.boolti.presentation.screen.ticketing.TicketingState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf

@@ -97,10 +97,10 @@ private fun PreQuestionItem(
             bottomEndText = stringResource(
                 R.string.input_limit,
                 answer.unicodeLength(),
-                TicketingState.MAX_ANSWER_LENGTH
+                TicketingUiState.MAX_ANSWER_LENGTH
             ),
             supportingText = if (isError) {
-                stringResource(R.string.input_upper_limit_text, TicketingState.MAX_ANSWER_LENGTH)
+                stringResource(R.string.input_upper_limit_text, TicketingUiState.MAX_ANSWER_LENGTH)
             } else null,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Default,

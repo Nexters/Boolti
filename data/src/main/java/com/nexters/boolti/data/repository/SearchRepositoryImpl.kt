@@ -3,6 +3,7 @@ package com.nexters.boolti.data.repository
 import com.nexters.boolti.data.datasource.SearchDataSource
 import com.nexters.boolti.domain.model.NewShowsAndRisingKeywords
 import com.nexters.boolti.domain.model.PagingData
+import com.nexters.boolti.domain.model.Place
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.SearchRepository
@@ -32,5 +33,12 @@ internal class SearchRepositoryImpl @Inject constructor(
         page: Int
     ): Result<PagingData<User.Others>> = suspendRunCatching {
         searchDataSource.getProfiles(keyword, page, 10)
+    }
+
+    override suspend fun searchPlaces(
+        keyword: String,
+        page: Int,
+    ): Result<PagingData<Place>> = suspendRunCatching {
+        searchDataSource.getPlaces(keyword, page, 10)
     }
 }

@@ -50,8 +50,8 @@ internal class TicketRepositoryImpl @Inject constructor(
 
     override suspend fun requestEntrance(request: ManagerCodeRequest): Flow<Boolean> = flow {
         val response = hostDataSource.requestEntranceWithManagerCode(request)
-        if (response.isSuccessful) {
-            emit(response.body() ?: false)
+        if (response.isSuccessful && response.body() == true) {
+            emit(true)
         } else {
             val errMsg = response.errorBody()?.string()
             throw ManagerCodeException(ManagerCodeErrorType.fromString(errMsg?.errorType))

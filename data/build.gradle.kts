@@ -1,14 +1,5 @@
-import java.io.FileInputStream
-import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
-val localPropertiesFile = rootProject.file("local.properties")
-val localProperties = Properties()
-localProperties.load(FileInputStream(localPropertiesFile))
-
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    id("boolti.android.library")
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
@@ -16,42 +7,37 @@ plugins {
 
 android {
     namespace = "com.nexters.boolti.data"
-    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "APP_VERSION", "\"${libs.versions.versionName.get()}\"")
-        buildConfigField("String", "YOUTUBE_API_KEY", getApiKey("YOUTUBE_API_KEY"))
+        buildConfigField("String", "YOUTUBE_API_KEY", localProperty("YOUTUBE_API_KEY"))
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            buildConfigField("String", "BASE_URL", getApiKey("PROD_BASE_URL"))
+            buildConfigField("String", "BASE_URL", localProperty("PROD_BASE_URL"))
         }
         debug {
-            buildConfigField("String", "BASE_URL", getApiKey("DEV_BASE_URL"))
+            buildConfigField("String", "BASE_URL", localProperty("DEV_BASE_URL"))
+            // QA 디버그 정보 전송용. 없으면 전송 버튼이 비활성화된다
+            buildConfigField("String", "DISCORD_DEBUG_INFO_WEBHOOK_URL", localPropertyOrNull("DISCORD_DEBUG_INFO_WEBHOOK_URL") ?: "\"\"")
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         buildConfig = true
+    }
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
     }
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
@@ -83,10 +69,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.bundles.kotest)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.bundles.android.test)
-    androidTestImplementation(libs.kotest.runner.junit5.jvm)
-}
-
-fun getApiKey(propertyKey: String): String {
-    return providers.gradleProperty(propertyKey).orNull ?: localProperties.getProperty(propertyKey)
 }

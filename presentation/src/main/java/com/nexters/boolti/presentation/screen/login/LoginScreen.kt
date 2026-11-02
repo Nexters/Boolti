@@ -37,6 +37,7 @@ import com.nexters.boolti.common.tracker.field.BottomSheet
 import com.nexters.boolti.common.tracker.field.Login
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.impression.impression
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtBottomSheet
@@ -143,16 +144,16 @@ private fun SignUpBottomSheetContent(
     val tag = stringResource(id = R.string.term_notice_tag)
     val spanOffset = Pair(term.indexOf(tag), tag.length)
 
-    LaunchedEffect(Unit) {
-        AppTracker.impression(
-            screen = Screen.Login,
-            objectRole = Role.BottomSheet,
-            objectValue = "TermsAgreement",
-        )
-    }
-
     Column(
         modifier = modifier
+            .impression { extras ->
+                AppTracker.impression(
+                    screen = Screen.Login,
+                    objectRole = Role.BottomSheet,
+                    objectValue = "TermsAgreement",
+                    properties = extras,
+                )
+            }
             .padding(horizontal = 24.dp)
     ) {
         Text(

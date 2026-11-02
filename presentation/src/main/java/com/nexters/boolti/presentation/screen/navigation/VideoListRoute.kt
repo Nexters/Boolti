@@ -5,14 +5,19 @@ import kotlinx.serialization.Serializable
 
 sealed interface VideoListRoute {
     @Serializable
-    data class VideoListRoot(
+    data class VideoList(
         val userCode: UserCode,
         val isEditMode: Boolean,
     ) : VideoListRoute
 
+    /**
+     * @param localId null이면 새 동영상 추가
+     * @param closeListOnBack 빈 목록이라 자동으로 열렸을 때 true. 뒤로 가면 목록까지 닫는다
+     */
     @Serializable
-    data object VideoList : VideoListRoute
-
-    @Serializable
-    data class VideoEdit(val isEditMode: Boolean) : VideoListRoute
+    data class VideoEdit(
+        val localId: String? = null,
+        val url: String = "",
+        val closeListOnBack: Boolean = false,
+    ) : VideoListRoute
 }

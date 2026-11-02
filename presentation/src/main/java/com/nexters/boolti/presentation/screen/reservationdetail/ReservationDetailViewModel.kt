@@ -5,19 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.PreQuestionAnswer
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.plus
 import timber.log.Timber
@@ -28,7 +28,7 @@ class ReservationDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reservationRepository: ReservationRepository,
     private val giftRepository: GiftRepository,
-    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : BaseViewModel() {
     private val reservationId: String = checkNotNull(savedStateHandle["reservationId"]) {
         "reservationId가 전달되어야 합니다."
@@ -46,10 +46,14 @@ class ReservationDetailViewModel @Inject constructor(
     private val _preQuestionAnswers = MutableStateFlow<ImmutableList<PreQuestionAnswer>>(persistentListOf())
     val preQuestionAnswers: StateFlow<ImmutableList<PreQuestionAnswer>> = _preQuestionAnswers.asStateFlow()
 
+    private var reservationJob: Job? = null
+    private var preQuestionAnswersJob: Job? = null
+
     init {
         fetchRefundPolicy()
     }
 
+    /** 화면에 돌아올 때마다(환불·답변 수정 후 포함) 예약과 사전 질문 답변을 다시 불러온다. */
     fun fetchReservation() {
         val reservationFlow = if (isGift) {
             giftRepository.getGiftPaymentInfo(reservationId)
@@ -57,10 +61,8 @@ class ReservationDetailViewModel @Inject constructor(
             reservationRepository.findReservationById(reservationId)
         }
 
-        reservationFlow
-            .onStart {
-                _uiState.update { ReservationDetailUiState.Loading }
-            }
+        reservationJob?.cancel()
+        reservationJob = reservationFlow
             .onEach { reservation ->
                 val canShowPreQuestions = reservation.canShowPreQuestions()
                 _uiState.update {
@@ -83,17 +85,9 @@ class ReservationDetailViewModel @Inject constructor(
             .launchIn(viewModelScope + recordExceptionHandler)
     }
 
-    fun refreshPreQuestionAnswers() {
-        val state = _uiState.value as? ReservationDetailUiState.Success ?: return
-        if (!state.canShowPreQuestions) {
-            _preQuestionAnswers.value = persistentListOf()
-            return
-        }
-        fetchPreQuestionAnswers()
-    }
-
     private fun fetchPreQuestionAnswers() {
-        reservationRepository.getPreQuestionAnswers(reservationId)
+        preQuestionAnswersJob?.cancel()
+        preQuestionAnswersJob = reservationRepository.getPreQuestionAnswers(reservationId)
             .onEach { answers ->
                 _preQuestionAnswers.value = answers.toImmutableList()
             }
@@ -104,7 +98,7 @@ class ReservationDetailViewModel @Inject constructor(
     }
 
     private fun fetchRefundPolicy() {
-        getRefundPolicyUsecase()
+        getRefundPolicyUseCase()
             .onEach { refundPolicy ->
                 _refundPolicy.value = refundPolicy
             }

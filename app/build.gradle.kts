@@ -1,13 +1,12 @@
 import com.android.build.api.artifact.SingleArtifact
+import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Properties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("boolti.android.application")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -16,17 +15,18 @@ plugins {
     id("kotlin-parcelize")
 }
 
+apply(from = "app-version.gradle")
+
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-val localPropertiesFile = rootProject.file("local.properties")
-val localProperties = Properties()
-localProperties.load(FileInputStream(localPropertiesFile))
+val gitHash = providers.exec {
+    commandLine("git", "rev-parse", "--short=7", "HEAD")
+}.standardOutput.asText.get().trim()
 
 android {
     namespace = libs.versions.packageName.get()
-    compileSdk = libs.versions.compileSdk.get().toInt()
 
     signingConfigs {
         create("release") {
@@ -39,35 +39,28 @@ android {
 
     defaultConfig {
         applicationId = "com.nexters.boolti"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = libs.versions.versionCode.get().toInt()
-        versionName = libs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "KAKAO_APP_KEY", getApiKey("KAKAO_APP_KEY"))
-        buildConfigField("String", "YOUTUBE_API_KEY", getApiKey("YOUTUBE_API_KEY"))
-        manifestPlaceholders["KAKAO_APP_KEY"] = (localProperties["KAKAO_APP_KEY"] as String).trim('"')
+        buildConfigField("String", "KAKAO_APP_KEY", localProperty("KAKAO_APP_KEY"))
+        manifestPlaceholders["KAKAO_APP_KEY"] = localProperty("KAKAO_APP_KEY").trim('"')
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
             applicationIdSuffix = ".debug"
+            versionNameSuffix = "-$gitHash"
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         buildConfig = true
@@ -80,30 +73,20 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(libs.versions.targetJvm.get()))
-    }
-}
-
 androidComponents {
     onVariants { variant ->
         val capitalizedName = variant.name.replaceFirstChar { it.uppercase() }
         val apkDir = variant.artifacts.get(SingleArtifact.APK)
-        val gitHash = providers.exec {
-            commandLine("git", "rev-parse", "--short=7", "HEAD")
-            isIgnoreExitValue = true
-        }.standardOutput.asText.map { it.trim().ifEmpty { "nogit" } }
+        val versionName = libs.versions.versionName.get()
+        val buildType = variant.buildType ?: "unknown"
+        val hash = gitHash
 
         tasks.register("copy${capitalizedName}Apk") {
             doLast {
                 val dir = apkDir.get().asFile
                 if (!dir.exists()) return@doLast
-                val versionName = libs.versions.versionName.get()
-                val buildType = variant.buildType ?: "unknown"
-                val hash = gitHash.get()
                 val date = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
-                dir.listFiles()?.filter { it.extension == "apk" }?.forEach { apk ->
+                dir.listFiles()?.filter { it.name == "app-$buildType.apk" }?.forEach { apk ->
                     val newName = "app-$buildType-$versionName-$hash-$date.apk"
                     apk.copyTo(File(apk.parentFile, newName))
                 }
@@ -138,12 +121,10 @@ dependencies {
 
     implementation(libs.timber)
     implementation(libs.zxing.android.embedded)
+
+    testImplementation(libs.bundles.kotest)
 }
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-}
-
-fun getApiKey(propertyKey: String): String {
-    return providers.gradleProperty(propertyKey).orNull ?: localProperties.getProperty(propertyKey)
 }

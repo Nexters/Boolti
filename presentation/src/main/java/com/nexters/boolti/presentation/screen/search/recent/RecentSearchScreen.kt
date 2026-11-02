@@ -44,7 +44,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
-import com.nexters.boolti.common.tracker.event.search
 import com.nexters.boolti.common.tracker.field.Item
 import com.nexters.boolti.common.tracker.field.Role
 import com.nexters.boolti.common.tracker.field.Screen
@@ -55,6 +54,7 @@ import com.nexters.boolti.presentation.component.BtSearchBar
 import com.nexters.boolti.presentation.extension.highlightMatches
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.search.ClearSearchHistoriesDialog
+import com.nexters.boolti.presentation.screen.search.SearchSource
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecentSearchScreen(
     navigateBack: () -> Unit,
-    search: (String) -> Unit,
+    search: (keyword: String, searchSource: SearchSource) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RecentSearchViewModel = hiltViewModel(),
 ) {
@@ -87,7 +87,7 @@ fun RecentSearchScreen(
                 }
             }
 
-            is RecentSearchEvent.Search -> search(it.keyword)
+            is RecentSearchEvent.Search -> search(it.keyword, it.searchSource)
         }
     }
 
@@ -121,8 +121,8 @@ fun RecentSearchScreen(
             viewModel.onIntent(RecentSearchIntent.DismissClearHistoriesDialog)
         },
         navigateBack = navigateBack,
-        search = { keyword ->
-            viewModel.onIntent(RecentSearchIntent.Search(keyword))
+        search = { keyword, searchSource ->
+            viewModel.onIntent(RecentSearchIntent.Search(keyword, searchSource))
         },
         modifier = modifier,
     )
@@ -142,7 +142,7 @@ private fun RecentSearchScreen(
     showClearButton: Boolean,
     dismissClearDialog: () -> Unit,
     navigateBack: () -> Unit,
-    search: (String) -> Unit,
+    search: (keyword: String, searchSource: SearchSource) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -191,14 +191,7 @@ private fun RecentSearchScreen(
                 },
                 hint = stringResource(R.string.search_search_hint),
                 search = {
-                    search(textFieldValue.text)
-                    AppTracker.search(
-                        screen = Screen.Search,
-                        keyword = textFieldValue.text,
-                        properties = mapOf(
-                            "search_source" to "Direct",
-                        ),
-                    )
+                    search(textFieldValue.text, SearchSource.Direct)
                 },
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -211,14 +204,7 @@ private fun RecentSearchScreen(
                     recentKeywords = recentKeywords,
                     showClearButton = showClearButton,
                     onClickKeyword = {
-                        search(it)
-                        AppTracker.search(
-                            screen = Screen.Search,
-                            keyword = it,
-                            properties = mapOf(
-                                "search_source" to "Recent",
-                            ),
-                        )
+                        search(it, SearchSource.Recent)
                     },
                     onClickDeleteButton = deleteKeyword,
                     onClickClearButton = onClickClearButton,
@@ -236,14 +222,7 @@ private fun RecentSearchScreen(
                                 "keyword" to keyword,
                             ),
                         )
-                        AppTracker.search(
-                            screen = Screen.Search,
-                            keyword = keyword,
-                            properties = mapOf(
-                                "search_source" to "AutoComplete",
-                            ),
-                        )
-                        search(keyword)
+                        search(keyword, SearchSource.AutoComplete)
                     },
                 )
             }
@@ -423,7 +402,7 @@ private fun RecentSearchScreenPreview_Empty() {
             showClearButton = true,
             dismissClearDialog = {},
             navigateBack = {},
-            search = {},
+            search = { _, _ -> },
         )
     }
 }
@@ -445,7 +424,7 @@ private fun RecentSearchScreenPreview_EmptyHistory() {
             showClearButton = false,
             dismissClearDialog = {},
             navigateBack = {},
-            search = {},
+            search = { _, _ -> },
         )
     }
 }
@@ -467,7 +446,7 @@ private fun RecentSearchScreenPreview_Searching() {
             showClearButton = false,
             dismissClearDialog = {},
             navigateBack = {},
-            search = {},
+            search = { _, _ -> },
         )
     }
 }
@@ -489,7 +468,7 @@ private fun RecentSearchScreenPreview_ClearDialog() {
             showClearButton = true,
             dismissClearDialog = {},
             navigateBack = {},
-            search = {},
+            search = { _, _ -> },
         )
     }
 }

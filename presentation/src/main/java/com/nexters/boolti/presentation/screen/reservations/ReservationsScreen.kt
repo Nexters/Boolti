@@ -39,6 +39,7 @@ import com.nexters.boolti.domain.model.ReservationState
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
+import com.nexters.boolti.presentation.constants.datetimeFormat
 import com.nexters.boolti.presentation.extension.toDescriptionAndColorPair
 import com.nexters.boolti.presentation.theme.Grey05
 import com.nexters.boolti.presentation.theme.Grey30
@@ -48,7 +49,6 @@ import com.nexters.boolti.presentation.theme.Grey85
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point1
 import com.nexters.boolti.presentation.theme.subTextPadding
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ReservationsScreen(
@@ -174,9 +174,8 @@ private fun ReservationItem(
             modifier = Modifier.padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val format = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
             Text(
-                text = reservation.reservationDateTime.format(format),
+                text = reservation.reservationDateTime.format(datetimeFormat),
                 style = MaterialTheme.typography.bodySmall,
                 color = Grey50,
             )

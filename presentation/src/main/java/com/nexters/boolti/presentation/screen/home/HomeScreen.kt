@@ -36,6 +36,7 @@ import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.screen.my.myScreen
 import com.nexters.boolti.presentation.screen.navigation.HomeRoute
 import com.nexters.boolti.presentation.screen.navigation.homeRoutes
+import com.nexters.boolti.presentation.screen.search.SearchSource
 import com.nexters.boolti.presentation.screen.search.searchScreen
 import com.nexters.boolti.presentation.screen.show.showScreen
 import com.nexters.boolti.presentation.screen.ticket.ticketScreen
@@ -49,7 +50,7 @@ import kotlinx.coroutines.flow.Flow
 fun HomeScreen(
     navigateToShowDetail: (showId: String) -> Unit,
     navigateToRecentSearch: () -> Unit,
-    navigateToSearchDetail: (keyword: String) -> Unit,
+    navigateToSearchDetail: (keyword: String, searchSource: SearchSource) -> Unit,
     navigateToTicketDetail: (ticketId: String) -> Unit,
     navigateToQrScan: () -> Unit,
     navigateToAccountSetting: () -> Unit,

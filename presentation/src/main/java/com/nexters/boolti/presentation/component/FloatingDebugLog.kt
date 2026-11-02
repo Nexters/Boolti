@@ -301,7 +301,8 @@ private fun SettingsScreen() {
         "OkHttp",
         "Config",
         "rememberNavControllerWithLog",
-        "recordExceptionHandler"
+        "recordExceptionHandler",
+        "webview_bridge",
     )
 
     Column(

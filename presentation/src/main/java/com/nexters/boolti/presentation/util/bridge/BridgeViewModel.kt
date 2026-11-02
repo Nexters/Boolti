@@ -21,4 +21,22 @@ class BridgeViewModel @Inject constructor(
         Timber.tag("bridge").w(e, "토큰 갱신 실패 (비로그인 상태일 수 있음)")
         ""
     }
+
+    suspend fun getClientInfo(
+        osVersion: String,
+        appVersion: String,
+        deviceModel: String,
+        screenResolution: String,
+    ): ClientInfoResponse {
+        val loggedIn = authRepository.loggedIn.first()
+        return ClientInfoResponse(
+            platform = "Android",
+            osVersion = osVersion,
+            appVersion = appVersion,
+            deviceModel = deviceModel,
+            screenResolution = screenResolution,
+            isLoggedIn = loggedIn,
+            userId = if (loggedIn) authRepository.cachedUser.first()?.id else null,
+        )
+    }
 }

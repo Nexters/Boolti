@@ -1,13 +1,18 @@
 package com.nexters.boolti.presentation.util.bridge
 
+import android.os.Build
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
+import kotlin.math.roundToInt
 
 /**
  * 웹뷰 화면에서 쓸 [WebBridge]를 만든다. 모든 화면에 필요한 공통 커맨드는 여기서 등록한다.
@@ -28,10 +33,23 @@ fun rememberWebBridge(
     val scope = rememberCoroutineScope()
     val currentSnackbarController by rememberUpdatedState(LocalSnackbarController.current)
     val currentBridgeViewModel by rememberUpdatedState(bridgeViewModel)
+    val density = LocalDensity.current
+    val windowSize = LocalWindowInfo.current.containerSize
+    val currentScreenResolution by rememberUpdatedState(
+        with(density) { "${windowSize.width.toDp().value.roundToInt()}x${windowSize.height.toDp().value.roundToInt()}" },
+    )
 
     return remember(scope) {
         WebBridge(scope) {
             handle { _: RequestToken -> TokenResponse(currentBridgeViewModel.refreshAndGetToken()) }
+            handle { _: RequestClientInfo ->
+                currentBridgeViewModel.getClientInfo(
+                    osVersion = Build.VERSION.RELEASE,
+                    appVersion = BuildConfig.VERSION_NAME,
+                    deviceModel = Build.MODEL,
+                    screenResolution = currentScreenResolution,
+                )
+            }
             handle { t: ShowToast ->
                 currentSnackbarController.showMessage(
                     message = t.message,

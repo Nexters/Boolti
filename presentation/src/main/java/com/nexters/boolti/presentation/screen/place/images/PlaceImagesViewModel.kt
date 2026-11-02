@@ -25,6 +25,10 @@ class PlaceImagesViewModel @Inject constructor(
     private val placeRepository: PlaceRepository,
 ) : BaseViewModel() {
     private val route = savedStateHandle.toRoute<MainRoute.PlaceImages>()
+    val shareCode: String = route.placeShareCode ?: route.placeId
+    val placeName: String = route.placeName
+    val regionName: String? = route.regionName
+    val source: String = route.source
 
     private val _uiState = MutableStateFlow(PlaceImagesUiState())
     val uiState = _uiState.asStateFlow()

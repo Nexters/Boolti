@@ -12,17 +12,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 모듈 구조
 
-```
-app/              - Application, DI 설정, Crashlytics/Timber 초기화
-domain/           - Repository 인터페이스, UseCase, 모델 — 순수 Kotlin (JVM 모듈)
-data/             - API(Retrofit), Room, DataStore, Repository 구현
-presentation/     - Compose 화면, ViewModel
-tosspayments/     - 토스페이먼츠 결제 위젯 Activity
-common/logger/    - 디버그 로그 수집 (CollectableDebugTree)
-common/tracker/   - Mixpanel 이벤트 트래킹 (AppTracker)
-lint/             - 커스텀 Android Lint 규칙 (presentation에 lintChecks로 연결)
-```
-
 - 의존 방향: `presentation → domain ← data`
 - 기능별로 패키지를 나눈다 (`presentation/screen/<기능>/`)
 - 모듈별 세부 규칙은 `.claude/rules/`에 있고, 해당 모듈 파일을 다룰 때 불러온다
@@ -31,15 +20,10 @@ lint/             - 커스텀 Android Lint 규칙 (presentation에 lintChecks로
 
 ```bash
 ./gradlew btTest            # 전체 모듈 테스트 (CI와 같은 명령)
-./gradlew assembleDebug     # 디버그 APK
-./gradlew domain:test
-./gradlew data:testDebugUnitTest
-./gradlew presentation:testDebugUnitTest
 ./gradlew koverHtmlReportUnit  # 커버리지 리포트 (build/reports/kover/htmlUnit), UI·자동 생성 코드 제외
 ```
 
 - 테스트: Kotest + MockK
-- 버전은 `gradle/libs.versions.toml`에서 확인한다
 
 ## 테스트 작성 원칙
 
@@ -81,17 +65,9 @@ lint/             - 커스텀 Android Lint 규칙 (presentation에 lintChecks로
 - 버전은 `gradle/libs.versions.toml`의 `versionName`만 관리한다. versionCode는 `app/app-version.gradle`이 계산한다 (`major * 100000 + minor * 100 + patch`)
 - 테스터 배포(App Distribution)는 `boolti-distribution` 스킬을 쓴다
 
-## CI (PR에서 실행)
+## PR
 
-`pull-request-ci`, `anti-pattern-check`는 `develop`·`feature/**` 대상 PR에서 돈다.
-
-
-| 워크플로 | 확인 내용 |
-|---|---|
-| `pull-request-ci` | `./gradlew btTest`, `assembleDebug`, APK 크기 비교. 실패 시 디스코드 알림 |
-| `anti-pattern-check` | data 레이어에 `runCatching` 추가 여부 (`suspendRunCatching`만 허용) |
-| `pr-milestone-required` | PR에 마일스톤 지정 여부 |
-| `release-version-check` | `release/*`·`hotfix/*` PR의 versionName (브랜치 이름과 같고 main보다 큰지) |
+- PR에는 마일스톤을 꼭 지정한다 (`pr-milestone-required` CI가 확인)
 
 ## Firebase
 

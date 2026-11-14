@@ -37,6 +37,13 @@ paths:
 - 사용자에게 보이는 문구는 `strings.xml`에 두고 `stringResource`로 쓴다
 - 색상·여백은 `theme/`의 값(`Grey05`~, `Orange01`, `marginHorizontal` 등)을 쓴다. `Color(0xFF...)`를 직접 쓰지 않는다
 
+## 내비게이션
+
+- `navigation<XxxRoot>` 그래프 안에서 `sharedViewModel()`을 쓰는 화면으로 이동하는 클릭은 화면이 RESUMED일 때만 이동한다
+  - 인자 없는 콜백: `dropUnlessResumed { navController.navigate(...) }`
+  - 인자 있는 콜백: `if (entry.lifecycle.currentState == Lifecycle.State.RESUMED)`로 감싼다
+  - 뒤로 가는 중에 이동하면 그래프 밖에서 자식 화면이 열려, 인자 없는 부모 entry의 ViewModel이 생성되다 크래시 난다
+
 ## Composable
 
 - UI를 그리는 Composable은 `modifier: Modifier = Modifier`를 받는다 (진입 Screen, `NavGraphBuilder` 확장, Preview는 예외)
@@ -46,6 +53,11 @@ paths:
 - Preview
   - 본문을 `BooltiTheme { }`로 감싼다
   - 이름은 `{컴포넌트명}Preview`, `private`으로 둔다
+
+## 웹뷰
+
+- `BtWebView`는 기본으로 포커스를 받지 않는다. LazyColumn 안에서 포커스를 가진 WebView가 사라지면(탭 전환, 스크롤) Compose가 크래시 난다
+- 키 입력·뒤로가기 키가 필요한 화면만 `BtWebView(context = context, focusable = true)`로 켠다 (예: 공연 등록). 이 WebView는 LazyColumn 안에 넣지 않는다
 
 ## 웹 브릿지
 

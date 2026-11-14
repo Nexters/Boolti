@@ -3,12 +3,12 @@ package com.nexters.boolti.presentation.screen.gift
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nexters.boolti.domain.model.ImagePair
+import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,14 +31,11 @@ import javax.inject.Inject
 @HiltViewModel
 class GiftViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getCachedUserUseCase: GetCachedUserUseCase,
+    private val authRepository: AuthRepository,
     private val ticketingRepository: TicketingRepository,
     private val giftRepository: GiftRepository,
     private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : BaseViewModel() {
-    private val userId = checkNotNull(getCachedUserUseCase()?.id) {
-        "[GiftViewModel] 사용자 정보가 없습니다."
-    }
     val showId: String = requireNotNull(savedStateHandle["showId"])
     val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
@@ -77,7 +74,13 @@ class GiftViewModel @Inject constructor(
 
         viewModelScope.launch(recordExceptionHandler) {
             _uiState.update { it.copy(loading = true) }
-            ticketingRepository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
+            ticketingRepository.getTicketingInfo(
+                TicketingInfoRequest(
+                    showId,
+                    salesTicketTypeId,
+                    ticketCount,
+                )
+            )
                 .onSuccess { info ->
                     _uiState.update {
                         it.copy(
@@ -149,9 +152,20 @@ class GiftViewModel @Inject constructor(
 
         viewModelScope.launch(recordExceptionHandler) {
             _uiState.update { it.copy(loading = true) }
-            ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
-                .onSuccess { orderId -> sendEvent(GiftEvent.ProgressPayment(userId, orderId)) }
+            val userId = authRepository.getUser()
                 .onFailure { e -> Timber.e(e) }
+                .getOrNull()?.id
+            if (userId != null) {
+                ticketingRepository.requestOrderId(
+                    OrderIdRequest(
+                        showId,
+                        salesTicketTypeId,
+                        ticketCount,
+                    )
+                )
+                    .onSuccess { orderId -> sendEvent(GiftEvent.ProgressPayment(userId, orderId)) }
+                    .onFailure { e -> Timber.e(e) }
+            }
             _uiState.update { it.copy(loading = false) }
         }
     }

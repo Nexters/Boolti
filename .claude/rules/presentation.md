@@ -58,6 +58,10 @@ paths:
 
 - `BtWebView`는 기본으로 포커스를 받지 않는다. LazyColumn 안에서 포커스를 가진 WebView가 사라지면(탭 전환, 스크롤) Compose가 크래시 난다
 - 키 입력·뒤로가기 키가 필요한 화면만 `BtWebView(context = context, focusable = true)`로 켠다 (예: 공연 등록). 이 WebView는 LazyColumn 안에 넣지 않는다
+- `focusable = true` WebView가 탭 안에 필요하면 탭을 바꿔도 화면에서 빼지 않는다
+  - WebView는 `when (selectedTab)` 바깥에 두고 URL이나 `visibility`만 바꾼다 (예: 장소 화면)
+  - 빼야 한다면 탭 클릭 핸들러에서 상태를 바꾸기 전에 `webView.clearFocus()`를 부른다. `onDispose`에서 부르면 늦다
+  - `HorizontalPager`도 화면 밖 페이지를 빼므로 LazyColumn과 같이 피한다
 
 ## 웹 브릿지
 

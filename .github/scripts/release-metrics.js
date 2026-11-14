@@ -53,7 +53,8 @@ function collect() {
 
 // gh-pages의 data.js에서 마지막 기록을 읽는다
 function readBaseline(dataJsPath) {
-  if (!fs.existsSync(dataJsPath)) return null;
+  // 기준값을 못 가져오면 workflow가 빈 파일을 남긴다 (gh-pages에 아직 data.js가 없을 때 등)
+  if (!fs.existsSync(dataJsPath) || fs.statSync(dataJsPath).size === 0) return null;
   const json = fs.readFileSync(dataJsPath, 'utf8').replace(/^window\.BENCHMARK_DATA\s*=\s*/, '');
   const entries = Object.values(JSON.parse(json).entries)[0];
   return entries?.at(-1) ?? null;

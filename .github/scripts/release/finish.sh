@@ -73,10 +73,11 @@ else
 - 충돌이나 권한 문제로 바로 머지하지 못하면 승인 뒤 자동으로 머지돼요"
   fi
   # 리뷰 대기 동안 develop에서 딴 브랜치가 QA 수정을 놓쳐 충돌하지 않게 바로 머지한다
+  # 열린 PR에 누가 커밋을 더 올렸으면 리뷰 없이 들어가지 않게 main 머지 커밋일 때만 머지한다
   # 관리자나 develop 리뷰 예외(bypass)에 등록된 앱만 성공한다. 실패하면 승인 뒤 자동 머지로 넘긴다
   if ! $APPLY; then
-    echo "  [미리보기] gh pr merge $BACKMERGE --merge --admin (실패하면 --auto --merge로 예약)"
-  elif ! gh pr merge "$BACKMERGE" --merge --admin; then
+    echo "  [미리보기] gh pr merge $BACKMERGE --merge --admin --match-head-commit $MERGE_SHA (실패하면 --auto --merge로 예약)"
+  elif ! gh pr merge "$BACKMERGE" --merge --admin --match-head-commit "$MERGE_SHA"; then
     echo "  ⚠️ 바로 머지하지 못했어요. 승인하면 자동으로 머지되게 예약해요"
     gh pr merge "$BACKMERGE" --auto --merge
     BACKMERGE_WAITING=true

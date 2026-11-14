@@ -39,7 +39,12 @@ internal class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun kakaoLogin(request: LoginRequest): Result<LoginUserState> {
         return authDataSource.login(request).onSuccess { response ->
-            tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
+            val accessToken = response.accessToken
+            val refreshToken = response.refreshToken
+            // 가입이 필요한 사용자는 토큰이 없다. 토큰은 가입 후 signUp에서 저장한다
+            if (accessToken == null || refreshToken == null) return@onSuccess
+
+            tokenDataSource.saveTokens(accessToken, refreshToken)
             deviceTokenDataSource.sendFcmToken()
             // 캐시 실패로 로그인이 실패하면 안 된다. 비어 있으면 getUser()가 다시 받는다
             getUser(forceRefresh = true).onFailure { Timber.w(it) }

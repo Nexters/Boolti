@@ -1,5 +1,6 @@
 package com.nexters.boolti.presentation.util
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.os.Build
@@ -12,6 +13,8 @@ import com.nexters.boolti.presentation.screen.MainActivity
  *
  * 맨 앞(resumed) Activity에만 콜백을 걸어서, 팝업이 떠 있을 때 찍어도 팝업이 겹치지 않는다
  */
+// 권한은 src/debug 매니페스트에만 있다. debug 빌드에서만 등록하므로 release lint 경고는 해당 없음
+@SuppressLint("MissingPermission")
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class ScreenCaptureWatcher : Application.ActivityLifecycleCallbacks {
     private var registered: Pair<Activity, Activity.ScreenCaptureCallback>? = null

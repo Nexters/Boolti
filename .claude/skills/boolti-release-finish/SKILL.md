@@ -1,6 +1,6 @@
 ---
 name: boolti-release-finish
-description: 출시가 끝난 불티 정기 릴리즈를 마무리한다. release/* PR을 main에 머지하고, v<버전> 태그와 GitHub Release를 만들고, develop 역머지 PR에 자동 머지를 예약한다. "릴리즈 마무리", "스토어 출시 끝났어", "릴리즈 태깅해줘", "main에 머지하고 태그 달아줘" 같은 요청에 트리거. 핫픽스 마무리는 boolti-hotfix-finish를 쓴다.
+description: 출시가 끝난 불티 정기 릴리즈를 마무리한다. release/* PR을 main에 머지하고, v<버전> 태그와 GitHub Release를 만들고, develop 역머지 PR을 바로 머지한다(권한이 없으면 자동 머지 예약). "릴리즈 마무리", "스토어 출시 끝났어", "릴리즈 태깅해줘", "main에 머지하고 태그 달아줘" 같은 요청에 트리거. 핫픽스 마무리는 boolti-hotfix-finish를 쓴다.
 ---
 
 # 릴리즈 마무리

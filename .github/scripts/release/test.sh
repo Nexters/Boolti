@@ -86,7 +86,7 @@ pass "핫픽스 선반영 시 멈춤"
 # 7. 머지된 뒤 finish 미리보기: 태그·Release·역머지 순서로 진행하고 아무것도 바꾸지 않는다
 git push -q -f origin origin/release/1.15.0:main
 OUT=$(FAKE_PR="7 MERGED" $S/finish.sh release 1.15.0 2>&1) || { echo "$OUT"; fail "finish 미리보기 실패"; }
-for step in "git tag -f -a v1.15.0" "release create v1.15.0" "--notes-start-tag v1.14.3" "backmerge/1.15.0" "--auto --merge" "title=1.16.0"; do
+for step in "git tag -f -a v1.15.0" "release create v1.15.0" "--notes-start-tag v1.14.3" "backmerge/1.15.0" "--merge --admin" "title=1.16.0"; do
   grep -q -- "$step" <<< "$OUT" || fail "finish 미리보기에 '$step' 없음"
 done
 ! git ls-remote --exit-code --tags origin v1.15.0 > /dev/null || fail "미리보기가 태그를 만듦"

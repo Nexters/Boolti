@@ -61,16 +61,26 @@ fi
 
 info "develop 역머지"
 BACKMERGE="backmerge/$VERSION"
+BACKMERGE_WAITING=false
 if git merge-base --is-ancestor "$MERGE_SHA" origin/develop 2> /dev/null; then
   echo "  이미 develop에 들어가 있어요"
-elif [ -n "$(gh pr list --head "$BACKMERGE" --base develop --state open --json number -q '.[0].number')" ]; then
-  echo "  역머지 PR이 이미 열려 있어요"
 else
-  run git push -q origin "$MERGE_SHA:refs/heads/$BACKMERGE"
-  run gh pr create --base develop --head "$BACKMERGE" --title "$TAG 역머지" --milestone "$VERSION" \
-    --body "- $TAG 을 develop에 반영해요. 요청: @$REQUESTER
-- 승인하면 자동으로 머지돼요"
-  run gh pr merge "$BACKMERGE" --auto --merge
+  if [ -z "$(gh pr list --head "$BACKMERGE" --base develop --state open --json number -q '.[0].number')" ]; then
+    run git push -q origin "$MERGE_SHA:refs/heads/$BACKMERGE"
+    run gh pr create --base develop --head "$BACKMERGE" --title "$TAG 역머지" --milestone "$VERSION" \
+      --body "- $TAG 을 develop에 반영해요. 요청: @$REQUESTER
+- release 브랜치에서 리뷰를 받은 커밋이라 리뷰 없이 바로 머지해요
+- 충돌이나 권한 문제로 바로 머지하지 못하면 승인 뒤 자동으로 머지돼요"
+  fi
+  # 리뷰 대기 동안 develop에서 딴 브랜치가 QA 수정을 놓쳐 충돌하지 않게 바로 머지한다
+  # 관리자나 develop 리뷰 예외(bypass)에 등록된 앱만 성공한다. 실패하면 승인 뒤 자동 머지로 넘긴다
+  if ! $APPLY; then
+    echo "  [미리보기] gh pr merge $BACKMERGE --merge --admin (실패하면 --auto --merge로 예약)"
+  elif ! gh pr merge "$BACKMERGE" --merge --admin; then
+    echo "  ⚠️ 바로 머지하지 못했어요. 승인하면 자동으로 머지되게 예약해요"
+    gh pr merge "$BACKMERGE" --auto --merge
+    BACKMERGE_WAITING=true
+  fi
 fi
 
 MILESTONE=$(milestone_number "$VERSION")
@@ -80,5 +90,9 @@ if [ -n "$MILESTONE" ]; then
 fi
 ensure_milestone "$(next_version release "$VERSION")"
 
-notify "🎉 $TAG 출시 마무리 (요청: $REQUESTER). 역머지 PR 승인이 필요해요"
+if $BACKMERGE_WAITING; then
+  notify "🎉 $TAG 출시 마무리 (요청: $REQUESTER). 역머지 PR 승인이 필요해요"
+else
+  notify "🎉 $TAG 출시 마무리 (요청: $REQUESTER). develop 역머지까지 끝났어요"
+fi
 preview_hint

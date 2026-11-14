@@ -11,7 +11,7 @@ AI 없이도 쓸 수 있어요. 스킬(`boolti-release-*`, `boolti-hotfix-*`)과
 
 ```
 start  → <kind>/<버전> 브랜치 + 버전 커밋 + main 대상 PR (QA 수정은 이 브랜치로 PR)
-finish → main 머지 → 태그 v<버전> → GitHub Release → backmerge/<버전> → develop PR (자동 머지 예약)
+finish → main 머지 → 태그 v<버전> → GitHub Release → backmerge/<버전> → develop PR 바로 머지 (권한이 없으면 자동 머지 예약)
 cancel → 버전 커밋 하나만 있을 때 PR 닫기 + 브랜치·빈 마일스톤 삭제
 ```
 

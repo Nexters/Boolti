@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,11 +61,14 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun updateUserInfoFromKaKao(idToken: String) {
-        val payloadMap = JwtUtil().decodePayload(idToken)
+        // 형식이 잘못된 토큰이어도 로그인은 진행한다. 가입할 때만 userId가 필요하다
+        val payloadMap = runCatching { JwtUtil().decodePayload(idToken) }
+            .onFailure { e -> Timber.e(e) }
+            .getOrDefault(emptyMap())
 
         val profileImageUrl = payloadMap["picture"]?.replace("http:", "https:")
         val nickname = payloadMap["nickname"]
-        val userId = payloadMap["sub"]!! // todo : sub가 null일 때 처리하기. 근데 그러면 안 되는데...
+        val userId = payloadMap["sub"]
         val email = payloadMap["email"]
 
         _uiState.update {
@@ -80,6 +84,12 @@ class LoginViewModel @Inject constructor(
     fun signUp() {
         viewModelScope.launch {
             val loginState = uiState.value
+            val userId = loginState.userId
+            if (userId == null) {
+                Timber.e(IllegalStateException("카카오 idToken에 sub가 없어 가입할 수 없습니다."))
+                event(LoginEvent.SignupFailed)
+                return@launch
+            }
             authRepository.signUp(
                 SignUpRequest(
                     email = loginState.email,
@@ -87,7 +97,7 @@ class LoginViewModel @Inject constructor(
                     imgPath = loginState.profileImageUrl,
                     phoneNumber = null,
                     oauthType = OauthType.KAKAO,
-                    oauthIdentity = loginState.userId,
+                    oauthIdentity = userId,
                 )
             ).onSuccess {
                 AppTracker.complete(

@@ -17,10 +17,12 @@ import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
 import com.nexters.boolti.domain.request.SignUpRequest
 import com.nexters.boolti.domain.request.SignoutRequest
+import com.nexters.boolti.domain.util.suspendRunCatching
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class AuthRepositoryImpl @Inject constructor(
@@ -39,7 +41,8 @@ internal class AuthRepositoryImpl @Inject constructor(
         return authDataSource.login(request).onSuccess { response ->
             tokenDataSource.saveTokens(response.accessToken ?: "", response.refreshToken ?: "")
             deviceTokenDataSource.sendFcmToken()
-            getUserAndCache().first()
+            // 캐시 실패로 로그인이 실패하면 안 된다. 비어 있으면 getUser()가 다시 받는다
+            getUser(forceRefresh = true).onFailure { Timber.w(it) }
         }.mapCatching(LoginResponse::toDomain)
     }
 
@@ -49,6 +52,8 @@ internal class AuthRepositoryImpl @Inject constructor(
         return signUpDataSource.signUp(signUpRequest).onSuccess { response ->
             tokenDataSource.saveTokens(response.accessToken, response.refreshToken)
             deviceTokenDataSource.sendFcmToken()
+            // 캐시 실패로 가입이 실패하면 안 된다. 비어 있으면 getUser()가 다시 받는다
+            getUser(forceRefresh = true).onFailure { Timber.w(it) }
         }.mapCatching { }
     }
 
@@ -58,21 +63,23 @@ internal class AuthRepositoryImpl @Inject constructor(
         authDataSource.localLogout()
     }
 
-    override fun getUserAndCache(): Flow<User.My?> = flow {
-        val response = userDateSource.getUser()
-        response?.let {
-            authDataSource.updateUser(it)
-            AppTracker.identify(
-                userId = it.id,
-                properties = buildMap {
-                    it.userCode?.let { userCode -> put("userCode", userCode) }
-                    it.email?.let { email -> put($$"$email", email) }
-                    it.nickname?.let { nickname -> put($$"$name", nickname) }
-                },
-            )
-        }
+    override suspend fun getUser(forceRefresh: Boolean): Result<User.My> = suspendRunCatching {
+        val cached = if (forceRefresh) null else cachedUser.first()
+        cached ?: fetchAndCacheUser()
+    }
 
-        emit(response?.toDomain())
+    private suspend fun fetchAndCacheUser(): User.My {
+        val response = checkNotNull(userDateSource.getUser()) { "내 정보 응답이 비어 있어요" }
+        authDataSource.updateUser(response)
+        AppTracker.identify(
+            userId = response.id,
+            properties = buildMap {
+                response.userCode?.let { userCode -> put("userCode", userCode) }
+                response.email?.let { email -> put($$"$email", email) }
+                response.nickname?.let { nickname -> put($$"$name", nickname) }
+            },
+        )
+        return response.toDomain()
     }
 
     override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()

@@ -99,7 +99,7 @@ fun ShowRegistrationScreen(
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = { context ->
-                    BtWebView(context = context).apply {
+                    BtWebView(context = context, focusable = true).apply {
                         setWebChromeClient(
                             launchActivity = { launcher.launch(arrayOf("image/*")) },
                             setFilePathCallback = { callback -> filePathCallback = callback },

@@ -3,10 +3,12 @@ package com.nexters.boolti.presentation.screen.showdetail
 import androidx.compose.runtime.Stable
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.domain.model.ShowState
 
 @Stable
 data class ShowDetailUiState(
     val showDetail: ShowDetail? = null,
+    val showState: ShowState? = null,
     val selectedTab: Int = 0,
     val castTeams: List<CastTeams> = emptyList(),
     val shouldShowNaverMapDialog: Boolean = true,

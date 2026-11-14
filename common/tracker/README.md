@@ -134,11 +134,135 @@ import com.nexters.boolti.common.tracker.event.impression
 
 AppTracker.impression(
     screen = Screen.Home,
+    objectRole = Role.Banner,
+    objectValue = "PromotionBanner",
     properties = mapOf(
         "banner_id" to "promotion_001"
     )
 )
 ```
+
+#### Compose 컴포넌트 노출 감지
+
+- `Modifier.impression`으로 지정 비율 이상 노출되었을 때 기록함.
+- 기본은 50% 노출이며, 스크롤 아웃 후 돌아오면 다시 기록함.
+- 노출 중 리컴포지션이나 위치 변경만으로 다시 기록하지 않음.
+- **이벤트 전달은 한 경로만 사용함**: 로컬 `onImpressed`가 있으면 우선 호출하고, 없으면 `ImpressionState`의 중앙 콜백으로 전달함.
+
+```kotlin
+import com.nexters.boolti.common.tracker.AppTracker
+import com.nexters.boolti.common.tracker.event.impression
+import com.nexters.boolti.common.tracker.field.Banner
+import com.nexters.boolti.common.tracker.field.Home
+import com.nexters.boolti.common.tracker.field.Role
+import com.nexters.boolti.common.tracker.field.Screen
+import com.nexters.boolti.common.tracker.impression.impression
+
+// key와 state 생략 가능. key는 랜덤 String으로 자동 생성함.
+Box(
+    modifier = Modifier.impression(
+        threshold = 0.5f,
+        extras = { mapOf("banner_id" to banner.id) },
+    ) { extras ->
+        AppTracker.impression(
+            screen = Screen.Home,
+            objectRole = Role.Banner,
+            objectValue = "PromotionBanner",
+            properties = extras,
+        )
+    },
+)
+```
+
+#### 여러 컴포넌트의 로그를 한 곳에서 기록
+
+```kotlin
+import com.nexters.boolti.common.tracker.field.Item
+import com.nexters.boolti.common.tracker.impression.rememberImpressionState
+
+// rememberSaveable 기반. 기본값 deduplicate=false는 재노출마다 기록함.
+val impressionState = rememberImpressionState { event ->
+    AppTracker.impression(
+        event = event,
+        screen = Screen.Home,
+        objectRole = Role.Item,
+        objectValue = "ShowCard",
+    )
+}
+
+LazyColumn {
+    itemsIndexed(shows, key = { _, show -> show.id }) { index, show ->
+        ShowCard(
+            modifier = Modifier.impression(
+                key = show.id,
+                state = impressionState,
+                extras = { mapOf("show_id" to show.id, "rank" to index + 1) },
+            ),
+        )
+    }
+}
+```
+
+- 중앙 콜백은 `ImpressionEvent(key: Any, threshold: Float, extras: Map<String, Any>)` 수신함.
+- 이벤트의 threshold는 설정한 기준값임. 실제 측정 비율은 아님.
+- 새 AppTracker 오버로드는 extras를 기존 properties로 전달함. key와 threshold는 자동 전송하지 않음.
+- extras에 `screen`, `object_role`, `object_value`를 넣으면 새 오버로드가 오류로 거부함.
+- Flow 대신 생성자 콜백을 제공함. 수집 시작 전 이벤트 유실이나 재수집 중복 없이 직접 수신함.
+
+#### ViewModel에서 상태 소유
+
+```kotlin
+import com.nexters.boolti.common.tracker.impression.ImpressionState
+
+class HomeViewModel : ViewModel() {
+    val impressionState = ImpressionState(deduplicate = true) { event ->
+        AppTracker.impression(
+            event = event,
+            screen = Screen.Home,
+            objectRole = Role.Item,
+            objectValue = "ShowCard",
+        )
+    }
+}
+
+// Composable에서 전달
+Modifier.impression(key = show.id, state = viewModel.impressionState)
+```
+
+| 항목 | 동작 |
+|---|---|
+| `deduplicate = false` — 기본값 | 기준 미달 → 충족으로 바뀔 때마다 기록 |
+| `deduplicate = true` | state에서 key별 1회만 기록 |
+| 같은 state의 동일 key 여러 개 | 하나의 대상으로 취급. 모두 기준 미달이 된 뒤 다시 충족할 때 재노출 |
+| key 생략 | 호출 위치별 UUID 문자열 생성. 리컴포지션·저장 복원 시 유지 |
+| key 직접 지정 | 목록이나 ViewModel에서 동일 데이터를 지속해서 식별할 때 사용 |
+| threshold | 0~1의 유한한 Float. 기준과 같은 비율도 포함. 기본 0.5f |
+| threshold 0 | 크기가 있는 첫 실제 배치 시 기록. 화면 밖 배치도 포함. 단순 사전 구성으로는 기록하지 않음 |
+| extras 람다 | 발생 확정 시 한 번 평가하고 Map 복사. 가벼운 값 구성만 수행 |
+| `reset(key)` / `resetAll()` | 기록 이력 제거. 이미 노출 중이면 다음 노출 구간부터 재기록 |
+
+- key는 `Any`를 받으며 `equals`/`hashCode` 기준으로 비교함. 예: `123`, `"123"`은 서로 다른 key임. 비교 결과가 변하지 않는 불변 값을 사용함.
+- `deduplicate = true` 상태를 저장 복원할 때는 key도 Android에서 저장 가능한 타입이어야 함. Int·Long·String·Parcelable·Serializable 등이 해당함. 일반 객체 key는 ViewModel에서 생성한 상태처럼 저장하지 않는 상태에서 사용 가능함.
+
+#### 저장 복원과 수명
+
+- `rememberImpressionState`는 정책과 기록 이력을 저장 복원하고 최신 중앙 콜백을 다시 연결함.
+- 직접 생성도 가능함: `rememberSaveable(saver = ImpressionState.Saver) { ImpressionState() }`.
+- 직접 Saver 사용 시 콜백은 저장하지 않으므로 로컬 `onImpressed`를 전달함. 중앙 콜백 복원이 필요하면 헬퍼 사용을 권장함.
+- ViewModel에서 생성하면 화면 회전에 유지됨. 프로세스 종료 후 복원은 기본 제공하지 않음.
+- 기본 상태는 과거 key를 누적하지 않음. 중복 제한 상태는 key가 쌓이므로 화면 범위로 사용하고 큰 무한 목록의 저장 용량에 유의함.
+- 자동 key의 저장 상태가 사라지면 새 key가 생성됨. 화면 재생성 뒤에도 ViewModel의 중복 이력을 적용하려면 명시적 데이터 key 사용.
+- 콜백 실행 전에 중복 이력을 기록함. 콜백 오류 시 자동 재전송하지 않으며 서버 수신 성공까지 보장하지 않음.
+- ImpressionState 변경과 콜백은 메인 스레드에서 실행함. ViewModel 콜백에서 Activity나 View를 보관하지 않음.
+
+#### 면적 기준과 성능
+
+- 부모 clip과 Compose 루트 경계가 반영된 창 좌표의 사각형 면적을 사용함. 큰 항목도 항목 전체 면적을 분모로 사용함.
+- 다른 UI가 덮는 픽셀, 투명도, 둥근 모양의 정확한 픽셀 면적은 계산하지 않음.
+- 호스트 lifecycle이 STARTED 이상이고 View가 표시된 상태에서 판정함. 비활성 상태에서 활성화되면 재판정함.
+- `Modifier.impression().padding(...)`은 padding을 포함한 크기, `Modifier.padding(...).impression()`은 padding 안쪽 크기를 기준으로 함.
+- Modifier.Node에서 배치·좌표 변화만 관찰함. 좌표를 Compose 상태로 올리지 않으며 항목별 반복 검사·코루틴을 만들지 않음.
+- 인자 변경 시 새 배치가 끝난 뒤 1회 재판정함. extras/콜백만 바뀌면 참조만 갱신함.
 
 ### 4. Search - 검색 이벤트 트래킹
 

@@ -2,6 +2,7 @@ package com.nexters.boolti.data.di
 
 import com.nexters.boolti.data.repository.AuthRepositoryImpl
 import com.nexters.boolti.data.repository.ConfigRepositoryImpl
+import com.nexters.boolti.data.repository.DeviceInfoRepositoryImpl
 import com.nexters.boolti.data.repository.FileRepositoryImpl
 import com.nexters.boolti.data.repository.GiftRepositoryImpl
 import com.nexters.boolti.data.repository.HostRepositoryImpl
@@ -14,9 +15,11 @@ import com.nexters.boolti.data.repository.ShowRepositoryImpl
 import com.nexters.boolti.data.repository.TicketRepositoryImpl
 import com.nexters.boolti.data.repository.TicketingRepositoryImpl
 import com.nexters.boolti.data.repository.UserConfigRepositoryImpl
+import com.nexters.boolti.data.repository.PlaceRepositoryImpl
 import com.nexters.boolti.data.repository.YouTubeRepositoryImpl
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.ConfigRepository
+import com.nexters.boolti.domain.repository.DeviceInfoRepository
 import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.HostRepository
@@ -26,6 +29,7 @@ import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.SearchHistoryRepository
 import com.nexters.boolti.domain.repository.SearchRepository
 import com.nexters.boolti.domain.repository.ShowRepository
+import com.nexters.boolti.domain.repository.PlaceRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
@@ -82,4 +86,10 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindSearchRepository(repository: SearchRepositoryImpl): SearchRepository
+
+    @Binds
+    abstract fun bindPlaceRepository(repository: PlaceRepositoryImpl): PlaceRepository
+
+    @Binds
+    abstract fun bindDeviceInfoRepository(repository: DeviceInfoRepositoryImpl): DeviceInfoRepository
 }

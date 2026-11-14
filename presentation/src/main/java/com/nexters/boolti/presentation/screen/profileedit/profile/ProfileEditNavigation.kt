@@ -16,7 +16,7 @@ fun NavGraphBuilder.profileEditScreen(
 
         ProfileEditScreen(
             modifier = modifier,
-            navigateBack = navController::popBackStack,
+            navigateUp = navController::popBackStack,
             navigateToNicknameEdit = {
                 navController.navigate(ProfileRoute.ProfileNicknameEdit)
             },
@@ -30,10 +30,10 @@ fun NavGraphBuilder.profileEditScreen(
                 navController.navigate(ProfileRoute.ProfileSnsEdit)
             },
             navigateToVideoEdit = { userCode ->
-                navController.navigate(VideoListRoute.VideoListRoot(userCode, true))
+                navController.navigate(VideoListRoute.VideoList(userCode, true))
             },
             navigateToLinkEdit = { userCode ->
-                navController.navigate(LinkListRoute.LinkListRoot(userCode, true))
+                navController.navigate(LinkListRoute.LinkList(userCode, true))
             },
         )
     }

@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTClearableTextField
@@ -35,8 +36,6 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
 import com.nexters.boolti.presentation.component.MainButton
-import com.nexters.boolti.presentation.screen.link.LinkEditEvent
-import com.nexters.boolti.presentation.screen.link.LinkListViewModel
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.Grey90
@@ -46,47 +45,39 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 @Composable
 fun LinkEditScreen(
     navigateUp: () -> Unit,
+    closeList: () -> Unit,
+    returnResult: (LinkEditResult) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LinkListViewModel,
+    viewModel: LinkEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel.linkEditEvent
 
     BackHandler {
-        viewModel.tryBack()
+        viewModel.onAction(LinkEditAction.Back)
     }
 
-    ObserveAsEvents(event) {
+    ObserveAsEvents(viewModel.event) {
         when (it) {
-            LinkEditEvent.Finish -> navigateUp()
+            is LinkEditEvent.Done -> returnResult(it.result)
+            LinkEditEvent.Close -> navigateUp()
+            LinkEditEvent.CloseWithList -> closeList()
         }
     }
 
     LinkEditScreen(
-        isEditMode = uiState.editingLink?.id?.isNotEmpty() == true,
-        linkName = uiState.editingLink?.name.orEmpty(),
-        linkUrl = uiState.editingLink?.url.orEmpty(),
-        onClickBack = viewModel::tryBack,
-        onClickComplete = viewModel::completeAddOrEditLink,
-        onChangeLinkName = viewModel::onLinkNameChanged,
-        onChangeLinkUrl = viewModel::onLinkUrlChanged,
-        requireRemove = viewModel::removeLink,
+        uiState = uiState,
+        onAction = viewModel::onAction,
         modifier = modifier,
     )
 }
 
 @Composable
-fun LinkEditScreen(
-    isEditMode: Boolean,
-    linkName: String,
-    linkUrl: String,
-    onClickBack: () -> Unit,
-    onClickComplete: () -> Unit,
-    onChangeLinkName: (String) -> Unit,
-    onChangeLinkUrl: (String) -> Unit,
-    requireRemove: () -> Unit,
+private fun LinkEditScreen(
+    uiState: LinkEditUiState,
+    onAction: (LinkEditAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isEditMode = uiState.isEditMode
     var showLinkRemoveDialog by remember { mutableStateOf(false) }
     val linkNameInteractionSource = remember { MutableInteractionSource() }
     val linkUrlInteractionSource = remember { MutableInteractionSource() }
@@ -99,15 +90,15 @@ fun LinkEditScreen(
             BtAppBar(
                 navigateButtons = {
                     BtAppBarDefaults.AppBarIconButton(
-                        onClick = onClickBack,
+                        onClick = { onAction(LinkEditAction.Back) },
                         iconRes = R.drawable.ic_arrow_back,
                     )
                 },
                 actionButtons = {
                     BtAppBarDefaults.AppBarTextButton(
                         label = stringResource(R.string.complete),
-                        onClick = onClickComplete,
-                        enabled = linkName.isNotBlank() && linkUrl.isNotBlank(),
+                        onClick = { onAction(LinkEditAction.Complete) },
+                        enabled = uiState.completeEnabled,
                     )
                 },
                 title = stringResource(if (isEditMode) R.string.link_edit else R.string.link_add),
@@ -135,9 +126,9 @@ fun LinkEditScreen(
                         modifier = Modifier
                             .padding(start = 12.dp)
                             .fillMaxWidth(),
-                        text = linkName,
+                        text = uiState.name,
                         placeholder = stringResource(R.string.link_name_placeholder),
-                        onValueChanged = onChangeLinkName,
+                        onValueChanged = { onAction(LinkEditAction.ChangeName(it)) },
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
                         ),
@@ -157,9 +148,9 @@ fun LinkEditScreen(
                         modifier = Modifier
                             .padding(start = 12.dp)
                             .fillMaxWidth(),
-                        text = linkUrl,
+                        text = uiState.url,
                         placeholder = stringResource(R.string.link_url_placeholder),
-                        onValueChanged = onChangeLinkUrl,
+                        onValueChanged = { onAction(LinkEditAction.ChangeUrl(it)) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Default,
@@ -190,7 +181,7 @@ fun LinkEditScreen(
                 positiveButtonLabel = stringResource(R.string.btn_delete),
                 negativeButtonLabel = stringResource(R.string.cancel),
                 onClickPositiveButton = {
-                    requireRemove()
+                    onAction(LinkEditAction.Remove)
                     showLinkRemoveDialog = false
                 },
                 onClickNegativeButton = { showLinkRemoveDialog = false },
@@ -212,14 +203,8 @@ fun LinkEditScreen(
 private fun LinkEditScreenPreview() {
     BooltiTheme {
         LinkEditScreen(
-            isEditMode = true,
-            linkName = "링크 이름",
-            linkUrl = "링크 URL",
-            onClickBack = {},
-            onClickComplete = {},
-            onChangeLinkName = {},
-            onChangeLinkUrl = {},
-            requireRemove = {},
+            uiState = LinkEditUiState(isEditMode = true, name = "링크 이름", url = "링크 URL"),
+            onAction = {},
         )
     }
 }

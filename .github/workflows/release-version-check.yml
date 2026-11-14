@@ -1,0 +1,63 @@
+name: Release Version Check
+
+on:
+  pull_request:
+    branches: [main]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-version-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: >
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (startsWith(github.event.pull_request.head.ref, 'release/') ||
+       startsWith(github.event.pull_request.head.ref, 'hotfix/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # versionCode는 app/app-version.gradle이 versionName에서 계산하므로 versionName만 검사한다
+      - name: Verify versionName
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          source .github/scripts/release/lib.sh
+
+          current_name=$(version_of HEAD)
+          main_name=$(version_of origin/main)
+          branch_version="${HEAD_REF#*/}"
+
+          echo "Branch: $HEAD_REF (version: $branch_version)"
+          echo "versionName: $current_name (main: $main_name)"
+
+          errors=0
+
+          if ! is_version "$branch_version" || [ "$current_name" != "$branch_version" ]; then
+            echo "::error::versionName($current_name) must equal branch suffix ($branch_version) in major.minor.patch."
+            errors=$((errors + 1))
+          fi
+
+          if [ "$current_name" = "$main_name" ] || [ "$(higher_version "$current_name" "$main_name")" != "$current_name" ]; then
+            echo "::error::versionName($current_name) must be greater than main($main_name) per semver."
+            errors=$((errors + 1))
+          fi
+
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
+
+          echo "✅ 버전 검증 통과"

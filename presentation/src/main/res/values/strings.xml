@@ -27,6 +27,7 @@
     <string name="error_ticket_not_matched">이 공연의 티켓이 아니에요</string>
     <string name="error_ticket_not_found">존재하지 않는 티켓이에요</string>
     <string name="error_invalid_ticket">불티에서 발권된 티켓이 아니에요</string>
+    <string name="error_invalid_reservation">취소되었거나 유효하지 않은 예매예요</string>
 
     <string name="kakao">카카오</string>
 
@@ -185,6 +186,8 @@
     <string name="ticketing_invite_code_placeholder">초청 코드를 입력해주세요</string>
     <string name="ticketing_invite_code_use_button">사용하기</string>
     <string name="ticketing_invite_code_success">사용되었어요</string>
+    <string name="ticketing_load_error">예매 정보를 불러오지 못했어요</string>
+    <string name="retry">다시 시도</string>
     <string name="ticketing_invite_code_duplicated">이미 사용된 초청 코드입니다</string>
     <string name="ticketing_invite_code_invalid">올바른 초청 코드를 입력해 주세요</string>
     <string name="ticketing_invite_code_empty">초청 코드를 입력해 주세요</string>
@@ -259,9 +262,12 @@
     <string name="save_short">저장</string>
     <string name="save_cancel">취소</string>
 
+    <!-- 문의 -->
+    <string name="inquiry_call_to_ask">전화 문의하기</string>
+    <string name="inquiry_text_to_ask">문자 문의하기</string>
+    <string name="inquiry_mail_to_ask">메일 문의하기</string>
+
     <!-- 공연 -->
-    <string name="show_call_to_ask">전화 문의하기</string>
-    <string name="show_text_to_ask">문자 문의하기</string>
     <string name="show_tab_info">공연 정보</string>
     <string name="show_tab_cast">출연진</string>
     <string name="show_sold_ticket_count">%d매 판매 완료</string>
@@ -274,6 +280,24 @@
     <string name="show_naver_map_dialog_title">길찾기를 위해\n네이버 지도앱으로 이동합니다.</string>
     <string name="show_naver_map_dialog_content">이 안내는 한 번만 표시됩니다.</string>
     <string name="show_navigate_to_nmap">앱으로 이동하기</string>
+
+    <!-- 공연장 -->
+    <string name="place_tab_home">홈</string>
+    <string name="place_tab_rental">대관 정보</string>
+    <string name="place_rental_fee">대관료</string>
+    <string name="place_capacity">수용인원</string>
+    <string name="place_location">위치</string>
+    <string name="place_subway">지하철역</string>
+    <string name="place_contact">문의처</string>
+    <string name="place_capacity_format">%d명</string>
+    <string name="place_website">웹사이트</string>
+    <string name="place_phone">전화</string>
+    <string name="place_email">메일</string>
+    <string name="place_no_website">웹사이트를 준비 중이에요</string>
+    <string name="place_no_phone">전화 정보를 준비 중이에요</string>
+    <string name="place_no_email">메일 정보를 준비 중이에요</string>
+    <string name="place_photos">사진</string>
+    <string name="description_place_photo">공연장 사진 %1$d번째</string>
 
     <!-- 입장 코드 -->
     <string name="manager_code">입장 코드</string>
@@ -301,12 +325,18 @@
     <string name="search_no_result">와 관련된 결과가 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_no_show_result">와 관련된 공연이 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_no_artist_result">와 관련된 아티스트가 없어요.\n검색어를 확인해 주세요.</string>
+    <string name="search_no_place_result">와 관련된 공연장이 없어요.\n검색어를 확인해 주세요.</string>
     <string name="search_reset_searched_keyword_button">검색어 초기화</string>
     <string name="search_tab_all">전체</string>
     <string name="search_tab_show_section">공연</string>
     <string name="search_tab_artist_section">아티스트</string>
+    <string name="search_tab_place_section">공연장</string>
     <string name="search_tab_show">공연(%d)</string>
     <string name="search_tab_artist">아티스트(%d)</string>
+    <string name="search_tab_place">공연장(%d)</string>
+    <string name="search_place_finder_subtitle">조건에 맞는 공연장을 찾고 있나요?</string>
+    <string name="search_place_finder_title">공연장 찾기</string>
+    <string name="search_place_finder_beta">Beta</string>
 
     <!-- 결제 -->
     <string name="account_transfer_title">%s까지 아래 계좌로\n%s을 입금해주세요</string>
@@ -349,7 +379,6 @@
     <string name="profile_edit_introduction_placeholder">예) 재즈와 펑크락을 좋아해요</string>
     <string name="remove_link_dialog_message">링크를 삭제하시겠어요?</string>
     <string name="change_thumbnail_description">썸네일 이미지 변경</string>
-    <string name="profile_edit_success_msg">프로필 편집을 완료했어요</string>
     <string name="profile_edit_alert_exit">저장하지 않고 이 페이지를 나가면\n작성한 정보가 손실됩니다.\n변경된 정보를 저장할까요?</string>
     <string name="profile_withdraw_user_message">탈퇴한 회원의 프로필입니다.</string>
     <string name="profile_invalid_user_message">존재하지 않는 프로필입니다.</string>
@@ -369,9 +398,6 @@
     <string name="sns_edit">SNS 편집</string>
     <string name="sns_delete">SNS 삭제</string>
     <string name="sns_delete_message">SNS를 삭제하시겠어요?</string>
-    <string name="sns_add_msg">SNS를 추가했어요</string>
-    <string name="sns_edit_msg">SNS를 편집했어요</string>
-    <string name="sns_remove_msg">SNS를 삭제했어요</string>
     <string name="sns_reorder_description">SNS 순서 변경</string>
     <string name="sns_username_placeholder">ex) boolti_official</string>
     <string name="sns_username_contains_at_error">\@을 제외한 Username을 입력해 주세요</string>
@@ -557,4 +583,6 @@
 
     <!-- 디버깅 옵션 -->
     <string name="debug_show_log">로그 보기</string>
+    <string name="debug_impression_test">임프레션 테스트</string>
+    <string name="debug_info">디버그 정보</string>
 </resources>

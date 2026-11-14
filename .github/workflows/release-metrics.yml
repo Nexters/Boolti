@@ -1,0 +1,120 @@
+name: Release Metrics
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-metrics-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BENCH_DIR: dev/bench
+
+jobs:
+  metrics:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 빌드 캐시를 쓰면 컴파일이 건너뛰어져 Compose 리포트가 생기지 않는다
+      # 측정용 빌드라 Crashlytics mapping 파일은 올리지 않는다
+      - name: Build and measure
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+        run: |
+          echo "$KEYSTORE" | base64 -d > ./app/boolti-keystore
+          echo "$KEYSTORE_PROPERTIES" > keystore.properties
+          echo "$LOCAL_PROPERTIES" > local.properties
+          echo "$GOOGLE_SERVICES" | base64 -d > ./app/google-services.json
+          ./gradlew btTest koverXmlReportUnit lintRelease assembleRelease -PcomposeReports=true \
+            -x uploadCrashlyticsMappingFileRelease --no-build-cache --stacktrace
+
+      - name: Collect metrics
+        run: node .github/scripts/release-metrics.js metrics.json
+
+      - name: Store metrics to gh-pages
+        if: github.event_name == 'push'
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Release Metrics
+          tool: customSmallerIsBetter
+          output-file-path: metrics.json
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: ${{ env.BENCH_DIR }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+
+      # 카드 영역만 캡처해 README용 latest.png로 올리고 디스코드에 첨부한다
+      - name: Capture dashboard
+        if: github.event_name == 'push'
+        run: |
+          sudo apt-get install -y -qq fonts-noto-cjk > /dev/null
+          git fetch --depth=1 origin gh-pages
+          git worktree add pages origin/gh-pages
+          google-chrome --headless=new --disable-gpu --hide-scrollbars --window-size=1200,410 \
+            --virtual-time-budget=5000 --screenshot="$PWD/pages/$BENCH_DIR/latest.png" \
+            "file://$PWD/pages/$BENCH_DIR/index.html"
+          cd pages
+          git add "$BENCH_DIR/latest.png"
+          git -c user.name=github-actions[bot] -c user.email=41898282+github-actions[bot]@users.noreply.github.com \
+            commit -m "릴리즈 지표 캡처 갱신"
+          git push origin HEAD:gh-pages
+
+      - name: Notify Discord
+        if: github.event_name == 'push'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_METRICS_WEBHOOK_URL }}
+          DASHBOARD_URL: https://nexters.github.io/Boolti/${{ env.BENCH_DIR }}/
+        run: |
+          [ -n "$DISCORD_WEBHOOK_URL" ] || exit 0
+          version=$(awk -F '"' '/^versionName = /{ print $2; exit }' gradle/libs.versions.toml)
+          jq -n --arg c "📊 릴리즈 지표 갱신: v$version"$'\n'"$DASHBOARD_URL" '{content: $c}' > payload.json
+          curl -sS --fail-with-body -F "payload_json=<payload.json" -F "files[0]=@pages/$BENCH_DIR/latest.png" "$DISCORD_WEBHOOK_URL"
+
+      - name: Fetch baseline from gh-pages
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          git fetch --depth=1 origin gh-pages
+          git show "origin/gh-pages:$BENCH_DIR/data.js" > baseline-data.js
+
+      - name: Metrics diff comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { comment } = require('./.github/scripts/release-metrics.js');
+            await comment({ github, context, dataJsPath: 'baseline-data.js' });

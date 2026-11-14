@@ -1,57 +1,34 @@
 package com.nexters.boolti.data.repository
 
-import com.nexters.boolti.data.datasource.LocalMemberDataSource
+import com.nexters.boolti.data.cache.CacheKeys
+import com.nexters.boolti.data.cache.CacheStore
 import com.nexters.boolti.data.datasource.RemoteMemberDataSource
 import com.nexters.boolti.domain.model.Link
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.MemberRepository
+import com.nexters.boolti.domain.util.suspendRunCatching
 import javax.inject.Inject
 
 internal class MemberRepositoryImpl @Inject constructor(
     private val remoteMemberDataSource: RemoteMemberDataSource,
-    private val localMemberDataSource: LocalMemberDataSource,
+    private val cacheStore: CacheStore,
 ) : MemberRepository {
     override suspend fun getMember(userCode: String): Result<User.Others> = runCatching {
         remoteMemberDataSource.getMember(userCode).toDomain()
     }
 
-    override suspend fun getLinks(userCode: String, refresh: Boolean): Result<List<Link>> =
-        runCatching {
-            suspend fun getRemoteLinksAndCache(): List<Link> {
-                return remoteMemberDataSource.getLinks(userCode).also {
-                    localMemberDataSource.setLink(userCode, it)
-                }.map { it.toDomain() }
-            }
-
-            if (refresh) {
-                getRemoteLinksAndCache()
-            } else {
-                localMemberDataSource.getLinks(userCode)?.map { it.toDomain() }
-                    ?: getRemoteLinksAndCache()
-            }
-        }
-
-    override suspend fun getPerformedShows(userCode: String): Result<List<Show>> = runCatching {
-        localMemberDataSource.getPerformedShows(userCode)?.map { it.toDomain() }
-            ?: remoteMemberDataSource.getPerformedShows(userCode).also {
-                localMemberDataSource.setPerformedShows(userCode, it)
-            }.map { it.toDomain() }
+    override suspend fun getLinks(userCode: String): Result<List<Link>> = suspendRunCatching {
+        remoteMemberDataSource.getLinks(userCode).map { it.toDomain() }
     }
 
-    override suspend fun getVideoLinks(userCode: String, refresh: Boolean): Result<List<String>> =
-        runCatching {
-            suspend fun getRemoteVideosAndCache(): List<String> {
-                return remoteMemberDataSource.getVideoLinks(userCode).also {
-                    localMemberDataSource.setVideoLinks(userCode, it)
-                }
-            }
-
-            if (refresh) {
-                getRemoteVideosAndCache()
-            } else {
-                localMemberDataSource.getVideoLinks(userCode)
-                    ?: getRemoteVideosAndCache()
-            }
+    override suspend fun getPerformedShows(userCode: String): Result<List<Show>> = suspendRunCatching {
+        cacheStore.getOrFetch(CacheKeys.performedShows(userCode)) {
+            remoteMemberDataSource.getPerformedShows(userCode).map { it.toDomain() }
         }
+    }
+
+    override suspend fun getVideoLinks(userCode: String): Result<List<String>> = suspendRunCatching {
+        remoteMemberDataSource.getVideoLinks(userCode)
+    }
 }

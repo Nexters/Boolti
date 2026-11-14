@@ -18,13 +18,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface TicketingRepository {
     fun getSalesTickets(request: SalesTicketRequest): Flow<List<TicketWithQuantity>>
-    fun getTicketingInfo(request: TicketingInfoRequest): Flow<TicketingInfo>
-    fun requestReservation(request: TicketingRequest): Flow<String>
-    fun checkInviteCode(request: CheckInviteCodeRequest): Flow<InviteCodeStatus>
+    suspend fun getTicketingInfo(request: TicketingInfoRequest): Result<TicketingInfo>
+    suspend fun requestReservation(request: TicketingRequest): Result<String>
+    suspend fun checkInviteCode(request: CheckInviteCodeRequest): Result<InviteCodeStatus>
     fun getPaymentInfo(reservationId: String): Flow<ReservationDetail>
-    fun requestOrderId(request: OrderIdRequest): Flow<String>
+    suspend fun requestOrderId(request: OrderIdRequest): Result<String>
     fun approvePayment(request: PaymentApproveRequest): Flow<ApprovePaymentResponse>
     fun cancelPayment(request: PaymentCancelRequest): Flow<Boolean>
-    fun getPreQuestions(showId: String): Flow<List<PreQuestion>>
-    fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Flow<Unit>
+    suspend fun getPreQuestions(showId: String): Result<List<PreQuestion>>
+    suspend fun submitPreQuestionAnswers(request: SubmitPreQuestionAnswersRequest): Result<Unit>
 }

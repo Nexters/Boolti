@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -25,3 +26,4 @@ include(":presentation")
 include(":tosspayments")
 include(":common:tracker")
 include(":common:logger")
+include(":lint")

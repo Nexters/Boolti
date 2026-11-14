@@ -1,0 +1,73 @@
+name: Release
+
+# 릴리즈·핫픽스 시작/마무리/취소를 버튼으로 실행한다. 로직은 .github/scripts/release/에 있다
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: 종류
+        required: true
+        type: choice
+        options: ['선택하세요', release, hotfix]
+      action:
+        description: 단계
+        required: true
+        type: choice
+        options: ['선택하세요', start, finish, cancel]
+      version:
+        description: 버전 (finish·cancel에서 대상이 여러 개일 때만)
+        required: false
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: contains(fromJSON('["mangbaam", "HamBP"]'), github.triggering_actor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # develop에서만 secret을 쓸 수 있게 Environment에 묶는다
+    environment: release
+    steps:
+      - name: Create app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      # 앱 토큰으로 push·PR을 만들어야 그 PR에서 다른 CI가 돈다
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # 스크립트는 ref만 다루고 파일 내용은 거의 읽지 않아서 내용은 필요할 때만 받는다
+          filter: blob:none
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Set git identity
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          user_id=$(gh api "/users/${APP_SLUG}[bot]" -q .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${user_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+
+      - name: Run
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+          KIND: ${{ inputs.kind }}
+          ACTION: ${{ inputs.action }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          case "$ACTION" in
+            start | finish | cancel) ;;
+            *) echo "::error::단계를 선택하세요"; exit 1 ;;
+          esac
+          ".github/scripts/release/$ACTION.sh" "$KIND" $VERSION --apply

@@ -66,8 +66,8 @@ internal class AuthRepositoryImpl @Inject constructor(
                 userId = it.id,
                 properties = buildMap {
                     it.userCode?.let { userCode -> put("userCode", userCode) }
-                    it.email?.let { email -> put("email", email) }
-                    it.nickname?.let { nickname -> put("nickname", nickname) }
+                    it.email?.let { email -> put($$"$email", email) }
+                    it.nickname?.let { nickname -> put($$"$name", nickname) }
                 },
             )
         }

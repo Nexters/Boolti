@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debug_info_title">디버그 정보</string>
+    <string name="debug_info_copy">복사</string>
+    <string name="debug_info_close">닫기</string>
+    <string name="debug_info_copied">디버그 정보를 복사했어요</string>
+    <string name="debug_info_send">전송</string>
+    <string name="debug_info_sending">전송 중</string>
+    <string name="debug_info_sent">디스코드로 보냈어요</string>
+    <string name="debug_info_send_failed">전송에 실패했어요</string>
+</resources>

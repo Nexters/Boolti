@@ -1,13 +1,13 @@
 [versions]
 minSdk = "28"
 targetSdk = "36"
-versionCode = "53"
-versionName = "1.14.3"
+versionName = "1.15.1"
 packageName = "com.nexters.boolti"
 compileSdk = "36"
 targetJvm = "17"
 kotlin = "2.3.10"
 android = "9.0.0"
+lint = "32.0.0" # android 버전 + 23
 ksp = "2.3.6"
 composeBom = "2026.02.00"
 
@@ -50,6 +50,7 @@ tosspayments = "0.1.15"
 immutable = "0.4.0"
 reorderable = "0.9.6"
 mixpanel = "8.3.0"
+kover = "0.9.11"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-ktx" }
@@ -60,6 +61,9 @@ androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constr
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 andoridx-compose-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+androidx-compose-runtime-saveable = { group = "androidx.compose.runtime", name = "runtime-saveable" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-ui-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-compose-ui-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
@@ -83,11 +87,14 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
-hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax-inject" }
 junit = { module = "junit:junit", version.ref = "junit" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lint" }
+lint-cli = { module = "com.android.tools.lint:lint", version.ref = "lint" }
+lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "lint" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
@@ -123,7 +130,6 @@ mixpanel-android = { group = "com.mixpanel.android", name = "mixpanel-android", 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android" }
 android-library = { id = "com.android.library", version.ref = "android" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
@@ -131,6 +137,7 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 
 [bundles]
 coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-android"]

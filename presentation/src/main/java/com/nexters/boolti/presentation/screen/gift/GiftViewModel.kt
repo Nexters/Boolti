@@ -8,8 +8,8 @@ import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.FreeGiftRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
-import com.nexters.boolti.domain.usecase.GetUserUsecase
+import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
@@ -25,17 +25,18 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class GiftViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getUserUseCase: GetUserUsecase,
+    getCachedUserUseCase: GetCachedUserUseCase,
     private val ticketingRepository: TicketingRepository,
     private val giftRepository: GiftRepository,
-    private val getRefundPolicyUseCase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : BaseViewModel() {
-    private val userId = checkNotNull(getUserUseCase()?.id) {
+    private val userId = checkNotNull(getCachedUserUseCase()?.id) {
         "[GiftViewModel] 사용자 정보가 없습니다."
     }
     val showId: String = requireNotNull(savedStateHandle["showId"])
@@ -74,26 +75,24 @@ class GiftViewModel @Inject constructor(
             }
             .launchIn(viewModelScope + recordExceptionHandler)
 
-        ticketingRepository.getTicketingInfo(
-            TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)
-        ).onStart {
+        viewModelScope.launch(recordExceptionHandler) {
             _uiState.update { it.copy(loading = true) }
-        }.onEach { info ->
-            _uiState.update {
-                it.copy(
-                    poster = info.showImg,
-                    showDate = info.showDate,
-                    showName = info.showName,
-                    ticketName = info.saleTicketName,
-                    ticketCount = info.ticketCount,
-                    totalPrice = info.totalPrice,
-                )
-            }
-        }.onCompletion {
-            _uiState.update {
-                it.copy(loading = false)
-            }
-        }.launchIn(viewModelScope + recordExceptionHandler)
+            ticketingRepository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount))
+                .onSuccess { info ->
+                    _uiState.update {
+                        it.copy(
+                            poster = info.showImg,
+                            showDate = info.showDate,
+                            showName = info.showName,
+                            ticketName = info.saleTicketName,
+                            ticketCount = info.ticketCount,
+                            totalPrice = info.totalPrice,
+                        )
+                    }
+                }
+                .onFailure { e -> Timber.e(e) }
+            _uiState.update { it.copy(loading = false) }
+        }
     }
 
     fun updateMessage(message: String) {
@@ -148,13 +147,13 @@ class GiftViewModel @Inject constructor(
             return
         }
 
-        ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
-            .onStart { _uiState.update { it.copy(loading = true) } }
-            .onEach { orderId ->
-                sendEvent(GiftEvent.ProgressPayment(userId, orderId))
-            }
-            .onCompletion { _uiState.update { it.copy(loading = false) } }
-            .launchIn(viewModelScope + recordExceptionHandler)
+        viewModelScope.launch(recordExceptionHandler) {
+            _uiState.update { it.copy(loading = true) }
+            ticketingRepository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
+                .onSuccess { orderId -> sendEvent(GiftEvent.ProgressPayment(userId, orderId)) }
+                .onFailure { e -> Timber.e(e) }
+            _uiState.update { it.copy(loading = false) }
+        }
     }
 
     private fun sendEvent(event: GiftEvent) {

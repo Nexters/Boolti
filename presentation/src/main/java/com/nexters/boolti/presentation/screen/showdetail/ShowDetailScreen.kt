@@ -31,9 +31,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +50,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -79,7 +76,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.click
 import com.nexters.boolti.common.tracker.event.view
@@ -92,6 +88,7 @@ import com.nexters.boolti.common.tracker.field.Tab
 import com.nexters.boolti.domain.model.Cast
 import com.nexters.boolti.domain.model.CastTeams
 import com.nexters.boolti.domain.model.ShowDetail
+import com.nexters.boolti.domain.model.ShowState
 import com.nexters.boolti.presentation.BuildConfig
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BTDialog
@@ -105,6 +102,8 @@ import com.nexters.boolti.presentation.component.UserThumbnail
 import com.nexters.boolti.presentation.extension.asString
 import com.nexters.boolti.presentation.extension.filterToPhoneNumber
 import com.nexters.boolti.presentation.extension.showDateTimeString
+import com.nexters.boolti.presentation.screen.LocalNavController
+import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import com.nexters.boolti.presentation.screen.ticketing.ChooseTicketBottomSheet
 import com.nexters.boolti.presentation.screen.ticketing.TicketBottomSheetType
 import com.nexters.boolti.presentation.theme.BooltiTheme
@@ -121,16 +120,17 @@ import com.nexters.boolti.presentation.theme.Grey90
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.theme.point2
 import com.nexters.boolti.presentation.theme.point3
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
+import com.nexters.boolti.presentation.util.bridge.NavigateToPlaceDetail
+import com.nexters.boolti.presentation.util.bridge.rememberWebBridge
+import com.nexters.boolti.presentation.util.rememberCountdown
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URI
 import java.net.URISyntaxException
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.math.ceil
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -152,6 +152,7 @@ fun ShowDetailScreen(
     ) -> Unit,
     navigateToReport: () -> Unit,
     navigateToProfile: (userCode: String) -> Unit,
+    navigateToPlace: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ShowDetailViewModel = hiltViewModel(),
 ) {
@@ -218,22 +219,28 @@ fun ShowDetailScreen(
                 ) {
                     BtCircularProgressIndicator()
                 }
-            } else if (uiState.showDetail != null) {
-                ShowDetailScreen(
-                    modifier = Modifier.padding(innerPadding),
-                    showDetail = uiState.showDetail!!,
-                    castTeams = uiState.castTeams,
-                    selectedTab = uiState.selectedTab,
-                    navigateToLogin = navigateToLogin,
-                    navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
-                    onTicketSelected = onTicketSelected,
-                    onGiftTicketSelected = onGiftTicketSelected,
-                    navigateToProfile = navigateToProfile,
-                    isLoggedIn = isLoggedIn == true,
-                    onSelectTab = viewModel::selectTab,
-                    shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
-                    doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
-                )
+            } else {
+                val showDetail = uiState.showDetail
+                val showState = uiState.showState
+                if (showDetail != null && showState != null) {
+                    ShowDetailScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        showDetail = showDetail,
+                        showState = showState,
+                        castTeams = uiState.castTeams,
+                        selectedTab = uiState.selectedTab,
+                        navigateToLogin = navigateToLogin,
+                        navigateToImages = { viewModel.sendEvent(ShowDetailEvent.NavigateToImages(it)) },
+                        onTicketSelected = onTicketSelected,
+                        onGiftTicketSelected = onGiftTicketSelected,
+                        navigateToProfile = navigateToProfile,
+                        navigateToPlace = navigateToPlace,
+                        isLoggedIn = isLoggedIn == true,
+                        onSelectTab = viewModel::selectTab,
+                        shouldShowNaverMapDialog = uiState.shouldShowNaverMapDialog,
+                        doNotShowNaverMapDialog = viewModel::doNotShowNaverMapDialogAnymore,
+                    )
+                }
             }
         }
     }
@@ -242,6 +249,7 @@ fun ShowDetailScreen(
 @Composable
 fun ShowDetailScreen(
     showDetail: ShowDetail,
+    showState: ShowState,
     castTeams: List<CastTeams>,
     selectedTab: Int,
     navigateToLogin: () -> Unit,
@@ -258,21 +266,51 @@ fun ShowDetailScreen(
         ticketCount: Int,
     ) -> Unit,
     navigateToProfile: (userCode: String) -> Unit,
+    navigateToPlace: (placeId: String) -> Unit,
     isLoggedIn: Boolean,
     onSelectTab: (index: Int) -> Unit,
     shouldShowNaverMapDialog: Boolean,
     doNotShowNaverMapDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showState by flow {
-        while (true) {
-            emit(showDetail.state)
-            delay(200)
-        }
-    }.collectAsStateWithLifecycle(showDetail.state)
-
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf<TicketBottomSheetType?>(null) }
+    val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
+    val url = "https://${host}/show/${showDetail.id}/info"
+    // ex. tel:010-1010-1101
+    val telSchemes = listOf("tel", "telprompt")
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+    var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
+    var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
+    val navController = LocalNavController.current
+    val bridge = rememberWebBridge {
+        handle { p: NavigateToPlaceDetail -> navController.navigate(MainRoute.Place(placeId = p.placeId.toString(), source = Screen.ShowDetail.value)) }
+    }
+    val webView = remember(context) {
+        BtWebView(preUriLoading = { url ->
+            preUriLoading(
+                url = url,
+                context = context,
+                uriHandler = uriHandler,
+                navigateWithUrl = { url -> redirectedInquiryUrl = url },
+                navigateWithIntent = { intent -> intentToNavigateTo = intent })
+        }, context = context).apply {
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            bridge.attach(this)
+        }
+    }
+
+    LaunchedEffect(webView, url) {
+        webView.loadUrl(url)
+    }
+
+    LaunchedEffect(intentToNavigateTo) {
+        if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
+            context.startActivity(intentToNavigateTo)
+            intentToNavigateTo = null
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -300,6 +338,7 @@ fun ShowDetailScreen(
                         .background(color = MaterialTheme.colorScheme.surface)
                         .padding(top = paddingTop),
                     navigateToImages = navigateToImages,
+                    navigateToPlace = navigateToPlace,
                     showDetail = showDetail,
                 )
             }
@@ -314,9 +353,7 @@ fun ShowDetailScreen(
 
             when (selectedTab) {
                 0 -> ShowInfoTab(
-                    showId = showDetail.id,
-                    shouldShowNaverMapDialog = shouldShowNaverMapDialog,
-                    doNotShowNaverMapDialog = doNotShowNaverMapDialog
+                    infoContentWebView = webView,
                 )
 
                 1 -> CastTab(
@@ -379,6 +416,17 @@ fun ShowDetailScreen(
                 deadlineDateTime = showDetail.salesEndDateTime!!,
             )
         }
+
+        redirectedInquiryUrl?.let { url ->
+            val contact = url.filterToPhoneNumber()
+            val isPhone = URI(url).scheme in telSchemes
+
+            InquiryBottomSheet(
+                isTelephone = isPhone,
+                onDismissRequest = { redirectedInquiryUrl = null },
+                contact = contact
+            )
+        }
     }
 
     showBottomSheet?.let { type ->
@@ -406,6 +454,40 @@ fun ShowDetailScreen(
                 showBottomSheet = null
             }
         )
+    }
+
+    if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
+        BTDialog(
+            onDismiss = {
+                intentToNavigateTo = null
+            },
+            positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
+            onClickPositiveButton = {
+                context.startActivity(intentToNavigateTo)
+                doNotShowNaverMapDialog()
+                intentToNavigateTo = null
+            }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.show_naver_map_dialog_title),
+                    color = Grey15,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    modifier = Modifier.padding(
+                        top = 4.dp
+                    ),
+                    text = stringResource(R.string.show_naver_map_dialog_content),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Grey50,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
     }
 }
 
@@ -671,114 +753,40 @@ private fun ContentTab(
 @SuppressLint("SetJavaScriptEnabled")
 @Suppress("FunctionName")
 private fun LazyListScope.ShowInfoTab(
-    showId: String,
-    shouldShowNaverMapDialog: Boolean,
-    doNotShowNaverMapDialog: () -> Unit,
+    infoContentWebView: BtWebView,
 ) {
     item {
-        var redirectedInquiryUrl: String? by remember { mutableStateOf(null) }
-        val host = if (BuildConfig.DEBUG) "dev.preview.boolti.in" else "preview.boolti.in"
-        val url = "https://${host}/show/${showId}/info"
-        val context = LocalContext.current
-        val uriHandler = LocalUriHandler.current
-        var intentToNavigateTo: Intent? by remember { mutableStateOf(null) }
-
-        LaunchedEffect(intentToNavigateTo) {
-            if (intentToNavigateTo != null && !shouldShowNaverMapDialog) {
-                if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                    trackNaverMap()
-                }
-                context.startActivity(intentToNavigateTo)
-                intentToNavigateTo = null
-            }
-        }
-
-        // ex. tel:010-1010-1101
-        val telSchemes = listOf("tel", "telprompt")
-        val webView by remember {
-            mutableStateOf(BtWebView(preUriLoading = { url ->
-                preUriLoading(
-                    url = url,
-                    context = context,
-                    uriHandler = uriHandler,
-                    navigateWithUrl = { url -> redirectedInquiryUrl = url },
-                    navigateWithIntent = { intent -> intentToNavigateTo = intent })
-            }, context = context).apply {
-                isFocusable = false
-                isFocusableInTouchMode = false
-                loadUrl(url)
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            })
-        }
+        var isLoading by remember { mutableStateOf(infoContentWebView.progress.value < 100) }
+        val scope = rememberCoroutineScope()
 
         Box(
             modifier = Modifier
                 .heightIn(min = 96.dp)
                 .fillMaxWidth()
         ) {
-            BtCircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
+            if (isLoading) {
+                BtCircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
             AndroidView(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clipToBounds(),
                 factory = { context ->
-                    webView.apply {
+                    infoContentWebView.apply {
                         layoutParams = ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                         )
                         setOnLongClickListener { true }
+                        progress.onEach {
+                            isLoading = it < 100
+                        }.launchIn(scope)
+                        setWebChromeClient()
                     }
                 },
             )
-        }
-
-        redirectedInquiryUrl?.let { url ->
-            val contact = url.filterToPhoneNumber()
-            val isPhone = URI(url).scheme in telSchemes
-
-            InquiryBottomSheet(
-                isTelephone = isPhone,
-                onDismissRequest = { redirectedInquiryUrl = null },
-                contact = contact
-            )
-        }
-
-        if (intentToNavigateTo != null && shouldShowNaverMapDialog) {
-            BTDialog(
-                onDismiss = {
-                    intentToNavigateTo = null
-                },
-                positiveButtonLabel = stringResource(R.string.show_navigate_to_nmap),
-                onClickPositiveButton = {
-                    if (intentToNavigateTo?.`package` == "com.nhn.android.nmap") {
-                        trackNaverMap()
-                    }
-                    context.startActivity(intentToNavigateTo)
-                    doNotShowNaverMapDialog()
-                    intentToNavigateTo = null
-                }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(R.string.show_naver_map_dialog_title),
-                        color = Grey15,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        modifier = Modifier.padding(
-                            top = 4.dp
-                        ),
-                        text = stringResource(R.string.show_naver_map_dialog_content),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Grey50,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
         }
     }
 
@@ -817,7 +825,6 @@ fun preUriLoading(
             val lng = fallbackUri.getQueryParameter("lng")
             val name = fallbackUri.getQueryParameter("name")
 
-            trackNaverMap()
             uriHandler.openUri("https://map.naver.com/?lat=${lat}&lng=${lng}&title=${name}")
         }
         return true
@@ -838,21 +845,11 @@ fun getIntentFromUri(uri: String): Intent? {
     try {
         return Intent.parseUri(uri, Intent.URI_INTENT_SCHEME)
     } catch (e: URISyntaxException) {
-        FirebaseCrashlytics.getInstance().recordException(e)
+        Timber.e(e)
         return null
     }
 }
 
-private fun trackNaverMap() {
-    AppTracker.click(
-        screen = Screen.ShowDetail,
-        objectRole = Role.Item,
-        objectValue = "Map",
-        properties = mapOf("map_provider" to "NaverMap"),
-    )
-}
-
-@OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName")
 fun LazyListScope.CastTab(
     teams: List<CastTeams>,
@@ -883,7 +880,7 @@ fun LazyListScope.CastTab(
             }
         }
     } else {
-        itemsIndexed(teams) { index, team ->
+        itemsIndexed(teams, key = { _, team -> team.id }) { index, team ->
             if (index > 0) Divider(paddingModifier) else Spacer(modifier = Modifier.size(8.dp))
             Section(
                 modifier = paddingModifier,
@@ -891,27 +888,20 @@ fun LazyListScope.CastTab(
                 space = if (team.members.isNotEmpty()) 20.dp else 0.dp,
                 paddingVertical = 24.dp,
                 content = {
-                    val spacedBySize = 20.dp
-                    val memberHeight = 46.dp
                     val spanCount = 2
-                    val rows = ceil(team.members.size / spanCount.toFloat())
-
-                    /**
-                     * 중첩 Lazy 레이아웃 처리를 위해 높이 고정 필요
-                     */
-                    val gridHeight = memberHeight * rows + spacedBySize * (rows - 1)
-                    LazyVerticalGrid(
-                        modifier = Modifier.height(gridHeight),
-                        columns = GridCells.Fixed(spanCount),
-                        verticalArrangement = Arrangement.spacedBy(spacedBySize),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items(team.members) { member ->
-                            Cast(
-                                memberHeight,
-                                member,
-                                onClick = { onClickMember(member.userCode) },
-                            )
+                    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        team.members.chunked(spanCount).forEach { rowMembers ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                rowMembers.forEach { member ->
+                                    Cast(
+                                        modifier = Modifier.weight(1f),
+                                        memberHeight = 46.dp,
+                                        member = member,
+                                        onClick = { onClickMember(member.userCode) },
+                                    )
+                                }
+                                repeat(spanCount - rowMembers.size) { Spacer(modifier = Modifier.weight(1f)) }
+                            }
                         }
                     }
                 }
@@ -925,9 +915,10 @@ fun LazyListScope.CastTab(
 private fun Poster(
     showDetail: ShowDetail,
     navigateToImages: (index: Int) -> Unit,
+    navigateToPlace: (placeId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val images by remember { derivedStateOf { showDetail.images.map { it.originImage } } }
+    val images = remember(showDetail.images) { showDetail.images.map { it.originImage } }
 
     Column(
         modifier = modifier.padding(horizontal = 38.dp)
@@ -977,8 +968,29 @@ private fun Poster(
                 )
             }
         }
+        val placeId = showDetail.placeId
         Row(
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .then(
+                    if (placeId != null) {
+                        Modifier.clickable {
+                            AppTracker.click(
+                                screen = Screen.ShowDetail,
+                                objectRole = Role.Item,
+                                objectValue = "PlaceProfile",
+                                properties = mapOf(
+                                    "show_id" to showDetail.id,
+                                    "place_id" to placeId,
+                                    "entry_point" to "Summary",
+                                ),
+                            )
+                            navigateToPlace(placeId)
+                        }
+                    } else {
+                        Modifier
+                    }
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -992,6 +1004,14 @@ private fun Poster(
                 text = showDetail.placeName,
                 style = MaterialTheme.typography.bodyLarge.copy(color = Grey30),
             )
+            if (placeId != null) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
+                    tint = Grey50,
+                    contentDescription = null,
+                )
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -1028,10 +1048,11 @@ private fun SectionTitle(
 private fun Cast(
     memberHeight: Dp,
     member: Cast,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .height(memberHeight)
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
@@ -1071,17 +1092,7 @@ private fun Divider(modifier: Modifier = Modifier) {
 private fun CountDownBanner(
     deadlineDateTime: LocalDateTime,
 ) {
-    val remainingTime by flow {
-        while (true) {
-            val duration = Duration.between(
-                LocalDateTime.now(),
-                deadlineDateTime
-            )
-            emit(maxOf(duration, Duration.ZERO))
-            if (duration <= Duration.ZERO) break
-            delay(200L)
-        }
-    }.collectAsStateWithLifecycle(Duration.ZERO)
+    val remainingTime by rememberCountdown(deadlineDateTime)
 
     Box(
         modifier = Modifier
@@ -1103,6 +1114,7 @@ private fun ShowDetailScreenPreview() {
     BooltiTheme {
         ShowDetailScreen(
             showDetail = ShowDetail(),
+            showState = ShowState.TicketingInProgress,
             castTeams = emptyList(),
             selectedTab = 0,
             navigateToLogin = {},
@@ -1110,6 +1122,7 @@ private fun ShowDetailScreenPreview() {
             onTicketSelected = { _, _, _, _ -> },
             onGiftTicketSelected = { _, _, _ -> },
             navigateToProfile = {},
+            navigateToPlace = {},
             isLoggedIn = true,
             onSelectTab = {},
             shouldShowNaverMapDialog = false,

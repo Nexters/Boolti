@@ -6,19 +6,14 @@ import android.content.Intent
 import android.net.Uri
 import android.util.AttributeSet
 import android.webkit.ConsoleMessage
-import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.net.toUri
-import com.nexters.boolti.presentation.util.bridge.BridgeDto
-import com.nexters.boolti.presentation.util.bridge.BridgeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.net.URI
 
@@ -51,13 +46,23 @@ class BtWebView @JvmOverloads constructor(
         this.domStorageEnabled = domStorageEnabled
     }
 
+    override fun loadUrl(url: String) {
+        _progress.value = 0
+        super.loadUrl(url)
+    }
+
+    override fun loadUrl(url: String, additionalHttpHeaders: Map<String, String>) {
+        _progress.value = 0
+        super.loadUrl(url, additionalHttpHeaders)
+    }
+
     private fun setupWebViewClient() {
         webViewClient = BtWebViewClient(preUriLoading)
     }
 
     fun setWebChromeClient(
-        launchActivity: () -> Unit,
-        setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
+        launchActivity: (() -> Unit)? = null,
+        setFilePathCallback: ((ValueCallback<Array<Uri>>) -> Unit)? = null,
     ) {
         webChromeClient = BtWebChromeClient(
             launchActivity = launchActivity,
@@ -65,39 +70,15 @@ class BtWebView @JvmOverloads constructor(
             onProgressChanged = { _progress.value = it },
         )
     }
-
-    suspend fun setBridgeManager(bridgeManager: BridgeManager) {
-        addJavascriptInterface(
-            object {
-                @JavascriptInterface
-                fun postMessage(message: String) {
-                    Timber.tag("webview_bridge").d("(WEB -> APP) $message 수신")
-                    try {
-                        // JSON 메시지 파싱
-                        val dto = Json.decodeFromString(BridgeDto.serializer(), message)
-                        bridgeManager.handleIncomingData(dto)
-                    } catch (e: SerializationException) {
-                        Timber.tag("webview_bridge")
-                            .e(e, "(WEB -> APP) 유효하지 않은 JSON 포맷: $message")
-                    } catch (e: IllegalArgumentException) {
-                        Timber.tag("webview_bridge")
-                            .e(e, "(WEB -> APP) BridgeDto 타입으로 파싱 실패: $message")
-                    } catch (e: Exception) {
-                        Timber.tag("webview_bridge")
-                            .e(e, "(WEB -> APP) 알 수 없는 에러")
-                        e.printStackTrace() // 에러 처리
-                    }
-                }
-            },
-            bridgeManager.bridgeName,
-        )
-        bridgeManager.dataToSendWeb.collect {
-            evaluateJavascript(it) { result ->
-                Timber.tag("webview_bridge").d("(APP -> WEB)\n\t$it\n전송 결과:\n\t$result")
-            }
-        }
-    }
 }
+
+/**
+ * 웹뷰 안에서 열어도 되는 불티 도메인인지 확인한다. 브릿지(토큰 요청 등)가 노출되므로 다른 도메인은 외부 브라우저로 연다.
+ */
+internal fun isBooltiHost(host: String): Boolean =
+    host.equals(BOOLTI_HOST, ignoreCase = true) || host.endsWith(".$BOOLTI_HOST", ignoreCase = true)
+
+private const val BOOLTI_HOST = "boolti.in"
 
 /**
  * @param preUriLoading redirect 될 때 우선적으로 처리돼야 하는 로직. 반환 값은 해당 이벤트의 consume 여부를 의미한다.
@@ -117,7 +98,7 @@ class BtWebViewClient(
 
         if (preUriLoading(url)) return true
 
-        if (url != "null" && domain != null && !domain.contains("boolti.in") && context != null) {
+        if (url != "null" && domain != null && !isBooltiHost(domain) && context != null) {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             context.startActivity(intent)
             return true
@@ -128,8 +109,8 @@ class BtWebViewClient(
 }
 
 class BtWebChromeClient(
-    private val launchActivity: () -> Unit,
-    private val setFilePathCallback: (ValueCallback<Array<Uri>>) -> Unit,
+    private val launchActivity: (() -> Unit)?,
+    private val setFilePathCallback: ((ValueCallback<Array<Uri>>) -> Unit)?,
     private val onProgressChanged: (Int) -> Unit = {},
 ) : WebChromeClient() {
     override fun onProgressChanged(view: WebView?, newProgress: Int) {
@@ -142,10 +123,9 @@ class BtWebChromeClient(
         filePathCallback: ValueCallback<Array<Uri>>?,
         fileChooserParams: FileChooserParams
     ): Boolean {
-        if (filePathCallback == null) return false
-        setFilePathCallback(filePathCallback)
-
-        launchActivity()
+        if (filePathCallback == null || setFilePathCallback == null || launchActivity == null) return false
+        setFilePathCallback.invoke(filePathCallback)
+        launchActivity.invoke()
 
         return true
     }

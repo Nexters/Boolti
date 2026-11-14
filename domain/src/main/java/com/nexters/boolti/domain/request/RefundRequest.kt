@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RefundRequest(
+    @SerialName("reservationId")
     val reservationId: String,
     @SerialName("refundReason") val reason: String,
     @SerialName("refundPhoneNumber") val phoneNumber: String,

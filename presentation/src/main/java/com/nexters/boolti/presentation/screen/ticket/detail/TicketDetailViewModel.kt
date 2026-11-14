@@ -8,7 +8,7 @@ import com.nexters.boolti.domain.repository.GiftRepository
 import com.nexters.boolti.domain.repository.ReservationRepository
 import com.nexters.boolti.domain.repository.TicketRepository
 import com.nexters.boolti.domain.request.ManagerCodeRequest
-import com.nexters.boolti.domain.usecase.GetRefundPolicyUsecase
+import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -34,7 +34,7 @@ class TicketDetailViewModel @Inject constructor(
     private val repository: TicketRepository,
     private val giftRepository: GiftRepository,
     private val reservationRepository: ReservationRepository,
-    private val getRefundPolicyUsecase: GetRefundPolicyUsecase,
+    private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : BaseViewModel() {
     // 실제로는 reservationId가 들어온다. api 변경에 따른 수정
     private val ticketId: String = requireNotNull(savedStateHandle["ticketId"]) {
@@ -74,7 +74,7 @@ class TicketDetailViewModel @Inject constructor(
                 }
                 .launchIn(viewModelScope + recordExceptionHandler)
 
-            getRefundPolicyUsecase().onEach { refundPolicy ->
+            getRefundPolicyUseCase().onEach { refundPolicy ->
                 _uiState.update { it.copy(refundPolicy = refundPolicy) }
             }.launchIn(viewModelScope + recordExceptionHandler)
 

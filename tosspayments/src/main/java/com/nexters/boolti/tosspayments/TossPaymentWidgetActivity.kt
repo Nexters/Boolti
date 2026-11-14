@@ -146,6 +146,11 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
                 setResult(RESULT_SOLD_OUT)
                 finish()
             }
+
+            is PaymentEvent.Failed -> {
+                setResult(RESULT_FAIL)
+                finish()
+            }
         }
     }
 
@@ -207,6 +212,9 @@ class TossPaymentWidgetActivity : AppCompatActivity() {
     }
 
     private fun handlePaymentSuccessResult(success: TossPaymentResult.Success) {
+        // 승인 결과가 오면 Activity가 종료되므로 되돌리지 않는다
+        binding.btnPay.isEnabled = false
+        binding.pbLoading.isVisible = true
         viewModel.approvePayment(
             orderId = success.orderId,
             paymentKey = success.paymentKey,

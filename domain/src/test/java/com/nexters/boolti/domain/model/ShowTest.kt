@@ -27,7 +27,7 @@ class ShowTest : BehaviorSpec() {
             val shows = ticketingStartDates.map { standardShow.copy(salesStartDate = it) }
 
             `when`("공연 상태를 계산했을 때") {
-                val results = shows.map { it.state }
+                val results = shows.map { it.state() }
                 then("Waiting 상태가 반환한다.") {
                     results.forEach {
                         it.shouldBeInstanceOf<ShowState.WaitingTicketing>()
@@ -50,7 +50,7 @@ class ShowTest : BehaviorSpec() {
             }
 
             `when`("공연 상태를 계산했을 때") {
-                val results = shows.map { it.state }
+                val results = shows.map { it.state() }
                 then("TicketingInProgress 상태를 반환한다.") {
                     results.forEach {
                         it shouldBe ShowState.TicketingInProgress
@@ -69,7 +69,7 @@ class ShowTest : BehaviorSpec() {
             }
 
             `when`("공연 상태를 계산했을 때") {
-                val results = shows.map { it.state }
+                val results = shows.map { it.state() }
                 then("ClosedTicketing 상태를 반환한다.") {
                     results.forEach {
                         it shouldBe ShowState.ClosedTicketing
@@ -88,7 +88,7 @@ class ShowTest : BehaviorSpec() {
             }
 
             `when`("공연 상태를 계산했을 때") {
-                val results = shows.map { it.state }
+                val results = shows.map { it.state() }
                 then("FinishedShow 상태를 반환한다.") {
                     results.forEach {
                         it shouldBe ShowState.FinishedShow

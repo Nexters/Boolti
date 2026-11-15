@@ -1,6 +1,7 @@
 package com.nexters.boolti.logger
 
 import android.util.Log
+import com.nexters.boolti.data.network.ApiCallSite
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -66,6 +67,16 @@ class CrashlyticsTreeTest : BehaviorSpec() {
             }
         }
 
+        given("호출 위치가 붙은 HttpException이 주어지고") {
+            then("호출 위치를 원인으로 붙이고, 두 번 기록해도 예외를 던지지 않는다") {
+                val callSite = ApiCallSite()
+                val e = httpException("GET", "https://a.com/api/shows", 400, "", callSite)
+                CrashlyticsTree.attachCallSite(e)
+                CrashlyticsTree.attachCallSite(e)
+                e.cause shouldBe callSite
+            }
+        }
+
         given("HttpException이 아닌 예외가 주어지고") {
             then("키를 남기지 않는다") {
                 CrashlyticsTree.httpErrorKeys(IllegalStateException()).shouldBeEmpty()
@@ -73,10 +84,10 @@ class CrashlyticsTreeTest : BehaviorSpec() {
         }
     }
 
-    private fun httpException(method: String, url: String, code: Int, body: String): HttpException {
+    private fun httpException(method: String, url: String, code: Int, body: String, callSite: ApiCallSite? = null): HttpException {
         val requestBody = if (method == "GET") null else "".toRequestBody()
         val raw = RawResponse.Builder()
-            .request(Request.Builder().url(url).method(method, requestBody).build())
+            .request(Request.Builder().url(url).method(method, requestBody).tag(ApiCallSite::class.java, callSite).build())
             .protocol(Protocol.HTTP_1_1)
             .code(code)
             .message("error")

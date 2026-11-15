@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.crashlytics
+import com.nexters.boolti.data.network.ApiCallSite
 import com.nexters.boolti.domain.extension.toErrorResponse
 import okhttp3.HttpUrl
 import retrofit2.HttpException
@@ -14,6 +15,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class CrashlyticsTree : Timber.Tree() {
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (t == null || !shouldRecord(priority, t)) return
+        attachCallSite(t)
         val keys = CustomKeysAndValues.Builder()
         httpErrorKeys(t).forEach { (key, value) -> keys.putString(key, value) }
         Firebase.crashlytics.recordException(t, keys.build())
@@ -23,6 +25,13 @@ class CrashlyticsTree : Timber.Tree() {
         // 네트워크 끊김·코루틴 취소는 앱 결함이 아니라서 제외해요
         internal fun shouldRecord(priority: Int, t: Throwable): Boolean =
             priority >= Log.ERROR && t !is IOException && t !is CancellationException
+
+        // HttpException은 OkHttp 스레드에서 만들어져 스택에 앱 코드가 없어요. 요청을 보낸 위치의 스택을 원인으로 붙여요
+        internal fun attachCallSite(t: Throwable) {
+            val callSite = (t as? HttpException)?.response()?.raw()?.request?.tag(ApiCallSite::class.java) ?: return
+            // 원인이 이미 있으면 initCause가 예외를 던져요. 같은 예외를 두 번 기록하는 경우도 여기서 걸러져요
+            if (t.cause == null) runCatching { t.initCause(callSite) }
+        }
 
         // HttpException은 스택에 앱 코드가 없어서 어느 API인지 키로 남겨요. 요청 body는 개인 정보가 섞일 수 있어서 넣지 않아요
         internal fun httpErrorKeys(t: Throwable): Map<String, String> {

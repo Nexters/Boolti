@@ -12,6 +12,7 @@ import com.nexters.boolti.data.di.qualifier.YouTubeOkHttpClient
 import com.nexters.boolti.data.di.qualifier.YouTubeRetrofit
 import com.nexters.boolti.data.network.AuthAuthenticator
 import com.nexters.boolti.data.network.AuthInterceptor
+import com.nexters.boolti.data.network.CallSiteCallAdapterFactory
 import com.nexters.boolti.data.network.CustomHeaderInterceptor
 import com.nexters.boolti.data.network.RetryInterceptor
 import com.nexters.boolti.data.network.api.AuthFileService
@@ -101,6 +102,7 @@ internal object NetworkModule {
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(jsonConverterFactory)
+            .addCallAdapterFactory(CallSiteCallAdapterFactory())
             .build()
     }
 
@@ -112,6 +114,7 @@ internal object NetworkModule {
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(jsonConverterFactory)
+            .addCallAdapterFactory(CallSiteCallAdapterFactory())
             .build()
     }
 
@@ -122,6 +125,7 @@ internal object NetworkModule {
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(jsonConverterFactory)
+            .addCallAdapterFactory(CallSiteCallAdapterFactory())
             .build()
     }
 
@@ -207,6 +211,7 @@ internal object NetworkModule {
             .baseUrl("https://www.googleapis.com/youtube/v3/")
             .client(okHttpClient)
             .addConverterFactory(jsonConverterFactory)
+            .addCallAdapterFactory(CallSiteCallAdapterFactory())
             .build()
     }
 

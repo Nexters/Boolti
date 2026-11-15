@@ -120,6 +120,7 @@ dependencies {
     ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.timber)
+    implementation(libs.retrofit)
     implementation(libs.zxing.android.embedded)
 
     testImplementation(libs.bundles.kotest)

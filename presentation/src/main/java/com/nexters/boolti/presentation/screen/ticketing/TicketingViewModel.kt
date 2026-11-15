@@ -7,6 +7,7 @@ import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.common.tracker.event.complete
 import com.nexters.boolti.domain.exception.TicketingException
 import com.nexters.boolti.domain.model.InviteCodeStatus
+import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.TicketingRepository
 import com.nexters.boolti.domain.request.CheckInviteCodeRequest
 import com.nexters.boolti.domain.request.OrderIdRequest
@@ -14,7 +15,6 @@ import com.nexters.boolti.domain.request.PreQuestionAnswerRequest
 import com.nexters.boolti.domain.request.SubmitPreQuestionAnswersRequest
 import com.nexters.boolti.domain.request.TicketingInfoRequest
 import com.nexters.boolti.domain.request.TicketingRequest
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetRefundPolicyUseCase
 import com.nexters.boolti.presentation.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,15 +40,12 @@ import javax.inject.Inject
 class TicketingViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: TicketingRepository,
-    getCachedUserUseCase: GetCachedUserUseCase,
+    private val authRepository: AuthRepository,
     private val getRefundPolicyUseCase: GetRefundPolicyUseCase,
 ) : ViewModel() {
     private val showId: String = requireNotNull(savedStateHandle["showId"])
     private val salesTicketTypeId: String = requireNotNull(savedStateHandle["salesTicketId"])
     private val ticketCount: Int = savedStateHandle["ticketCount"] ?: 1
-    private val userId = checkNotNull(getCachedUserUseCase()?.id) {
-        "[TicketingViewModel] 사용자 정보가 없습니다."
-    }
 
     private val _uiState = MutableStateFlow<TicketingUiState>(TicketingUiState.Loading)
     val uiState: StateFlow<TicketingUiState> = _uiState.asStateFlow()
@@ -68,19 +65,27 @@ class TicketingViewModel @Inject constructor(
         when (action) {
             TicketingAction.RetryLoad -> load()
             is TicketingAction.ChangeReservationName -> updateSuccess { it.copy(reservationName = action.name) }
-            is TicketingAction.ChangeReservationContact -> updateSuccess { it.copy(reservationContact = action.contact) }
+            is TicketingAction.ChangeReservationContact -> updateSuccess {
+                it.copy(
+                    reservationContact = action.contact
+                )
+            }
+
             is TicketingAction.ChangeDepositorName -> updateSuccess { it.copy(depositorName = action.name) }
             is TicketingAction.ChangeDepositorContact -> updateSuccess { it.copy(depositorContact = action.contact) }
             TicketingAction.ToggleSameContactInfo -> updateSuccess { it.copy(isSameContactInfo = !it.isSameContactInfo) }
             is TicketingAction.ChangeInviteCode -> updateSuccess {
                 it.copy(inviteCode = action.code, inviteCodeStatus = InviteCodeStatus.Default)
             }
+
             TicketingAction.CheckInviteCode -> if (state != null && inviteCodeJob?.isActive != true) {
                 inviteCodeJob = viewModelScope.launch { checkInviteCode(state) }
             }
+
             is TicketingAction.ChangePreQuestionAnswer -> updateSuccess {
                 it.copy(preQuestionAnswers = (it.preQuestionAnswers + (action.questionId to action.answer)).toImmutableMap())
             }
+
             TicketingAction.ToggleAgreement -> updateSuccess { it.toggleAgreement() }
             is TicketingAction.ShowPolicy -> updateSuccess { it.copy(policyPageUrl = action.url) }
             TicketingAction.DismissPolicy -> updateSuccess { it.copy(policyPageUrl = null) }
@@ -88,11 +93,13 @@ class TicketingViewModel @Inject constructor(
             TicketingAction.ConfirmReservation -> if (state != null && reservationJob?.isActive != true) {
                 reservationJob = viewModelScope.launch { reservation(state) }
             }
+
             TicketingAction.DismissDialog -> updateSuccess { it.copy(dialog = null) }
             is TicketingAction.PaymentSucceeded -> if (state != null) {
                 viewModelScope.launch { submitPreQuestionAnswers(action.reservationId, state) }
                 viewModelScope.launch { completeReservation(action.reservationId, state) }
             }
+
             TicketingAction.PaymentSoldOut -> updateSuccess { it.copy(dialog = TicketingDialog.SoldOut) }
             TicketingAction.PaymentFailed -> updateSuccess { it.copy(dialog = TicketingDialog.PaymentFailure) }
         }
@@ -102,9 +109,18 @@ class TicketingViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             _uiState.value = TicketingUiState.Loading
-            val info = async { repository.getTicketingInfo(TicketingInfoRequest(showId, salesTicketTypeId, ticketCount)) }
+            val info = async {
+                repository.getTicketingInfo(
+                    TicketingInfoRequest(
+                        showId,
+                        salesTicketTypeId,
+                        ticketCount
+                    )
+                )
+            }
             val preQuestions = async { repository.getPreQuestions(showId) }
-            val refundPolicy = async { getRefundPolicyUseCase().catch { emit(emptyList()) }.first() }
+            val refundPolicy =
+                async { getRefundPolicyUseCase().catch { emit(emptyList()) }.first() }
 
             val ticketingInfo = info.await().onFailure { e -> Timber.e(e) }.getOrNull()
             val questions = preQuestions.await().onFailure { e -> Timber.e(e) }.getOrNull()
@@ -140,6 +156,11 @@ class TicketingViewModel @Inject constructor(
     }
 
     private suspend fun reservation(state: TicketingUiState.Success) {
+        val userId = authRepository.getUser()
+            .onFailure { showError(it) }
+            .getOrNull()?.id
+            ?: return
+
         when {
             state.isInviteTicket -> reserve(
                 state,
@@ -153,7 +174,7 @@ class TicketingViewModel @Inject constructor(
                 ),
             )
 
-            state.totalPrice > 0 -> progressPayment(state)
+            state.totalPrice > 0 -> progressPayment(state, userId)
             else -> reserve(
                 state,
                 TicketingRequest.Free(
@@ -168,7 +189,7 @@ class TicketingViewModel @Inject constructor(
         }
     }
 
-    private suspend fun progressPayment(state: TicketingUiState.Success) {
+    private suspend fun progressPayment(state: TicketingUiState.Success, userId: String) {
         repository.requestOrderId(OrderIdRequest(showId, salesTicketTypeId, ticketCount))
             .onSuccess { orderId ->
                 updateSuccess { it.copy(dialog = null) }
@@ -193,7 +214,10 @@ class TicketingViewModel @Inject constructor(
             }
     }
 
-    private suspend fun completeReservation(reservationId: String, state: TicketingUiState.Success) {
+    private suspend fun completeReservation(
+        reservationId: String,
+        state: TicketingUiState.Success,
+    ) {
         AppTracker.complete(
             target = "Purchase",
             properties = mapOf(
@@ -208,7 +232,10 @@ class TicketingViewModel @Inject constructor(
         _event.send(TicketingEvent.NavigateToPaymentComplete(reservationId, showId))
     }
 
-    private suspend fun submitPreQuestionAnswers(reservationId: String, state: TicketingUiState.Success) {
+    private suspend fun submitPreQuestionAnswers(
+        reservationId: String,
+        state: TicketingUiState.Success,
+    ) {
         if (state.preQuestions.isEmpty()) return
 
         val request = SubmitPreQuestionAnswersRequest(
@@ -224,7 +251,8 @@ class TicketingViewModel @Inject constructor(
     private suspend fun showError(e: Throwable) {
         Timber.e(e)
         updateSuccess { it.copy(dialog = null) }
-        val message = if (e is IOException) R.string.error_network else R.string.message_unknown_error
+        val message =
+            if (e is IOException) R.string.error_network else R.string.message_unknown_error
         _event.send(TicketingEvent.ShowErrorMessage(message))
     }
 

@@ -13,7 +13,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,8 +55,10 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun fetchUserInfo() {
-        authRepository.getUserAndCache()
-            .launchIn(viewModelScope + recordExceptionHandler)
+        viewModelScope.launch {
+            authRepository.getUser(forceRefresh = true)
+                .onFailure { e -> Timber.e(e) }
+        }
     }
 
     private fun sendFcmToken() {

@@ -20,6 +20,8 @@ import java.net.URI
 class BtWebView @JvmOverloads constructor(
     private val preUriLoading: (url: String) -> Boolean = { false },
     context: Context,
+    // 키 입력이 필요한 화면만 켠다. LazyColumn 안에서 포커스를 가진 채 사라지면 Compose가 죽는다
+    focusable: Boolean = false,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
@@ -29,8 +31,9 @@ class BtWebView @JvmOverloads constructor(
     val progress = _progress.asStateFlow()
 
     init {
-        isFocusable = true
-        isFocusableInTouchMode = true
+        isFocusable = focusable
+        isFocusableInTouchMode = focusable
+        if (!focusable) descendantFocusability = FOCUS_BLOCK_DESCENDANTS
 
         setupSettings()
         setupWebViewClient()

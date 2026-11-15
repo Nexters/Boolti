@@ -1,6 +1,6 @@
 ---
 name: boolti-feature-planner
-description: 불티 프로젝트의 기능 개발(새 화면, ViewModel/Repository/UseCase, API 연동, 디자인 적용 등 신규 작업)을 phase 기반 계획에 따라 컨벤션을 지키며 진행한다. 단순 버그 수정·문구 변경·소규모 리팩토링에는 사용하지 않는다. 키워드: 기능 추가, 화면 추가, feature 구현, plan, planning.
+description: "불티 프로젝트의 기능 개발(새 화면, ViewModel/Repository/UseCase, API 연동, 디자인 적용 등 신규 작업)을 phase 기반 계획에 따라 컨벤션을 지키며 진행한다. 단순 버그 수정·문구 변경·소규모 리팩토링에는 사용하지 않는다. 키워드: 기능 추가, 화면 추가, feature 구현, plan, planning."
 ---
 
 # 불티 기능 개발 플래너

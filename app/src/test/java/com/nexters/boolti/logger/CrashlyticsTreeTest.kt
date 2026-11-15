@@ -43,6 +43,13 @@ class CrashlyticsTreeTest : BehaviorSpec() {
                 }
             }
 
+            `when`("GET 쿼리에 허용 목록 밖의 이름이 있으면") {
+                then("그 값은 가린다") {
+                    CrashlyticsTree.httpErrorKeys(httpException("GET", "https://a.com/api/search?keyword=010-1234&inviteCode=abc&page=0", 400, errorBody))["http_api"] shouldBe
+                        "GET /api/search?keyword=***&inviteCode=***&page=0 400"
+                }
+            }
+
             `when`("GET이 아닌 요청이면") {
                 then("쿼리는 남기지 않는다") {
                     CrashlyticsTree.httpErrorKeys(httpException("POST", "https://a.com/api/order?x=1", 400, errorBody))["http_api"] shouldBe

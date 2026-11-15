@@ -5,6 +5,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.crashlytics
 import com.nexters.boolti.domain.extension.toErrorResponse
+import okhttp3.HttpUrl
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -27,7 +28,7 @@ class CrashlyticsTree : Timber.Tree() {
         internal fun httpErrorKeys(t: Throwable): Map<String, String> {
             val response = (t as? HttpException)?.response() ?: return emptyMap()
             val request = response.raw().request
-            val query = request.url.encodedQuery?.takeIf { request.method == "GET" }?.let { "?$it" }.orEmpty()
+            val query = if (request.method == "GET") maskedQuery(request.url) else ""
             val keys = mutableMapOf("http_api" to "${request.method} ${request.url.encodedPath}$query ${response.code()}")
 
             // peek()으로 읽어야 에러 body를 소비하지 않아요. 에러 형식이 아니면(예: 502 HTML) 키를 빼요
@@ -39,6 +40,18 @@ class CrashlyticsTree : Timber.Tree() {
                 keys["error_trace_id"] = error.errorTraceId
             }
             return keys
+        }
+
+        // ID·숫자 쿼리만 값을 남기고, 나머지(초대 코드·검색어 등)는 값을 가려요. 새 쿼리는 기본으로 가려져요
+        private val SAFE_QUERY_NAMES = setOf("id", "showId", "salesTicketTypeId", "ticketCount", "page", "size", "limit", "part")
+
+        private fun maskedQuery(url: HttpUrl): String {
+            if (url.querySize == 0) return ""
+            return (0 until url.querySize).joinToString("&", prefix = "?") { i ->
+                val name = url.queryParameterName(i)
+                val value = if (name in SAFE_QUERY_NAMES) url.queryParameterValue(i) else "***"
+                "$name=$value"
+            }
         }
     }
 }

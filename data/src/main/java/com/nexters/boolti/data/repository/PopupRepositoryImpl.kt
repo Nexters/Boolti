@@ -17,7 +17,7 @@ internal class PopupRepositoryImpl @Inject constructor(
     }
 
     override fun getPopup(view: String) = flow {
-        emit(dataSource.getPopup(view).toDomain())
+        dataSource.getPopup(view)?.let { emit(it.toDomain()) }
     }
 
     override fun shouldShowNaverMapDialog() = dataSource.shouldShowNaverMapDialog()

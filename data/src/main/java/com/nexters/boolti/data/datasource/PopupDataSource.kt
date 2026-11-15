@@ -7,6 +7,7 @@ import com.nexters.boolti.data.network.response.PopupResponse
 import com.nexters.boolti.data.util.toLocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import retrofit2.HttpException
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -16,7 +17,12 @@ internal class PopupDataSource @Inject constructor(
 ) {
     private val dataStore = context.dataStore
 
-    suspend fun getPopup(view: String): PopupResponse = service.getPopup(view)
+    /** 팝업이 없으면 서버가 204로 응답하므로 null을 반환한다 */
+    suspend fun getPopup(view: String): PopupResponse? {
+        val response = service.getPopup(view)
+        if (!response.isSuccessful) throw HttpException(response)
+        return response.body()
+    }
 
     fun shouldShowEvent(id: String): Flow<Boolean> = dataStore.data.map {
         LocalDate.now() > (it.dateHidingEvent?.get(id)?.toLocalDate() ?: LocalDate.MIN)

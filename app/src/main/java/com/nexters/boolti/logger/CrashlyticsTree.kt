@@ -2,19 +2,43 @@ package com.nexters.boolti.logger
 
 import android.util.Log
 import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.crashlytics
+import com.nexters.boolti.domain.extension.toErrorResponse
+import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 
 class CrashlyticsTree : Timber.Tree() {
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        if (t != null && shouldRecord(priority, t)) Firebase.crashlytics.recordException(t)
+        if (t == null || !shouldRecord(priority, t)) return
+        val keys = CustomKeysAndValues.Builder()
+        httpErrorKeys(t).forEach { (key, value) -> keys.putString(key, value) }
+        Firebase.crashlytics.recordException(t, keys.build())
     }
 
     companion object {
         // 네트워크 끊김·코루틴 취소는 앱 결함이 아니라서 제외해요
         internal fun shouldRecord(priority: Int, t: Throwable): Boolean =
             priority >= Log.ERROR && t !is IOException && t !is CancellationException
+
+        // HttpException은 스택에 앱 코드가 없어서 어느 API인지 키로 남겨요. 요청 body는 개인 정보가 섞일 수 있어서 넣지 않아요
+        internal fun httpErrorKeys(t: Throwable): Map<String, String> {
+            val response = (t as? HttpException)?.response() ?: return emptyMap()
+            val request = response.raw().request
+            val query = request.url.encodedQuery?.takeIf { request.method == "GET" }?.let { "?$it" }.orEmpty()
+            val keys = mutableMapOf("http_api" to "${request.method} ${request.url.encodedPath}$query ${response.code()}")
+
+            // peek()으로 읽어야 에러 body를 소비하지 않아요. 에러 형식이 아니면(예: 502 HTML) 키를 빼요
+            val error = runCatching {
+                response.errorBody()?.source()?.peek()?.readUtf8()?.toErrorResponse()
+            }.getOrNull()
+            if (error != null) {
+                keys["error_type"] = error.type
+                keys["error_trace_id"] = error.errorTraceId
+            }
+            return keys
+        }
     }
 }

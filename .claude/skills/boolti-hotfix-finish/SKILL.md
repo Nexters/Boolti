@@ -1,6 +1,6 @@
 ---
 name: boolti-hotfix-finish
-description: 출시가 끝난 불티 핫픽스를 마무리한다. hotfix/* PR을 main에 머지하고, v<버전> 태그와 GitHub Release를 만들고, develop 역머지 PR에 자동 머지를 예약한다. "핫픽스 마무리", "핫픽스 배포 끝났어", "핫픽스 태깅해줘" 같은 요청에 트리거. 정기 릴리즈 마무리는 boolti-release-finish를 쓴다.
+description: 출시가 끝난 불티 핫픽스를 마무리한다. hotfix/* PR을 main에 머지하고, v<버전> 태그와 GitHub Release를 만들고, develop 역머지 PR을 바로 머지한다(권한이 없으면 자동 머지 예약). "핫픽스 마무리", "핫픽스 배포 끝났어", "핫픽스 태깅해줘" 같은 요청에 트리거. 정기 릴리즈 마무리는 boolti-release-finish를 쓴다.
 ---
 
 # 핫픽스 마무리

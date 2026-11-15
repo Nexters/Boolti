@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -94,7 +95,6 @@ import com.nexters.boolti.presentation.component.MainButtonDefaults
 import com.nexters.boolti.presentation.component.PreQuestionAnswerItem
 import com.nexters.boolti.presentation.component.ShowInquiry
 import com.nexters.boolti.presentation.extension.OnResume
-import com.nexters.boolti.presentation.extension.toDp
 import com.nexters.boolti.presentation.extension.toPx
 import com.nexters.boolti.presentation.screen.LocalNavController
 import com.nexters.boolti.presentation.screen.LocalSnackbarController
@@ -127,7 +127,8 @@ fun NavGraphBuilder.ticketDetailScreen(
         TicketDetailScreen(
             modifier = modifier,
             onBackClicked = navController::popBackStack,
-            onClickQr = { navController.navigate(TicketRoute.Qr) },
+            // 뒤로 가는 중에 누르면 티켓 그래프 밖에서 Qr로 이동해 ticketId 없이 ViewModel이 생긴다
+            onClickQr = dropUnlessResumed { navController.navigate(TicketRoute.Qr) },
             navigateToShowDetail = { navController.navigate(ShowRoute.ShowRoot(showId = it, source = Screen.Ticket.value)) },
             navigateToPreQuestionEdit = { reservationId ->
                 navController.navigate(MainRoute.PreQuestionEdit(reservationId = reservationId))

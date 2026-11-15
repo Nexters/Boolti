@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.showdetail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -45,7 +46,12 @@ fun NavGraphBuilder.showDetailScreen(
             },
             viewModel = showViewModel,
             navigateToLogin = { navController.navigate(MainRoute.Login) },
-            navigateToImages = { index -> navController.navigate(ShowRoute.Images(index)) },
+            navigateToImages = { index ->
+                // 뒤로 가는 중에 누르면 공연 그래프 밖에서 Images로 이동해 showId 없이 ViewModel이 생긴다
+                if (entry.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                    navController.navigate(ShowRoute.Images(index))
+                }
+            },
             navigateToReport = {
                 val showId = entry.arguments?.getString("showId")
                 navController.navigate(ShowRoute.Report(showId))

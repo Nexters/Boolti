@@ -23,10 +23,17 @@ interface AuthRepository {
     suspend fun logout(): Result<Unit>
     suspend fun signUp(signUpRequest: SignUpRequest): Result<Unit>
     suspend fun signout(request: SignoutRequest): Result<Unit>
-    fun getUserAndCache(): Flow<User.My?>
+
+    /**
+     * 내 정보를 한 번 가져온다. 캐시에 있으면 캐시 값을, 없거나 [forceRefresh]면 서버에서 받아 캐시한다
+     */
+    suspend fun getUser(forceRefresh: Boolean = false): Result<User.My>
+
     suspend fun sendFcmToken(): Result<Unit>
 
     val loggedIn: Flow<Boolean>
+
+    /** 캐시된 내 정보. 바뀔 때마다 새 값을 준다. 화면에서 구독할 때 쓴다 */
     val cachedUser: Flow<User.My?>
 
     suspend fun editProfile(editProfileRequest: EditProfileRequest): Result<Unit>
@@ -34,4 +41,3 @@ interface AuthRepository {
     fun getTokens(): Flow<TokenPairs>
     fun refreshToken(): Flow<AccessToken>
 }
-

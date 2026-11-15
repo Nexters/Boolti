@@ -27,3 +27,6 @@
 # Navigation 타입 안전 라우트는 enum 인자를 클래스 전체 이름과 상수 이름으로 찾는다
 # 난독화로 이름이 바뀌면 NavHost를 만들 때(앱 시작 시) 크래시가 나므로 모든 모듈의 앱 enum 이름을 유지한다
 -keepnames enum com.nexters.boolti.** { *; }
+
+# Crashlytics에서 예외 이름을 읽을 수 있게 예외 클래스 이름은 유지한다
+-keepnames class * extends java.lang.Throwable

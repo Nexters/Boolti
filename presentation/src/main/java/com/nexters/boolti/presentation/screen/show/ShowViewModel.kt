@@ -1,12 +1,12 @@
 package com.nexters.boolti.presentation.screen.show
 
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.PopupResult
 import com.nexters.boolti.domain.model.Show
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.PopupRepository
 import com.nexters.boolti.domain.repository.ShowRepository
-import com.nexters.boolti.domain.usecase.GetPopupUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,7 +29,6 @@ import javax.inject.Inject
 class ShowViewModel @Inject constructor(
     private val showRepository: ShowRepository,
     private val popupRepository: PopupRepository,
-    private val getPopupUseCase: GetPopupUseCase,
     authRepository: AuthRepository,
 ) : BaseViewModel() {
     val user: StateFlow<User.My?> = authRepository.cachedUser.stateIn(
@@ -95,9 +93,13 @@ class ShowViewModel @Inject constructor(
     }
 
     private fun fetchPopup() {
-        getPopupUseCase("HOME")
-            .onEach { popup -> sendEvent(ShowEvent.ShowPopup(popup)) }
-            .launchIn(viewModelScope + recordExceptionHandler)
+        viewModelScope.launch(recordExceptionHandler) {
+            when (val result = popupRepository.getPopup("HOME")) {
+                is PopupResult.None -> Timber.d("홈 팝업 없음")
+                is PopupResult.Hidden -> Timber.d("오늘 숨긴 이벤트 팝업: ${result.popup.id}")
+                is PopupResult.Show -> sendEvent(ShowEvent.ShowPopup(result.popup))
+            }
+        }
     }
 
     fun hideEventToday(popupId: String) {

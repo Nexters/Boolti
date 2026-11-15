@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+/**
+ * 캐시만 동기로 읽어서, 가입 직후·딥링크 진입처럼 캐시가 비어 있으면 null을 준다.
+ * 생성자에서 값이 꼭 있다고 가정하면 크래시가 난다 (#607).
+ */
+@Deprecated("캐시가 비어 있으면 null이에요. 한 번 조회는 AuthRepository.getUser(), 구독은 cachedUser를 쓰세요")
 class GetCachedUserUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {

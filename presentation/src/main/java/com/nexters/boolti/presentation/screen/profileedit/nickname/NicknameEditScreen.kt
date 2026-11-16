@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,10 +27,13 @@ import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NicknameEditScreen(
@@ -39,9 +43,16 @@ fun NicknameEditScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val snackbarController = LocalSnackbarController.current
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
+
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             NicknameEditEvent.NavigateUp -> navigateUp()
+            NicknameEditEvent.LoadFailed -> {
+                snackbarController.showMessage(unknownErrorMsg)
+                navigateUp()
+            }
         }
     }
 
@@ -93,6 +104,7 @@ private fun NicknameEditScreen(
                     .padding(top = 20.dp)
                     .padding(horizontal = marginHorizontal),
                 text = uiState.nickname,
+                enabled = !uiState.loading,
                 onValueChanged = { onAction(NicknameEditAction.ChangeNickname(it)) },
                 isError = uiState.nicknameError != null,
                 supportingText = uiState.nicknameError?.let {
@@ -124,6 +136,16 @@ private fun NicknameEditScreen(
             )
         }
 
+        if (uiState.loading) {
+            BtCircularProgressIndicator(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize(),
+                showDelay = 300.milliseconds,
+            )
+        }
+
         if (uiState.showExitAlertDialog) {
             BTDialog(
                 enableDismiss = true,
@@ -150,7 +172,7 @@ private fun NicknameEditScreen(
 private fun NicknameEditScreenPreview() {
     BooltiTheme {
         NicknameEditScreen(
-            uiState = NicknameEditUiState(nickname = "mangbaam"),
+            uiState = NicknameEditUiState(nickname = "mangbaam", loading = false),
             onAction = {},
         )
     }

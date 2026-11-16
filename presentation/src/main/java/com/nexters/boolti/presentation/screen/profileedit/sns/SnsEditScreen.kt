@@ -4,9 +4,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -31,14 +33,17 @@ import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.component.FixedWidthText
 import com.nexters.boolti.presentation.extension.centerToTop
 import com.nexters.boolti.presentation.extension.icon
 import com.nexters.boolti.presentation.extension.label
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey30
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SnsEditScreen(
@@ -48,9 +53,16 @@ fun SnsEditScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val snackbarController = LocalSnackbarController.current
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
+
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             SnsEditEvent.NavigateUp -> navigateUp()
+            SnsEditEvent.LoadFailed -> {
+                snackbarController.showMessage(unknownErrorMsg)
+                navigateUp()
+            }
         }
     }
 
@@ -102,12 +114,24 @@ private fun SnsEditScreen(
                 username = uiState.instagramUsername,
                 onUsernameChanged = { onAction(SnsEditAction.ChangeInstagramUsername(it)) },
                 error = uiState.instagramUsernameError,
+                enabled = !uiState.loading,
             )
             SnsUsernameInput(
                 snsType = Sns.SnsType.YOUTUBE,
                 username = uiState.youtubeUsername,
                 onUsernameChanged = { onAction(SnsEditAction.ChangeYoutubeUsername(it)) },
                 error = uiState.youtubeUsernameError,
+                enabled = !uiState.loading,
+            )
+        }
+
+        if (uiState.loading) {
+            BtCircularProgressIndicator(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize(),
+                showDelay = 300.milliseconds,
             )
         }
 
@@ -139,6 +163,7 @@ private fun SnsUsernameInput(
     onUsernameChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
     error: SnsError? = null,
+    enabled: Boolean = true,
 ) {
     val icon = snsType.icon
     val label = snsType.label
@@ -176,6 +201,7 @@ private fun SnsUsernameInput(
             isError = error != null,
             placeholder = stringResource(R.string.sns_username_placeholder),
             onValueChanged = onUsernameChanged,
+            enabled = enabled,
         )
     }
 }
@@ -206,7 +232,7 @@ private fun SnsUsernameInputPreview() {
 private fun SnsEditScreenPreview() {
     BooltiTheme {
         SnsEditScreen(
-            uiState = SnsEditUiState(),
+            uiState = SnsEditUiState(loading = false),
             onAction = {},
         )
     }

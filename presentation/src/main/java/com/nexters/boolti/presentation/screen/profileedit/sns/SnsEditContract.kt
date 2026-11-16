@@ -5,6 +5,7 @@ data class SnsEditUiState(
     val youtubeUsername: String = "",
     val originalInstagramUsername: String = "",
     val originalYoutubeUsername: String = "",
+    val loading: Boolean = true,
     val saving: Boolean = false,
     val showExitAlertDialog: Boolean = false,
 ) {
@@ -22,7 +23,8 @@ data class SnsEditUiState(
         !(originalInstagramUsername == instagramUsername && originalYoutubeUsername == youtubeUsername) &&
                 instagramUsernameError == null &&
                 youtubeUsernameError == null &&
-                !saving
+                !saving &&
+                !loading
 }
 
 enum class SnsError {
@@ -40,4 +42,5 @@ sealed interface SnsEditAction {
 
 sealed interface SnsEditEvent {
     data object NavigateUp : SnsEditEvent
+    data object LoadFailed : SnsEditEvent
 }

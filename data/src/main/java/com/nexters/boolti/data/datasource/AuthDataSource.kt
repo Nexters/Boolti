@@ -73,7 +73,7 @@ internal class AuthDataSource @Inject constructor(
 
     val loggedIn: Flow<Boolean> = dataStore.data.map { it.accessToken.isNotBlank() }
 
-    suspend fun login(request: LoginRequest) = runCatching {
+    suspend fun login(request: LoginRequest) = suspendRunCatching {
         loginService.kakaoLogin(request)
     }.onSuccess {
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)

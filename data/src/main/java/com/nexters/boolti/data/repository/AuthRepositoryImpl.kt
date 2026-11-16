@@ -62,7 +62,7 @@ internal class AuthRepositoryImpl @Inject constructor(
         }.mapCatching { }
     }
 
-    override suspend fun signout(request: SignoutRequest): Result<Unit> = runCatching {
+    override suspend fun signout(request: SignoutRequest): Result<Unit> = suspendRunCatching {
         userDateSource.signout(request)
     }.onSuccess {
         authDataSource.localLogout()
@@ -92,7 +92,7 @@ internal class AuthRepositoryImpl @Inject constructor(
     override suspend fun sendFcmToken(): Result<Unit> = deviceTokenDataSource.sendFcmToken()
 
     override suspend fun editProfile(editProfileRequest: EditProfileRequest) =
-        runCatching { userDateSource.edit(editProfileRequest) }
+        suspendRunCatching { userDateSource.edit(editProfileRequest) }
             .onSuccess { authDataSource.updateUser(it) }
             .mapCatching {}
 

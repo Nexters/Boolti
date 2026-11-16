@@ -12,6 +12,7 @@ import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -22,13 +23,16 @@ class SnsEditViewModelTest : DescribeSpec({
     beforeTest { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     afterTest { Dispatchers.resetMain() }
 
-    fun createViewModel(repository: UserConfigRepository = mockk()) = SnsEditViewModel(
-        getCachedUserUseCase = mockk {
-            every { this@mockk.invoke() } returns User.My(
+    fun createViewModel(
+        repository: UserConfigRepository = mockk(),
+        user: suspend () -> Result<User.My> = { Result.success(
+            User.My(
                 id = "user",
                 sns = listOf(Sns(id = "1", type = Sns.SnsType.INSTAGRAM, username = "boolti")),
             )
-        },
+        ) },
+    ) = SnsEditViewModel(
+        authRepository = mockk { coEvery { getUser(any()) } coAnswers { user() } },
         userConfigRepository = repository,
     )
 
@@ -84,5 +88,21 @@ class SnsEditViewModelTest : DescribeSpec({
             Sns.SnsType.INSTAGRAM to "boolti",
             Sns.SnsType.YOUTUBE to "boolti_tv",
         )
+    }
+
+    describe("내 정보 불러오기") {
+        it("불러오기 전에는 입력해도 저장할 수 없다") {
+            val viewModel = createViewModel(user = { awaitCancellation() })
+
+            viewModel.onAction(SnsEditAction.ChangeInstagramUsername("new"))
+
+            viewModel.uiState.value.saveEnabled shouldBe false
+        }
+
+        it("불러오지 못하면 실패를 알린다") {
+            val viewModel = createViewModel(user = { Result.failure(RuntimeException()) })
+
+            viewModel.event.first() shouldBe SnsEditEvent.LoadFailed
+        }
     }
 })

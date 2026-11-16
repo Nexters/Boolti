@@ -42,7 +42,7 @@ class LinkListViewModelTest : DescribeSpec({
         savedStateHandle = SavedStateHandle().also {
             every { it.toRoute<LinkListRoute.LinkList>() } returns LinkListRoute.LinkList(userCode = "me", isEditMode = isEditMode)
         },
-        getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "me") },
+        authRepository = mockk { coEvery { getUser(any()) } returns Result.success(User.My(id = "user", userCode = "me")) },
         memberRepository = mockk<MemberRepository> {
             coEvery { getLinks(any()) } returns Result.success(links)
         },

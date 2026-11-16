@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,10 +24,13 @@ import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BTTextField
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
+import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
 import com.nexters.boolti.presentation.extension.takeForUnicode
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun IntroduceEditScreen(
@@ -36,9 +40,16 @@ fun IntroduceEditScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val snackbarController = LocalSnackbarController.current
+    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
+
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             IntroduceEditEvent.NavigateUp -> navigateUp()
+            IntroduceEditEvent.LoadFailed -> {
+                snackbarController.showMessage(unknownErrorMsg)
+                navigateUp()
+            }
         }
     }
 
@@ -91,11 +102,22 @@ private fun IntroduceEditScreen(
                     .padding(horizontal = marginHorizontal),
                 text = uiState.introduce.takeForUnicode(IntroduceEditUiState.MAX_LENGTH),
                 placeholder = stringResource(R.string.introduce_edit_placeholder),
+                enabled = !uiState.loading,
                 singleLine = false,
                 bottomEndText = "${uiState.introduce.length}/${IntroduceEditUiState.MAX_LENGTH}자",
                 onValueChanged = {
                     onAction(IntroduceEditAction.ChangeIntroduce(it.takeForUnicode(IntroduceEditUiState.MAX_LENGTH)))
                 },
+            )
+        }
+
+        if (uiState.loading) {
+            BtCircularProgressIndicator(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize(),
+                showDelay = 300.milliseconds,
             )
         }
 
@@ -125,7 +147,7 @@ private fun IntroduceEditScreen(
 private fun IntroduceEditScreenPreview() {
     BooltiTheme {
         IntroduceEditScreen(
-            uiState = IntroduceEditUiState(introduce = "mangbaam"),
+            uiState = IntroduceEditUiState(introduce = "mangbaam", loading = false),
             onAction = {},
         )
     }

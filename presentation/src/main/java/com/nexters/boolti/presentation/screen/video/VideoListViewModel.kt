@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.YouTubeVideo
+import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.domain.usecase.GetYouTubeVideoInfoByUrlUseCase
 import com.nexters.boolti.domain.usecase.GetYouTubeVideoListByUserCodeUseCase
 import com.nexters.boolti.presentation.screen.navigation.VideoListRoute
@@ -20,36 +20,35 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class VideoListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getCachedUserUseCase: GetCachedUserUseCase,
+    authRepository: AuthRepository,
     private val getYouTubeVideoListByUserCodeUseCase: GetYouTubeVideoListByUserCodeUseCase,
     private val getYouTubeVideoInfoByUrlUseCase: GetYouTubeVideoInfoByUrlUseCase,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<VideoListRoute.VideoList>()
     private val userCode = route.userCode
-    private val isMine = getCachedUserUseCase()?.userCode == userCode
-    private val isEditModeAtFirst = route.isEditMode && isMine
-    private var autoNavigatedToEdit = isEditModeAtFirst
+    private var autoNavigatedToEdit = false
 
-    private val _uiState = MutableStateFlow(
-        VideoListUiState(
-            isMine = isMine,
-            loading = true,
-            editing = isEditModeAtFirst,
-        )
-    )
+    private val _uiState = MutableStateFlow(VideoListUiState(loading = true))
     val uiState: StateFlow<VideoListUiState> = _uiState.asStateFlow()
 
     private val _event = Channel<VideoListEvent>(Channel.BUFFERED)
     val event: Flow<VideoListEvent> = _event.receiveAsFlow()
 
     init {
-        fetchVideos()
+        viewModelScope.launch {
+            val isMine = authRepository.getUser().onFailure { Timber.e(it) }.getOrNull()?.userCode == userCode
+            val editing = route.isEditMode && isMine
+            autoNavigatedToEdit = editing
+            _uiState.update { it.copy(isMine = isMine, editing = editing) }
+            fetchVideos()
+        }
     }
 
     fun onAction(action: VideoListAction) {
@@ -76,11 +75,11 @@ class VideoListViewModel @Inject constructor(
                         it.copy(
                             videos = videos,
                             originalVideos = videos,
-                            editing = it.editing || isMine && videos.isEmpty(),
+                            editing = it.editing || it.isMine && videos.isEmpty(),
                             loading = false,
                         )
                     }
-                    if (isMine && videos.isEmpty()) {
+                    if (uiState.value.isMine && videos.isEmpty()) {
                         autoNavigatedToEdit = true
                         sendEvent(VideoListEvent.NavigateToAddVideo(closeListOnBack = true))
                     }

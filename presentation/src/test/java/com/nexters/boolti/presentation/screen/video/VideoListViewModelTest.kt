@@ -38,7 +38,7 @@ class VideoListViewModelTest : DescribeSpec({
         savedStateHandle = SavedStateHandle().also {
             every { it.toRoute<VideoListRoute.VideoList>() } returns VideoListRoute.VideoList(userCode = "me", isEditMode = false)
         },
-        getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "me") },
+        authRepository = mockk { coEvery { getUser(any()) } returns Result.success(User.My(id = "user", userCode = "me")) },
         getYouTubeVideoListByUserCodeUseCase = mockk<GetYouTubeVideoListByUserCodeUseCase> {
             coEvery { this@mockk.invoke(any()) } returns Result.success(videos)
         },

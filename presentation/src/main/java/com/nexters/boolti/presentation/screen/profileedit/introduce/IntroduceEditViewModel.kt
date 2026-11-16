@@ -2,8 +2,8 @@ package com.nexters.boolti.presentation.screen.profileedit.introduce
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -13,20 +13,35 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class IntroduceEditViewModel @Inject constructor(
-    getCachedUserUseCase: GetCachedUserUseCase,
+    authRepository: AuthRepository,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val originalIntroduce = getCachedUserUseCase()?.introduction.orEmpty()
+    private var originalIntroduce = ""
 
-    private val _uiState = MutableStateFlow(IntroduceEditUiState(introduce = originalIntroduce))
+    private val _uiState = MutableStateFlow(IntroduceEditUiState())
     val uiState: StateFlow<IntroduceEditUiState> = _uiState.asStateFlow()
 
     private val _event = Channel<IntroduceEditEvent>(Channel.BUFFERED)
     val event: Flow<IntroduceEditEvent> = _event.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            authRepository.getUser()
+                .onSuccess { user ->
+                    originalIntroduce = user.introduction
+                    _uiState.update { it.copy(introduce = originalIntroduce, loading = false) }
+                }
+                .onFailure {
+                    Timber.e(it)
+                    _event.send(IntroduceEditEvent.LoadFailed)
+                }
+        }
+    }
 
     fun onAction(action: IntroduceEditAction) {
         when (action) {

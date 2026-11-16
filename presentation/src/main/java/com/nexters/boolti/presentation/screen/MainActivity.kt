@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.nexters.boolti.domain.repository.AuthRepository
@@ -26,6 +27,8 @@ import com.nexters.boolti.presentation.extension.requestPermission
 import com.nexters.boolti.presentation.extension.startActivity
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -66,6 +69,14 @@ class MainActivity : ComponentActivity() {
 
         createDefaultFcmChannel()
         subscribeDefaultTopic()
+        if (savedInstanceState == null) refreshUser()
+    }
+
+    private fun refreshUser() {
+        lifecycleScope.launch {
+            if (!authRepository.loggedIn.first()) return@launch
+            authRepository.getUser(forceRefresh = true).onFailure { Timber.e(it) }
+        }
     }
 
     private fun createDefaultFcmChannel() {

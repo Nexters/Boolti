@@ -2,6 +2,7 @@ package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.LoginResponse
@@ -36,6 +37,7 @@ class AuthRepositoryImplTest : DescribeSpec({
         server: UserResponse?,
         login: LoginResponse? = null,
         tokenDataSource: TokenDataSource = mockk(),
+        authTokenDataSource: AuthTokenDataSource = mockk(),
         signoutError: Throwable? = null,
     ): AuthRepositoryImpl {
         val authDataSource = mockk<AuthDataSource> {
@@ -52,7 +54,7 @@ class AuthRepositoryImplTest : DescribeSpec({
         return AuthRepositoryImpl(
             authDataSource = authDataSource,
             tokenDataSource = tokenDataSource,
-            authTokenDataSource = mockk(),
+            authTokenDataSource = authTokenDataSource,
             signUpDataSource = mockk(),
             userDateSource = userDataSource,
             deviceTokenDataSource = mockk(),
@@ -116,4 +118,12 @@ class AuthRepositoryImplTest : DescribeSpec({
         }
     }
 
+    describe("토큰 갱신") {
+        it("새 토큰을 받지 못하면 예외를 던지지 않고 실패 결과를 준다") {
+            val authTokenDataSource = mockk<AuthTokenDataSource> { coEvery { getNewAccessToken(any()) } returns null }
+            val repository = createRepository(cached = null, server = null, authTokenDataSource = authTokenDataSource)
+
+            repository.refreshToken().isFailure shouldBe true
+        }
+    }
 })

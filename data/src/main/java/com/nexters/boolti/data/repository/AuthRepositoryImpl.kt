@@ -8,9 +8,7 @@ import com.nexters.boolti.data.datasource.SignUpDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.LoginResponse
-import com.nexters.boolti.domain.model.AccessToken
 import com.nexters.boolti.domain.model.LoginUserState
-import com.nexters.boolti.domain.model.TokenPairs
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.request.EditProfileRequest
@@ -20,7 +18,6 @@ import com.nexters.boolti.domain.request.SignoutRequest
 import com.nexters.boolti.domain.util.suspendRunCatching
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
@@ -96,13 +93,7 @@ internal class AuthRepositoryImpl @Inject constructor(
             .onSuccess { authDataSource.updateUser(it) }
             .mapCatching {}
 
-    override fun getTokens(): Flow<TokenPairs> = authDataSource.getTokens().map {
-        TokenPairs(it.first, it.second)
-    }
-
-    override fun refreshToken(): Flow<AccessToken> = flow {
-        authTokenDataSource.getNewAccessToken()?.let {
-            emit(AccessToken(it))
-        }
+    override suspend fun refreshToken(): Result<String> = suspendRunCatching {
+        checkNotNull(authTokenDataSource.getNewAccessToken()) { "토큰 갱신에 실패했어요" }
     }
 }

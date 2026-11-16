@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -19,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nexters.boolti.presentation.R
 import com.nexters.boolti.presentation.component.BtBackAppBar
 import com.nexters.boolti.presentation.component.MainButton
+import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.marginHorizontal
 
 @Composable
@@ -29,6 +31,8 @@ fun SignoutScreen(
 ) {
     var firstPage by remember { mutableStateOf(true) }
     val reason by viewModel.reason.collectAsStateWithLifecycle()
+    val snackbarController = LocalSnackbarController.current
+    val resources = LocalResources.current
 
     BackHandler {
         if (firstPage) navigateBack() else firstPage = true
@@ -38,6 +42,7 @@ fun SignoutScreen(
         viewModel.event.collect {
             when (it) {
                 SignoutEvent.SignoutSuccess -> navigateToHome()
+                is SignoutEvent.SignoutFailed -> snackbarController.showMessage(resources.getString(it.message))
             }
         }
     }

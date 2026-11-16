@@ -66,6 +66,8 @@ internal class AuthRepositoryImpl @Inject constructor(
         userDateSource.signout(request)
     }.onSuccess {
         authDataSource.localLogout()
+        // 탈퇴를 로그아웃 이벤트로 집계하지 않도록 식별만 지운다
+        AppTracker.reset()
     }
 
     override suspend fun getUser(forceRefresh: Boolean): Result<User.My> = suspendRunCatching {

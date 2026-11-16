@@ -2,11 +2,13 @@ package com.nexters.boolti.data.repository
 
 import com.nexters.boolti.common.tracker.AppTracker
 import com.nexters.boolti.data.datasource.AuthDataSource
+import com.nexters.boolti.data.datasource.AuthTokenDataSource
 import com.nexters.boolti.data.datasource.TokenDataSource
 import com.nexters.boolti.data.datasource.UserDataSource
 import com.nexters.boolti.data.network.response.LoginResponse
 import com.nexters.boolti.data.network.response.UserResponse
 import com.nexters.boolti.domain.request.LoginRequest
+import com.nexters.boolti.domain.request.SignoutRequest
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -18,6 +20,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.runs
 import io.mockk.unmockkObject
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 
 class AuthRepositoryImplTest : DescribeSpec({
@@ -25,6 +28,7 @@ class AuthRepositoryImplTest : DescribeSpec({
     beforeTest {
         mockkObject(AppTracker)
         every { AppTracker.identify(properties = any(), userId = any(), withLogcat = any()) } just runs
+        every { AppTracker.reset(any()) } just runs
     }
     afterTest { unmockkObject(AppTracker) }
 
@@ -33,18 +37,24 @@ class AuthRepositoryImplTest : DescribeSpec({
         server: UserResponse?,
         login: LoginResponse? = null,
         tokenDataSource: TokenDataSource = mockk(),
+        authTokenDataSource: AuthTokenDataSource = mockk(),
+        signoutError: Throwable? = null,
     ): AuthRepositoryImpl {
         val authDataSource = mockk<AuthDataSource> {
             every { user } returns flowOf(cached)
             every { loggedIn } returns flowOf(true)
             coEvery { updateUser(any()) } just runs
+            coEvery { localLogout() } just runs
             if (login != null) coEvery { login(any()) } returns Result.success(login)
         }
-        val userDataSource = mockk<UserDataSource> { coEvery { getUser() } returns server }
+        val userDataSource = mockk<UserDataSource> {
+            coEvery { getUser() } returns server
+            if (signoutError == null) coEvery { signout(any()) } just runs else coEvery { signout(any()) } throws signoutError
+        }
         return AuthRepositoryImpl(
             authDataSource = authDataSource,
             tokenDataSource = tokenDataSource,
-            authTokenDataSource = mockk(),
+            authTokenDataSource = authTokenDataSource,
             signUpDataSource = mockk(),
             userDateSource = userDataSource,
             deviceTokenDataSource = mockk(),
@@ -89,6 +99,31 @@ class AuthRepositoryImplTest : DescribeSpec({
 
             repository.kakaoLogin(LoginRequest("kakao")).getOrNull()?.signUpRequired shouldBe true
             coVerify(exactly = 0) { tokenDataSource.saveTokens(any(), any()) }
+        }
+    }
+
+    describe("탈퇴") {
+        it("성공하면 트래커의 사용자 식별을 지운다") {
+            val repository = createRepository(cached = null, server = null)
+
+            repository.signout(SignoutRequest("reason")).isSuccess shouldBe true
+            verify(exactly = 1) { AppTracker.reset(any()) }
+        }
+
+        it("실패하면 트래커의 사용자 식별을 지우지 않는다") {
+            val repository = createRepository(cached = null, server = null, signoutError = IllegalStateException())
+
+            repository.signout(SignoutRequest("reason")).isFailure shouldBe true
+            verify(exactly = 0) { AppTracker.reset(any()) }
+        }
+    }
+
+    describe("토큰 갱신") {
+        it("새 토큰을 받지 못하면 예외를 던지지 않고 실패 결과를 준다") {
+            val authTokenDataSource = mockk<AuthTokenDataSource> { coEvery { getNewAccessToken(any()) } returns null }
+            val repository = createRepository(cached = null, server = null, authTokenDataSource = authTokenDataSource)
+
+            repository.refreshToken().isFailure shouldBe true
         }
     }
 })

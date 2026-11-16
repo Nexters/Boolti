@@ -140,9 +140,20 @@ object AppTracker {
         withLogcat: Boolean = true,
     ) {
         tracker.track("logout")
-        tracker.reset()
+        reset(withLogcat = false)
 
         if (withLogcat) trackLogcat("logout")
+    }
+
+    /**
+     * 유저 식별 정보를 지웁니다. 이벤트는 남기지 않아요. 탈퇴처럼 로그아웃이 아닌 이유로 식별을 끊을 때 호출합니다.
+     */
+    fun reset(
+        withLogcat: Boolean = true,
+    ) {
+        tracker.reset()
+
+        if (withLogcat) trackLogcat("reset")
     }
 
     private fun trackLogcat(

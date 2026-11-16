@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.nexters.boolti.data.network.api.DeviceTokenService
 import com.nexters.boolti.data.network.request.DeviceTokenRequest
+import com.nexters.boolti.domain.util.suspendRunCatching
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -13,7 +14,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class DeviceTokenDataSource @Inject constructor(
     private val deviceTokenService: DeviceTokenService,
 ) {
-    suspend fun sendFcmToken(): Result<Unit> = runCatching {
+    suspend fun sendFcmToken(): Result<Unit> = suspendRunCatching {
         val response = deviceTokenService.postFcmToken(
             DeviceTokenRequest(deviceToken = getFcmToken(), deviceType = "ANDROID")
         )

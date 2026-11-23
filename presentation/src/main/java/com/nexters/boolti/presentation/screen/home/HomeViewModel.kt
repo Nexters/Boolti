@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,16 +48,8 @@ class HomeViewModel @Inject constructor(
     private var pendingGift: PendingGift? = null
 
     init {
-        fetchUserInfo()
         sendFcmToken()
         collectHomeNavigationEvent()
-    }
-
-    private fun fetchUserInfo() {
-        viewModelScope.launch {
-            authRepository.getUser(forceRefresh = true)
-                .onFailure { e -> Timber.e(e) }
-        }
     }
 
     private fun sendFcmToken() {

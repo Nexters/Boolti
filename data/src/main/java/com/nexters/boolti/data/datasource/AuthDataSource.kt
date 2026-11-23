@@ -31,8 +31,6 @@ internal class AuthDataSource @Inject constructor(
     private val dataStore: DataStore<AppSettings>
         get() = context.dataStore
 
-    private val data: Flow<AppSettings> = dataStore.data
-
     val user: Flow<UserResponse?> = dataStore.data.map {
         if (it.userId == null) {
             null
@@ -73,7 +71,7 @@ internal class AuthDataSource @Inject constructor(
 
     val loggedIn: Flow<Boolean> = dataStore.data.map { it.accessToken.isNotBlank() }
 
-    suspend fun login(request: LoginRequest) = runCatching {
+    suspend fun login(request: LoginRequest) = suspendRunCatching {
         loginService.kakaoLogin(request)
     }.onSuccess {
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.LOGIN, null)
@@ -129,7 +127,7 @@ internal class AuthDataSource @Inject constructor(
     }
 
     suspend fun refresh(): Result<SignUpResponse?> = suspendRunCatching {
-        val refreshToken = data.map { it.refreshToken }.first()
+        val refreshToken = dataStore.data.first().refreshToken
 
         if (refreshToken.isNotBlank()) loginService.refresh(RefreshRequest(refreshToken)) else null
     }
@@ -169,9 +167,4 @@ internal class AuthDataSource @Inject constructor(
             setUserProperty("nickname", user.nickname)
         }
     }
-
-    /**
-     * @return [accessToken, refreshToken]
-     */
-    fun getTokens(): Flow<Pair<String, String>> = data.map { it.accessToken to it.refreshToken }
 }

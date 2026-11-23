@@ -1,9 +1,11 @@
 package com.nexters.boolti.presentation.screen.profileedit.introduce
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -17,10 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IntroduceEditViewModel @Inject constructor(
-    getCachedUserUseCase: GetCachedUserUseCase,
+    savedStateHandle: SavedStateHandle,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val originalIntroduce = getCachedUserUseCase()?.introduction.orEmpty()
+    private val originalIntroduce = savedStateHandle.toRoute<ProfileRoute.ProfileIntroduceEdit>().introduction
 
     private val _uiState = MutableStateFlow(IntroduceEditUiState(introduce = originalIntroduce))
     val uiState: StateFlow<IntroduceEditUiState> = _uiState.asStateFlow()

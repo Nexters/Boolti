@@ -17,17 +17,17 @@ fun NavGraphBuilder.profileEditScreen(
         ProfileEditScreen(
             modifier = modifier,
             navigateUp = navController::popBackStack,
-            navigateToNicknameEdit = {
-                navController.navigate(ProfileRoute.ProfileNicknameEdit)
+            navigateToNicknameEdit = { nickname ->
+                navController.navigate(ProfileRoute.ProfileNicknameEdit(nickname))
             },
-            navigateToUserCodeEdit = {
-                navController.navigate(ProfileRoute.ProfileUserCodeEdit)
+            navigateToUserCodeEdit = { userCode ->
+                navController.navigate(ProfileRoute.ProfileUserCodeEdit(userCode))
             },
-            navigateToIntroductionEdit = {
-                navController.navigate(ProfileRoute.ProfileIntroduceEdit)
+            navigateToIntroductionEdit = { introduction ->
+                navController.navigate(ProfileRoute.ProfileIntroduceEdit(introduction))
             },
-            navigateToSnsEdit = {
-                navController.navigate(ProfileRoute.ProfileSnsEdit)
+            navigateToSnsEdit = { instagramUsername, youtubeUsername ->
+                navController.navigate(ProfileRoute.ProfileSnsEdit(instagramUsername, youtubeUsername))
             },
             navigateToVideoEdit = { userCode ->
                 navController.navigate(VideoListRoute.VideoList(userCode, true))

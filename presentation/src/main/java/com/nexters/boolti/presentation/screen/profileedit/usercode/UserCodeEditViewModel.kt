@@ -1,10 +1,13 @@
 package com.nexters.boolti.presentation.screen.profileedit.usercode
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -16,14 +19,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class UserCodeEditViewModel @Inject constructor(
-    getCachedUserUseCase: GetCachedUserUseCase,
+    savedStateHandle: SavedStateHandle,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val originalUserCode = getCachedUserUseCase()?.userCode.orEmpty().lowercase()
+    private val originalUserCode = savedStateHandle.toRoute<ProfileRoute.ProfileUserCodeEdit>().userCode.lowercase()
 
     private val _uiState = MutableStateFlow(UserCodeEditUiState(userCode = originalUserCode))
     val uiState: StateFlow<UserCodeEditUiState> = _uiState.asStateFlow()

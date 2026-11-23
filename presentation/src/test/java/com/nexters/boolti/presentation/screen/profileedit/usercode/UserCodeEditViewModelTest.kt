@@ -1,13 +1,17 @@
 package com.nexters.boolti.presentation.screen.profileedit.usercode
 
-import com.nexters.boolti.domain.model.User
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -26,8 +30,14 @@ class UserCodeEditViewModelTest : DescribeSpec({
     }
     afterTest { Dispatchers.resetMain() }
 
+    // toRoute()는 안에서 Bundle을 써서 JVM 테스트에서 돌지 않는다 (b/349807172)
+    beforeSpec { mockkStatic("androidx.navigation.SavedStateHandleKt") }
+    afterSpec { unmockkStatic("androidx.navigation.SavedStateHandleKt") }
+
     fun createViewModel(repository: UserConfigRepository = mockk()) = UserCodeEditViewModel(
-        getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", userCode = "Boolti") },
+        savedStateHandle = SavedStateHandle().also {
+            every { it.toRoute<ProfileRoute.ProfileUserCodeEdit>() } returns ProfileRoute.ProfileUserCodeEdit(userCode = "Boolti")
+        },
         userConfigRepository = repository,
     )
 

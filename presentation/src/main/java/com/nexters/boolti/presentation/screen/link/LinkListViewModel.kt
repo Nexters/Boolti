@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Link
+import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.presentation.screen.navigation.LinkListRoute
 import com.nexters.boolti.presentation.screen.profileedit.link.LinkEditResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,29 +26,28 @@ import javax.inject.Inject
 @HiltViewModel
 class LinkListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getCachedUserUseCase: GetCachedUserUseCase,
+    authRepository: AuthRepository,
     private val memberRepository: MemberRepository,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<LinkListRoute.LinkList>()
     private val userCode = route.userCode
-    private val isMine = getCachedUserUseCase()?.userCode == userCode
-    private val isEditModeAtFirst = route.isEditMode && isMine
-    private var autoNavigatedToEdit = isEditModeAtFirst
+    private var autoNavigatedToEdit = false
 
-    private val _uiState = MutableStateFlow(
-        LinkListUiState(
-            isMine = isMine,
-            editing = isEditModeAtFirst,
-        )
-    )
+    private val _uiState = MutableStateFlow(LinkListUiState())
     val uiState: StateFlow<LinkListUiState> = _uiState.asStateFlow()
 
     private val _event = Channel<LinkListEvent>(Channel.BUFFERED)
     val event: Flow<LinkListEvent> = _event.receiveAsFlow()
 
     init {
-        fetchLinks()
+        viewModelScope.launch {
+            val isMine = authRepository.cachedUser.first()?.userCode == userCode
+            val editing = route.isEditMode && isMine
+            autoNavigatedToEdit = editing
+            _uiState.update { it.copy(isMine = isMine, editing = editing) }
+            fetchLinks()
+        }
     }
 
     fun onAction(action: LinkListAction) {
@@ -74,10 +74,10 @@ class LinkListViewModel @Inject constructor(
                         it.copy(
                             links = links,
                             originalLinks = links,
-                            editing = it.editing || isMine && links.isEmpty(),
+                            editing = it.editing || it.isMine && links.isEmpty(),
                         )
                     }
-                    if (isMine && links.isEmpty()) {
+                    if (uiState.value.isMine && links.isEmpty()) {
                         autoNavigatedToEdit = true
                         sendEvent(LinkListEvent.NavigateToAddLink(closeListOnBack = true))
                     }

@@ -7,7 +7,6 @@ import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.MemberRepository
 import com.nexters.boolti.domain.repository.YouTubeRepository
-import com.nexters.boolti.domain.usecase.GetCachedUserUseCase
 import com.nexters.boolti.presentation.base.BaseViewModel
 import com.nexters.boolti.presentation.screen.navigation.MainRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +14,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -25,7 +25,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getCachedUserUseCase: GetCachedUserUseCase,
     private val memberRepository: MemberRepository,
     private val authRepository: AuthRepository,
     private val youTubeRepository: YouTubeRepository,
@@ -33,14 +32,12 @@ class ProfileViewModel @Inject constructor(
     private val route = savedStateHandle.toRoute<MainRoute.Profile>()
     private val _userCode: String? = route.userCode
     val source: String = route.source
-    private val myProfile: User.My = getCachedUserUseCase() ?: User.My("-999")
-    private val isMyProfile = _userCode?.equals(myProfile.userCode) ?: true
     private var previousVideoIds: List<String>? = null
 
     private val _uiState = MutableStateFlow(
         ProfileState(
-            isMine = isMyProfile,
-            user = if (isMyProfile) myProfile else User.Others(""),
+            isMine = _userCode == null,
+            user = if (_userCode == null) User.My("") else User.Others(),
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -49,10 +46,14 @@ class ProfileViewModel @Inject constructor(
     val event = _event.receiveAsFlow()
 
     init {
-        if (isMyProfile) {
-            collectMyProfile()
-        } else {
-            fetchOthersProfile(_userCode!!)
+        viewModelScope.launch(recordExceptionHandler) {
+            val userCode = _userCode
+            if (userCode == null || userCode == authRepository.cachedUser.first()?.userCode) {
+                _uiState.update { it.copy(isMine = true) }
+                collectMyProfile()
+            } else {
+                fetchOthersProfile(userCode)
+            }
         }
     }
 

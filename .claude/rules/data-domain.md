@@ -32,7 +32,6 @@ paths:
 - 한 번 가져올 때는 `AuthRepository.getUser(forceRefresh = false)`만 쓴다. 캐시에 없거나 `forceRefresh`면 서버에서 받아 캐시하고, 실패는 `Result`로 준다
 - 화면에서 값 변화를 구독할 때만 `cachedUser` Flow를 쓴다
 - 캐시가 비어 있을 수 있다 (가입 직후, 딥링크로 바로 진입 등). ViewModel 생성자에서 사용자 정보를 `checkNotNull`하지 말고, 쓰는 시점에 `getUser()`로 받는다
-- `GetCachedUserUseCase`(`runBlocking`)는 새 코드에서 쓰지 않는다
 
 ## 캐시
 

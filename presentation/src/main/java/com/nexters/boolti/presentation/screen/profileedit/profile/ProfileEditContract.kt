@@ -8,6 +8,8 @@ data class ProfileEditUiState(
     val nickname: String = "",
     val userCode: UserCode = "",
     val introduction: String = "",
+    val instagramUsername: String = "",
+    val youtubeUsername: String = "",
     val snsCount: Int = 0,
     val upcomingShowCount: Int = 0,
     val pastShowCount: Int = 0,
@@ -35,10 +37,10 @@ sealed interface ProfileEditAction {
 
 sealed interface ProfileEditEvent {
     data object NavigateUp : ProfileEditEvent
-    data object NavigateToNicknameEdit : ProfileEditEvent
-    data object NavigateToUserCodeEdit : ProfileEditEvent
-    data object NavigateToIntroductionEdit : ProfileEditEvent
-    data object NavigateToSnsEdit : ProfileEditEvent
+    data class NavigateToNicknameEdit(val nickname: String) : ProfileEditEvent
+    data class NavigateToUserCodeEdit(val userCode: UserCode) : ProfileEditEvent
+    data class NavigateToIntroductionEdit(val introduction: String) : ProfileEditEvent
+    data class NavigateToSnsEdit(val instagramUsername: String, val youtubeUsername: String) : ProfileEditEvent
     data class NavigateToVideoEdit(val userCode: UserCode) : ProfileEditEvent
     data class NavigateToLinkEdit(val userCode: UserCode) : ProfileEditEvent
     data object ShowUnknownError : ProfileEditEvent

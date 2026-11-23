@@ -1,13 +1,17 @@
 package com.nexters.boolti.presentation.screen.profileedit.nickname
 
-import com.nexters.boolti.domain.model.User
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -18,11 +22,16 @@ import kotlinx.coroutines.test.setMain
 @OptIn(ExperimentalCoroutinesApi::class)
 class NicknameEditViewModelTest : DescribeSpec({
 
+    // toRoute()는 안에서 Bundle을 써서 JVM 테스트에서 돌지 않는다 (b/349807172)
+    beforeSpec { mockkStatic("androidx.navigation.SavedStateHandleKt") }
+    afterSpec { unmockkStatic("androidx.navigation.SavedStateHandleKt") }
     beforeTest { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     afterTest { Dispatchers.resetMain() }
 
     fun createViewModel(repository: UserConfigRepository = mockk()) = NicknameEditViewModel(
-        getCachedUserUseCase = mockk { every { this@mockk.invoke() } returns User.My(id = "user", nickname = "불티") },
+        savedStateHandle = SavedStateHandle().also {
+            every { it.toRoute<ProfileRoute.ProfileNicknameEdit>() } returns ProfileRoute.ProfileNicknameEdit(nickname = "불티")
+        },
         userConfigRepository = repository,
     )
 

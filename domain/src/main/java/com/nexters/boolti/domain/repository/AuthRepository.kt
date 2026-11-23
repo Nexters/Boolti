@@ -1,8 +1,6 @@
 package com.nexters.boolti.domain.repository
 
-import com.nexters.boolti.domain.model.AccessToken
 import com.nexters.boolti.domain.model.LoginUserState
-import com.nexters.boolti.domain.model.TokenPairs
 import com.nexters.boolti.domain.model.User
 import com.nexters.boolti.domain.request.EditProfileRequest
 import com.nexters.boolti.domain.request.LoginRequest
@@ -38,6 +36,6 @@ interface AuthRepository {
 
     suspend fun editProfile(editProfileRequest: EditProfileRequest): Result<Unit>
 
-    fun getTokens(): Flow<TokenPairs>
-    fun refreshToken(): Flow<AccessToken>
+    /** 토큰을 갱신해 새 access token을 돌려줘요. 갱신하지 못하면(비로그인 등) 실패를 돌려줘요 */
+    suspend fun refreshToken(): Result<String>
 }

@@ -2,7 +2,6 @@ package com.nexters.boolti.presentation.screen.profileedit.nickname
 
 data class NicknameEditUiState(
     val nickname: String = "",
-    val loading: Boolean = true,
     val saving: Boolean = false,
     val showExitAlertDialog: Boolean = false,
 ) {
@@ -14,7 +13,7 @@ data class NicknameEditUiState(
         else -> null
     }
 
-    val saveEnabled: Boolean = nicknameError == null && !saving && !loading
+    val saveEnabled: Boolean = nicknameError == null && !saving
 }
 
 enum class NicknameError {
@@ -35,5 +34,4 @@ sealed interface NicknameEditAction {
 
 sealed interface NicknameEditEvent {
     data object NavigateUp : NicknameEditEvent
-    data object LoadFailed : NicknameEditEvent
 }

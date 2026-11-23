@@ -1,15 +1,19 @@
 package com.nexters.boolti.presentation.screen.profileedit.introduce
 
-import com.nexters.boolti.domain.model.User
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -17,14 +21,16 @@ import kotlinx.coroutines.test.setMain
 @OptIn(ExperimentalCoroutinesApi::class)
 class IntroduceEditViewModelTest : DescribeSpec({
 
+    // toRoute()는 안에서 Bundle을 써서 JVM 테스트에서 돌지 않는다 (b/349807172)
+    beforeSpec { mockkStatic("androidx.navigation.SavedStateHandleKt") }
+    afterSpec { unmockkStatic("androidx.navigation.SavedStateHandleKt") }
     beforeTest { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     afterTest { Dispatchers.resetMain() }
 
-    fun createViewModel(
-        repository: UserConfigRepository = mockk(),
-        user: suspend () -> Result<User.My> = { Result.success(User.My(id = "user", introduction = "안녕")) },
-    ) = IntroduceEditViewModel(
-        authRepository = mockk { coEvery { getUser(any()) } coAnswers { user() } },
+    fun createViewModel(repository: UserConfigRepository = mockk()) = IntroduceEditViewModel(
+        savedStateHandle = SavedStateHandle().also {
+            every { it.toRoute<ProfileRoute.ProfileIntroduceEdit>() } returns ProfileRoute.ProfileIntroduceEdit(introduction = "안녕")
+        },
         userConfigRepository = repository,
     )
 
@@ -47,21 +53,5 @@ class IntroduceEditViewModelTest : DescribeSpec({
         viewModel.onAction(IntroduceEditAction.Save)
 
         viewModel.event.first() shouldBe IntroduceEditEvent.NavigateUp
-    }
-
-    describe("내 정보 불러오기") {
-        it("불러오기 전에는 입력해도 저장할 수 없다") {
-            val viewModel = createViewModel(user = { awaitCancellation() })
-
-            viewModel.onAction(IntroduceEditAction.ChangeIntroduce("새 소개"))
-
-            viewModel.uiState.value.saveEnabled shouldBe false
-        }
-
-        it("불러오지 못하면 실패를 알린다") {
-            val viewModel = createViewModel(user = { Result.failure(RuntimeException()) })
-
-            viewModel.event.first() shouldBe IntroduceEditEvent.LoadFailed
-        }
     }
 })

@@ -1,10 +1,12 @@
 package com.nexters.boolti.presentation.screen.profileedit.sns
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nexters.boolti.domain.model.Sns
-import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
+import com.nexters.boolti.presentation.screen.navigation.ProfileRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -14,43 +16,29 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SnsEditViewModel @Inject constructor(
-    authRepository: AuthRepository,
+    savedStateHandle: SavedStateHandle,
     private val userConfigRepository: UserConfigRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SnsEditUiState())
+    private val route = savedStateHandle.toRoute<ProfileRoute.ProfileSnsEdit>()
+    private val originalInstagramUsername: String = route.instagramUsername
+    private val originalYoutubeUsername: String = route.youtubeUsername
+
+    private val _uiState = MutableStateFlow(
+        SnsEditUiState(
+            originalInstagramUsername = originalInstagramUsername,
+            originalYoutubeUsername = originalYoutubeUsername,
+            instagramUsername = originalInstagramUsername,
+            youtubeUsername = originalYoutubeUsername,
+        )
+    )
     val uiState: StateFlow<SnsEditUiState> = _uiState.asStateFlow()
 
     private val _event = Channel<SnsEditEvent>(Channel.BUFFERED)
     val event: Flow<SnsEditEvent> = _event.receiveAsFlow()
-
-    init {
-        viewModelScope.launch {
-            authRepository.getUser()
-                .onSuccess { user ->
-                    val snsList = user.sns.associate { it.type to it.username }
-                    val instagram = snsList[Sns.SnsType.INSTAGRAM].orEmpty()
-                    val youtube = snsList[Sns.SnsType.YOUTUBE].orEmpty()
-                    _uiState.update {
-                        it.copy(
-                            originalInstagramUsername = instagram,
-                            originalYoutubeUsername = youtube,
-                            instagramUsername = instagram,
-                            youtubeUsername = youtube,
-                            loading = false,
-                        )
-                    }
-                }
-                .onFailure {
-                    Timber.e(it)
-                    _event.send(SnsEditEvent.LoadFailed)
-                }
-        }
-    }
 
     fun onAction(action: SnsEditAction) {
         when (action) {
@@ -94,8 +82,8 @@ class SnsEditViewModel @Inject constructor(
 
     private fun canExit(): Boolean {
         val state = uiState.value
-        val unchanged = state.instagramUsername == state.originalInstagramUsername &&
-                state.youtubeUsername == state.originalYoutubeUsername
+        val unchanged = state.instagramUsername == originalInstagramUsername &&
+                state.youtubeUsername == originalYoutubeUsername
         return unchanged || state.instagramUsernameError != null || state.youtubeUsernameError != null
     }
 }

@@ -2,6 +2,7 @@ package com.nexters.boolti.presentation.screen.profileedit.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nexters.boolti.domain.model.Sns
 import com.nexters.boolti.domain.repository.AuthRepository
 import com.nexters.boolti.domain.repository.FileRepository
 import com.nexters.boolti.domain.repository.UserConfigRepository
@@ -41,6 +42,8 @@ class ProfileEditViewModel @Inject constructor(
                             thumbnail = user.photo.orEmpty(),
                             nickname = user.nickname,
                             introduction = user.introduction,
+                            instagramUsername = user.sns.usernameOf(Sns.SnsType.INSTAGRAM),
+                            youtubeUsername = user.sns.usernameOf(Sns.SnsType.YOUTUBE),
                             snsCount = user.sns.size,
                             videoCount = user.video.totalSize,
                             linkCount = user.link.totalSize,
@@ -58,10 +61,12 @@ class ProfileEditViewModel @Inject constructor(
         when (action) {
             ProfileEditAction.ClickBack -> _event.trySend(ProfileEditEvent.NavigateUp)
             is ProfileEditAction.SelectThumbnail -> changeThumbnail(action.imageUri)
-            ProfileEditAction.ClickNickname -> _event.trySend(ProfileEditEvent.NavigateToNicknameEdit)
-            ProfileEditAction.ClickUserCode -> _event.trySend(ProfileEditEvent.NavigateToUserCodeEdit)
-            ProfileEditAction.ClickIntroduction -> _event.trySend(ProfileEditEvent.NavigateToIntroductionEdit)
-            ProfileEditAction.ClickSns -> _event.trySend(ProfileEditEvent.NavigateToSnsEdit)
+            ProfileEditAction.ClickNickname -> _event.trySend(ProfileEditEvent.NavigateToNicknameEdit(uiState.value.nickname))
+            ProfileEditAction.ClickUserCode -> _event.trySend(ProfileEditEvent.NavigateToUserCodeEdit(uiState.value.userCode))
+            ProfileEditAction.ClickIntroduction -> _event.trySend(ProfileEditEvent.NavigateToIntroductionEdit(uiState.value.introduction))
+            ProfileEditAction.ClickSns -> _event.trySend(
+                ProfileEditEvent.NavigateToSnsEdit(uiState.value.instagramUsername, uiState.value.youtubeUsername)
+            )
             ProfileEditAction.ToggleUpcomingShows -> toggleVisibility {
                 userConfigRepository.setUpcomingShowVisible(!uiState.value.showUpcomingShows)
             }
@@ -96,3 +101,5 @@ class ProfileEditViewModel @Inject constructor(
         _event.send(ProfileEditEvent.ShowUnknownError)
     }
 }
+
+private fun List<Sns>.usernameOf(type: Sns.SnsType): String = firstOrNull { it.type == type }?.username.orEmpty()

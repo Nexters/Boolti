@@ -11,16 +11,19 @@ sealed interface ProfileRoute {
     data object ProfileEdit : ProfileRoute
 
     @Serializable
-    data object ProfileNicknameEdit : ProfileRoute
+    data class ProfileNicknameEdit(val nickname: String) : ProfileRoute
 
     @Serializable
-    data object ProfileUserCodeEdit : ProfileRoute
+    data class ProfileUserCodeEdit(val userCode: String) : ProfileRoute
 
     @Serializable
-    data object ProfileIntroduceEdit : ProfileRoute
+    data class ProfileIntroduceEdit(val introduction: String) : ProfileRoute
 
     @Serializable
-    data object ProfileSnsEdit : ProfileRoute
+    data class ProfileSnsEdit(
+        val instagramUsername: String,
+        val youtubeUsername: String,
+    ) : ProfileRoute
 
     @Serializable
     data class ProfileLinkEdit(

@@ -4,7 +4,6 @@ import com.nexters.boolti.domain.model.UserCode
 
 data class UserCodeEditUiState(
     val userCode: String = "",
-    val loading: Boolean = true,
     val checkingDuplicated: Boolean = false,
     val saving: Boolean = false,
     val showExitAlertDialog: Boolean = false,
@@ -19,7 +18,7 @@ data class UserCodeEditUiState(
         else -> null
     }
 
-    val saveEnabled: Boolean = userCodeError == null && !saving && !checkingDuplicated && !loading
+    val saveEnabled: Boolean = userCodeError == null && !saving && !checkingDuplicated
 }
 
 enum class UserCodeError {
@@ -40,5 +39,4 @@ sealed interface UserCodeEditAction {
 
 sealed interface UserCodeEditEvent {
     data object NavigateUp : UserCodeEditEvent
-    data object LoadFailed : UserCodeEditEvent
 }

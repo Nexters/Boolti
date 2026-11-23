@@ -74,10 +74,10 @@ import com.nexters.boolti.presentation.util.ObserveAsEvents
 @Composable
 fun ProfileEditScreen(
     navigateUp: () -> Unit,
-    navigateToNicknameEdit: () -> Unit,
-    navigateToUserCodeEdit: () -> Unit,
-    navigateToIntroductionEdit: () -> Unit,
-    navigateToSnsEdit: () -> Unit,
+    navigateToNicknameEdit: (nickname: String) -> Unit,
+    navigateToUserCodeEdit: (userCode: UserCode) -> Unit,
+    navigateToIntroductionEdit: (introduction: String) -> Unit,
+    navigateToSnsEdit: (instagramUsername: String, youtubeUsername: String) -> Unit,
     navigateToLinkEdit: (userCode: UserCode) -> Unit,
     navigateToVideoEdit: (userCode: UserCode) -> Unit,
     modifier: Modifier = Modifier,
@@ -94,10 +94,10 @@ fun ProfileEditScreen(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             ProfileEditEvent.NavigateUp -> navigateUp()
-            ProfileEditEvent.NavigateToNicknameEdit -> navigateToNicknameEdit()
-            ProfileEditEvent.NavigateToUserCodeEdit -> navigateToUserCodeEdit()
-            ProfileEditEvent.NavigateToIntroductionEdit -> navigateToIntroductionEdit()
-            ProfileEditEvent.NavigateToSnsEdit -> navigateToSnsEdit()
+            is ProfileEditEvent.NavigateToNicknameEdit -> navigateToNicknameEdit(event.nickname)
+            is ProfileEditEvent.NavigateToUserCodeEdit -> navigateToUserCodeEdit(event.userCode)
+            is ProfileEditEvent.NavigateToIntroductionEdit -> navigateToIntroductionEdit(event.introduction)
+            is ProfileEditEvent.NavigateToSnsEdit -> navigateToSnsEdit(event.instagramUsername, event.youtubeUsername)
             is ProfileEditEvent.NavigateToVideoEdit -> navigateToVideoEdit(event.userCode)
             is ProfileEditEvent.NavigateToLinkEdit -> navigateToLinkEdit(event.userCode)
             ProfileEditEvent.ShowUnknownError -> snackbarController.showMessage(unknownErrorMsg)

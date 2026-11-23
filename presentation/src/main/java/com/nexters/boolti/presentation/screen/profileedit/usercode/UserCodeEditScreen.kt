@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,13 +26,10 @@ import com.nexters.boolti.presentation.component.BTClearableTextField
 import com.nexters.boolti.presentation.component.BTDialog
 import com.nexters.boolti.presentation.component.BtAppBar
 import com.nexters.boolti.presentation.component.BtAppBarDefaults
-import com.nexters.boolti.presentation.component.BtCircularProgressIndicator
-import com.nexters.boolti.presentation.screen.LocalSnackbarController
 import com.nexters.boolti.presentation.theme.BooltiTheme
 import com.nexters.boolti.presentation.theme.Grey50
 import com.nexters.boolti.presentation.theme.marginHorizontal
 import com.nexters.boolti.presentation.util.ObserveAsEvents
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun UserCodeEditScreen(
@@ -43,16 +39,9 @@ fun UserCodeEditScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val snackbarController = LocalSnackbarController.current
-    val unknownErrorMsg = stringResource(R.string.message_unknown_error)
-
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             UserCodeEditEvent.NavigateUp -> navigateUp()
-            UserCodeEditEvent.LoadFailed -> {
-                snackbarController.showMessage(unknownErrorMsg)
-                navigateUp()
-            }
         }
     }
 
@@ -104,7 +93,6 @@ private fun UserCodeEditScreen(
                     .padding(top = 20.dp)
                     .padding(horizontal = marginHorizontal),
                 text = uiState.userCode,
-                enabled = !uiState.loading,
                 onValueChanged = { onAction(UserCodeEditAction.ChangeUserCode(it)) },
                 isError = uiState.userCodeError != null,
                 supportingText = uiState.userCodeError?.let {
@@ -137,16 +125,6 @@ private fun UserCodeEditScreen(
             )
         }
 
-        if (uiState.loading) {
-            BtCircularProgressIndicator(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .wrapContentSize(),
-                showDelay = 300.milliseconds,
-            )
-        }
-
         if (uiState.showExitAlertDialog) {
             BTDialog(
                 enableDismiss = true,
@@ -173,7 +151,7 @@ private fun UserCodeEditScreen(
 private fun UserCodeEditScreenPreview() {
     BooltiTheme {
         UserCodeEditScreen(
-            uiState = UserCodeEditUiState(userCode = "a1234", loading = false),
+            uiState = UserCodeEditUiState(userCode = "a1234"),
             onAction = {},
         )
     }

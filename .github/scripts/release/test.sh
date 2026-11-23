@@ -36,6 +36,7 @@ cat > "$WORK/bin/gh" << 'GH'
 echo "gh $*" >> "$GH_LOG"
 case "$*" in
   "api user"*) echo mangbaam ;;
+  "pr merge 7 --merge --admin"*) [ -z "${FAKE_ADMIN_FAIL:-}" ] || exit 1 ;;
   "pr list"*"--state all"*) [ -n "${FAKE_PR:-}" ] && echo "$FAKE_PR" ;;
   "pr list"*"--state open"*"--base main"*) echo 7 ;;
   "pr view"*) git rev-parse origin/main ;;
@@ -83,8 +84,15 @@ grep -q "main을 머지해" <<< "$OUT" || fail "main 머지 안내 없음"
 [ "$(git ls-remote origin refs/heads/release/1.15.0)" = "$BEFORE" ] || fail "브랜치가 바뀜"
 pass "핫픽스 선반영 시 멈춤"
 
-# 7. 머지된 뒤 finish 미리보기: 태그·Release·역머지 순서로 진행하고 아무것도 바꾸지 않는다
+# 7. 머지 전 finish 미리보기: 확인한 커밋일 때만 main에 바로 머지한다
 git push -q -f origin origin/release/1.15.0:main
+HEAD_SHA=$(git rev-parse origin/release/1.15.0)
+OUT=$(FAKE_PR="7 OPEN" $S/finish.sh release 1.15.0 2>&1) || { echo "$OUT"; fail "main 머지 미리보기 실패"; }
+grep -q -- "gh pr merge 7 --merge --admin --match-head-commit $HEAD_SHA (실패하면 --merge)" <<< "$OUT" ||
+  fail "main 머지 미리보기 형식이 다름"
+pass "main 머지 미리보기"
+
+# 머지된 뒤 finish 미리보기: 태그·Release·역머지 순서로 진행하고 아무것도 바꾸지 않는다
 OUT=$(FAKE_PR="7 MERGED" $S/finish.sh release 1.15.0 2>&1) || { echo "$OUT"; fail "finish 미리보기 실패"; }
 for step in "git tag -f -a v1.15.0" "release create v1.15.0" "--notes-start-tag v1.14.3" "backmerge/1.15.0" "--merge --admin" "title=1.16.0"; do
   grep -q -- "$step" <<< "$OUT" || fail "finish 미리보기에 '$step' 없음"
@@ -96,4 +104,12 @@ git push -q origin --delete release/1.15.0
 OUT=$($S/start.sh release 2>&1) && fail "역머지 전에 릴리즈가 시작됨"
 grep -q "역머지 PR을 먼저" <<< "$OUT" || fail "역머지 안내 없음"
 pass "역머지 전 릴리즈 시작 차단"
+
+# 9. main 바로 머지가 거절되면 일반 머지로 넘어간다
+git push -q origin "$HEAD_SHA:refs/heads/release/1.15.0"
+: > "$GH_LOG"
+FAKE_PR="7 OPEN" FAKE_ADMIN_FAIL=1 $S/finish.sh release 1.15.0 --apply > /dev/null 2>&1 || fail "finish 실행 실패"
+grep -qx "gh pr merge 7 --merge --admin --match-head-commit $HEAD_SHA" "$GH_LOG" || fail "바로 머지를 시도하지 않음"
+grep -qx "gh pr merge 7 --merge" "$GH_LOG" || fail "일반 머지로 넘어가지 않음"
+pass "바로 머지 실패 시 일반 머지"
 echo "모든 체크 통과"

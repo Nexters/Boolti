@@ -36,8 +36,19 @@ if [ "$STATE" = OPEN ]; then
     if $APPLY; then die "$msg"; else echo "  ⚠️ $msg"; fi
   fi
   info "PR #$PR main에 머지"
-  run gh pr merge "$PR" --merge
-  if $APPLY; then git fetch -q origin main; else MERGE_SHA="<머지 커밋>"; fi
+  # QA·CI를 거친 PR이라 승인을 기다리지 않고 바로 머지한다. 위에서 확인한 커밋일 때만 머지한다
+  # 관리자나 main 리뷰 예외(bypass)에 등록된 앱만 성공한다. 실패하면 일반 머지로 넘긴다
+  HEAD_SHA=$(git rev-parse "origin/$BRANCH")
+  if ! $APPLY; then
+    echo "  [미리보기] gh pr merge $PR --merge --admin --match-head-commit $HEAD_SHA (실패하면 --merge)"
+    MERGE_SHA="<머지 커밋>"
+  else
+    if ! gh pr merge "$PR" --merge --admin --match-head-commit "$HEAD_SHA"; then
+      echo "  ⚠️ 바로 머지하지 못했어요. 일반 머지를 시도해요"
+      gh pr merge "$PR" --merge
+    fi
+    git fetch -q origin main
+  fi
 fi
 MERGE_SHA=${MERGE_SHA:-$(gh pr view "$PR" --json mergeCommit -q .mergeCommit.oid)}
 

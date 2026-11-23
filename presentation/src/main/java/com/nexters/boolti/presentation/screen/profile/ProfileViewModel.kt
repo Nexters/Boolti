@@ -14,12 +14,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,12 +47,12 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(recordExceptionHandler) {
-            val othersUserCode = _userCode?.takeIf { it != authRepository.getUser().onFailure { Timber.e(it) }.getOrNull()?.userCode }
-            if (othersUserCode == null) {
+            val userCode = _userCode
+            if (userCode == null || userCode == authRepository.cachedUser.first()?.userCode) {
                 _uiState.update { it.copy(isMine = true) }
                 collectMyProfile()
             } else {
-                fetchOthersProfile(othersUserCode)
+                fetchOthersProfile(userCode)
             }
         }
     }

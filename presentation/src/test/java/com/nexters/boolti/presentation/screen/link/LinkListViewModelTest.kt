@@ -18,6 +18,7 @@ import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -42,7 +43,7 @@ class LinkListViewModelTest : DescribeSpec({
         savedStateHandle = SavedStateHandle().also {
             every { it.toRoute<LinkListRoute.LinkList>() } returns LinkListRoute.LinkList(userCode = "me", isEditMode = isEditMode)
         },
-        authRepository = mockk { coEvery { getUser(any()) } returns Result.success(User.My(id = "user", userCode = "me")) },
+        authRepository = mockk { every { cachedUser } returns flowOf(User.My(id = "user", userCode = "me")) },
         memberRepository = mockk<MemberRepository> {
             coEvery { getLinks(any()) } returns Result.success(links)
         },

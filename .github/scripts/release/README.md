@@ -11,12 +11,14 @@ AI 없이도 쓸 수 있어요. 스킬(`boolti-release-*`, `boolti-hotfix-*`)과
 
 ```
 start  → <kind>/<버전> 브랜치 + 버전 커밋 + main 대상 PR (QA 수정은 이 브랜치로 PR)
-finish → main 머지 → 태그 v<버전> → GitHub Release → backmerge/<버전> → develop PR 바로 머지 (권한이 없으면 자동 머지 예약)
+finish → main 바로 머지 (권한이 없으면 일반 머지) → 태그 v<버전> → GitHub Release → backmerge/<버전> → develop PR 바로 머지 (권한이 없으면 자동 머지 예약)
 cancel → 버전 커밋 하나만 있을 때 PR 닫기 + 브랜치·빈 마일스톤 삭제
 ```
 
 - versionCode는 `app/app-version.gradle`이 versionName에서 계산해요 (`major * 100000 + minor * 100 + patch`)
 - 실행 권한은 GitHub 브랜치 보호·Ruleset이 막아요. 권한이 없으면 push·머지 단계에서 GitHub이 거절해요
+- finish는 main·develop 머지에 리뷰 승인을 기다리지 않아요. 관리자나 리뷰 예외(bypass)에 등록된 `boolti-release` 앱이 실행할 때만 바로 머지돼요
+- QA 수정 PR(`release/**`, `hotfix/**` 대상)에도 PR CI가 돌아요
 
 ## 준비 (처음 한 번)
 

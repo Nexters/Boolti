@@ -2,7 +2,7 @@ name: Android Pull Request CI
 
 on:
   pull_request:
-    branches: [ develop, 'feature/**' ]
+    branches: [ develop, 'feature/**', 'release/**', 'hotfix/**' ]
     paths-ignore:
       - '**.md'
       - 'docs/**'
